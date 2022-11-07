@@ -26,15 +26,15 @@ export const removeTaskCommit = async (body) => {
 };
 
 export const redeployTask = async (body) => {
-  return await request.post("/api/dispatch/redeploy", body);
+  return await request.post("/api/flow/dispatch/redeploy", body);
 };
 
 export const manualDeployApp = async (body) => {
-  return await request.post('/api/dispatch/manual', body);
+  return await request.post('/api/flow/dispatch/manual', body);
 };
 
 export const cancelDeployTask = async (body) => {
-  return await request.post('/api/dispatch/cancel', body);
+  return await request.post('/api/flow/dispatch/cancel', body);
 };
 
 
