@@ -1,0 +1,32 @@
+edition: 1.0.0
+name: serverless-cd
+access: {{ access }}
+
+services:
+  ui:
+    component: cd-generate
+    props:
+      serviceName: {{ serviceName }}
+      dbPrefix: {{ dbPrefix }}
+      REGION: {{ region }}
+      OSS_BUCKET: {{ ossBukect }}
+      OTS_INSTANCE_NAME: {{ instanceName }}
+      DOMAIN: {{ domain }}
+      CD_PIPLINE_YAML: {{ cdPipLineYaml }}
+
+      OTS_TASK_TABLE_NAME: task
+      OTS_USER_TABLE_NAME: user
+      OTS_APP_TABLE_NAME: application
+      OTS_TOKEN_TABLE_NAME: token
+      OTS_SESSION_TABLE_NAME: session
+      OTS_TASK_INDEX_NAME: task_index
+      OTS_USER_INDEX_NAME: user_index
+      OTS_APP_INDEX_NAME: application_index
+      OTS_TOKEN_INDEX_NAME: token_index
+      SESSION_EXPIRATION: 5184000000
+      DOWNLOAD_CODE_DIR: /tmp/code
+      ACCOUNTID: # ACCOUNTID ACCESS_KEY_ID ACCESS_KEY_SECRET 全部填写才会生效
+      ACCESS_KEY_ID: 
+      ACCESS_KEY_SECRET: 
+      GITHUB_CLIENT_ID: 
+      GITHUB_CLIENT_SECRET: 

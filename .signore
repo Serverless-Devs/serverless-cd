@@ -1,0 +1,6 @@
+__test__
+node_modules
+src/example
+.ice
+.env
+.s

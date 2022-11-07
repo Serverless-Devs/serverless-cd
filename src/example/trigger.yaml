@@ -1,0 +1,38 @@
+extend: ./s.base.yaml
+
+services:
+  trigger:
+    component: fc
+    props:
+      region: ${vars.region}
+      service: ${vars.service}
+      function:
+        name: ${vars.trigerFunctionName}
+        description: 用于验证 CD的触发方式、请求的合法性以及组装一些 worker 函数需要的内容
+        runtime: nodejs14
+        codeUri: ../trigger
+        handler: index.handler
+        memorySize: 640
+        timeout: 12
+        instanceConcurrency: 20
+        environmentVariables:
+          REGION: ${vars.region}
+          SERVICE_NAME: ${vars.service.name}
+          WORKER_FUNCTION_NAME: ${vars.workerFunctionName} # worker 函数的名称
+          CD_PIPLINE_YAML: ${env.CD_PIPLINE_YAML}
+          ACCOUNTID: ${env.ACCOUNTID}
+          ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
+          ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
+          OTS_INSTANCE_NAME: ${env.OTS_INSTANCE_NAME}
+          OTS_USER_TABLE_NAME: ${env.OTS_USER_TABLE_NAME}
+          OTS_USER_INDEX_NAME: ${env.OTS_USER_INDEX_NAME}
+          OTS_APP_TABLE_NAME: ${env.OTS_APP_TABLE_NAME}
+          OTS_APP_INDEX_NAME: ${env.OTS_APP_INDEX_NAME}
+      triggers:
+        - name: http-trigger
+          type: http
+          config:
+            authType: anonymous
+            methods:
+              - POST
+  

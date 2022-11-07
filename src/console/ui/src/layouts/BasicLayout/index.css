@@ -1,0 +1,20 @@
+.user-menu {
+  width: 225px;
+  box-shadow: 0px 4px 8px rgba(0,0,0,.12);
+}
+/* .user-menu .next-menu-item {
+  line-height: 100% !important;
+} */
+.user-menu .next-menu-item .next-menu-item-inner {
+  height: 35px;
+}
+.user-menu .next-menu-item .next-menu-item-inner .next-menu-item-text {
+  line-height: 35px;
+}
+.user-name{
+  font-weight: 500;
+  font-size: 16px;
+}
+.user-email {
+  color: #6e7c88;
+}

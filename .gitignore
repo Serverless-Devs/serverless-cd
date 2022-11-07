@@ -1,0 +1,11 @@
+node_modules
+.env
+.s
+.DS_Store
+
+_mock
+logs
+__test__
+**/ui/build
+.ice
+**.log

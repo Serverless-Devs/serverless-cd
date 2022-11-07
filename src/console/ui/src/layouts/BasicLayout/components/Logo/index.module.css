@@ -1,0 +1,14 @@
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 32px;
+}
+
+.logo:visited,
+.logo:link {
+  color: #000;
+}

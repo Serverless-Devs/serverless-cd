@@ -1,0 +1,19 @@
+.github-btn {
+  border-color: #24292e !important;
+  background: #24292e !important;
+  color: #fff !important;
+
+}
+
+.github-btn:hover {
+  background: #555 !important;
+}
+.session-container {
+  background: #fff;
+  max-width: 400px;
+  padding: 20px 40px 40px 40px;
+  text-align: center;
+  margin: 80px auto;
+  border-radius: 5px;
+  box-shadow: -2px 4px 26px 0 rgb(0 0 0 / 10%);
+}

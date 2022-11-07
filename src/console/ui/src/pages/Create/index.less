@@ -1,0 +1,81 @@
+.appliaction-create-container {
+  background: #fff;
+  padding: 16px 24px;
+
+  .application-type-select {
+    &-content {
+      margin-right: -8px;
+      margin-left: -8px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(277px, 349px));
+
+      &-card {
+        position: relative;
+        margin: 8px;
+        height: 112px; //  144px;
+
+        &:hover {
+          background-color: #f7f9fa;
+          box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16);
+        }
+
+        &.active {
+          border-color: #c0c6cc;
+          border-radius: 2px;
+          background-color: #eff3f8;
+        }
+
+        &.disabled {
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+  .env-container{
+    .env-value{
+      position: relative;
+    }
+    .next-input-inner.next-before{
+      padding-left: 16px;
+      color: #555;
+    }
+  }
+}
+
+.icon-right .next-menu .next-menu-icon-selected.next-icon.next-menu-icon-right{
+  right: unset;
+}
+
+.create-submit-step {
+  .next-step-item {
+    &-finish,
+    &-process,
+    &-wait {
+      .next-step-item-body {
+        margin-left: 4px !important;
+        padding-bottom: 10px;
+        .next-step-item-title {
+          color: var(--color-text1-9, #333);
+        }
+        .next-step-item-content {
+          color: #888;
+        }
+      }
+      .next-step-item-tail {
+        margin: 0 auto !important;
+        .next-step-item-tail-overlay {
+          background-color: #888;
+        }
+      }
+    }
+    .next-icon-success {
+      color: rgba(0, 158, 100, 1);
+    }
+    .next-icon-error {
+      color: red;
+    }
+    .next-icon-loading {
+      color: #888;
+    }
+  }
+}

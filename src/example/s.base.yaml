@@ -1,0 +1,28 @@
+edition: 1.0.0
+name: serverless-cd
+access: dankun
+
+vars:
+  region: ${env.REGION}
+  service:
+    name: serverless-cd
+    description: Serverless-cd 应用
+    logConfig: auto
+  trigerFunctionName: trigger
+  workerFunctionName: worker
+  uiFunctionName: ui
+  adminFunctionName: admin
+
+  httpTriggerAll:
+    name: http-trigger
+    type: http
+    config:
+      authType: anonymous
+      methods:
+        - HEAD
+        - DELETE
+        - POST
+        - GET
+        - OPTIONS
+        - PUT
+        - PATCH
