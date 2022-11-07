@@ -6,6 +6,6 @@ node_modules
 _mock
 logs
 __test__
-**/ui/build
+
 .ice
 **.log
