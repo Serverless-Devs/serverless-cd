@@ -8,9 +8,11 @@ jobs:
   serverless-devs-cd:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: file_changes
-        uses: tj-actions/changed-files@v14.5
+        uses: tj-actions/changed-files@v34
         id: console-ui-changed
         with:
           files: |
