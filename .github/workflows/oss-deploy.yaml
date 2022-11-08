@@ -2,7 +2,8 @@ name: Serverless Devs Project CI/CD
 
 on:
   push:
-    branches: [main]
+    tags:
+      - release-*
 
 jobs:
   serverless-devs-cd:
@@ -11,12 +12,6 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: file_changes
-        uses: tj-actions/changed-files@v34
-        id: console-ui-changed
-        with:
-          files: |
-            src/console/ui/**
       - uses: actions/setup-node@v2
         with:
           node-version: 16
