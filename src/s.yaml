@@ -76,27 +76,27 @@ services:
           maxAsyncRetryAttempts: 0
           statefulInvocation: true
 
-  ui:
-    component: fc
-    actions:
-      pre-deploy:
-    #     - run: npm install && npm run build # 需要 node 版本 16+
-    #       path: "./console/ui"
-        - plugin: website-fc
-    props:
-      region: ${vars.region}
-      service: ${vars.service}
-      function:
-        name: ${vars.uiFunctionName}
-        description: serverless-cd 前端应用
-        runtime: nodejs14
-        codeUri: ./console/ui/build
-        handler: index.handler
-        memorySize: 640
-        timeout: 12
-        instanceConcurrency: 20
-      triggers:
-        - ${vars.httpTriggerAll}
+  # ui:
+  #   component: fc
+  #   actions:
+  #     pre-deploy:
+  #   #     - run: npm install && npm run build # 需要 node 版本 16+
+  #   #       path: "./console/ui"
+  #       - plugin: website-fc
+  #   props:
+  #     region: ${vars.region}
+  #     service: ${vars.service}
+  #     function:
+  #       name: ${vars.uiFunctionName}
+  #       description: serverless-cd 前端应用
+  #       runtime: nodejs14
+  #       codeUri: ./console/ui/build
+  #       handler: index.handler
+  #       memorySize: 640
+  #       timeout: 12
+  #       instanceConcurrency: 20
+  #     triggers:
+  #       - ${vars.httpTriggerAll}
   
   admin:
     component: fc
@@ -162,9 +162,9 @@ services:
         domainName: ${env.DOMAIN}
         protocol: HTTP
         routeConfigs:
+          # - path: /*
+          #   serviceName: ${vars.service.name}
+          #   functionName: ${vars.uiFunctionName}
           - path: /*
-            serviceName: ${vars.service.name}
-            functionName: ${vars.uiFunctionName}
-          - path: /api/*
             serviceName: ${vars.service.name}
             functionName: ${vars.adminFunctionName}

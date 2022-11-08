@@ -35,6 +35,8 @@ const options = {
 app.use(express.raw());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(function (req, res, next) {
   if (_.isEmpty(req.headers.cd_token)) {
     cookieParser()(req, res, next);
@@ -84,6 +86,8 @@ app.use(async function (req, res, next) {
     next();
   }
 });
+
+app.use('/', require('./routes'));
 
 app.use('/api', require('./routes'));
 

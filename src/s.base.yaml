@@ -10,7 +10,7 @@ vars:
     logConfig: auto
   trigerFunctionName: trigger
   workerFunctionName: worker
-  uiFunctionName: ui
+  # uiFunctionName: ui
   adminFunctionName: admin
 
   httpTriggerAll:

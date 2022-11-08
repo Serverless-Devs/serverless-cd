@@ -2,7 +2,7 @@ Type: Application
 Name: serverless-cd
 Provider:
   - 阿里云
-Version: 0.0.14
+Version: 0.0.15
 Description: test
 HomePage: https://github.com/serverless-cd/serverless-cd
 Tags:
