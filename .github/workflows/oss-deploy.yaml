@@ -3,7 +3,7 @@ name: Serverless Devs Project CI/CD
 on:
   push:
     tags:
-      - release-*
+      - release/*
 
 jobs:
   serverless-devs-cd:
