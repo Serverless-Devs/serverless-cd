@@ -14,7 +14,7 @@ jobs:
         id: console-ui-changed
         with:
           files: |
-            console/ui/**
+            src/console/ui/**
       - uses: actions/setup-node@v2
         with:
           node-version: 16
