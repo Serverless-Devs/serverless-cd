@@ -4,7 +4,7 @@ async function preInit(inputObj) {
   if (process.env["CLI_VERSION"] < "2.1.7") {
     logger.log(
       'Please upgrade the CLI version to 2.1.7 or above, and you can execute the command "npm i @serverless-devs/s -g --registry=https://registry.npmmirror.com" to upgrade.',
-      "yellow"
+      "red"
     );
   }
 }
@@ -22,15 +22,15 @@ async function postInit(inputObj) {
       syaml,
       method: "generate",
     });
+    console.log(`
+    \n Cloud resource creation is complete
+    \n Execute the command " s deploy " and enjoy!
+    `);
   } catch (ex) {
     const logger = new inputObj.Logger("");
     logger.log(`\nGenerate resource error: ${ex.message}\n`, "red");
-    logger.log(`\nPlease use 's generate -t ${syaml}' try again\n`, "yellow");
+    logger.log(`\nPlease use 's generate -t ${syaml}' try again\n`, "red");
   }
-  console.log(`
-  \n Cloud resource creation is complete
-  \n Execute the command " s deploy " and enjoy!
-  `);
 }
 
 module.exports = {
