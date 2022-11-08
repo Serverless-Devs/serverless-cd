@@ -3,7 +3,7 @@ async function preInit(inputObj) {
   const logger = new inputObj.Logger("");
   if (process.env["CLI_VERSION"] < "2.1.7") {
     logger.log(
-      'Please upgrade the CLI version to 2.1.7 or above, and you can execute the command "npm i @serverless-devs/s -g" to upgrade.',
+      'Please upgrade the CLI version to 2.1.7 or above, and you can execute the command "npm i @serverless-devs/s -g --registry=https://registry.npmmirror.com" to upgrade.',
       "yellow"
     );
   }
