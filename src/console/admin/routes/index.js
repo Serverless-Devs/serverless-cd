@@ -1,12 +1,13 @@
 const router = require("express").Router();
 const { generateErrorResult } = require('../util');
 
-router.use("/application", require("./application"));
-router.use("/task", require("./task"));
+router.use("/flow/application", require("./application"));
+router.use("/flow/task", require("./task"));
+router.use("/flow/dispatch", require("./dispatch"));
+
 router.use("/github", require("./github"));
 router.use("/auth", require("./auth"));
 router.use("/user", require("./user"));
-router.use("/dispatch", require("./dispatch"));
 router.use("/tokens", require("./tokens"));
 
 router.use(function (err, _req, res, next) {

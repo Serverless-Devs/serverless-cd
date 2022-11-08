@@ -1,0 +1,1 @@
+import{R as r}from"./index.js";import{c as t}from"./index7.js";var e=function(){return e=Object.assign||function(r){for(var t,e=1,n=arguments.length;e<n;e++)for(var o in t=arguments[e])Object.prototype.hasOwnProperty.call(t,o)&&(r[o]=t[o]);return r},e.apply(this,arguments)},n,o=r.forwardRef((function(n,o){return r.createElement(t,e({spacing:8},n,{ref:o}))}));export{o as B};
