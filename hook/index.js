@@ -16,7 +16,12 @@ async function postInit(inputObj) {
   console.log(`
     \n Cloud resources are being created...
     `);
-
+  const logger = new inputObj.Logger("");
+  
+  if(process.env["CLI_VERSION"] < "2.1.7") {
+    return logger.log(`\nPlease run exec " generate -t ${syaml} " init cloud resources \n`, "red");
+  }
+  
   try {
     await inputObj.execCommand({
       syaml,
@@ -27,7 +32,6 @@ async function postInit(inputObj) {
     \n Execute the command " s deploy " and enjoy!
     `);
   } catch (ex) {
-    const logger = new inputObj.Logger("");
     logger.log(`\nGenerate resource error: ${ex.message}\n`, "red");
     logger.log(`\nPlease use 's generate -t ${syaml}' try again\n`, "red");
   }
