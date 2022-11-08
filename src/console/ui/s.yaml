@@ -1,0 +1,20 @@
+edition: 1.0.0
+access: "serverless-devs"
+
+services:
+  website-starter:
+    component: oss
+    actions:
+      pre-deploy:
+        - run: npm install --registry=https://registry.npmmirror.com
+          path: ./
+        - run: npm run build
+          path: ./
+    props:
+      bucket: "serverless-cd-hongkong-website"
+      codeUri: ./build
+      acl: public-read
+      region: cn-hongkong
+      website:
+        index: index.html
+        subDirType: index

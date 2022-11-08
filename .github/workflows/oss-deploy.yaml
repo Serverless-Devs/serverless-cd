@@ -1,0 +1,29 @@
+name: Serverless Devs Project CI/CD
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  serverless-devs-cd:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: file_changes
+        uses: tj-actions/changed-files@v14.5
+        id: console-ui-changed
+        with:
+          files: |
+            console/ui/**
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+      - run: npm install -g @serverless-devs/s  --registry=https://registry.npmmirror.com
+      - run: s config add --AccountID ${{secrets.ALIYUN_ACCOUNT_ID}}  --AccessKeyID ${{secrets.ALIYUN_ACCESS_KEY_ID}}  --AccessKeySecret ${{secrets.ALIYUN_ACCESS_KEY_SECRET}} -a serverless-devs -f
+      - name: deploy serverless devs
+        env:
+          ACCESS_KEY_ID: ${{secrets.ALIYUN_ACCESS_KEY_ID}}
+          ACCESS_KEY_SECRET: ${{secrets.ALIYUN_ACCESS_KEY_ID}}
+        run: s deploy --use-local -y
+        working-directory: ./src/ui
