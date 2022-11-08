@@ -3,7 +3,7 @@
 
 <description>
 
-> ***快速部署一个基于Serverless架构的CICD流水线系统***
+> ***快速部署一个基于Serverless 架构上的轻量级、易拓展、前端友好的 CI/CD框架**
 
 </description>
 
@@ -49,6 +49,7 @@
 
 - 通过 [Serverless Devs Cli](https://www.serverless-devs.com/serverless-devs/install) 进行部署：
     - [安装 Serverless Devs Cli 开发者工具](https://www.serverless-devs.com/serverless-devs/install) ，并进行[授权信息配置](https://www.serverless-devs.com/fc/config) ；
+    注意： CLI版本需要大于 `2.1.7`
     - 初始化项目：`s init serverless-cd -d serverless-cd`   
     - 进入项目，并进行项目部署：`cd serverless-cd && s deploy -y`
 
@@ -57,44 +58,9 @@
 <appdetail id="flushContent">
 
 # 应用详情
+Serverless-cd 是一款基于 Serverless Devs 开发者工具打造，运行在 Serverless 架构上的轻量级、易拓展、前端友好的 CI/CD框架。通过 Serverless-cd，开发者可以快速打造高性能、低成本的 Serverless CI/CD 能力，并对建设私有化的 Serverless 应用管理平台提供帮助。
 
-本项目的希望将宝塔面板的大部分能力在云函数上实现，让使用者能一键部署面板、创建网站并签发 HTTPS 证书，体验到使用云函数的种种优势：无需固定的服务器费用，网站之间相互隔离，自动扩容等。项目仍处于 DEMO 阶段，当前已具备完整的网站创建、管理和证书签发能力。
 
-一键成功部署后， 会生成两个 url， 其中:
-
-- **宝塔面板的 url 为:**
-
-  `http://baota.baota.123456789.cn-hangzhou.fc.devsapp.net`
-
-  账号为 admin， 密码为您部署应用时设置的密码， 默认为 passwd
-
-  1. 新建一个网站
-  ![demo](https://img.alicdn.com/imgextra/i1/O1CN01AckOp31nfB3cKsA8p_!!6000000005116-0-tps-3048-1336.jpg)
-  2. 网站设置
-  ![](https://img.alicdn.com/imgextra/i3/O1CN01wPYWkZ1FhkLUjLn5p_!!6000000000519-0-tps-2630-1498.jpg)
-  3. 管理网站工程
-  ![](https://img.alicdn.com/imgextra/i1/O1CN01CFQl5L1t6GZ0evBMY_!!6000000005852-0-tps-2394-650.jpg)
-
-- **kodbox的 url 为:**
-  
-  `http://kodbox.baota.123456789.cn-hangzhou.fc.devsapp.net`
-
-  1. 部署成功后， 打开 domain url 地址，按照安装指引完整安装（数据库配置选择 PDO），就得到一个 web 版 windows 用户体验的文件管理系统。
- ![](https://img.alicdn.com/imgextra/i2/O1CN01KkJoBE1PbT2w3zmxb_!!6000000001859-2-tps-1034-832.png)
-  2. 快捷进入 NAS 根目录管理, 在地址栏输入 `/mnt/auto` （建议添加到收藏）， 即可以实现对 web 工程目录文件管理
-  ![](https://img.alicdn.com/imgextra/i1/O1CN013QtzXr1HCGK5I5qh7_!!6000000000721-2-tps-1280-712.png)
-  3. 其他 Tips:
-   - 进入管理页面后，可以点击左上角的 kod 图标从管理页面返回首页。
-   - 如果升级提醒，一般建议直接忽视。
-
-  宝塔面板也可以上传编辑 web 目录文件， 但是能力不强，可以使用 kodbox 完成对 web 工程目录文件更好的管理
-
-项目核心使用到的开源项目有：
-
-- [Serverless Devs](http://www.serverless-devs.com): Serverless 应用全生命周期管理工具
-- [mdserver-web](https://github.com/midoks/mdserver-web): 一款简单 Linux 面板服务，使用 BT.CN 的后台管理界面，运行环境为 Python3
-- [kodbox](https://github.com/kalcaddle/kodbox): 一个 NAS+OSS UI文件管理系统，详情见 [start-fc-kodbox](https://github.com/devsapp/start-fc-kodbox)
-- [acme.sh](https://acme.sh): 自动化签发免费 HTTPS 证书
 
 </appdetail>
 
