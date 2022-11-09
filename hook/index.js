@@ -12,7 +12,7 @@ async function preInit(inputObj) {
 }
 
 async function postInit(inputObj) {
-  inputObj.artTemplate("s.base.yaml");
+  inputObj.artTemplate("s.yaml");
   inputObj.artTemplate("generate.yaml");
   const syaml = path.join(inputObj.targetPath, "generate.yaml");
   console.log(`
