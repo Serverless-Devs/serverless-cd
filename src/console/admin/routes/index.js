@@ -1,6 +1,10 @@
 const router = require("express").Router();
 const { generateErrorResult } = require('../util');
 
+router.get('/', function(req, res, next) {
+  res.render('index', { title: 'Express' });
+});
+
 router.use("/flow/application", require("./application"));
 router.use("/flow/task", require("./task"));
 router.use("/flow/dispatch", require("./dispatch"));

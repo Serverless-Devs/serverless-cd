@@ -1,9 +1,11 @@
 const path = require('path');
 const fs = require('fs');
 const envPath = path.join(__dirname, '..', '..', '.env');
+console.log(envPath, fs.existsSync(envPath))
 if (fs.existsSync(envPath)) {
   require('dotenv').config({ path: envPath });
 }
+console.log(process.env)
 const express = require('express');
 require('express-async-errors');
 const createError = require('http-errors');
@@ -32,10 +34,13 @@ const options = {
   expiration: Number(SESSION_EXPIRATION),
 };
 
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 app.use(express.raw());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/', require('./routes'));
 
 app.use(function (req, res, next) {
   if (_.isEmpty(req.headers.cd_token)) {
@@ -87,9 +92,10 @@ app.use(async function (req, res, next) {
   }
 });
 
-app.use('/', require('./routes'));
-
 app.use('/api', require('./routes'));
+
+// fallback
+app.use('/*', require('./routes'));
 
 app.use(function (req, _res, next) {
   next(createError(404, `接口没有找到 ${req.path}`));

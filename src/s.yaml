@@ -1,20 +1,33 @@
-extend: ./s.base.yaml
+edition: 1.0.0
+name: serverless-cd
+access: {{ access }}
+
+vars:
+  region: ${env.REGION}
+  service:
+    name: {{ serviceName }}
+    description: Serverless-cd 应用
+    logConfig: auto
+  masterFunctionName: master
+  workerFunctionName: worker
+  adminFunctionName: admin
+
 
 services:
-  trigger:
+  master:
     component: fc
     actions:
       pre-deploy:
         - run: npm install --registry=https://registry.npmmirror.com
-          path: "./trigger"
+          path: "./master"
     props:
       region: ${vars.region}
       service: ${vars.service}
       function:
-        name: ${vars.trigerFunctionName}
+        name: ${vars.masterFunctionName}
         description: 用于验证 CD的触发方式、请求的合法性以及组装一些 worker 函数需要的内容
         runtime: nodejs14
-        codeUri: ./trigger
+        codeUri: ./master
         handler: index.handler
         memorySize: 640
         timeout: 12
@@ -75,28 +88,6 @@ services:
           maxAsyncEventAgeInSeconds: 456
           maxAsyncRetryAttempts: 0
           statefulInvocation: true
-
-  # ui:
-  #   component: fc
-  #   actions:
-  #     pre-deploy:
-  #   #     - run: npm install && npm run build # 需要 node 版本 16+
-  #   #       path: "./console/ui"
-  #       - plugin: website-fc
-  #   props:
-  #     region: ${vars.region}
-  #     service: ${vars.service}
-  #     function:
-  #       name: ${vars.uiFunctionName}
-  #       description: serverless-cd 前端应用
-  #       runtime: nodejs14
-  #       codeUri: ./console/ui/build
-  #       handler: index.handler
-  #       memorySize: 640
-  #       timeout: 12
-  #       instanceConcurrency: 20
-  #     triggers:
-  #       - ${vars.httpTriggerAll}
   
   admin:
     component: fc
@@ -108,7 +99,7 @@ services:
           args:
             region: ${vars.region}
             serviceName: ${vars.service.name}
-            functionName: ${vars.trigerFunctionName}
+            functionName: ${vars.masterFunctionName}
             envKey: WEBHOOKURL
     props:
       region: ${vars.region}
@@ -152,7 +143,18 @@ services:
           OTS_TOKEN_INDEX_NAME: ${env.OTS_TOKEN_INDEX_NAME}
           SESSION_EXPIRATION: ${env.SESSION_EXPIRATION}
       triggers:
-        - ${vars.httpTriggerAll}
+        - name: http-trigger
+          type: http
+          config:
+            authType: anonymous
+            methods:
+              - HEAD
+              - DELETE
+              - POST
+              - GET
+              - OPTIONS
+              - PUT
+              - PATCH
   
   compose:
     component: fc-domain
@@ -162,9 +164,6 @@ services:
         domainName: ${env.DOMAIN}
         protocol: HTTP
         routeConfigs:
-          # - path: /*
-          #   serviceName: ${vars.service.name}
-          #   functionName: ${vars.uiFunctionName}
           - path: /*
             serviceName: ${vars.service.name}
             functionName: ${vars.adminFunctionName}
