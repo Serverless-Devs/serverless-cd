@@ -13,9 +13,9 @@
 需要开通的产品：
 
 - [函数计算FC](https://fcnext.console.aliyun.com/)：整个系统的计算能力运行在FC上
-- [日志服务SLS](https://sls.console.aliyun.com/)：分布式日志存储服务，更好的定位和发现问题
+- [日志服务SLS](https://sls.console.aliyun.com/)：分布式日志存储服务，用于定位和发现问题
 - [对象存储OSS](https://oss.console.aliyun.com/)：用于存储日志信息
-- [表格存储Tablestore](https://otsnext.console.aliyun.com/): 应用和任务的云数据信息存储
+- [表格存储Tablestore](https://otsnext.console.aliyun.com/): 应用和任务的元数据信息存储
 
 
 推荐您拥有以下的产品权限 / 策略：
@@ -32,7 +32,7 @@
 
 # 代码 & 预览
 
-- [:smiley_cat: 源代码](https://github.com/devsapp/Serverless-Baota)
+- [:smiley_cat: 源代码](https://github.com/Serverless-Devs/serverless-cd)
         
 </codepre>
 
