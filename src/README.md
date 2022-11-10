@@ -60,6 +60,39 @@
 # 应用详情
 Serverless-cd 是一款基于 Serverless Devs 开发者工具打造，运行在 Serverless 架构上的轻量级、易拓展、前端友好的 CI/CD框架。通过 Serverless-cd，开发者可以快速打造高性能、低成本的 Serverless CI/CD 能力，并对建设私有化的 Serverless 应用管理平台提供帮助。
 
+部署完成后会生成一个对应的测试域名，格式为`auto.serverless-cd.${uid}.{region}.fc.devsapp.net`
+<a name="h4bK9"></a>
+## 快速体验
+<a name="IvtR1"></a>
+#### 访问控制台： 
+`auto.serverless-cd.${uid}.{region}.fc.devsapp.net`
+<a name="wU2X0"></a>
+#### 创建应用：
+
+   - 添加授权<br />![image.png](https://cdn.nlark.com/yuque/0/2022/png/22111491/1668063809412-b0292502-aff4-4397-9eae-404b440e65a5.png#averageHue=%23fafafa&clientId=uf225b962-d843-4&crop=0&crop=0&crop=1&crop=1&from=paste&height=696&id=Oy3Wp&margin=%5Bobject%20Object%5D&name=image.png&originHeight=1392&originWidth=2346&originalType=binary&ratio=1&rotation=0&showTitle=false&size=223792&status=done&style=none&taskId=ue681ad6b-848b-4d5f-a13c-418056e4507&title=&width=1173)
+
+![image.png](https://cdn.nlark.com/yuque/0/2022/png/22111491/1668063886561-b378b5e3-44a9-4aa4-b2a2-00c763b74ba5.png#averageHue=%23f7f7f7&clientId=uf225b962-d843-4&crop=0&crop=0&crop=1&crop=1&from=paste&height=279&id=sBA9W&margin=%5Bobject%20Object%5D&name=image.png&originHeight=558&originWidth=1220&originalType=binary&ratio=1&rotation=0&showTitle=false&size=52766&status=done&style=none&taskId=u1aa146d9-1996-4864-bae4-8ac3fedde86&title=&width=610)
+
+   - 获取Token<br />在对应[GitHub setting](https://github.com/settings/tokens)页面，添加个人Token，并填入
+
+![s_token.gif](https://cdn.nlark.com/yuque/0/2022/gif/22111491/1668064404553-2bb7835b-1257-4ad1-bfff-a579b1133083.gif#averageHue=%23000000&clientId=uf225b962-d843-4&crop=0&crop=0&crop=1&crop=1&from=drop&id=uf0089dd3&margin=%5Bobject%20Object%5D&name=s_token.gif&originHeight=680&originWidth=1161&originalType=binary&ratio=1&rotation=0&showTitle=false&size=951606&status=done&style=none&taskId=uaf1d2c4a-bae2-4fd2-ba17-c953282831e&title=)
+
+   - 导入应用:
+      - 选择nodejs模版应用: [https://github.com/serverless-cd-demo/nodejs-ci](https://github.com/serverless-cd-demo/nodejs-ci)，并fork到当前账号
+
+![s_demo.gif](https://cdn.nlark.com/yuque/0/2022/gif/22111491/1668064760983-0a45cac3-ff0e-4794-b622-c642fc9d3d02.gif#averageHue=%23000000&clientId=uf225b962-d843-4&crop=0&crop=0&crop=1&crop=1&from=drop&height=364&id=Nmi1M&margin=%5Bobject%20Object%5D&name=s_demo.gif&originHeight=663&originWidth=1161&originalType=binary&ratio=1&rotation=0&showTitle=false&size=1774659&status=done&style=none&taskId=u123abe95-418b-4b53-9569-43cfd41a64c&title=&width=638)
+
+   - 创建应用
+
+![image.png](https://cdn.nlark.com/yuque/0/2022/png/22111491/1668064987688-8b202fc0-174a-4e26-a0c8-f012691aba40.png#averageHue=%23faf8f8&clientId=uf225b962-d843-4&crop=0&crop=0&crop=1&crop=1&from=paste&height=424&id=u4edae3f6&margin=%5Bobject%20Object%5D&name=image.png&originHeight=1524&originWidth=2346&originalType=binary&ratio=1&rotation=0&showTitle=false&size=222266&status=done&style=none&taskId=ucbe35cf0-160a-4f5a-be93-414e08c0bcf&title=&width=652)
+
+3. 查看应用详情
+
+可以看到刚创建的应用已经触发部署<br />![image.png](https://cdn.nlark.com/yuque/0/2022/png/22111491/1668065107301-8a32ca13-a302-43a7-8ffa-38a6b1816558.png#averageHue=%23fafafa&clientId=uf225b962-d843-4&crop=0&crop=0&crop=1&crop=1&from=paste&height=687&id=u177f3e1f&margin=%5Bobject%20Object%5D&name=image.png&originHeight=1374&originWidth=1984&originalType=binary&ratio=1&rotation=0&showTitle=false&size=128563&status=done&style=none&taskId=u968b97fa-8998-4265-8017-7182a176bff&title=&width=992)<br />并且可以看到详细的部署日志信息<br />![image.png](https://cdn.nlark.com/yuque/0/2022/png/22111491/1668065144073-2952541b-c2f2-4e45-b3fe-9459622ec937.png#averageHue=%23999999&clientId=uf225b962-d843-4&crop=0&crop=0&crop=1&crop=1&from=paste&height=541&id=u3f634eda&margin=%5Bobject%20Object%5D&name=image.png&originHeight=1082&originWidth=2004&originalType=binary&ratio=1&rotation=0&showTitle=false&size=99798&status=done&style=none&taskId=ue3646785-81e4-4822-87ba-980ec8ce34c&title=&width=1002)
+
+<a name="hZVXq"></a>
+#### webhook触发部署
+修改代码并且提交，查看自动化执行部署构建流程<br />![s_redeploy.gif](https://cdn.nlark.com/yuque/0/2022/gif/22111491/1668065492165-0210010f-1138-4b89-9f7a-1ca0036d1f73.gif#averageHue=%23000000&clientId=uc43ce293-3493-4&crop=0&crop=0&crop=1&crop=1&from=drop&id=udae1dff0&margin=%5Bobject%20Object%5D&name=s_redeploy.gif&originHeight=682&originWidth=1161&originalType=binary&ratio=1&rotation=0&showTitle=false&size=2127570&status=done&style=none&taskId=u85188504-47be-4bf9-afe2-7141a04bea6&title=)
 
 
 </appdetail>
