@@ -11,7 +11,7 @@
   "dependencies": {
     "@serverless-cd/core": "^0.0.1-alpha.24",
     "@serverless-cd/engine": "^0.0.1",
-    "@serverless-cd/git": "^0.0.1-alpha.46",
+    "@serverless-cd/git": "^0.0.2",
     "@serverless-cd/ots-orm": "^1.0.14",
     "dotenv": "^16.0.2",
     "lodash": "^4.17.21",
