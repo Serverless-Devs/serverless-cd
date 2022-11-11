@@ -34,7 +34,7 @@ const Dashboard = () => {
     if (!data) return;
     setLoading(false);
     if (data?.length > 0) {
-      const notDeployList = filter(data, (item: any) => get(item, 'latest_task.completed', false))
+      const notDeployList = filter(data, (item: any) => !get(item, 'latest_task.completed'))
       if (isEmpty(notDeployList)) {
         cancel()
       }
