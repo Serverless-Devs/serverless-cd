@@ -125,6 +125,7 @@ async function handler (event, _context, callback) {
 
   console.log('ots task init');
   // init task 表
+  // 思考：如果支持异步重拾，是否 retry 的时候一定失败
   await otsTask.create(taskId, {
     user_id: userId,
     app_id: appId,

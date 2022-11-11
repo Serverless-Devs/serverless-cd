@@ -38,7 +38,12 @@ async function update(id, params = {}) {
   };
 }
 
+async function find(id) {
+  return await model.findOne(id);
+}
+
 module.exports = {
   create,
   update,
+  find,
 }

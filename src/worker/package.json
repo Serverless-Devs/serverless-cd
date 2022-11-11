@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@alicloud/fc-open20210406": "^1.1.13",
     "@serverless-cd/core": "^0.0.1-alpha.24",
     "@serverless-cd/engine": "^0.0.1",
     "@serverless-cd/git": "^0.0.2",
