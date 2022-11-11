@@ -13,7 +13,7 @@
     "@alicloud/fc2": "^2.6.3",
     "@serverless-cd/core": "^0.0.1-alpha.23",
     "@serverless-cd/express-ots-session": "^1.0.2",
-    "@serverless-cd/git": "^0.0.1-alpha.46",
+    "@serverless-cd/git": "^0.0.2",
     "@serverless-cd/git-provider": "^0.0.6",
     "@serverless-cd/ots-orm": "^1.0.14",
     "@serverless-devs/core": "^0.1.45",
