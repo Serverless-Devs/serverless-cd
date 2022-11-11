@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const _ = require("lodash");
 const { OTS_USER, SUPPORT_LOGIN } = require('../../config');
-const { unionid, doSession, md5Encrypt, generateSuccessResult, generateErrorResult } = require("../../util");
+const { unionid, setSession, md5Encrypt, generateSuccessResult, generateErrorResult } = require("../../util");
 const orm = require("../../util/orm")(OTS_USER.name, OTS_USER.index);
 
 router.post("/signUp", async function (req, res) {
@@ -24,7 +24,7 @@ router.post("/signUp", async function (req, res) {
       password: md5Encrypt(password),
     }
   );
-  doSession(req, {
+  setSession(req, {
     userId: id
   });
   return res.json(generateSuccessResult());
@@ -37,7 +37,7 @@ router.post("/login", async function (req, res) {
   const data = _.get(userResult, "result[0]", {});
   if (_.get(data, 'username', '')) {
     if (_.get(data, 'password', '') === md5Encrypt(password)) {
-        doSession(req, {
+        setSession(req, {
           userId: data.id
         });
         return res.json(generateSuccessResult());

@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prestart": "export WORKER_FUNCTION_NAME=worker && export SERVICE_NAME=serverless-cd && export REGION=cn-hongkong",
     "start": "nodemon index.js"
   },
   "author": "",
@@ -27,6 +26,13 @@
     "express-async-errors": "^3.1.1",
     "express-session": "^1.17.3",
     "http-errors": "^2.0.0",
+    "koa": "^2.13.4",
+    "koa-bodyparser": "^4.3.0",
+    "koa-convert": "^2.0.0",
+    "koa-json": "^2.0.2",
+    "koa-router": "^12.0.0",
+    "koa-views": "^8.0.0",
+    "lodash": "^4.17.21",
     "nanoid": "^3.3.4",
     "qs": "^6.11.0",
     "rimraf": "^3.0.2",

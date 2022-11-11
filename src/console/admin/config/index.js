@@ -81,4 +81,5 @@ module.exports = {
     github: supportGithubLogin,
     account: true,
   },
+  COOKIE_SECRET: 'secr3t'
 };
