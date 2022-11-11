@@ -1,7 +1,7 @@
 const { customAlphabet } = require("nanoid");
 const axios = require("axios");
 const crypto = require('crypto');
-const _ = require('lodash');
+const { lodash: _ } = require('@serverless-cd/core');
 
 
 class ValidationError extends Error {
@@ -35,7 +35,7 @@ const githubRequest = (accessToken) => {
 }
 
 // 公共数据存储到 session
-function doSession(req, data) {
+function setSession(req, data) {
   for (const key in data) {
     _.set(req, `session.${key}`, data[key]);
   }
@@ -82,7 +82,7 @@ const formatBranch = (ref) => {
 }
 
 module.exports={
-  doSession,
+  setSession,
   md5Encrypt,
   generateErrorResult,
   generateSuccessResult,

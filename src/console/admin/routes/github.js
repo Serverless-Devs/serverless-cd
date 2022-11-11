@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const git = require('@serverless-cd/git-provider');
 const { checkFile } = require('@serverless-cd/git');
-const _ = require('lodash');
+const { lodash: _ } = require('@serverless-cd/core');
 const { OTS_USER, OTS_APPLICATION } = require('../config');
 const { generateSuccessResult } = require('../util');
 const orm = require('../util/orm')(OTS_USER.name, OTS_USER.index);

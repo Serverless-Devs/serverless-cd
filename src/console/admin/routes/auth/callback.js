@@ -2,7 +2,7 @@ const router = require("express").Router();
 const axios = require("axios");
 const { GITHUB } = require("../../config");
 const _ = require("lodash");
-const { doSession, md5Encrypt, generateErrorResult, generateSuccessResult, unionid, githubRequest } = require("../../util");
+const { setSession, md5Encrypt, generateErrorResult, generateSuccessResult, unionid, githubRequest } = require("../../util");
 const { OTS_USER } = require('../../config');
 const orm = require("../../util/orm")(OTS_USER.name, OTS_USER.index);
 
@@ -48,7 +48,7 @@ router.get("/github", async (req, res) => {
         }
       }
     });
-    doSession(req, {
+    setSession(req, {
       userId: findObj.id,
       providerUid: data.id,
       login_token: login_token,
@@ -100,7 +100,7 @@ router.post("/bindingAccount", async function (req, res, next) {
             }
           }
         });
-        doSession(req, {
+        setSession(req, {
           userId: userInfo.id,
           providerUid: providerId,
           login_token
@@ -133,7 +133,7 @@ router.post("/bindingAccount", async function (req, res, next) {
         }
       }
     );
-    doSession(req, {
+    setSession(req, {
       userId: id,
       providerUid: providerId,
       login_token,
