@@ -11,9 +11,40 @@ vars:
   masterFunctionName: master
   workerFunctionName: worker
   adminFunctionName: admin
+  # workerMaxAsyncRetryAttempts: 0
+  workerAbnormalFunctionName: workerAbnormal
 
 
 services:
+  worker-abnormal:
+    component: fc
+    props:
+      region: ${vars.region}
+      service: ${vars.service}
+      function:
+        name: ${vars.workerAbnormalFunctionName}
+        description: 执行用户配置的 CD 流程。
+        runtime: nodejs14
+        codeUri: ./src/worker
+        handler: abnormal.handler
+        memorySize: 640
+        timeout: 600
+        environmentVariables:
+          REGION: ${vars.region}
+          SERVICE_NAME: ${vars.service.name}
+          WORKER_FUNCTION_NAME: ${vars.workerFunctionName} # worker 函数的名称
+          # WORKER_MAX_RETRY_ATTEMPTS: ${vars.workerMaxAsyncRetryAttempts}
+          ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
+          ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
+          OSS_BUCKET: ${env.OSS_BUCKET}
+          OTS_INSTANCE_NAME: ${env.OTS_INSTANCE_NAME}
+          OTS_TASK_TABLE_NAME: ${env.OTS_TASK_TABLE_NAME}
+          OTS_TASK_INDEX_NAME: ${env.OTS_TASK_INDEX_NAME}
+          OTS_APP_TABLE_NAME: ${env.OTS_APP_TABLE_NAME}
+          OTS_APP_INDEX_NAME: ${env.OTS_APP_INDEX_NAME}
+        asyncConfiguration:
+          maxAsyncRetryAttempts: 0
+
   master:
     component: fc
     actions:
@@ -85,9 +116,11 @@ services:
           OTS_APP_TABLE_NAME: ${env.OTS_APP_TABLE_NAME}
           OTS_APP_INDEX_NAME: ${env.OTS_APP_INDEX_NAME}
         asyncConfiguration:
-          maxAsyncEventAgeInSeconds: 456
           maxAsyncRetryAttempts: 0
+          # maxAsyncRetryAttempts: ${vars.workerMaxAsyncRetryAttempts}
           statefulInvocation: true
+          destination:
+            onFailure: acs:fc:::services/${vars.service.name}/functions/${vars.workerAbnormalFunctionName}
   
   admin:
     component: fc
