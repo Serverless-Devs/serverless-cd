@@ -25,7 +25,7 @@ services:
         name: ${vars.workerAbnormalFunctionName}
         description: 执行用户配置的 CD 流程。
         runtime: nodejs14
-        codeUri: ./src/worker
+        codeUri: ./worker
         handler: abnormal.handler
         memorySize: 640
         timeout: 600
