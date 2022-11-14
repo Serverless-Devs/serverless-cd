@@ -1,11 +1,32 @@
 {
+  "name": "master",
+  "version": "1.0.0",
+  "description": "sevrerless-cd master",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Serverless-Devs/serverless-cd.git"
+  },
+  "keywords": [
+    "sevrerless-cd",
+    "master"
+  ],
   "dependencies": {
     "@alicloud/fc2": "^2.6.3",
     "@serverless-cd/git": "^0.0.2",
-    "@serverless-cd/ots-orm": "^1.0.14",
+    "@serverless-cd/ots-orm": "^1.1.0",
     "@serverless-cd/trigger": "0.0.1",
     "dotenv": "^16.0.2",
     "nanoid": "^3.3.4",
     "tablestore": "^5.2.2"
-  }
+  },
+  "author": "mamba",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Serverless-Devs/serverless-cd/issues"
+  },
+  "homepage": "https://github.com/Serverless-Devs/serverless-cd#readme"
 }
