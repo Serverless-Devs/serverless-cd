@@ -1,37 +1,17 @@
 const model = require('./model');
-const createError = require('http-errors');
 
-async function create(id, params = {}) {
+async function make(id, params = {}) {
   const dbConfig = await model.findOne(id);
-  if (dbConfig.id) {
-    return {
-      success: false,
-      data: createError(400, 'task已存在，请勿重复添加'),
-    };
-  }
-  // 创建 ots
   const attributes = { ...params };
-
-  const res = await model.create(id, attributes);
-  return {
-    success: true,
-    data: res,
-  };
-}
-
-async function update(id, params = {}) {
-  const dbConfig = await model.findOne(id);
-  if (!dbConfig.id) {
+  if (dbConfig.id) {
+    const res = await model.update(id, attributes);
     return {
-      success: false,
-      data: createError(400, 'task不存在'),
+      success: true,
+      data: res,
     };
   }
+  const res = await model.create(id, attributes);
 
-  const attributes = {
-    ...params,
-  };
-  const res = await model.update(id, attributes);
   return {
     success: true,
     data: res,
@@ -43,7 +23,6 @@ async function find(id) {
 }
 
 module.exports = {
-  create,
-  update,
+  make,
   find,
 }

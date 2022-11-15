@@ -80,7 +80,7 @@ async function handler(event, context, callback) {
 
     const dbConfig = await otsTask.find(taskId);
     if (dbConfig.id) {
-      await otsTask.update(taskId, {
+      await otsTask.make(taskId, {
         status: FAILED_STATUS,
         steps: dbConfig.steps.map(({ run, stepCount, status }) => ({
           run,
@@ -89,7 +89,7 @@ async function handler(event, context, callback) {
         }))
       });
     } else {
-      await otsTask.create(taskId, {
+      await otsTask.make(taskId, {
         user_id: userId,
         app_id: appId,
         status: FAILED_STATUS,

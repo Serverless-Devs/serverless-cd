@@ -100,19 +100,19 @@ async function handler (event, _context, callback) {
         await otsApp.update(appId, { latest_task: { ...appTaskConfig, completed: context.completed, status: context.status } });
       },
       onPreRun: async function (_data, context) {
-        await otsTask.update(taskId, {
+        await otsTask.make(taskId, {
           status: context.status,
           steps: getOTSTaskPayload(context.steps), 
         });
       },
       onPostRun: async function (_data, context) {
-        await otsTask.update(taskId, {
+        await otsTask.make(taskId, {
           status: context.status,
           steps: getOTSTaskPayload(context.steps), 
         });
       },
       onCompleted: async function (context) {
-        await otsTask.update(taskId, {
+        await otsTask.make(taskId, {
           status: context.status,
           steps: getOTSTaskPayload(context.steps),
         });
@@ -125,8 +125,7 @@ async function handler (event, _context, callback) {
 
   console.log('ots task init');
   // init task 表
-  // 思考：如果支持异步重拾，是否 retry 的时候一定失败
-  await otsTask.create(taskId, {
+  await otsTask.make(taskId, {
     user_id: userId,
     app_id: appId,
     status: engine.context.status,
