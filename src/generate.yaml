@@ -23,7 +23,7 @@ services:
       OTS_USER_INDEX_NAME: user_index
       OTS_APP_INDEX_NAME: application_index
       OTS_TOKEN_INDEX_NAME: token_index
-      SESSION_EXPIRATION: 5184000000
+      SESSION_EXPIRATION: 604800000 # 1000 * 60 * 60 * 24 * 7
       DOWNLOAD_CODE_DIR: /tmp/code
       ACCOUNTID: # ACCOUNTID ACCESS_KEY_ID ACCESS_KEY_SECRET 全部填写才会生效
       ACCESS_KEY_ID: 
