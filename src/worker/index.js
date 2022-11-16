@@ -42,32 +42,39 @@ async function handler (event, _context, callback) {
   console.log('start task, uuid: ', taskId);
 
   // 拉取代码
-  console.log('checkout start');
-  await checkout({
-    token,
-    provider,
-    logger: console,
-    owner,
-    clone_url: cloneUrl,
-    execDir,
-    ref,
-    commit,
-  });
-  console.log('checkout success');
-
-  // 解析 pipline
-  const pipLineYaml = path.join(execDir, _.get(trigger, 'template', CD_PIPLINE_YAML))
-  console.info(`parse spec: ${pipLineYaml}`);
-  core.setServerlessCdVariable('TEMPLATE_PATH', pipLineYaml);
-  const piplineContext = await core.parseSpec();
-  console.log('piplineContext:\n', JSON.stringify(piplineContext));
+  const onInit = async (context, logger) => {
+    logger.info('onInit: checkout start');
+    logger.debug(`start checkout code, taskId: ${taskId}`);
+    await checkout({
+      token,
+      provider,
+      logger,
+      owner,
+      clone_url: cloneUrl,
+      execDir,
+      ref,
+      commit,
+    });
+    logger.info('checkout success');
+  
+    // 解析 pipline
+    const pipLineYaml = path.join(execDir, _.get(trigger, 'template', CD_PIPLINE_YAML))
+    logger.info(`parse spec: ${pipLineYaml}`);
+    core.setServerlessCdVariable('TEMPLATE_PATH', pipLineYaml);
+    const piplineContext = await core.parseSpec();
+    logger.debug('piplineContext:\n', JSON.stringify(piplineContext));
+    const steps = _.get(piplineContext, 'steps');
+    logger.debug(`start update app`);
+    await otsApp.update(appId, { latest_task: { ...appTaskConfig, completed: context.completed, status: context.status } });
+    logger.debug(`start update app success`);
+    return { steps }
+  }
 
   // 启动 engine
   const appTaskConfig = { taskId, commit, message, ref };
-  const steps = _.get(piplineContext, 'steps');
+
   const engine = new Engine({
     cwd: execDir,
-    steps,
     logConfig: {
       logPrefix,
       ossConfig: {
@@ -95,10 +102,7 @@ async function handler (event, _context, callback) {
       trigger, // 触发 pipline 的配置
     },
     events: {
-      onInit: async (context) => {
-        console.log('start');
-        await otsApp.update(appId, { latest_task: { ...appTaskConfig, completed: context.completed, status: context.status } });
-      },
+      onInit,
       onPreRun: async function (_data, context) {
         await otsTask.make(taskId, {
           status: context.status,
@@ -111,13 +115,13 @@ async function handler (event, _context, callback) {
           steps: getOTSTaskPayload(context.steps), 
         });
       },
-      onCompleted: async function (context) {
+      onCompleted: async function (context, logger) {
         await otsTask.make(taskId, {
           status: context.status,
           steps: getOTSTaskPayload(context.steps),
         });
         await otsApp.update(appId, { latest_task: { ...appTaskConfig, completed: context.completed, status: context.status }});
-        console.log('completed end.');
+        logger.info('completed end.');
         callback(null, '');
       },
     },
@@ -129,7 +133,6 @@ async function handler (event, _context, callback) {
     user_id: userId,
     app_id: appId,
     status: engine.context.status,
-    steps: getOTSTaskPayload(engine.context.steps), 
     trigger_payload: inputs,
   });
   console.log('ots app update');
