@@ -22,7 +22,11 @@ router.get("/list", async function (req, res) {
   console.log(`token list userId: ${userId}`);
 
   const tokenList = await model.find({ user_id: userId });
-  const result = _.get(tokenList, 'result', []).map((tokenItem) => _.omit(tokenItem, 'cd_token'))
+  const result = _.get(tokenList, 'result', []).map((tokenItem) => ({
+    ..._.omit(tokenItem, 'cd_token'),
+    expire_time: _.toNumber(tokenItem.expire_time),
+    active_time: _.toNumber(tokenItem.active_time),
+  }))
   console.log('token list result', result);
   res.json(generateSuccessResult({
     result
@@ -36,9 +40,10 @@ router.post("/create", async function (req, res) {
   const id = unionid();
 
   console.log(`create token: ${cd_token}, body: ${JSON.stringify(req.body)}`);
+  const expirationNum = _.toNumber(expiration);
   const params = {
     description,
-    expire_time: expiration === -1 ? expiration : Date.now() + expiration,
+    expire_time: _.toString(expirationNum === -1 ? expirationNum : Date.now() + expirationNum),
     user_id: userId,
     cd_token
   }
@@ -69,8 +74,9 @@ router.post("/update", async function (req, res) {
   const { success, data: result, message } = await getTokenInfo(id);
   if (!success) return res.json(generateErrorResult(message));
   console.log('update tokenInfo', result)
+  const expirationNum = _.toNumber(expiration);
   await model.update(result.id, {
-    expire_time: expiration === -1 ? expiration : Date.now() + expiration,
+    expire_time: _.toString(expirationNum === -1 ? expirationNum : Date.now() + expirationNum),
   });
 
   res.json(generateSuccessResult());

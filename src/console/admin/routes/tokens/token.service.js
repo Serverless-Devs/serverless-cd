@@ -9,12 +9,16 @@ async function queryToken(cd_token) {
   if (_.isEmpty(result)) {
     return generateErrorResult('token 不存在');
   }
+  result.expire_time = _.toNumber(result.expire_time);
+  if (result.active_time) {
+    result.active_time = _.toNumber(result.active_time);
+  }
   return generateSuccessResult(result);
 }
 
 async function updateActiveToken(id) {
   await model.update(id, {
-    active_time: Date.now(),
+    active_time: _.toString(Date.now()),
   });
 
   return generateSuccessResult();
