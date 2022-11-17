@@ -4,6 +4,7 @@
   "description": "轻量级模板，使用 TypeScript，仅包含基础的 Layout。",
   "dependencies": {
     "@alicloud/console-components": "^1.5.10",
+    "@serverless-cd/ui": "^0.0.1-beta.8",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
     "moment": "^2.24.0",
