@@ -10,3 +10,4 @@ __test__
 .ice
 **.log
 /s.yaml
+/Makefile
