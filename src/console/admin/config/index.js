@@ -1,4 +1,5 @@
 const {
+  ASSERT_URL,
   DOWNLOAD_CODE_DIR,
   CD_PIPLINE_YAML,
   GITHUB_CLIENT_ID,
@@ -28,6 +29,7 @@ const {
 const supportGithubLogin = !((!GITHUB_CLIENT_ID || GITHUB_CLIENT_ID.startsWith('${env.')) || (!GITHUB_CLIENT_SECRET || GITHUB_CLIENT_SECRET.startsWith('${env.')));
 
 module.exports = {
+  ASSERT_URL,
   CD_PIPLINE_YAML,
   SESSION_EXPIRATION,
   CODE_DIR: DOWNLOAD_CODE_DIR,

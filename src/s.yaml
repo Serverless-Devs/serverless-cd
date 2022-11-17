@@ -84,6 +84,24 @@ services:
             methods:
               - POST
   
+  ui:  # 前端UI
+    component: oss
+    actions:
+      pre-deploy:
+        - run: npm install --registry=https://registry.npmmirror.com
+          path: "./console/ui"
+        - run: npm run build
+          path: "./console/ui"
+    props:
+      bucket: ${env.OSS_BUCKET}-website
+      codeUri: "./console/ui/build"
+      acl: public-read
+      region: ${vars.region}
+      cors: # OSS 设置跨域资源共享规则
+        - allowedOrigin: ["*.fc.devsapp.net"]
+          allowedMethod: ['GET', 'PUT', 'DELETE', 'POST', 'HEAD']
+
+
   worker:
     component: fc
     actions:
@@ -122,7 +140,7 @@ services:
           destination:
             onFailure: acs:fc:::services/${vars.service.name}/functions/${vars.workerAbnormalFunctionName}
   
-  admin:
+  admin: # Admin 控制台提供Api Server函数
     component: fc
     actions:
       pre-deploy:
@@ -189,7 +207,7 @@ services:
               - PUT
               - PATCH
   
-  compose:
+  router: # 路由函数
     component: fc-domain
     props:
       region: ${vars.region}

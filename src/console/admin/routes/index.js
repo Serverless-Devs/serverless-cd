@@ -1,9 +1,9 @@
 const router = require('express').Router();
 const { generateErrorResult } = require('../util');
-const { CD_PIPLINE_YAML } = require('../config');
+const { ASSERT_URL, CD_PIPLINE_YAML } = require('../config');
 
 router.get('/', function (req, res, next) {
-  res.render('index', { CD_PIPLINE_YAML });
+  res.render('index', { ASSERT_URL, CD_PIPLINE_YAML });
 });
 
 router.use('/flow/application', require('./application'));

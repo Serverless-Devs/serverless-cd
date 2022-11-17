@@ -1,16 +1,17 @@
-import { IRouterConfig, lazy } from "ice";
-import { BasicLayout } from "@/layouts/BasicLayout";
-import { LoginLayout } from "@/layouts/LoginLayout";
+import { IRouterConfig} from 'ice';
+import { BasicLayout } from '@/layouts/BasicLayout';
+import { LoginLayout } from '@/layouts/LoginLayout';
 
-const Dashboard = lazy(() => import("@/pages/Dashboard"));
-const Login = lazy(() => import("@/pages/Login"));
-const Signup = lazy(() => import("@/pages/Signup"));
-const Create = lazy(() => import("@/pages/Create"));
-const Details = lazy(() => import("@/pages/Details"));
-const TaskDetails = lazy(() => import("@/pages/TaskDetails"));
-const Auth = lazy(() => import("@/pages/Auth"));
-const Tokens = lazy(() => import("@/pages/Tokens"));
-const Secrets = lazy(() => import("@/pages/Secrets"));
+import Dashboard from '@/pages/Dashboard';
+import Login from '@/pages/Login';
+import Signup from '@/pages/Signup';
+import Create from '@/pages/Create';
+import Details from '@/pages/Details';
+import TaskDetails from '@/pages/TaskDetails';
+import Auth from '@/pages/Auth';
+import Tokens from '@/pages/Tokens';
+import Secrets from '@/pages/Secrets';
+
 
 const routerConfig: IRouterConfig[] = [
   {
