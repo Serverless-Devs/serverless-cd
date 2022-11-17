@@ -2,7 +2,7 @@ const router = require('express').Router();
 const git = require('@serverless-cd/git-provider');
 const { checkFile } = require('@serverless-cd/git');
 const { lodash: _ } = require('@serverless-cd/core');
-const { OTS_USER, OTS_APPLICATION } = require('../config');
+const { OTS_USER, OTS_APPLICATION, CD_PIPLINE_YAML } = require('../config');
 const { generateSuccessResult } = require('../util');
 const orm = require('../util/orm')(OTS_USER.name, OTS_USER.index);
 const applicationOrm = require('../util/orm')(OTS_APPLICATION.name, OTS_APPLICATION.index);
@@ -51,7 +51,7 @@ router.post('/checkFile', async function (req, res, _next) {
   console.log('checkFile body:', req.body);
   const userResult = await orm.find({ id: req.session.userId });
   const useGithubToken = _.get(userResult, 'result[0].third_part.github.access_token', '');
-  const rows = await checkFile({ ...req.body, token: useGithubToken });
+  const rows = await checkFile({ ...req.body, token: useGithubToken, file: CD_PIPLINE_YAML });
   return res.json(generateSuccessResult(rows));
 });
 

@@ -1,25 +1,25 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 import { useRequest, history } from 'ice';
 import { Button, Dialog, Loading } from '@alicloud/console-components';
 import PageLayout from '@/layouts/PageLayout';
-import CommitList from "./components/CommitList";
+import CommitList from './components/CommitList';
 import BasicInfoDetail from '@/components/BasicInfoDetail';
 import { applicationDetail, deleteApp } from '@/services/applist';
-import { Toast } from "@/components/ToastContainer";
+import { Toast } from '@/components/ToastContainer';
 import PageInfo from '@/components/PageInfo';
-import { sleep } from "@/utils";
+import { sleep } from '@/utils';
 import { get } from 'lodash';
-import SecretConfig from "./components/SecretCofing";
-import TriggerConfig from "./components/TriggerConfig";
+import SecretConfig from './components/SecretCofing';
+import TriggerConfig from './components/TriggerConfig';
 
 const Details = ({
   match: {
-    params: { appId }
-  }
+    params: { appId },
+  },
 }) => {
   const { loading, data: detailInfo, request, refresh } = useRequest(applicationDetail);
   const provider = get(detailInfo, 'data.provider');
-  const events = get(detailInfo, `data.trigger_spec[${provider}].events`, []);
+  const trigger_spec = get(detailInfo, `data.trigger_spec`, {});
   const taskId = get(detailInfo, 'data.latest_task.taskId', '');
   const repo_name = get(detailInfo, 'data.repo_name', '');
   const secrets = get(detailInfo, 'data.secrets', {});
@@ -43,11 +43,11 @@ const Details = ({
           >
             返回应用列表
           </Button>,
-          <Button onClick={() => dialog.hide()}>取消</Button>
-        ]
-      })
+          <Button onClick={() => dialog.hide()}>取消</Button>,
+        ],
+      });
     }
-  }, [detailInfo])
+  }, [detailInfo]);
 
   const deleteApplication = () => {
     const dialog = Dialog.alert({
@@ -57,13 +57,13 @@ const Details = ({
         const { success } = await deleteApp({ appId });
         if (success) {
           Toast.success('应用删除成功');
-          await sleep(800)
+          await sleep(800);
           history?.push('/');
         }
         dialog.hide();
-      }
-    })
-  }
+      },
+    });
+  };
 
   return (
     <PageLayout
@@ -72,24 +72,43 @@ const Details = ({
       breadcrumbs={[
         {
           name: '应用列表',
-          path: '/'
+          path: '/',
         },
         {
           name: appId,
-        }
+        },
       ]}
-      breadcrumbExtra={<Button type="primary" warning onClick={deleteApplication}>删除应用</Button>}
+      breadcrumbExtra={
+        <Button type="primary" warning onClick={deleteApplication}>
+          删除应用
+        </Button>
+      }
     >
       <Loading visible={loading} style={{ width: '100%' }}>
         <BasicInfoDetail data={get(detailInfo, 'data', {})} refreshCallback={refresh} />
         <hr className="mb-20" />
-        <TriggerConfig events={events} provider={provider} appId={appId} refreshCallback={refresh} />
-        <hr className="mb-20 mt-20" />
-        <SecretConfig secrets={secrets} provider={provider} appId={appId} refreshCallback={refresh} />
+        <TriggerConfig
+          triggerSpec={trigger_spec}
+          provider={provider}
+          appId={appId}
+          refreshCallback={refresh}
+        />
+        <hr className="mb-20" />
+        <SecretConfig
+          secrets={secrets}
+          provider={provider}
+          appId={appId}
+          refreshCallback={refresh}
+        />
         <hr className="mb-20 mt-20" />
       </Loading>
-      <PageInfo title="部署历史" >
-        <CommitList appId={appId} application={get(detailInfo, 'data', {})} latestTaskId={taskId} refreshCallback={refresh} />
+      <PageInfo title="部署历史">
+        <CommitList
+          appId={appId}
+          application={get(detailInfo, 'data', {})}
+          latestTaskId={taskId}
+          refreshCallback={refresh}
+        />
       </PageInfo>
     </PageLayout>
   );

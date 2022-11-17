@@ -5,13 +5,11 @@ import { manualDeployApp } from '@/services/task';
 import { checkFile, githubPutFile } from '@/services/git';
 import { useRequest, history } from 'ice';
 import { CREATE_TYPE, SERVERLESS_PIPELINE_CONTENT } from './constant';
-import { get, each, map, every, find, uniqWith, isEqual, includes, isEmpty } from 'lodash';
+import { get, each, map, every, find, uniqWith, isEqual, isEmpty } from 'lodash';
 import { sleep } from '@/utils';
 import { Toast } from '@/components/ToastContainer';
 import MonacoEditor from 'react-monaco-editor';
-import { TRIGGER_TYPE } from './constant';
 import yaml from 'js-yaml';
-import { IItem as IGithubTriggerItem } from './github/Trigger';
 interface IProps {
   field: Field;
 }
@@ -19,13 +17,13 @@ interface IProps {
 interface IStepItem {
   title: string;
   branch: string;
-  template: string;
   key: string;
   current: number;
   status: 'pending' | 'success' | 'failure';
 }
 
 const Submit = (props: IProps) => {
+  const CD_PIPLINE_YAML = get(window, 'CD_PIPLINE_YAML', 'serverless-pipeline.yaml');
   const { loading, request } = useRequest(createApp);
   const manualDeploy = useRequest(manualDeployApp);
   const field = Field.useField();
@@ -39,8 +37,8 @@ const Submit = (props: IProps) => {
       await githubPutFile({
         owner: get(values, 'repo.owner'),
         repo: get(values, 'repo.name'),
-        path: item.template,
-        message: `add ${item.template} by Serverless CD`,
+        path: CD_PIPLINE_YAML,
+        message: `add ${CD_PIPLINE_YAML} by Serverless CD`,
         content: getValue('yaml'),
         branch: item.branch,
       });
@@ -51,19 +49,10 @@ const Submit = (props: IProps) => {
   const doCreate = async () => {
     setValue('submitLoading', true);
     const values: any = props.field.getValues();
-    const trigger_spec: any = { [values['gitType']]: { events: [] } };
-    each(values['trigger'], (item) => {
-      const filter = item.manal ? item.input : `body.ref in ["refs/heads/${item.branch}"]`;
-      trigger_spec[values['gitType']].events.push({
-        eventName: item.type,
-        filter: item.type === TRIGGER_TYPE.PUSH ? filter : item.input,
-        template: item.template,
-      });
-    });
-    trigger_spec[values['gitType']].events = uniqWith(
-      trigger_spec[values['gitType']].events,
-      isEqual,
-    );
+    const precise: string[] = map(values['trigger'], (item) => item.branch);
+    const trigger_spec: any = {
+      [values['gitType']]: { push: { branches: { precise: uniqWith(precise, isEqual) } } },
+    };
     const secrets = {};
     each(values['secrets'], (item) => {
       if (item.key && item.value) {
@@ -83,15 +72,13 @@ const Submit = (props: IProps) => {
         secrets,
       },
     };
-    // await sleep(2000);
     try {
       const { success, data } = await request(dataMap[get(values, 'createType')]);
       if (success) {
-        const triggerPath = find(values['trigger'], (item) => item.type === TRIGGER_TYPE.PUSH);
-        if (data.id && !isEmpty(triggerPath)) {
+        if (data.id && !isEmpty(values['trigger'])) {
           await manualDeploy.request({
             appId: data.id,
-            ref: `refs/heads/${triggerPath.input || triggerPath.branch}`,
+            ref: `refs/heads/${get(values, 'trigger[0].branch')}`,
           });
         }
         await sleep(1500);
@@ -106,21 +93,19 @@ const Submit = (props: IProps) => {
 
   const berforeCreate = async () => {
     props.field.validate(async (errors, values) => {
+      console.log('errors', errors, values);
       if (errors) return;
-      const branchList: IGithubTriggerItem[] = [];
-      each(values['trigger'], (item) => {
-        if (item.type === TRIGGER_TYPE.PUSH && !includes(branchList, item.branch)) {
-          branchList.push(item);
-        }
+      let branchList: string[] = map(values['trigger'], (item) => item.branch);
+      branchList = uniqWith(branchList, isEqual);
+      const stepData: IStepItem[] = map(branchList, (branch, index) => {
+        return {
+          key: branch,
+          title: `检查${branch}分支是否存在${CD_PIPLINE_YAML}文件`,
+          status: 'pending',
+          current: Number(index),
+          branch,
+        };
       });
-      const stepData: IStepItem[] = map(branchList, (item: IGithubTriggerItem, index) => ({
-        key: item.branch,
-        title: `检查${item.branch}分支是否存在${item.template}文件`,
-        status: 'pending',
-        current: Number(index),
-        branch: item.branch,
-        template: item.template,
-      }));
       setValue('showDialog', true);
       // 设置当前步骤
       setValue('current', 0);
@@ -136,7 +121,6 @@ const Submit = (props: IProps) => {
           const res = await checkFile({
             clone_url: values['repo']['url'],
             ref: `refs/heads/${ele.branch}`,
-            file: ele.template,
             provider: get(values, 'gitType'),
             owner: get(values, 'repo.owner'),
           });
@@ -229,7 +213,7 @@ const Submit = (props: IProps) => {
             {map(errorBranch, (item) => {
               return (
                 <div>
-                  检测到{item.branch}分支不存在{item.template}文件。
+                  检测到{item.branch}分支不存在{CD_PIPLINE_YAML}文件。
                 </div>
               );
             })}

@@ -1,47 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { useRequest } from "ice";
-import { Button, Table, Drawer, Field } from '@alicloud/console-components';
+import React, { useState } from 'react';
+import { useRequest } from 'ice';
+import { Button, Drawer, Field, Form } from '@alicloud/console-components';
 import PageInfo from '@/components/PageInfo';
 import { Toast } from '@/components/ToastContainer';
 import { updateApp } from '@/services/applist';
-import { isEmpty, map, get } from 'lodash';
-import Trigger from "@/pages/Create/components/github/Trigger";
-import { formatBranch } from "@/utils";
-import { IFilterType, TRIGGER_TYPE } from "@/pages/Create/components/constant";
+import { get, noop, isEmpty } from 'lodash';
+import { Trigger } from '@serverless-cd/ui';
 
-
-const TriggerConfig = ({
-  events,
-  provider,
-  appId,
-  refreshCallback
-}) => {
+const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback }) => {
   const { request, loading } = useRequest(updateApp);
   const [visible, setVisible] = useState(false);
   const field = Field.useField();
-  const { init, setValue, validate } = field;
-  useEffect(() => {
-    if (isEmpty(events)) return;
-  }, [events])
+  const { init, resetToDefault, validate } = field;
 
   const onSubmit = () => {
     validate(async (errors, values) => {
-      if (errors) {
-        return;
-      }
-      const triggerConfig = get(values, 'trigger', []);
-
+      console.log('errors', errors, 'values', values);
+      if (errors) return;
       const trigger_spec: any = {
-        [provider]: {
-          events: map(triggerConfig, (item: any) => {
-            const filter = item.filterType === IFilterType.INPUT ? item.input : `body.ref in ["refs/heads/${item.branch}"]`;
-            return {
-              eventName: item.type,
-              filter: item.type === TRIGGER_TYPE.PUSH ? filter : item.input,
-              template: item.template,
-            }
-          })
-        }
+        [provider]: values['trigger'],
       };
       try {
         const { success } = await request({ trigger_spec, appId, provider });
@@ -54,76 +31,76 @@ const TriggerConfig = ({
         Toast.error(error.message);
       }
     });
-  }
+  };
 
   const onClose = () => {
     setVisible(false);
-    setValue('trigger', getDefaultTriggerValue());
-  }
+    resetToDefault();
+  };
 
-  const getDefaultTriggerValue = (): any[] => {
-    return events.map(({ eventName, filter, template }) => ({
-      type: eventName,
-      template,
-      branch: formatBranch(filter || ''),
-      filterType: IFilterType.BRANCH,
-    }));
-  }
+  const validateTrigger = (rule, value, callback) => {
+    if (isEmpty(get(value, 'push')) && isEmpty(get(value, 'pr'))) {
+      return callback('请选择触发方式');
+    } else if (
+      isEmpty(get(value, 'push.branches')) &&
+      isEmpty(get(value, 'push.tags')) &&
+      isEmpty(get(value, 'pr.branches'))
+    ) {
+      return callback('触发方式数据填写不完整');
+    }
+    callback();
+  };
 
   return (
     <PageInfo
       title="触发配置"
-      extra={<Button type="primary" text onClick={() => setVisible(true)}>编辑</Button>}>
-      <Table
-        dataSource={events}
-        columns={[
-          {
-            dataIndex: 'eventName',
-            title: '触发方式'
-          },
-          {
-            dataIndex: 'filter',
-            title: '过滤规则',
-            cell: (value) => value || "*"
-          },
-          {
-            dataIndex: 'template',
-            title: '配置文件',
-          }
-        ]}
-      />
-
-      {visible &&
-        <Drawer
-          title='编辑触发配置'
-          placement="right"
-          width="80%"
-          style={{ margin: 0 }}
-          visible={visible}
-          onClose={onClose}
-          className="dialog-drawer"
-        >
-          <div className='dialog-body'>
-            <Trigger
-              type="update"
-              repo={{
-                name: 'git-action-test',
-                owner: 'wss-git',
-              }}
-              {...(init('trigger', {
-                initValue: getDefaultTriggerValue(),
-              }) as any)}
-            />
-          </div>
-
-          <div className='dialog-footer'>
-            <Button className='mr-10' type="primary" loading={loading} onClick={onSubmit}>确定</Button>
-            <Button type="normal" onClick={onClose}>取消</Button>
-          </div>
-        </Drawer>
+      extra={
+        <Button type="primary" text onClick={() => setVisible(true)}>
+          编辑
+        </Button>
       }
-    </PageInfo>
-  )
-}
+    >
+      <div className="mt-16 pl-16 pr-32">
+        {/* 对于只读模式，可添加readOnly, 另外请移除onChange属性 */}
+        {triggerSpec[provider] && <Trigger value={triggerSpec[provider]} onChange={noop} />}
+      </div>
+      <Drawer
+        title="编辑触发配置"
+        placement="right"
+        width="80%"
+        style={{ margin: 0 }}
+        visible={visible}
+        onClose={onClose}
+        className="dialog-drawer"
+      >
+        <div className="dialog-body">
+          <Form field={field}>
+            <Form.Item>
+              <Trigger
+                {...(init('trigger', {
+                  initValue: triggerSpec[provider],
+                  rules: [
+                    {
+                      validator: validateTrigger,
+                    },
+                  ],
+                }) as any)}
+              />
+            </Form.Item>
+          </Form>
+        </div>
 
-export default TriggerConfig
+        <div className="dialog-footer">
+          <Button className="mr-10" type="primary" loading={loading} onClick={onSubmit}>
+            确定
+          </Button>
+          <Button type="normal" onClick={onClose}>
+            取消
+          </Button>
+        </div>
+      </Drawer>
+    </PageInfo>
+  );
+};
+
+export default TriggerConfig;
