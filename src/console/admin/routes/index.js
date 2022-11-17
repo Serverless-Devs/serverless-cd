@@ -1,21 +1,22 @@
-const router = require("express").Router();
+const router = require('express').Router();
 const { generateErrorResult } = require('../util');
+const { CD_PIPLINE_YAML } = require('../config');
 
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.get('/', function (req, res, next) {
+  res.render('index', { CD_PIPLINE_YAML });
 });
 
-router.use("/flow/application", require("./application"));
-router.use("/flow/task", require("./task"));
-router.use("/flow/dispatch", require("./dispatch"));
+router.use('/flow/application', require('./application'));
+router.use('/flow/task', require('./task'));
+router.use('/flow/dispatch', require('./dispatch'));
 
-router.use("/github", require("./github"));
-router.use("/auth", require("./auth"));
-router.use("/user", require("./user"));
-router.use("/tokens", require("./tokens"));
+router.use('/github', require('./github'));
+router.use('/auth', require('./auth'));
+router.use('/user', require('./user'));
+router.use('/tokens', require('./tokens'));
 
 router.use(function (err, _req, res, next) {
-  if (err.name === "ValidationError") {
+  if (err.name === 'ValidationError') {
     return res.status(422).json(generateErrorResult(err.message));
   }
 
