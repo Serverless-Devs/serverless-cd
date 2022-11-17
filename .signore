@@ -4,3 +4,5 @@ src/example
 .ice
 .env
 .s
+/s.yaml
+/Makefile
