@@ -65,6 +65,7 @@ services:
             - index.js
         environmentVariables:
           REGION: ${vars.region}
+          ASSERT_URL: ${env.OSS_BUCKET}-website.oss-${vars.region}.aliyuncs.com
           SERVICE_NAME: ${vars.service.name}
           WORKER_FUNCTION_NAME: ${vars.workerFunctionName} # worker 函数的名称
           DOWNLOAD_CODE_DIR: ${env.DOWNLOAD_CODE_DIR}

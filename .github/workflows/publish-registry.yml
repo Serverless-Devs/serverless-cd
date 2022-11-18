@@ -1,9 +1,9 @@
 name: publish package to serverless-hub
 
 on:
-  release:
-    types: [created]
-
+  push:
+    tags:
+      - publish/*
 jobs:
   deploy:
     runs-on: ubuntu-latest
