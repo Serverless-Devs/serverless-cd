@@ -33,7 +33,7 @@ const Trigger = (props: IProps) => {
 
   useEffect(() => {
     setList([getDefaultTriggerValue()]);
-    repo && request({ owner: repo.owner, repo: repo.name });
+    !isEmpty(repo) && request({ owner: repo.owner, repo: repo.name });
   }, [JSON.stringify(repo)]);
 
   useEffect(() => {

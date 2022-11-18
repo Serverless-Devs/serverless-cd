@@ -14,7 +14,7 @@
     "@serverless-cd/core": "^0.0.2",
     "@serverless-cd/express-ots-session": "^1.0.2",
     "@serverless-cd/git": "^0.0.2",
-    "@serverless-cd/git-provider": "^0.0.6",
+    "@serverless-cd/git-provider": "^0.0.7",
     "@serverless-cd/ots-orm": "^1.1.0",
     "@serverless-devs/core": "^0.1.45",
     "ali-oss": "^6.17.1",
