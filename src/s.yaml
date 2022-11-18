@@ -17,29 +17,33 @@ vars:
 
 services:
  
-  ui:  # 前端UI
-    component: oss
-    actions:
-      pre-deploy:
-        - run: npm install --registry=https://registry.npmmirror.com
-          path: "./console/ui"
-        - run: npm run build
-          path: "./console/ui"
-    props:
-      bucket: ${env.OSS_BUCKET}-website
-      codeUri: "./console/ui/build"
-      acl: public-read
-      region: ${vars.region}
-      cors: # OSS 设置跨域资源共享规则
-        - allowedOrigin: ["*.fc.devsapp.net"]
-          allowedMethod: ['GET', 'PUT', 'DELETE', 'POST', 'HEAD']
+  # ui:  # 前端UI
+  #   component: oss
+  #   actions:
+  #     pre-deploy:
+  #       - run: npm install --registry=https://registry.npmmirror.com
+  #         path: "./ui"
+  #       - run: npm run build
+  #         path: "./ui"
+  #   props:
+  #     bucket: ${env.OSS_BUCKET}-website
+  #     codeUri: "./ui/build"
+  #     acl: public-read
+  #     region: ${vars.region}
+  #     cors: # OSS 设置跨域资源共享规则
+  #       - allowedOrigin: ["*.fc.devsapp.net"]
+  #         allowedMethod: ['GET', 'PUT', 'DELETE', 'POST', 'HEAD']
 
   admin: # Admin 控制台提供Api Server函数
     component: fc
     actions:
       pre-deploy:
         - run: npm install --registry=https://registry.npmmirror.com
-          path: "./console/admin"
+          path: "./admin/public"
+        - run: npm run build
+          path: "./admin/public"
+        - run: npm install --registry=https://registry.npmmirror.com
+          path: "./admin"
         - plugin: get-http-function-url # 获取依赖的 trigger 函数的触发器地址，也可以直接修改 environmentVariables 的 WEBHOOKURL
           args:
             region: ${vars.region}
@@ -53,7 +57,7 @@ services:
         name: ${vars.adminFunctionName}
         description: serverless-cd 前端应用接口
         runtime: custom
-        codeUri: ./console/admin
+        codeUri: ./admin
         handler: index.handler
         memorySize: 640
         timeout: 360
@@ -65,7 +69,6 @@ services:
             - index.js
         environmentVariables:
           REGION: ${vars.region}
-          ASSERT_URL: ${env.OSS_BUCKET}-website.oss-${vars.region}.aliyuncs.com
           SERVICE_NAME: ${vars.service.name}
           WORKER_FUNCTION_NAME: ${vars.workerFunctionName} # worker 函数的名称
           DOWNLOAD_CODE_DIR: ${env.DOWNLOAD_CODE_DIR}
@@ -160,7 +163,13 @@ services:
         handler: index.handler
         memorySize: 640
         timeout: 600
+        layers:
+          - acs:fc:${vars.region}:official:layers/Nodejs16/versions/1
         environmentVariables:
+          PATH: >-
+            /opt/nodejs16/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/bin
+          NODE_PATH: /opt/nodejs/node_modules
+          NODE_ENV: production
           CD_PIPLINE_YAML: ${env.CD_PIPLINE_YAML}
           DOWNLOAD_CODE_DIR: ${env.DOWNLOAD_CODE_DIR}
           ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
