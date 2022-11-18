@@ -22,9 +22,9 @@ module.exports = async function (req, res, next) {
     return;
   }
 
-  if (!req.session.userId && !req.url.startsWith('/api/auth')) {
-    res.status(401).send(generateErrorResult("Unauthorized"));
+  if (!req.session.userId && !req.url.startsWith('/api/auth') && !req.url.startsWith('/login')) {
+    return res.redirect('/login');
   } else {
     next();
   }
-}
+};
