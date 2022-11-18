@@ -5,6 +5,7 @@
   "dependencies": {
     "@alicloud/console-components": "^1.5.10",
     "@serverless-cd/ui": "^0.0.1-beta.8",
+    "ansi-to-html": "^0.7.2",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
     "moment": "^2.24.0",
