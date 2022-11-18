@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const envPath = path.join(__dirname, '..', '..', '.env');
+const envPath = path.join(__dirname, '..', '.env');
 if (fs.existsSync(envPath)) {
   require('dotenv').config({ path: envPath });
 }
@@ -14,7 +14,7 @@ const tokenAuth = require('./middleware/token-auth');
 const app = express();
 const PORT = 9000;
 const HOST = '0.0.0.0';
- // 解决 @octokit/request 报错 globalThis is not defined
+// 解决 @octokit/request 报错 globalThis is not defined
 globalThis = global;
 
 app.set('views', path.join(__dirname, 'views'));
