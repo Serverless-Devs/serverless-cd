@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRequest, history } from 'ice';
-import { Loading, Collapse, Input, Icon } from '@alicloud/console-components';
+import { Loading, Collapse, Icon } from '@alicloud/console-components';
 import { get, map, filter } from 'lodash';
 import { getTask, getTaskLog } from '@/services/task';
 import { DEPLOY_STATUS } from '@/constants/index';
@@ -8,6 +8,8 @@ import PageLayout from '@/layouts/PageLayout';
 import Redeploy from '@/components/Redeploy';
 import CancelDeploy from '@/components/CancelDeploy';
 import './index.less';
+import Convert from 'ansi-to-html';
+const convert = new Convert();
 
 const Panel = Collapse.Panel;
 
@@ -17,16 +19,18 @@ const PanelTitle = ({ step, isRequest }) => {
   const iconColor = get(DEPLOY_STATUS[status], 'color');
 
   return (
-    <div className='flex-r pr-16' style={{ width: '100%' }}>
+    <div className="flex-r pr-16" style={{ width: '100%' }}>
       <span>
         <span style={{ marginRight: 10 }}>
-          {isRequest && <Icon type="loading" size="small" style={{ position: 'absolute', left: 16 }} />}
+          {isRequest && (
+            <Icon type="loading" size="small" style={{ position: 'absolute', left: 16 }} />
+          )}
           <Icon type={type} className={`${iconColor}`} size="small" />
         </span>
         {run}
       </span>
       {process_time && (
-        <span className='flex-r' style={{ minWidth: 60 }}>
+        <span className="flex-r" style={{ minWidth: 60 }}>
           <i className="iconfont icon-process-time mr-8" style={{ fontSize: 16 }}></i>
           {process_time}s
         </span>
@@ -65,7 +69,7 @@ const Details = ({
     });
     if (!pollingStatus.includes(get(task.data, 'status'))) {
       setIsLoops(false);
-      task.cancel()
+      task.cancel();
     }
 
     setTaskSteps(steps as never[]);
@@ -91,16 +95,16 @@ const Details = ({
 
   const changeExpandedKeys = (panelItemIndex) => {
     if (expandedKeys.includes(panelItemIndex)) {
-      setExpandedKeys(filter(expandedKeys, index => index !== panelItemIndex));
+      setExpandedKeys(filter(expandedKeys, (index) => index !== panelItemIndex));
     } else {
       expandedKeys.push(panelItemIndex);
       setExpandedKeys([...expandedKeys]);
     }
-  }
+  };
 
   const redeployCallback = (id) => {
-    history?.replace(`/application/${appId}/detail/${id || taskId}`)
-  }
+    history?.replace(`/application/${appId}/detail/${id || taskId}`);
+  };
 
   return (
     <PageLayout
@@ -122,7 +126,8 @@ const Details = ({
             repoName={get(task.data, 'repo_name', '') as string}
             refreshCallback={redeployCallback}
           />
-        )}
+        )
+      }
       breadcrumbs={[
         {
           name: '应用列表',
@@ -138,32 +143,34 @@ const Details = ({
       ]}
     >
       <Loading visible={loading} style={{ width: '100%' }}>
-        <Collapse
-          className="task-collaps"
-          expandedKeys={expandedKeys}
-        >
+        <Collapse className="task-collaps" expandedKeys={expandedKeys}>
           {map(taskSteps, (step, i) => {
             const { initialize, loading, rawLog, status } = step;
             const disabledStatus = ['pending', 'skipped', 'cancelled'];
             const isDisabled = disabledStatus.includes(status);
-            const isRunning = status === 'running'
+            const isRunning = status === 'running';
             const isRequest = initialize && loading && !rawLog;
             return (
               <Panel
-                className={`task-details-panel ${(isDisabled || isRunning || isRequest) ? 'task-details-panel-loading' : ''}`}
+                className={`task-details-panel ${
+                  isDisabled || isRunning || isRequest ? 'task-details-panel-loading' : ''
+                }`}
                 title={<PanelTitle step={step} isRequest={isRequest} />}
                 disabled={isDisabled}
                 onClick={() => onExpand(i, status)}
               >
                 <Loading visible={loading} style={{ width: '100%' }}>
-                  <Input.TextArea
-                    className='task-details-textarea'
-                    rows={15}
-                    value={!rawLog ? '正在加载中' : rawLog}
-                  />
+                  <div className="task-details">
+                    <pre
+                      className="pre"
+                      dangerouslySetInnerHTML={{
+                        __html: !rawLog ? '正在加载中' : convert.toHtml(rawLog),
+                      }}
+                    ></pre>
+                  </div>
                 </Loading>
               </Panel>
-            )
+            );
           })}
         </Collapse>
       </Loading>

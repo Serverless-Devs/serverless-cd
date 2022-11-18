@@ -61,8 +61,9 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback }) => {
       }
     >
       <div className="mt-16 pl-16 pr-32">
-        {/* 对于只读模式，可添加readOnly, 另外请移除onChange属性 */}
-        {triggerSpec[provider] && <Trigger value={triggerSpec[provider]} onChange={noop} />}
+        {triggerSpec[provider] && (
+          <Trigger value={triggerSpec[provider]} onChange={noop} disabled />
+        )}
       </div>
       <Drawer
         title="编辑触发配置"
