@@ -29,6 +29,40 @@ router.get('/repos', async function (req, res, _next) {
   return res.json(generateSuccessResult(rows));
 });
 
+router.get('/orgs', async function (req, res, _next) {
+  const userResult = await orm.find({ id: req.session.userId });
+  const useGithubToken = _.get(userResult, 'result[0].third_part.github.access_token', '');
+  const prioverd = git('github', { access_token: useGithubToken });
+  const orgs = await prioverd.listOrgs();
+  return res.json(generateSuccessResult(orgs));
+});
+
+router.get('/orgRepos', async function (req, res, _next) {
+  const userResult = await orm.find({ id: req.session.userId });
+  console.log('orgRepos req.query', JSON.stringify(req.query));
+  const { org } = req.query;
+  const applicationResult = await applicationOrm.find({ user_id: req.session.userId });
+  const applicationList = _.get(applicationResult, 'result', []);
+  const useGithubToken = _.get(userResult, 'result[0].third_part.github.access_token', '');
+
+  const prioverd = git('github', { access_token: useGithubToken });
+  const rows = await prioverd.listOrgRepos(org);
+
+  if (!_.isEmpty(applicationList)) {
+    let mapRows = [];
+    _.forEach(applicationList, (applicationItem) => {
+      mapRows = _.map(rows, (item) => {
+        item.disabled = item.id === Number(applicationItem.provider_repo_id);
+        return item;
+      });
+    });
+    console.log('orgRepos response:', mapRows);
+    return res.json(generateSuccessResult(mapRows));
+  }
+  console.log('orgRepos response:', rows);
+  return res.json(generateSuccessResult(rows));
+});
+
 router.get('/branches', async function (req, res, _next) {
   const userResult = await orm.find({ id: req.session.userId });
   const useGithubToken = _.get(userResult, 'result[0].third_part.github.access_token', '');

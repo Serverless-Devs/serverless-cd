@@ -22,7 +22,7 @@ const appConfig: IAppConfig = {
           if (error.response.status === 401) {
             history?.push('/login');
           }
-          error.response.data.message && Toast.error(error.response.data.message);
+          (error.response.data.message && error.response.status !== 401) && Toast.error(error.response.data.message);
           return Promise.reject(error);
         },
       },
