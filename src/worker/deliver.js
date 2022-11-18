@@ -1,33 +1,27 @@
 const Client = require('@alicloud/fc-open20210406').default;
 const otsTask = require('./model/task');
 const otsApp = require('./model/app');
+const { CREDENTIALS } = require('./config');
 
-const {
-  WORKER_MAX_RETRY_ATTEMPTS,
-  REGION,
-  SERVICE_NAME,
-  WORKER_FUNCTION_NAME,
-} = process.env;
+const { WORKER_MAX_RETRY_ATTEMPTS, REGION, SERVICE_NAME, WORKER_FUNCTION_NAME } = process.env;
 
 async function handler(event, context, callback) {
   const eventPayload = JSON.parse(event.toString());
   console.debug(eventPayload);
   const { approximateInvokeCount } = eventPayload.requestContext;
   // 仅仅最后一次 retry 生效
-  if ((approximateInvokeCount - 1) !== Number(WORKER_MAX_RETRY_ATTEMPTS || '0')) {
-    console.debug(`approximateInvokeCount is ${approximateInvokeCount}, WORKER_MAX_RETRY_ATTEMPTS is ${Number(WORKER_MAX_RETRY_ATTEMPTS || '0')}, skipping`);
+  if (approximateInvokeCount - 1 !== Number(WORKER_MAX_RETRY_ATTEMPTS || '0')) {
+    console.debug(
+      `approximateInvokeCount is ${approximateInvokeCount}, WORKER_MAX_RETRY_ATTEMPTS is ${Number(
+        WORKER_MAX_RETRY_ATTEMPTS || '0',
+      )}, skipping`,
+    );
     return callback();
   }
 
   const payload = JSON.parse(eventPayload.requestPayload);
   console.debug('payload: ', payload);
-  const {
-    taskId,
-    commit,
-    message,
-    ref,
-    authorization: { appId, userId } = {},
-  } = payload || {};
+  const { taskId, commit, message, ref, authorization: { appId, userId } = {} } = payload || {};
 
   if (!(taskId || appId || userId)) {
     throw new Error(`taskId: ${taskId}, appId: ${appId}, userId: ${userId} cannot be empty`);
@@ -37,8 +31,7 @@ async function handler(event, context, callback) {
   const serviceName = SERVICE_NAME;
   const functionName = WORKER_FUNCTION_NAME;
   const qualifier = 'LATEST';
-  const accountId = context.accountId;
-  const { accessKeyId, accessKeySecret, securityToken } = context.credentials || {};
+  const { accountId, accessKeyId, accessKeySecret } = CREDENTIALS || {};
 
   console.debug('region: ', region);
   console.debug('serviceName: ', serviceName);
@@ -51,14 +44,19 @@ async function handler(event, context, callback) {
     accessKeyId,
     accessKeySecret,
     regionId: region,
-    securityToken: securityToken,
+    // securityToken: securityToken,
     endpoint: `${accountId}.${region}.fc.aliyuncs.com`,
     readTimeout: 30 * 1000,
   });
 
   let statefulAsyncInvocationStatus;
   try {
-    const { body: statefulRes } = await popClient.getStatefulAsyncInvocation(serviceName, functionName, taskId, { qualifier });
+    const { body: statefulRes } = await popClient.getStatefulAsyncInvocation(
+      serviceName,
+      functionName,
+      taskId,
+      { qualifier },
+    );
     console.debug('statefulRes: ', statefulRes);
     statefulAsyncInvocationStatus = statefulRes.status;
   } catch (ex) {
@@ -76,7 +74,9 @@ async function handler(event, context, callback) {
     const FAILED_STATUS = 'failure';
     const appTaskConfig = { taskId, commit, message, ref };
 
-    await otsApp.update(appId, { latest_task: { ...appTaskConfig, completed: true, status: FAILED_STATUS } });
+    await otsApp.update(appId, {
+      latest_task: { ...appTaskConfig, completed: true, status: FAILED_STATUS },
+    });
 
     const dbConfig = await otsTask.find(taskId);
     if (dbConfig.id) {
@@ -85,15 +85,15 @@ async function handler(event, context, callback) {
         steps: dbConfig.steps.map(({ run, stepCount, status }) => ({
           run,
           stepCount,
-          status: status === RUNNING ? FAILED_STATUS : status
-        }))
+          status: status === RUNNING ? FAILED_STATUS : status,
+        })),
       });
     } else {
       await otsTask.make(taskId, {
         user_id: userId,
         app_id: appId,
         status: FAILED_STATUS,
-        // steps: [], 
+        // steps: [],
         trigger_payload: payload,
       });
     }
