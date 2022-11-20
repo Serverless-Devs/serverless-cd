@@ -3,8 +3,8 @@ name: serverless-cd
 access: {{ access }}
 
 services:
-  ui:
-    component: cd-generate
+  generate:
+    component: serverless-cd-tool
     props:
       serviceName: {{ serviceName }}
       dbPrefix: {{ dbPrefix }}

@@ -11,4 +11,4 @@ __test__
 .ice
 **.log
 /Makefile
-s.local.yaml
+s.dev.yaml
