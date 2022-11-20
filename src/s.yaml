@@ -76,7 +76,6 @@ services:
         memorySize: 1024
         timeout: 600
         environmentVariables:
-          NODE_ENV: production
           CD_PIPLINE_YAML: ${env.CD_PIPLINE_YAML}
           DOWNLOAD_CODE_DIR: ${env.DOWNLOAD_CODE_DIR}
           ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
