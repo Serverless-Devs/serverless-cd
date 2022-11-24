@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useRequest, history } from 'ice';
 import { Loading, Collapse, Icon } from '@alicloud/console-components';
-import { get, map, filter } from 'lodash';
+import { get, map, filter, isEmpty } from 'lodash';
 import { getTask, getTaskLog } from '@/services/task';
 import { DEPLOY_STATUS } from '@/constants/index';
 import PageLayout from '@/layouts/PageLayout';
 import Redeploy from '@/components/Redeploy';
 import CancelDeploy from '@/components/CancelDeploy';
+import Empty from '@/components/Empty'
+import { formatLogs } from '@/utils/index';
 import './index.less';
 import Convert from 'ansi-to-html';
+
 const convert = new Convert();
 
 const Panel = Collapse.Panel;
@@ -62,7 +65,7 @@ const Details = ({
     const steps = map(get(task.data, 'steps', []), (item, i) => {
       return {
         ...item,
-        rawLog: taskSteps[i]?.rawLog || '',
+        rawLog: formatLogs(taskSteps[i]?.rawLog || ''),
         initialize: true,
         loading: false,
       };
@@ -71,7 +74,6 @@ const Details = ({
       setIsLoops(false);
       task.cancel();
     }
-
     setTaskSteps(steps as never[]);
   }, [task.data]);
 
@@ -82,7 +84,7 @@ const Details = ({
       panelItem.loading = true;
       setTaskSteps([...taskSteps]);
       getTaskLog({ taskId, stepCount: panelItem.stepCount }).then((item) => {
-        panelItem.rawLog = item;
+        panelItem.rawLog = formatLogs(item);
         panelItem.loading = false;
         panelItem.initialize = false;
         setTaskSteps([...taskSteps]);
@@ -143,36 +145,43 @@ const Details = ({
       ]}
     >
       <Loading visible={loading} style={{ width: '100%' }}>
-        <Collapse className="task-collaps" expandedKeys={expandedKeys}>
-          {map(taskSteps, (step, i) => {
-            const { initialize, loading, rawLog, status } = step;
-            const disabledStatus = ['pending', 'skipped', 'cancelled'];
-            const isDisabled = disabledStatus.includes(status);
-            const isRunning = status === 'running';
-            const isRequest = initialize && loading && !rawLog;
-            return (
-              <Panel
-                className={`task-details-panel ${
-                  isDisabled || isRunning || isRequest ? 'task-details-panel-loading' : ''
-                }`}
-                title={<PanelTitle step={step} isRequest={isRequest} />}
-                disabled={isDisabled}
-                onClick={() => onExpand(i, status)}
-              >
-                <Loading visible={loading} style={{ width: '100%' }}>
-                  <div className="task-details">
-                    <pre
-                      className="pre"
-                      dangerouslySetInnerHTML={{
-                        __html: !rawLog ? '正在加载中' : convert.toHtml(rawLog),
-                      }}
-                    ></pre>
-                  </div>
-                </Loading>
-              </Panel>
-            );
-          })}
-        </Collapse>
+        {
+          isEmpty(taskSteps) ? (
+            <Empty />
+          ) : (
+            <Collapse className="task-collaps" expandedKeys={expandedKeys}>
+              {map(taskSteps, (step, i) => {
+                const { initialize, loading, rawLog, status } = step;
+
+                const disabledStatus = ['pending', 'skipped', 'cancelled'];
+                const isDisabled = disabledStatus.includes(status);
+                const isRunning = status === 'running';
+                const isRequest = initialize && loading && !rawLog;
+                return (
+                  <Panel
+                    className={`task-details-panel ${isDisabled || isRunning || isRequest ? 'task-details-panel-loading' : ''
+                      }`}
+                    key={i}
+                    title={<PanelTitle step={step} isRequest={isRequest} />}
+                    disabled={isDisabled}
+                    onClick={() => onExpand(i, status)}
+                  >
+                    <Loading visible={loading} style={{ width: '100%' }}>
+                      <div className="task-details">
+                        <pre
+                          className="pre"
+                          dangerouslySetInnerHTML={{
+                            __html: !rawLog ? '暂无数据' : convert.toHtml(rawLog),
+                          }}
+                        ></pre>
+                      </div>
+                    </Loading>
+                  </Panel>
+                );
+              })}
+            </Collapse>
+          )
+        }
       </Loading>
     </PageLayout>
   );
