@@ -1,4 +1,6 @@
 import _ from "lodash";
+import moment from 'moment';
+const DATE_TIME_REG = /^\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d(?:\.\d+)?Z?/;
 
 export function getParams(search = '') {
   let obj = {};
@@ -11,6 +13,66 @@ export function getParams(search = '') {
 }
 
 export const sleep = (time = 1000) => new Promise((resolve) => setTimeout(resolve, time));
+
+export function replaceAll(string, search, replace) {
+  return string.split(search).join(replace);
+}
+
+/**
+ * 日志关键字高亮处理
+ * @param logs
+ * @param requestId
+ * @returns
+ */
+
+export function formatLogs(log, requestId = '') {
+  let l = log;
+  if (requestId) {
+    l = replaceAll(l, requestId, `\u001b[1;36m${requestId}\u001b[0m`);
+  }
+  let tokens = l.split(' ');
+  let timeToken = tokens[0];
+  if (tokens.length && DATE_TIME_REG.test(timeToken)) {
+    const dateStr = moment(timeToken).format('YYYY-MM-DD');
+    timeToken = timeToken.substring(0, timeToken.indexOf('Z') + 1);
+    tokens[0] = `\u001b[1;32m${dateStr === 'Invalid date' ? timeToken : dateStr}\u001b[0m`;
+  }
+
+  if (tokens[2] === '[silly]') {
+    tokens.splice(2, 1);
+  }
+  l = tokens.join(' ');
+
+  replaceToken(l)
+
+  return replaceToken(l);
+}
+
+/**
+ * @param replaceStr
+ * @returns
+ */
+
+export function replaceToken(replaceStr) {
+  const logKeys = {
+    warn: (key) => `\u001b[33m${key}\u001b[0m`,
+    info: (key) => `\u001b[32m${key}\u001b[0m`,
+    error: (key) => `\u001b[31m${key}\u001b[0m`,
+    success: (key) => `\u001b[32m${key}\u001b[0m`,
+  }
+  _.each(_.keys(logKeys), (logKey: string) => {
+    console.log(logKey);
+    const replaceFn = logKeys[logKey];
+    const toLowerKey = _.toLower(logKey); // 字符串转为小写
+    const toUpperKey = _.toUpper(logKey); // 字符串转为大写
+    const capitalizeKey = _.capitalize(toLowerKey); // 字符串首字母转为大写
+    replaceStr = replaceAll(replaceStr, toLowerKey, replaceFn(toLowerKey))
+    replaceStr = replaceAll(replaceStr, toUpperKey, replaceFn(toUpperKey))
+    replaceStr = replaceAll(replaceStr, capitalizeKey, replaceFn(capitalizeKey))
+  })
+
+  return replaceStr
+}
 
 
 /**

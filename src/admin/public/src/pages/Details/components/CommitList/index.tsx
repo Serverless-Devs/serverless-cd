@@ -137,7 +137,7 @@ const CommitList = (props: Props) => {
                     </div>
 
                     <div style={{ fontSize: 12, marginBottom: 5 }}>
-                      <span style={{ display: 'inline-block', width: '100%' }}>{message}</span>
+                      <div className='text-nowrap-2'>{message}</div>
                       <span style={{ color: '#888', lineHeight: 2 }}>{updatedTime}</span>
                     </div>
                     <div className="flex-r">

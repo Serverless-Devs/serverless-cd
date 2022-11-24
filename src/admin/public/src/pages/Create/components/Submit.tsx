@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Field, Button, Dialog, Step, Icon } from '@alicloud/console-components';
 import { createApp } from '@/services/applist';
 import { manualDeployApp } from '@/services/task';
@@ -28,6 +28,7 @@ const Submit = (props: IProps) => {
   const manualDeploy = useRequest(manualDeployApp);
   const field = Field.useField();
   const { setValue, getValue } = field;
+  const isDeploy = useRef(false)
 
   const handleCreate = async () => {
     setValue('submitLoading', true);
@@ -75,7 +76,7 @@ const Submit = (props: IProps) => {
     try {
       const { success, data } = await request(dataMap[get(values, 'createType')]);
       if (success) {
-        if (data.id && !isEmpty(values['trigger'])) {
+        if (get(isDeploy, 'current') && data.id && !isEmpty(values['trigger'])) {
           await manualDeploy.request({
             appId: data.id,
             ref: `refs/heads/${get(values, 'trigger[0].branch')}`,
@@ -91,7 +92,8 @@ const Submit = (props: IProps) => {
     setValue('submitLoading', false);
   };
 
-  const berforeCreate = async () => {
+  const berforeCreate = async (deployState) => {
+    isDeploy.current = deployState;
     props.field.validate(async (errors, values) => {
       console.log('errors', errors, values);
       if (errors) return;
@@ -240,8 +242,11 @@ const Submit = (props: IProps) => {
 
   return (
     <>
-      <Button className="mt-32" type="primary" onClick={berforeCreate} loading={loading}>
-        创建应用
+      <Button className="mt-32 mr-8" type="primary" onClick={() => berforeCreate(false)} loading={loading}>
+        创建
+      </Button>
+      <Button className="mt-32" onClick={() => berforeCreate(true)} loading={loading}>
+        创建并部署
       </Button>
       <Dialog
         size="medium"
@@ -251,16 +256,16 @@ const Submit = (props: IProps) => {
         footer={
           (getValue('errorBranch') as [])?.length > 0
             ? [
-                <Button
-                  type="primary"
-                  onClick={handleCreate}
-                  style={{ marginRight: 8 }}
-                  loading={getValue('submitLoading')}
-                >
-                  确定
-                </Button>,
-                <Button onClick={() => setValue('showDialog', false)}>取消</Button>,
-              ]
+              <Button
+                type="primary"
+                onClick={handleCreate}
+                style={{ marginRight: 8 }}
+                loading={getValue('submitLoading')}
+              >
+                确定
+              </Button>,
+              <Button onClick={() => setValue('showDialog', false)}>取消</Button>,
+            ]
             : []
         }
       >

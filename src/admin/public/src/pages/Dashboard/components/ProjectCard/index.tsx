@@ -8,7 +8,7 @@ import './index.css';
 
 const CardHeader = ({ name, owner }) => {
   return (
-    <div className='text-nowrap-1' style={{minWidth: 180}}>
+    <div className='text-nowrap-1' style={{ minWidth: 180 }}>
       <span
         className="avatar-content"
         style={{ display: 'inline-block', fontSize: 12, marginRight: 10 }}
@@ -40,11 +40,11 @@ const ProjectCard = ({ item }) => {
       <Card free showHeadDivider className="project-card cursor-pointer" onClick={goDetails}>
         <Card.Header title={<CardHeader name={name} owner={owner} />} />
         <Card.Content style={{ height: 40, paddingBottom: 0 }}>
-          <span className='text-nowrap-1'>{message}</span>
+          <div className='text-nowrap-1'>{message}</div>
           <p className='text-nowrap-1' style={{ margin: '5px 0' }}>{description}</p>
         </Card.Content>
         <Card.Actions>
-          <Box spacing={10} direction="row" style={{alignItems: 'center', justifyContent: 'space-between'}}>
+          <Box spacing={10} direction="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
             <div className='flex-r'>
               <span className="mr-8" >{moment(updated_time).format('YYYY-MM-DD HH:mm:ss')}</span>
               {item.provider === 'github' && (
