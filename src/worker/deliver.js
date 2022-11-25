@@ -2,6 +2,7 @@ const Client = require('@alicloud/fc-open20210406').default;
 const otsTask = require('./model/task');
 const otsApp = require('./model/app');
 const { CREDENTIALS } = require('./config');
+const _ = require('lodash');
 
 const { WORKER_MAX_RETRY_ATTEMPTS, REGION, SERVICE_NAME, WORKER_FUNCTION_NAME } = process.env;
 
@@ -79,7 +80,7 @@ async function handler(event, context, callback) {
     });
 
     const dbConfig = await otsTask.find(taskId);
-    if (dbConfig.id) {
+    if (dbConfig.id && !_.isEmpty(dbConfig.steps)) {
       await otsTask.make(taskId, {
         status: FAILED_STATUS,
         steps: dbConfig.steps.map(({ run, stepCount, status }) => ({
