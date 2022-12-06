@@ -13,7 +13,7 @@ const { getPayload, getOTSTaskPayload } = require('./utils');
 const otsTask = require('./model/task');
 const otsApp = require('./model/app');
 
-async function handler (event, _context, callback) {
+async function handler(event, _context, callback) {
   // 解析入参
   const inputs = getPayload(event);
   console.log(JSON.stringify(inputs, null, 2));
@@ -56,12 +56,11 @@ async function handler (event, _context, callback) {
       commit,
     });
     logger.info('checkout success');
-  
+
     // 解析 pipline
     const pipLineYaml = path.join(execDir, _.get(trigger, 'template', CD_PIPLINE_YAML))
     logger.info(`parse spec: ${pipLineYaml}`);
-    core.setServerlessCdVariable('TEMPLATE_PATH', pipLineYaml);
-    const piplineContext = await core.parseSpec();
+    const piplineContext = await core.parseSpec(pipLineYaml);
     logger.debug('piplineContext:\n', JSON.stringify(piplineContext));
     const steps = _.get(piplineContext, 'steps');
     logger.debug(`start update app`);
@@ -106,13 +105,13 @@ async function handler (event, _context, callback) {
       onPreRun: async function (_data, context) {
         await otsTask.make(taskId, {
           status: context.status,
-          steps: getOTSTaskPayload(context.steps), 
+          steps: getOTSTaskPayload(context.steps),
         });
       },
       onPostRun: async function (_data, context) {
         await otsTask.make(taskId, {
           status: context.status,
-          steps: getOTSTaskPayload(context.steps), 
+          steps: getOTSTaskPayload(context.steps),
         });
       },
       onCompleted: async function (context, logger) {
@@ -120,7 +119,7 @@ async function handler (event, _context, callback) {
           status: context.status,
           steps: getOTSTaskPayload(context.steps),
         });
-        await otsApp.update(appId, { latest_task: { ...appTaskConfig, completed: context.completed, status: context.status }});
+        await otsApp.update(appId, { latest_task: { ...appTaskConfig, completed: context.completed, status: context.status } });
         logger.info('completed end.');
         callback(null, '');
       },

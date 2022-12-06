@@ -1,8 +1,7 @@
 const router = require('express').Router();
 const addWebhook = require('./add-webhook');
-const core = require('@serverless-cd/core');
+const { lodash: _ } = require('@serverless-cd/core');
 const { generateSuccessResult, generateErrorResult, unionid } = require('../../util');
-const { lodash: _ } = core;
 const { OTS_APPLICATION, OTS_USER, OTS_TASK } = require('../../config');
 const orm = require('../../util/orm')(OTS_APPLICATION.name, OTS_APPLICATION.index);
 const userOrm = require('../../util/orm')(OTS_USER.name, OTS_USER.index);
