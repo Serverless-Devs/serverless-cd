@@ -193,15 +193,10 @@ services:
               - OPTIONS
               - PUT
               - PATCH
-  
-  router: # 路由函数
-    component: fc-domain
-    props:
-      region: ${vars.region}
-      customDomain:
-        domainName: ${env.DOMAIN}
-        protocol: HTTP
-        routeConfigs:
-          - path: /*
-            serviceName: ${vars.service.name}
-            functionName: ${vars.adminFunctionName}
+      customDomains:
+        - domainName: ${env.DOMAIN}
+          protocol: HTTP
+          routeConfigs:
+            - path: /*
+              serviceName: ${vars.service.name}
+              functionName: ${vars.adminFunctionName}
