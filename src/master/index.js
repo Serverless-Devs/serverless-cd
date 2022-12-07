@@ -5,7 +5,7 @@ if (fs.existsSync(envPath)) {
   require('dotenv').config({ path: envPath });
 }
 const getRawBody = require('raw-body');
-const trigger = require('@serverless-cd/trigger');
+const { verifyLegitimacy } = require('@serverless-cd/trigger');
 const { checkFile } = require('@serverless-cd/git');
 const { customAlphabet } = require('nanoid');
 const _ = require('lodash');
@@ -55,7 +55,7 @@ exports.handler = (req, resp, context) => {
       // 验证是否被触发
       console.log("eventConfig: ", JSON.stringify(eventConfig));
       console.log("triggerInputs: ", JSON.stringify(triggerInputs));
-      const triggerConfig = await trigger(eventConfig, triggerInputs);
+      const triggerConfig = await verifyLegitimacy(eventConfig, triggerInputs);
       console.log('triggerConfig: ', JSON.stringify(triggerConfig));
       if (!_.get(triggerConfig, 'success')) {
         resp.send(JSON.stringify(triggerConfig));
