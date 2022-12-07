@@ -18,7 +18,7 @@
     "@alicloud/fc2": "^2.6.3",
     "@serverless-cd/git": "^0.0.2",
     "@serverless-cd/ots-orm": "^1.1.0",
-    "@serverless-cd/trigger": "^0.0.3",
+    "@serverless-cd/trigger": "^0.0.9",
     "dotenv": "^16.0.2",
     "nanoid": "^3.3.4",
     "tablestore": "^5.2.2"
