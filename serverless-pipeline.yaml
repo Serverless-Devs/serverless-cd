@@ -3,8 +3,8 @@ steps:
   - run: s -v
   - run: s config add --AccountID ${{secrets.ACCOUNTID}}  --AccessKeyID ${{secrets.ACCESS_KEY_ID}}  --AccessKeySecret ${{secrets.ACCESS_KEY_SECRET}} -a default -f
   - run: s deploy --use-local -y -t ./src/serverless-cd.yaml
-  - name: 钉钉通知测试
-    plugin: @serverless-cd/ding-talk
+  - name: 钉钉通知
+    plugin: "@serverless-cd/ding-talk"
     inputs:
       webhook: https://oapi.dingtalk.com/robot/send?access_token=${{secrets.WEBHOOK_ACCESS_TOKEN}}
       msgtype: markdown
