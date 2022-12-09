@@ -1,4 +1,4 @@
-await $`cd('{{secrets.SESSION_EXPIRATION}}')`;
+await $`cd('{{secrets.DOWNLOAD_CODE_DIR}}')`;
 await $`pwd`;
 await $`echo SESSION_EXPIRATION={{secrets.SESSION_EXPIRATION}} >> .env`;
 await $`echo DOWNLOAD_CODE_DIR={{secrets.DOWNLOAD_CODE_DIR}} >> .env`;
