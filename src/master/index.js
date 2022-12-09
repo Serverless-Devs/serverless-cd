@@ -21,10 +21,12 @@ exports.handler = (req, resp, context) => {
   if (!userId) {
     console.log('Not a standard Serverless-cd trigger, lacks user_id');
     resp.statusCode = 400;
-    resp.send(JSON.stringify({
-      success: false,
-      message: 'Not a standard Serverless-cd trigger, lacks user_id',
-    }));
+    resp.send(
+      JSON.stringify({
+        success: false,
+        message: 'Not a standard Serverless-cd trigger, lacks user_id',
+      }),
+    );
     return;
   }
   getRawBody(req, async function (err, body) {
@@ -53,35 +55,16 @@ exports.handler = (req, resp, context) => {
       const eventConfig = _.get(workerPayload, 'authorization.trigger_spec');
 
       // 验证是否被触发
-      console.log("eventConfig: ", JSON.stringify(eventConfig));
-      console.log("triggerInputs: ", JSON.stringify(triggerInputs));
+      console.log('eventConfig: ', JSON.stringify(eventConfig));
+      console.log('triggerInputs: ', JSON.stringify(triggerInputs));
       const triggerConfig = await verifyLegitimacy(eventConfig, triggerInputs);
       console.log('triggerConfig: ', JSON.stringify(triggerConfig));
       if (!_.get(triggerConfig, 'success')) {
         resp.send(JSON.stringify(triggerConfig));
         return;
       }
-      const pipLineYaml = _.get(triggerConfig, 'trigger.template', CD_PIPLINE_YAML);
       _.merge(workerPayload, { trigger: triggerConfig.trigger, taskId: nanoid() });
       console.log('workerPayload:', JSON.stringify(workerPayload, null, 2));
-
-      // 验证 pipline 文件是否存在
-      const checkFilePayload = {
-        file: pipLineYaml,
-        clone_url: workerPayload.cloneUrl,
-        ref: workerPayload.ref,
-        owner: _.get(workerPayload, 'authorization.owner'),
-        provider: _.get(workerPayload, 'provider'),
-        token: _.get(workerPayload, 'authorization.accessToken'),
-      };
-      console.log('Check file payload: ', checkFilePayload);
-      if (!(await checkFile(checkFilePayload))) {
-        resp.send(JSON.stringify({
-          success: false,
-          message: `Not found config file: ${pipLineYaml}`,
-        }));
-        return;
-      }
 
       // 调用 worker
       try {
@@ -94,7 +77,7 @@ exports.handler = (req, resp, context) => {
       resp.send(JSON.stringify(triggerConfig));
     } catch (ex) {
       resp.statusCode = 500;
-      resp.send(ex.toString())
+      resp.send(ex.toString());
     }
   });
-}
+};
