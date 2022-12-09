@@ -7,12 +7,21 @@ steps:
   - run: ls -la /tmp/code
   - run: cat /tmp/code/.env
   - run: s deploy --use-local -y -t ./src/serverless-cd.yaml
-  - name: 钉钉通知
+  - name: 钉钉成功通知
     plugin: "@serverless-cd/ding-talk"
-    if: ${{ always() }}
+    if: ${{ success() }}
     inputs:
       webhook: https://oapi.dingtalk.com/robot/send?access_token=${{secrets.WEBHOOK_ACCESS_TOKEN}}
       msgtype: markdown
       payload:
         title: "Serverless CD"
-        text: "serverless cd 部署${{failure() ? '失败' : '成功'}}"
+        text: "serverless cd 部署成功"
+   - name: 钉钉通知
+    plugin: "@serverless-cd/ding-talk"
+    if: ${{ failure() }}
+    inputs:
+      webhook: https://oapi.dingtalk.com/robot/send?access_token=${{secrets.WEBHOOK_ACCESS_TOKEN}}
+      msgtype: markdown
+      payload:
+        title: "Serverless CD"
+        text: "serverless cd 部署失败"
