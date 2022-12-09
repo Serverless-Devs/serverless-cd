@@ -1,0 +1,212 @@
+edition: 1.0.0
+name: serverless-cd
+access: default
+
+vars:
+  region: ${env.REGION}
+  service:
+    name: serverless-cd
+    description: Serverless-cd 应用
+    logConfig: auto
+  masterFunctionName: master
+  workerFunctionName: worker
+  adminFunctionName: admin
+  workerMaxAsyncRetryAttempts: 0
+  workerDeliverFunctionName: workerDeliver
+
+services:
+  master:
+    component: fc
+    actions:
+      pre-deploy:
+        - run: npm install --registry=https://registry.npmmirror.com
+          path: ./src/master
+    props:
+      region: ${vars.region}
+      service: ${vars.service}
+      function:
+        name: ${vars.masterFunctionName}
+        description: 用于验证 CD的触发方式、请求的合法性以及组装一些 worker 函数需要的内容
+        runtime: nodejs14
+        codeUri: ./master
+        handler: index.handler
+        memorySize: 640
+        timeout: 12
+        instanceConcurrency: 20
+        environmentVariables:
+          REGION: ${vars.region}
+          SERVICE_NAME: ${vars.service.name}
+          WORKER_FUNCTION_NAME: ${vars.workerFunctionName} # worker 函数的名称
+          CD_PIPLINE_YAML: ${env.CD_PIPLINE_YAML}
+          ACCOUNTID: ${env.ACCOUNTID}
+          ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
+          ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
+          OTS_INSTANCE_NAME: ${env.OTS_INSTANCE_NAME}
+          OTS_USER_TABLE_NAME: ${env.OTS_USER_TABLE_NAME}
+          OTS_USER_INDEX_NAME: ${env.OTS_USER_INDEX_NAME}
+          OTS_APP_TABLE_NAME: ${env.OTS_APP_TABLE_NAME}
+          OTS_APP_INDEX_NAME: ${env.OTS_APP_INDEX_NAME}
+      triggers:
+        - name: http-trigger
+          type: http
+          config:
+            authType: anonymous
+            methods:
+              - POST
+
+  worker-deliver:
+    component: fc
+    props:
+      region: ${vars.region}
+      service: ${vars.service}
+      function:
+        name: ${vars.workerDeliverFunctionName}
+        description: 执行用户配置的 CD 流程。
+        runtime: nodejs14
+        codeUri: ./worker
+        handler: deliver.handler
+        memorySize: 640
+        timeout: 600
+        environmentVariables:
+          REGION: ${vars.region}
+          SERVICE_NAME: ${vars.service.name}
+          WORKER_FUNCTION_NAME: ${vars.workerFunctionName} # worker 函数的名称
+          ACCOUNTID: ${env.ACCOUNTID}
+          ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
+          ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
+          OSS_BUCKET: ${env.OSS_BUCKET}
+          OTS_INSTANCE_NAME: ${env.OTS_INSTANCE_NAME}
+          OTS_TASK_TABLE_NAME: ${env.OTS_TASK_TABLE_NAME}
+          OTS_TASK_INDEX_NAME: ${env.OTS_TASK_INDEX_NAME}
+          OTS_APP_TABLE_NAME: ${env.OTS_APP_TABLE_NAME}
+          OTS_APP_INDEX_NAME: ${env.OTS_APP_INDEX_NAME}
+        asyncConfiguration:
+          maxAsyncRetryAttempts: 0
+
+  admin:
+    component: fc
+    actions:
+      pre-deploy:
+        - run: npm install --registry=https://registry.npmmirror.com
+          path: "./admin/public"
+        - run: npm run build
+          path: "./admin/public"
+        - run: npm install --registry=https://registry.npmmirror.com
+          path: "./admin"
+        - plugin: get-http-function-url # 获取依赖的 trigger 函数的触发器地址，也可以直接修改 environmentVariables 的 WEBHOOKURL
+          args:
+            region: ${vars.region}
+            serviceName: ${vars.service.name}
+            functionName: ${vars.masterFunctionName}
+            envKey: WEBHOOKURL
+    props:
+      region: ${vars.region}
+      service: ${vars.service}
+      function:
+        name: ${vars.adminFunctionName}
+        description: serverless-cd 前端应用接口
+        runtime: custom
+        codeUri: ./admin
+        handler: index.handler
+        memorySize: 640
+        timeout: 360
+        caPort: 9000
+        instanceConcurrency: 5
+        customRuntimeConfig:
+          command:
+            - node
+            - index.js
+        environmentVariables:
+          REGION: ${vars.region}
+          SERVICE_NAME: ${vars.service.name}
+          WORKER_FUNCTION_NAME: ${vars.workerFunctionName} # worker 函数的名称
+          DOWNLOAD_CODE_DIR: ${env.DOWNLOAD_CODE_DIR}
+          CD_PIPLINE_YAML: ${env.CD_PIPLINE_YAML}
+          GITHUB_CLIENT_ID: ${env.GITHUB_CLIENT_ID} # 
+          GITHUB_CLIENT_SECRET: ${env.GITHUB_CLIENT_SECRET} # 是不是在 运行 init 之后在让用户手动填写比较好，因为我们能提示到下面的 callback
+          GITHUB_REDIRECT_URI: http://${env.DOMAIN}/auth/github/callback
+          ACCOUNTID: ${env.ACCOUNTID}
+          ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
+          ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
+          OSS_BUCKET: ${env.OSS_BUCKET}
+          OTS_INSTANCE_NAME: ${env.OTS_INSTANCE_NAME}
+          OTS_TASK_TABLE_NAME: ${env.OTS_TASK_TABLE_NAME}
+          OTS_TASK_INDEX_NAME: ${env.OTS_TASK_INDEX_NAME}
+          OTS_USER_TABLE_NAME: ${env.OTS_USER_TABLE_NAME}
+          OTS_USER_INDEX_NAME: ${env.OTS_USER_INDEX_NAME}
+          OTS_APP_TABLE_NAME: ${env.OTS_APP_TABLE_NAME}
+          OTS_APP_INDEX_NAME: ${env.OTS_APP_INDEX_NAME}
+          OTS_SESSION_TABLE_NAME: ${env.OTS_SESSION_TABLE_NAME}
+          OTS_TOKEN_TABLE_NAME: ${env.OTS_TOKEN_TABLE_NAME}
+          OTS_TOKEN_INDEX_NAME: ${env.OTS_TOKEN_INDEX_NAME}
+          SESSION_EXPIRATION: ${env.SESSION_EXPIRATION}
+      triggers:
+        - name: http-trigger
+          type: http
+          config:
+            authType: anonymous
+            methods:
+              - HEAD
+              - DELETE
+              - POST
+              - GET
+              - OPTIONS
+              - PUT
+              - PATCH
+
+  worker:
+    component: fc
+    actions:
+      pre-deploy:
+        - run: npm install --registry=https://registry.npmmirror.com
+          path: "./worker"
+      post-deploy:
+        - component: fc api UpdateFunction --region ${vars.region} --header '{"x-fc-disable-container-reuse":"True"}' --path '{"serviceName":"${vars.service.name}","functionName":"${vars.workerFunctionName}"}'
+    props:
+      region: ${vars.region}
+      service: ${vars.service}
+      function:
+        name: ${vars.workerFunctionName}
+        description: 执行用户配置的 CD 流程。
+        runtime: nodejs16
+        codeUri: ./worker
+        handler: index.handler
+        memorySize: 1024
+        timeout: 600
+        environmentVariables:
+          NODE_ENV: production
+          CD_PIPLINE_YAML: ${env.CD_PIPLINE_YAML}
+          DOWNLOAD_CODE_DIR: ${env.DOWNLOAD_CODE_DIR}
+          ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
+          ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
+          OSS_BUCKET: ${env.OSS_BUCKET}
+          REGION: ${env.REGION}
+          OTS_INSTANCE_NAME: ${env.OTS_INSTANCE_NAME}
+          OTS_TASK_TABLE_NAME: ${env.OTS_TASK_TABLE_NAME}
+          OTS_TASK_INDEX_NAME: ${env.OTS_TASK_INDEX_NAME}
+          OTS_APP_TABLE_NAME: ${env.OTS_APP_TABLE_NAME}
+          OTS_APP_INDEX_NAME: ${env.OTS_APP_INDEX_NAME}
+        asyncConfiguration:
+          maxAsyncRetryAttempts: 0
+          # maxAsyncRetryAttempts: ${vars.workerMaxAsyncRetryAttempts}
+          statefulInvocation: true
+          destination:
+            onFailure: acs:fc:::services/${vars.service.name}/functions/${vars.workerDeliverFunctionName}
+
+  compose:
+    component: fc-domain
+    props:
+      region: ${vars.region}
+      customDomain:
+        domainName: ${env.DOMAIN}
+        protocol: HTTP
+        routeConfigs:
+          - path: /*
+            serviceName: ${vars.service.name}
+            functionName: ${vars.adminFunctionName}
+          - path: /api
+            serviceName: ${vars.service.name}
+            functionName: ${worker.props.function.name}
+
+# s admin deploy
+# s compose deploy --patch

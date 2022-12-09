@@ -2,11 +2,7 @@ env:
   name: serverless-cd
   age: 30
 steps:
-  - run: echo 'Hi {{ env.name }}'
-  - run: echo 'Hi {{ env.name }}'
-    env:
-      name: Tony
-  - run: echo 'Hi {{ task_id }}'
-  - run: echo 'Hi {{ app.user_name }}'
-  - run: echo 'Hi {{ git.event_name }}'
-  - run: echo 'suceess end'
+  - run: npm install @serverless-devs/s -g  --registry=https://registry.npmmirror.com
+  - run: s -v
+  - run: s config add --AccountID ${{secrets.ACCOUNTID}}  --AccessKeyID ${{secrets.ACCESS_KEY_ID}}  --AccessKeySecret ${{secrets.ACCESS_KEY_SECRET}} -a default -f
+  - run: s deploy --use-local -y -t ./src/serverless-cd.yaml
