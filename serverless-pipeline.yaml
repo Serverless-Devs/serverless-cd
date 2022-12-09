@@ -1,3 +1,11 @@
 steps:
-  - run: echo "Hello Worldxx"
-  - run: env
+  - run: npm install --registry=https://registry.npmmirror.com
+    working-directory: ./master
+  - run: npm install --registry=https://registry.npmmirror.com
+    working-directory: ./worker
+  - run: npm install --registry=https://registry.npmmirror.com
+    working-directory: ./admin
+  - run: npm install --registry=https://registry.npmmirror.com
+    working-directory: ./admin/public
+  - run: npm run build
+    working-directory: ./admin/public
