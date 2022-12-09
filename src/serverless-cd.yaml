@@ -20,7 +20,7 @@ services:
     actions:
       pre-deploy:
         - run: npm install --registry=https://registry.npmmirror.com
-          path: ./src/master
+          path: ./master
     props:
       region: ${vars.region}
       service: ${vars.service}
