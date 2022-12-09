@@ -1,11 +1,16 @@
 steps:
-  - run: npm install --registry=https://registry.npmmirror.com
+  - name: Install master dependencies
+    run: npm install
     working-directory: ./master
-  - run: npm install --registry=https://registry.npmmirror.com
+  - name: Install worker dependencies
+    run: npm install
     working-directory: ./worker
-  - run: npm install --registry=https://registry.npmmirror.com
+  - name: Install admin dependencies
+    run: npm install
     working-directory: ./admin
-  - run: npm install --registry=https://registry.npmmirror.com
+  - name: Install admin/public dependencies
+    run: npm install
     working-directory: ./admin/public
-  - run: npm run build
+  - name: admin/public build
+    run: npm run build
     working-directory: ./admin/public
