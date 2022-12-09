@@ -8,21 +8,21 @@ steps:
   - run: cat /tmp/code/.env
   - run: env
   - run: s deploy --use-local -y -t ./src/serverless-cd.yaml
-  # - name: 钉钉成功通知
-  #   plugin: "@serverless-cd/ding-talk"
-  #   if: ${{ success() }}
-  #   inputs:
-  #     webhook: https://oapi.dingtalk.com/robot/send?access_token=${{secrets.WEBHOOK_ACCESS_TOKEN}}
-  #     msgtype: markdown
-  #     payload:
-  #       title: "Serverless CD"
-  #       text: "serverless cd 测试"
-  # - name: 钉钉失败通知
-  #   plugin: "@serverless-cd/ding-talk"
-  #   if: ${{ failure() }}
-  #   inputs:
-  #     webhook: https://oapi.dingtalk.com/robot/send?access_token=${{secrets.WEBHOOK_ACCESS_TOKEN}}
-  #     msgtype: markdown
-  #     payload:
-  #       title: "Serverless CD"
-  #       text: "serverless cd 部署失败"
+  - name: 钉钉成功通知
+    plugin: "@serverless-cd/ding-talk"
+    if: ${{ success() }}
+    inputs:
+      webhook: https://oapi.dingtalk.com/robot/send?access_token=${{secrets.WEBHOOK_ACCESS_TOKEN}}
+      msgtype: markdown
+      payload:
+        title: "Serverless CD"
+        text: "serverless cd 部署成功"
+  - name: 钉钉失败通知
+    plugin: "@serverless-cd/ding-talk"
+    if: ${{ failure() }}
+    inputs:
+      webhook: https://oapi.dingtalk.com/robot/send?access_token=${{secrets.WEBHOOK_ACCESS_TOKEN}}
+      msgtype: markdown
+      payload:
+        title: "Serverless CD"
+        text: "serverless cd 部署失败"
