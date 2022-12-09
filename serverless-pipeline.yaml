@@ -4,7 +4,8 @@ steps:
   # - run: s config add --AccountID ${{secrets.ACCOUNTID}}  --AccessKeyID ${{secrets.ACCESS_KEY_ID}}  --AccessKeySecret ${{secrets.ACCESS_KEY_SECRET}} -a default -f
   - name: generate env
     script: /tmp/code/scripts/generate-env.js
-  - run: cat .env
+  - run: ls -la /tmp/code
+  - run: cat /tmp/code/.env
   # - run: s deploy --use-local -y -t ./src/serverless-cd.yaml
   # - name: 钉钉通知
   #   plugin: "@serverless-cd/ding-talk"
