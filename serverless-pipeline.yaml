@@ -6,7 +6,8 @@ steps:
     script: /tmp/code/scripts/generate-env.js
   - run: ls -la /tmp/code
   - run: cat /tmp/code/.env
-  - run: s deploy --use-local -y -t ./src/serverless-cd.yaml
+  - run: env
+  # - run: s deploy --use-local -y -t ./src/serverless-cd.yaml
   - name: 钉钉成功通知
     plugin: "@serverless-cd/ding-talk"
     if: ${{ success() }}
