@@ -87,10 +87,10 @@ services:
     component: fc
     actions:
       pre-deploy:
-        - run: npm install --registry=https://registry.npmmirror.com
-          path: "./admin/public"
-        - run: npm run build
-          path: "./admin/public"
+        # - run: npm install --registry=https://registry.npmmirror.com
+        #   path: "./admin/public"
+        # - run: npm run build
+        #   path: "./admin/public"
         - run: npm install --registry=https://registry.npmmirror.com
           path: "./admin"
         - plugin: get-http-function-url # 获取依赖的 trigger 函数的触发器地址，也可以直接修改 environmentVariables 的 WEBHOOKURL

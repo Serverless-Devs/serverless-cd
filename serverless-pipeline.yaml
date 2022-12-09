@@ -1,17 +1,5 @@
 steps:
-  - run: npm i ice.js -g
-  - name: Install admin/public dependencies
-    run: npm install
-    working-directory: ./src/admin/public
-  - name: admin/public build
-    run: npm run build
-    working-directory: ./src/admin/public
-  - name: Install master dependencies
-    run: npm install
-    working-directory: ./src/master
-  - name: Install worker dependencies
-    run: npm install
-    working-directory: ./src/worker
-  - name: Install admin dependencies
-    run: npm install
-    working-directory: ./src/admin
+  - run: npm install @serverless-devs/s -g  --registry=https://registry.npmmirror.com
+  - run: s -v
+  - run: s config add --AccountID ${{secrets.ACCOUNTID}}  --AccessKeyID ${{secrets.ACCESS_KEY_ID}}  --AccessKeySecret ${{secrets.ACCESS_KEY_SECRET}} -a default -f
+  - run: s deploy --use-local -y -t ./src/serverless-cd.yaml
