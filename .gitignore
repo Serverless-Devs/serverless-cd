@@ -2,7 +2,7 @@ node_modules
 .env
 .s
 .DS_Store
-src/admin/public/build
+# src/admin/public/build
 
 _mock
 logs
