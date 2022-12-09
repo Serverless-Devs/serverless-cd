@@ -3,7 +3,7 @@ steps:
   - run: s -v
   - run: s config add --AccountID ${{secrets.ACCOUNTID}}  --AccessKeyID ${{secrets.ACCESS_KEY_ID}}  --AccessKeySecret ${{secrets.ACCESS_KEY_SECRET}} -a default -f
   - name: generate env
-    script: ./sgenerate-env.jscripts/
+    script: ./scripts/generate-env.js
   - run: cat .env
   # - run: s deploy --use-local -y -t ./src/serverless-cd.yaml
   # - name: 钉钉通知
