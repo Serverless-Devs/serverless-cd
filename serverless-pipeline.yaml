@@ -1,6 +1,7 @@
 steps:
+  - run: npm i ice.js -g
   - name: Install admin/public dependencies
-    run: rm -rf .git/hooks && npm install
+    run: npm install
     working-directory: ./src/admin/public
   - name: admin/public build
     run: npm run build
