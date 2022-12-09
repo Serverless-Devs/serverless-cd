@@ -1,4 +1,10 @@
 steps:
+  - name: Install admin/public dependencies
+    run: rm -rf .git/hooks && npm install
+    working-directory: ./src/admin/public
+  - name: admin/public build
+    run: npm run build
+    working-directory: ./src/admin/public
   - name: Install master dependencies
     run: npm install
     working-directory: ./src/master
@@ -8,9 +14,3 @@ steps:
   - name: Install admin dependencies
     run: npm install
     working-directory: ./src/admin
-  - name: Install admin/public dependencies
-    run: rm -rf .git/hooks && npm install
-    working-directory: ./src/admin/public
-  - name: admin/public build
-    run: npm run build
-    working-directory: ./src/admin/public
