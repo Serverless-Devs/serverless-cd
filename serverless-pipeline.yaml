@@ -16,7 +16,7 @@ steps:
       msgtype: markdown
       payload:
         title: "Serverless CD"
-        text: "serverless cd 部署成功"
+        text: "serverless cd 部署成功。"
   - name: 钉钉失败通知
     plugin: "@serverless-cd/ding-talk"
     if: ${{ failure() }}
@@ -25,4 +25,4 @@ steps:
       msgtype: markdown
       payload:
         title: "Serverless CD"
-        text: "serverless cd 部署失败"
+        text: "serverless cd 部署失败。"
