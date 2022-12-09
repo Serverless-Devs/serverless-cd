@@ -1,16 +1,16 @@
 steps:
   - name: Install master dependencies
     run: npm install
-    working-directory: ./master
+    working-directory: ./src/master
   - name: Install worker dependencies
     run: npm install
-    working-directory: ./worker
+    working-directory: ./src/worker
   - name: Install admin dependencies
     run: npm install
-    working-directory: ./admin
+    working-directory: ./src/admin
   - name: Install admin/public dependencies
     run: npm install
-    working-directory: ./admin/public
+    working-directory: ./src/admin/public
   - name: admin/public build
     run: npm run build
-    working-directory: ./admin/public
+    working-directory: ./src/admin/public
