@@ -19,7 +19,7 @@ services:
     component: fc
     actions:
       pre-deploy:
-        - run: npm install --registry=https://registry.npmmirror.com
+        - run: npm install
           path: ./master
     props:
       region: ${vars.region}
@@ -87,11 +87,11 @@ services:
     component: fc
     actions:
       pre-deploy:
-        # - run: npm install --registry=https://registry.npmmirror.com
+        # - run: npm install
         #   path: "./admin/public"
         # - run: npm run build
         #   path: "./admin/public"
-        - run: npm install --registry=https://registry.npmmirror.com
+        - run: npm install
           path: "./admin"
         - plugin: get-http-function-url # 获取依赖的 trigger 函数的触发器地址，也可以直接修改 environmentVariables 的 WEBHOOKURL
           args:
@@ -158,7 +158,7 @@ services:
     component: fc
     actions:
       pre-deploy:
-        - run: npm install --registry=https://registry.npmmirror.com
+        - run: npm install
           path: "./worker"
       post-deploy:
         - component: fc api UpdateFunction --region ${vars.region} --header '{"x-fc-disable-container-reuse":"True"}' --path '{"serviceName":"${vars.service.name}","functionName":"${vars.workerFunctionName}"}'
