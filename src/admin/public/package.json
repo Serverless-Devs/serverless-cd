@@ -13,10 +13,10 @@
     "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "^17.0.2",
     "react-monaco-editor": "^0.50.1",
-    "react-toastify": "^9.0.8",
-    "ice.js": "^2.0.0"
+    "react-toastify": "^9.0.8"
   },
   "devDependencies": {
+    "ice.js": "^2.0.0",
     "@iceworks/spec": "^1.0.0",
     "@types/js-yaml": "^4.0.5",
     "@types/lodash": "^4.14.184",
