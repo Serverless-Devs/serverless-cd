@@ -32,4 +32,4 @@ steps:
       secret: ${{secrets.DING_TALK_SECRET}}
       payload:
         title: "Serverless CD"
-        text: '${{status === "success" ? "serverless cd 部署成功。" : "serverless cd 部署失败。"}}\n ref: ${{git.ref}}\n message: ${{git.message}}\n commit: ${{git.commit}}\n author: ${{git.author}}\n'
+        text: '# ${{status === "success" ? "serverless cd 部署成功。" : "serverless cd 部署失败。"}}\n ## ref: ${{git.ref}}\n ## message: ${{git.message}}\n ## commit: ${{git.commit}}\n'
