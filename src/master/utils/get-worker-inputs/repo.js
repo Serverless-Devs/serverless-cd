@@ -2,7 +2,22 @@ const _ = require('lodash');
 const findUser = require('../../model/user').findOne;
 const findApplication = require('../../model/application').find;
 
-async function getRepoConfig (provider, repoId, userId) {
+async function getRepoConfig(provider, appId) {
+  console.log('find application');
+  const application = await findApplication({ provider, id: appId });
+  const applicationResult = _.get(application, 'result', []);
+  if (applicationResult.length !== 1) {
+    throw new Error(`Get ${applicationResult.length} applications, one is expected`);
+  }
+
+  const userId = _.get(applicationResult, '[0].user_id', null);
+  const repoId = _.get(applicationResult, '[0].provider_repo_id', null);
+  const app_id = _.get(applicationResult, '[0].id');
+  if (_.isEmpty(app_id, null)) {
+    throw new Error("Applicationn not found");
+  }
+  console.log('find application success');
+
   console.log('find user');
   const userConfig = await findUser(userId);
   if (_.isEmpty(userConfig)) {
@@ -16,19 +31,6 @@ async function getRepoConfig (provider, repoId, userId) {
   }
   console.log('find user success');
 
-  console.log('find application');
-  const application = await findApplication({ provider, provider_repo_id: repoId, user_id: userId });
-  const applicationResult = _.get(application, 'result', []);
-  if (applicationResult.length !== 1) {
-    throw new Error(`Get ${applicationResult.length} applications, one is expected`);
-  }
-  const appId = _.get(applicationResult, '[0].id', null);
-  if (_.isEmpty(appId)) {
-    throw new Error("Applicationn not found");
-  }
-  console.log('find application success');
-
-  
   return {
     appId,
     repoId,
@@ -37,8 +39,8 @@ async function getRepoConfig (provider, repoId, userId) {
     owner: _.get(applicationResult, '[0].owner', ''),
     trigger_spec: _.get(applicationResult, '[0].trigger_spec', {}),
     secrets: _.assign(
-    _.get(userConfig, 'secrets', {}),
-    _.get(applicationResult, '[0].secrets', {}))
+      _.get(userConfig, 'secrets', {}),
+      _.get(applicationResult, '[0].secrets', {}))
   };
 }
 

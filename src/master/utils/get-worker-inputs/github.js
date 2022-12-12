@@ -2,7 +2,7 @@ const _ = require('lodash');
 const { getRepoConfig } = require('./repo');
 const constants = require('../constants');
 
-module.exports = async function(triggerInputs, userId) {
+module.exports = async function (triggerInputs, appId) {
   console.log('generate worker inputs start');
   const { url, id: repoId } = _.get(triggerInputs, 'body.repository', {});
   if (_.isEmpty(url) || !_.isNumber(repoId)) {
@@ -33,7 +33,7 @@ module.exports = async function(triggerInputs, userId) {
   }
 
   // 验证 user，已经组装ots配置信息
-  const authorization = await getRepoConfig(constants.PROVIDER_GITHUB, repoId.toString(), userId);
+  const authorization = await getRepoConfig(constants.PROVIDER_GITHUB, appId);
   _.assign(result, { authorization });
 
   console.log('generate worker inputs success');

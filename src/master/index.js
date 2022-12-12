@@ -17,13 +17,14 @@ const { CD_PIPLINE_YAML } = require('./config');
 const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
 exports.handler = (req, resp, context) => {
-  const { user_id: userId } = req.queries || {};
-  if (!userId) {
-    console.log('Not a standard Serverless-cd trigger, lacks user_id');
+  console.log('req.queries:: ', req.queries);
+  const { app_id: appId } = req.queries || {};
+  if (!appId) {
+    console.log('Not a standard Serverless-cd trigger, lacks app_id');
     resp.statusCode = 400;
     resp.send(JSON.stringify({
       success: false,
-      message: 'Not a standard Serverless-cd trigger, lacks user_id',
+      message: 'Not a standard Serverless-cd trigger, lacks app_id',
     }));
     return;
   }
@@ -49,7 +50,7 @@ exports.handler = (req, resp, context) => {
 
       // 组装 worker 函数需要的参数
       // 验证 user 下是否存在这个仓库应用
-      const workerPayload = await getWorkerInputs[interceptor](triggerInputs, userId);
+      const workerPayload = await getWorkerInputs[interceptor](triggerInputs, appId);
       const eventConfig = _.get(workerPayload, 'authorization.trigger_spec');
 
       // 验证是否被触发

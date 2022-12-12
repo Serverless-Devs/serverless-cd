@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const addWebhook = require('./add-webhook');
+const webhook = require('./webhook');
 const { lodash: _ } = require('@serverless-cd/core');
 const { generateSuccessResult, generateErrorResult, unionid } = require('../../util');
 const { OTS_APPLICATION, OTS_USER, OTS_TASK } = require('../../config');
@@ -51,9 +51,9 @@ router.post('/create', async function (req, res, next) {
     webHookSecret = unionid();
     _.set(trigger_spec, `${provider}.secret`, webHookSecret);
   }
-  await addWebhook(owner, repo, token, webHookSecret, userId);
-
   const id = unionid();
+  await webhook.add(owner, repo, token, webHookSecret, id);
+
   await orm.create(
     [
       { id },
@@ -120,6 +120,10 @@ router.delete('/delete', async function (req, res) {
     await taskOrm.batchDelete(primaryKeys);
   }
   await orm.delete([{ id: appId }]);
+  // 尝试删除应用的 webhook
+  const { owner, repo_name, trigger_spec, provider } = app;
+  const token = _.get(trigger_spec, `${provider}.secret`);
+  await webhook.remove(owner, repo_name, token, appId);
   res.json(generateSuccessResult({ message: '删除应用成功' }));
 });
 
