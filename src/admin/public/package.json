@@ -15,19 +15,18 @@
     "react-monaco-editor": "^0.50.1",
     "react-toastify": "^9.0.8",
     "ice.js": "^2.0.0",
+    "build-plugin-moment-locales": "^0.1.0"
+  },
+  "devDependencies": {
     "@iceworks/spec": "^1.0.0",
     "@types/js-yaml": "^4.0.5",
     "@types/lodash": "^4.14.184",
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.2",
     "build-plugin-ignore-style": "^0.1.0",
-    "build-plugin-moment-locales": "^0.1.0",
     "eslint": "^7.30.0",
     "monaco-editor-webpack-plugin": "^7.0.1",
     "stylelint": "^13.2.0"
-  },
-  "devDependencies": {
-   
   },
   "scripts": {
     "start": "npx icejs start",
