@@ -25,7 +25,12 @@ const {
   REGION,
 } = process.env;
 
-const supportGithubLogin = !((!GITHUB_CLIENT_ID || GITHUB_CLIENT_ID.startsWith('${env.')) || (!GITHUB_CLIENT_SECRET || GITHUB_CLIENT_SECRET.startsWith('${env.')));
+const supportGithubLogin = !(
+  !GITHUB_CLIENT_ID ||
+  GITHUB_CLIENT_ID.startsWith('${env.') ||
+  !GITHUB_CLIENT_SECRET ||
+  GITHUB_CLIENT_SECRET.startsWith('${env.')
+);
 
 module.exports = {
   CD_PIPLINE_YAML,
@@ -68,7 +73,7 @@ module.exports = {
   },
   OTS_TOKEN: {
     name: OTS_TOKEN_TABLE_NAME,
-    index: OTS_TOKEN_INDEX_NAME
+    index: OTS_TOKEN_INDEX_NAME,
   },
   FC: {
     workerFunction: {
@@ -81,5 +86,6 @@ module.exports = {
     github: supportGithubLogin,
     account: true,
   },
-  COOKIE_SECRET: 'secr3t'
+  COOKIE_SECRET: 'secr3t',
+  WEBHOOK_EVENTS: ['push', 'pull_request'],
 };

@@ -1,6 +1,6 @@
 const git = require('@serverless-cd/git-provider');
 const { lodash: _ } = require('@serverless-cd/core');
-const { WEBHOOKURL: url } = require('../../../config');
+const { WEBHOOKURL: url, WEBHOOK_EVENTS } = require('../../../config');
 
 async function add(owner, repo, access_token, secret, appId) {
   const prioverd = git('github', { access_token });
@@ -9,11 +9,18 @@ async function add(owner, repo, access_token, secret, appId) {
   for (const row of webhooks) {
     if (row.url === u) {
       console.log('update webhook, id: ', row.id);
-      await prioverd.updateWebhook({ owner, repo, url: u, secret, hook_id: row.id });
+      await prioverd.updateWebhook({
+        owner,
+        repo,
+        url: u,
+        secret,
+        hook_id: row.id,
+        events: WEBHOOK_EVENTS,
+      });
       return;
     }
   }
-  return await prioverd.createWebhook({ owner, repo, url: u, secret });
+  return await prioverd.createWebhook({ owner, repo, url: u, secret, events: WEBHOOK_EVENTS });
 }
 
 async function remove(owner, repo, access_token, appId) {
