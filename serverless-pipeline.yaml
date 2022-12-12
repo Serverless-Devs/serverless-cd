@@ -31,5 +31,5 @@ steps:
       msgtype: markdown
       secret: ${{secrets.DING_TALK_SECRET}}
       payload:
-        title: "Serverless CD"
+        title: "Serverless CD test"
         text: '# ${{status === "success" ? "serverless cd 部署成功。" : "serverless cd 部署失败。"}}\n ## ref: ${{git.ref}}\n ## message: ${{git.message}}\n ## commit: ${{git.commit}}\n'
