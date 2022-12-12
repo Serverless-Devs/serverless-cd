@@ -59,6 +59,8 @@ exports.handler = (req, resp, context) => {
         event_name: _.get(triggerConfig, 'data.push') ? 'push' : 'pull_request',
         pusher: _.get(triggerConfig, 'data.pusher'),
         ref: _.get(triggerConfig, 'data.push.ref'),
+        branch: _.get(triggerConfig, 'data.push.branch'),
+        tag: _.get(triggerConfig, 'data.push.tag'),
         commit: _.get(triggerConfig, 'data.commit.id'),
         message: _.get(triggerConfig, 'data.commit.message'),
         authorization,

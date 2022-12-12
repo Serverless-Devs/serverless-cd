@@ -31,6 +31,8 @@ async function handler(event, _context, callback) {
     ref,
     commit,
     message,
+    branch,
+    tag,
     execDir = CODE_DIR,
     event_name,
     trigger,
@@ -96,6 +98,9 @@ async function handler(event, _context, callback) {
         clone_url: cloneUrl, // git 的 url 地址
         ref,
         commit,
+        branch,
+        message,
+        tag,
         event_name, // 触发的事件名称
       },
       trigger, // 触发 pipline 的配置
