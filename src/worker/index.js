@@ -8,7 +8,7 @@ const core = require("@serverless-cd/core");
 const checkout = require("@serverless-cd/git").default;
 const _ = require('lodash');
 const Engine = require("@serverless-cd/engine").default;
-const { CODE_DIR, CD_PIPLINE_YAML, CREDENTIALS, OSS_CONFIG } = require('./config');
+const { CODE_DIR, CD_PIPLINE_YAML, CREDENTIALS, OSS_CONFIG ,DEFAULT_UNSET_ENVS } = require('./config');
 const { getPayload, getOTSTaskPayload } = require('./utils');
 const otsTask = require('./model/task');
 const otsApp = require('./model/app');
@@ -124,6 +124,7 @@ async function handler(event, _context, callback) {
         callback(null, '');
       },
     },
+    unsetEnvs: DEFAULT_UNSET_ENVS,
   });
 
   console.log('ots task init');
