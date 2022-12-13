@@ -6,7 +6,8 @@ import SecretTable from '@/components/SecretTable';
 import SecretDrawer from '@/components/SecretDrawer';
 import { Toast } from '@/components/ToastContainer';
 import { updateApp } from '@/services/applist';
-import { isEmpty, map, keys, forEach } from 'lodash';
+import Copy from '@/components/CopyIcon';
+import { map, keys, forEach } from 'lodash';
 
 interface Props {
   secrets: object,
@@ -22,7 +23,7 @@ const SecretConfig = ({
   provider
 }: Props) => {
   const [secretList, setSecretList] = useState<any[]>([]);
-  const {loading, request} = useRequest(updateApp);
+  const { loading, request } = useRequest(updateApp);
   const secretsDrawerRef: any = useRef();
 
   useEffect(() => {
@@ -44,13 +45,17 @@ const SecretConfig = ({
     secretsDrawerRef?.current?.setVisible(true);
   }
 
-  const onCompileSecret = async() => {
-    const secretsData = secretsDrawerRef?.current?.getValue('secrets') || [];
-    const secretsParams = {}
-    forEach(secretsData, ({ key, value }) => {
-      secretsParams[key] = value
-    })
-    const { success } = await request({ secrets: secretsParams, appId, provider  })
+  const onCompileSecret = async (value) => {
+    const secretsData = value
+    let secretsParams = {}
+    if (secretsDrawerRef?.current?.editType === 'form') {
+      forEach(secretsData || [], ({ key, value }) => {
+        secretsParams[key] = value
+      })
+    } else {
+      secretsParams = value
+    }
+    const { success } = await request({ secrets: secretsParams, appId, provider })
     if (success) {
       Toast.success('配置成功');
       secretsDrawerRef?.current?.closeDrawer();
@@ -62,13 +67,15 @@ const SecretConfig = ({
     <PageInfo
       title="密钥配置"
       extra={<Button type="primary" text onClick={showDrawer}>编辑</Button>}
+      endExtra={<Copy content={JSON.stringify(secrets)} type="button" text='复制全部密钥' />}
     >
       <SecretTable secretList={secretList} setSecretList={setSecretList} />
       <SecretDrawer
-        title='编辑Secret'
+        title='编辑密钥'
         loading={loading}
         ref={secretsDrawerRef}
         onSubmit={onCompileSecret}
+        secretsData={secrets}
       />
     </PageInfo>
   )

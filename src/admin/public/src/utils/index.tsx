@@ -61,7 +61,6 @@ export function replaceToken(replaceStr) {
     success: (key) => `\u001b[32m${key}\u001b[0m`,
   }
   _.each(_.keys(logKeys), (logKey: string) => {
-    console.log(logKey);
     const replaceFn = logKeys[logKey];
     const toLowerKey = _.toLower(logKey); // 字符串转为小写
     const toUpperKey = _.toUpper(logKey); // 字符串转为大写
@@ -107,4 +106,14 @@ export const formatBranch = (ref) => {
   }
 
   return ref;
+}
+
+
+export function isJson(str) {
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
 }
