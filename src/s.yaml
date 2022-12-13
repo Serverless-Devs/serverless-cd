@@ -73,7 +73,7 @@ services:
         runtime: nodejs14
         codeUri: ./worker
         handler: index.handler
-        memorySize: 1024
+        memorySize: 2048
         timeout: 600
         environmentVariables:
           CD_PIPLINE_YAML: ${env.CD_PIPLINE_YAML}
