@@ -10,5 +10,10 @@
   </head>
   <body>
     <div id="ice-container"></div>
+    <script>
+      if (window && !window.global) {
+        window.global = window;
+      }
+    </script>
   </body>
 </html>

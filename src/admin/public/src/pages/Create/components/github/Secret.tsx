@@ -110,7 +110,7 @@ const Secret = (props: IProps) => {
           </Row>
         </div>
       ))}
-      <Button onClick={handleAdd}>
+      <Button onClick={handleAdd} className="mt-8 mb-20">
         <Icon type="add" className="mr-4" />
         新增
       </Button>

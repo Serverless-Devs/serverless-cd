@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRequest } from 'ice';
 import { Button, Drawer, Field, Form } from '@alicloud/console-components';
 import PageInfo from '@/components/PageInfo';
 import { Toast } from '@/components/ToastContainer';
 import { updateApp } from '@/services/applist';
-import { get, noop, isEmpty } from 'lodash';
-import { Trigger } from '@serverless-cd/ui';
+import { get, noop, isEmpty, uniqueId } from 'lodash';
+import Trigger from '@serverless-cd/trigger-ui';
 
 const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback }) => {
   const { request, loading } = useRequest(updateApp);
   const [visible, setVisible] = useState(false);
+  const [triggerKey, setTriggerKey] = useState(uniqueId());
   const field = Field.useField();
   const { init, resetToDefault, validate } = field;
 
   const onSubmit = () => {
     validate(async (errors, values) => {
-      console.log('errors', errors, 'values', values);
       if (errors) return;
       const trigger_spec: any = {
         [provider]: values['trigger'],
@@ -51,6 +51,10 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback }) => {
     callback();
   };
 
+  useEffect(() => {
+    setTriggerKey(uniqueId());
+  }, [triggerSpec])
+
   return (
     <PageInfo
       title="触发配置"
@@ -60,7 +64,7 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback }) => {
         </Button>
       }
     >
-      <div className="mt-16 pl-16 pr-32">
+      <div className="mt-16 pl-16 pr-32" key={triggerKey}>
         {triggerSpec[provider] && (
           <Trigger value={triggerSpec[provider]} onChange={noop} disabled />
         )}
