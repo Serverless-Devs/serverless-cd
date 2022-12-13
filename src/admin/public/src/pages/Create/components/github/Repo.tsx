@@ -2,7 +2,7 @@ import React, { useEffect, ReactNode, useState } from 'react';
 import { useRequest } from 'ice';
 import { Select, Icon, Field } from '@alicloud/console-components';
 import store from '@/store';
-import { noop, map, find, isEmpty } from 'lodash';
+import { noop, map, find, isEmpty, cloneDeep } from 'lodash';
 import RefreshIcon from '@/components/RefreshIcon';
 import { githubOrgs, githubOrgRepos } from '@/services/git';
 
@@ -45,26 +45,30 @@ const Repos = (props: IProps) => {
   const [userState, userDispatchers] = store.useModel('user');
   const effectsState = store.useModelEffectsState('user');
   const [refreshLoading, setRefreshLoading] = useState(false);
-  const [repoTypeList, setRepoTypeList] = useState(initRepoTypeList);
   const [currentRepoType, setCurrentRepoType] = useState('personal');
-  const { getValue, setValue } = field;
+  const { getValue, setValue, init } = field;
 
   useEffect(() => {
     if (!isEmpty(data)) {
       const { data: orgs } = data;
-      const orgList = map(orgs, ({ org, id }) => ({ label: org, value: org, id }))
-      repoTypeList[1].children = orgList as any;
-      setRepoTypeList([...repoTypeList])
+      const newRepoTypeList = cloneDeep(initRepoTypeList);
+      const orgList = map(orgs, ({ org, id }) => ({ label: org, value: org, id }));
+      newRepoTypeList[1].children = orgList as any;
+      setValue('repoTypeList', newRepoTypeList)
     }
   }, [data])
 
   useEffect(() => {
-    onRepoTypeChange('personal')
-  }, [userState.isAuth]);
+    if (!getValue('repoTypeList')) {
+      setValue('repoTypeList', initRepoTypeList)
+    }
+  }, [getValue('repoTypeList')])
 
   useEffect(() => {
+    if (!userState.isAuth) return;
+    onRepoTypeChange('personal')
     request();
-  }, [])
+  }, [userState.isAuth]);
 
   const valueRender = ({ value }) => {
     const userRepos = getValue('userRepos') as IRepoItem[] || [] as IRepoItem[]
@@ -186,6 +190,7 @@ const Repos = (props: IProps) => {
   };
   const onRepoTypeChange = (value) => {
     if (!value) return;
+    setValue('userRepos', []);
     if (value === 'personal') {
       fetchUserRepos()
     } else {
@@ -199,11 +204,15 @@ const Repos = (props: IProps) => {
       <Select
         style={{ flexBasis: '30%' }}
         placeholder="请选择个人/组织"
-        dataSource={repoTypeList}
-        defaultValue={'personal'}
+        dataSource={getValue('repoTypeList')}
+        {...init('repoTypeValue', {
+          initValue: 'personal',
+          props: {
+            onChange: onRepoTypeChange
+          }
+        })}
         state={loading ? 'loading' : undefined}
         disabled={loading}
-        onChange={onRepoTypeChange}
       />
       <Select
         style={{ flexBasis: '68%' }}

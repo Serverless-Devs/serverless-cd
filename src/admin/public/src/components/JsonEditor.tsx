@@ -44,7 +44,7 @@ class JsonEditor extends PureComponent<Props> {
   render() {
     const { value, onChange, showFormatBtn = true } = this.props;
     return (
-      <div style={{ position: 'relative' }}>
+      <div className='json-editor' style={{ position: 'relative' }}>
         <CodeMirror
           onBeforeChange={(editor, data, value) => {
             onChange(value);
