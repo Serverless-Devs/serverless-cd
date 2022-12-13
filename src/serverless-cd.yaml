@@ -87,7 +87,7 @@ services:
     component: fc
     actions:
       pre-deploy:
-        - run: npm install
+        - run: npm install --force
           path: "./admin/public"
         - run: npm run build
           path: "./admin/public"
