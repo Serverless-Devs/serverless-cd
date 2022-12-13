@@ -1,28 +1,26 @@
 edition: 1.0.0
 name: serverless-cd
-access: {{ access }}
+access: default
 
 vars:
   region: ${env.REGION}
   service:
-    name: {{ serviceName }}
+    name: serverless-cd
     description: Serverless-cd 应用
     logConfig: auto
   masterFunctionName: master
   workerFunctionName: worker
   adminFunctionName: admin
-  # workerMaxAsyncRetryAttempts: 0
+  workerMaxAsyncRetryAttempts: 0
   workerDeliverFunctionName: workerDeliver
 
-
 services:
- 
   master:
     component: fc
     actions:
       pre-deploy:
-        - run: npm install --registry=https://registry.npmmirror.com
-          path: "./master"
+        - run: npm install
+          path: ./master
     props:
       region: ${vars.region}
       service: ${vars.service}
@@ -56,44 +54,6 @@ services:
             methods:
               - POST
 
-  worker:
-    component: fc
-    actions:
-      pre-deploy:
-        - run: npm install --registry=https://registry.npmmirror.com
-          path: "./worker"
-      post-deploy:
-        - component: fc api UpdateFunction --region ${vars.region} --header '{"x-fc-disable-container-reuse":"True"}' --path '{"serviceName":"${vars.service.name}","functionName":"${vars.workerFunctionName}"}'
-    props:
-      region: ${vars.region}
-      service: ${vars.service}
-      function:
-        name: ${vars.workerFunctionName}
-        description: 执行用户配置的 CD 流程。
-        runtime: nodejs14
-        codeUri: ./worker
-        handler: index.handler
-        memorySize: 2048
-        timeout: 600
-        environmentVariables:
-          CD_PIPLINE_YAML: ${env.CD_PIPLINE_YAML}
-          DOWNLOAD_CODE_DIR: ${env.DOWNLOAD_CODE_DIR}
-          ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
-          ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
-          OSS_BUCKET: ${env.OSS_BUCKET}
-          REGION: ${env.REGION}
-          OTS_INSTANCE_NAME: ${env.OTS_INSTANCE_NAME}
-          OTS_TASK_TABLE_NAME: ${env.OTS_TASK_TABLE_NAME}
-          OTS_TASK_INDEX_NAME: ${env.OTS_TASK_INDEX_NAME}
-          OTS_APP_TABLE_NAME: ${env.OTS_APP_TABLE_NAME}
-          OTS_APP_INDEX_NAME: ${env.OTS_APP_INDEX_NAME}
-        asyncConfiguration:
-          maxAsyncRetryAttempts: 0
-          # maxAsyncRetryAttempts: ${vars.workerMaxAsyncRetryAttempts}
-          statefulInvocation: true
-          destination:
-            onFailure: acs:fc:::services/${vars.service.name}/functions/${vars.workerDeliverFunctionName}
-  
   worker-deliver:
     component: fc
     props:
@@ -123,15 +83,15 @@ services:
         asyncConfiguration:
           maxAsyncRetryAttempts: 0
 
-  admin: # Admin 控制台提供Api Server函数
+  admin:
     component: fc
     actions:
       pre-deploy:
-        - run: npm install --registry=https://registry.npmmirror.com --force
+        - run: npm install --force
           path: "./admin/public"
         - run: npm run build
           path: "./admin/public"
-        - run: npm install --registry=https://registry.npmmirror.com
+        - run: npm install
           path: "./admin"
         - plugin: get-http-function-url # 获取依赖的 trigger 函数的触发器地址，也可以直接修改 environmentVariables 的 WEBHOOKURL
           args:
@@ -193,10 +153,60 @@ services:
               - OPTIONS
               - PUT
               - PATCH
-      customDomains:
-        - domainName: ${env.DOMAIN}
-          protocol: HTTP
-          routeConfigs:
-            - path: /*
-              serviceName: ${vars.service.name}
-              functionName: ${vars.adminFunctionName}
+
+  worker:
+    component: fc
+    actions:
+      pre-deploy:
+        - run: npm install
+          path: "./worker"
+      post-deploy:
+        - component: fc api UpdateFunction --region ${vars.region} --header '{"x-fc-disable-container-reuse":"True"}' --path '{"serviceName":"${vars.service.name}","functionName":"${vars.workerFunctionName}"}'
+    props:
+      region: ${vars.region}
+      service: ${vars.service}
+      function:
+        name: ${vars.workerFunctionName}
+        description: 执行用户配置的 CD 流程。
+        runtime: nodejs16
+        codeUri: ./worker
+        handler: index.handler
+        memorySize: 2048
+        timeout: 600
+        environmentVariables:
+          NODE_ENV: production
+          CD_PIPLINE_YAML: ${env.CD_PIPLINE_YAML}
+          DOWNLOAD_CODE_DIR: ${env.DOWNLOAD_CODE_DIR}
+          ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
+          ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
+          OSS_BUCKET: ${env.OSS_BUCKET}
+          REGION: ${env.REGION}
+          OTS_INSTANCE_NAME: ${env.OTS_INSTANCE_NAME}
+          OTS_TASK_TABLE_NAME: ${env.OTS_TASK_TABLE_NAME}
+          OTS_TASK_INDEX_NAME: ${env.OTS_TASK_INDEX_NAME}
+          OTS_APP_TABLE_NAME: ${env.OTS_APP_TABLE_NAME}
+          OTS_APP_INDEX_NAME: ${env.OTS_APP_INDEX_NAME}
+        asyncConfiguration:
+          maxAsyncRetryAttempts: 0
+          # maxAsyncRetryAttempts: ${vars.workerMaxAsyncRetryAttempts}
+          statefulInvocation: true
+          destination:
+            onFailure: acs:fc:::services/${vars.service.name}/functions/${vars.workerDeliverFunctionName}
+
+  compose:
+    component: fc-domain
+    props:
+      region: ${vars.region}
+      customDomain:
+        domainName: ${env.DOMAIN}
+        protocol: HTTP
+        routeConfigs:
+          - path: /*
+            serviceName: ${vars.service.name}
+            functionName: ${vars.adminFunctionName}
+          - path: /api
+            serviceName: ${vars.service.name}
+            functionName: ${worker.props.function.name}
+
+# s admin deploy
+# s compose deploy --patch

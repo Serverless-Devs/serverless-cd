@@ -1,0 +1,55 @@
+steps:
+  - run: npm install @serverless-devs/s -g
+  - run: s -v
+  - run: s config add --AccountID ${{secrets.ACCOUNTID}}  --AccessKeyID ${{secrets.ACCESS_KEY_ID}}  --AccessKeySecret ${{secrets.ACCESS_KEY_SECRET}} -a default -f
+  - run: s deploy --use-local -y -t ./src/serverless-cd.yaml
+    env:
+      SESSION_EXPIRATION: ${{secrets.SESSION_EXPIRATION}}
+      DOWNLOAD_CODE_DIR: ${{secrets.DOWNLOAD_CODE_DIR}}
+      CD_PIPLINE_YAML: ${{secrets.CD_PIPLINE_YAML}}
+      REGION: ${{secrets.REGION}}
+      OSS_BUCKET: ${{secrets.OSS_BUCKET}}
+      OTS_INSTANCE_NAME: ${{secrets.OTS_INSTANCE_NAME}}
+      DOMAIN: ${{secrets.DOMAIN}}
+      OTS_TASK_TABLE_NAME: ${{secrets.OTS_TASK_TABLE_NAME}}
+      OTS_USER_TABLE_NAME: ${{secrets.OTS_USER_TABLE_NAME}}
+      OTS_APP_TABLE_NAME: ${{secrets.OTS_APP_TABLE_NAME}}
+      OTS_TOKEN_TABLE_NAME: ${{secrets.OTS_TOKEN_TABLE_NAME}}
+      OTS_SESSION_TABLE_NAME: ${{secrets.OTS_SESSION_TABLE_NAME}}
+      OTS_TASK_INDEX_NAME: ${{secrets.OTS_TASK_INDEX_NAME}}
+      OTS_USER_INDEX_NAME: ${{secrets.OTS_USER_INDEX_NAME}}
+      OTS_APP_INDEX_NAME: ${{secrets.OTS_APP_INDEX_NAME}}
+      OTS_TOKEN_INDEX_NAME: ${{secrets.OTS_TOKEN_INDEX_NAME}}
+      ACCOUNTID: ${{secrets.ACCOUNTID}}
+      ACCESS_KEY_ID: ${{secrets.ACCESS_KEY_ID}}
+      ACCESS_KEY_SECRET: ${{secrets.ACCESS_KEY_SECRET}}
+  - name: 钉钉通知
+    plugin: "@serverless-cd/ding-talk"
+    if: ${{ success() }}
+    inputs:
+      webhook: https://oapi.dingtalk.com/robot/send?access_token=${{secrets.DING_TALK_TOKEN}}
+      msgtype: markdown
+      secret: ${{secrets.DING_TALK_SECRET}}
+      payload:
+        title: "Serverless CD"
+        text: |
+          Serverless CD 部署成功 <br \/>
+          branch: ${{ git.branch }} <br />
+          commit: ${{ git.commit }} <br />
+          ref: ${{ git.ref }} <br />
+          message: ${{ git.message }} <br />
+  - name: 钉钉通知
+    plugin: "@serverless-cd/ding-talk"
+    if: ${{ failure() }}
+    inputs:
+      webhook: https://oapi.dingtalk.com/robot/send?access_token=${{secrets.DING_TALK_TOKEN}}
+      msgtype: markdown
+      secret: ${{secrets.DING_TALK_SECRET}}
+      payload:
+        title: "Serverless CD"
+        text: |
+          Serverless CD 部署失败 <br \/>
+          branch: ${{ git.branch }} <br />
+          commit: ${{ git.commit }} <br />
+          ref: ${{ git.ref }} <br />
+          message: ${{ git.message }} <br />
