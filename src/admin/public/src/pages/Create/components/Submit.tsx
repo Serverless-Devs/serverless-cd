@@ -95,7 +95,6 @@ const Submit = (props: IProps) => {
   const berforeCreate = async (deployState) => {
     isDeploy.current = deployState;
     props.field.validate(async (errors, values) => {
-      console.log('errors', errors, values);
       if (errors) return;
       let branchList: string[] = map(values['trigger'], (item) => item.branch);
       branchList = uniqWith(branchList, isEqual);
