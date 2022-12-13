@@ -38,11 +38,20 @@ const AuthDialog = (props: IProps) => {
   const { init, validate, setValue, getValue } = field;
 
   useEffect(() => {
+    if (!userState.isAuth) {
+      // 重置上层数据
+      reset();
+      // 重置当前组件的数据
+      field.reset();
+    }
     fetchUserList();
   }, [userState.isAuth]);
 
   const fetchUserList = async () => {
-    if (!userState.isAuth) return;
+    if (!userState.isAuth) {
+      setValue('user_list', []);
+      return;
+    }
     const userInfo = userState.userInfo as IUserInfo;
     const data: IUserInfo[] = [];
     data.push({

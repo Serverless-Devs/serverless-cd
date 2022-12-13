@@ -81,7 +81,7 @@ const SecretDrawer = ({
           ) : (
             <JsonEditor
               value={jsonValue}
-              height={600}
+              height={'auto'}
               width={'100%'}
               onChange={onJsonValueChanged}
             />
