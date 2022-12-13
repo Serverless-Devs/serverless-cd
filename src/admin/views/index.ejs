@@ -13,6 +13,9 @@
     <div id="ice-container"></div>
     <script>
       var CD_PIPLINE_YAML= "<%=CD_PIPLINE_YAML%>"
+      if (window && !window.global) {
+        window.global = window;
+      }
     </script>
   </body>
 </html>
