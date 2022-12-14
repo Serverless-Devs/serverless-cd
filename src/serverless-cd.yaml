@@ -168,7 +168,7 @@ services:
       function:
         name: ${vars.workerFunctionName}
         description: 执行用户配置的 CD 流程。
-        runtime: nodejs16
+        runtime: nodejs14
         codeUri: ./worker
         handler: index.handler
         memorySize: 2048
