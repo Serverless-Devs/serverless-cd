@@ -4,11 +4,17 @@ const envPath = path.join(__dirname, '..', '..', '.env');
 if (fse.existsSync(envPath)) {
   require('dotenv').config({ path: envPath });
 }
-const core = require("@serverless-cd/core");
-const checkout = require("@serverless-cd/git").default;
+const core = require('@serverless-cd/core');
+const checkout = require('@serverless-cd/git').default;
 const _ = require('lodash');
-const Engine = require("@serverless-cd/engine").default;
-const { CODE_DIR, CD_PIPLINE_YAML, CREDENTIALS, OSS_CONFIG ,DEFAULT_UNSET_ENVS } = require('./config');
+const Engine = require('@serverless-cd/engine').default;
+const {
+  CODE_DIR,
+  CD_PIPLINE_YAML,
+  CREDENTIALS,
+  OSS_CONFIG,
+  DEFAULT_UNSET_ENVS,
+} = require('./config');
 const { getPayload, getOTSTaskPayload } = require('./utils');
 const otsTask = require('./model/task');
 const otsApp = require('./model/app');
@@ -21,13 +27,8 @@ async function handler(event, _context, callback) {
     taskId,
     provider,
     cloneUrl,
-    authorization: {
-      userId,
-      owner,
-      appId,
-      accessToken: token,
-      secrets,
-    } = {},
+    pusher,
+    authorization: { userId, owner, appId, accessToken: token, secrets } = {},
     ref,
     commit,
     message,
@@ -60,16 +61,19 @@ async function handler(event, _context, callback) {
     logger.info('checkout success');
 
     // 解析 pipline
-    const pipLineYaml = path.join(execDir, _.get(trigger, 'template', CD_PIPLINE_YAML))
+    const pipLineYaml = path.join(execDir, _.get(trigger, 'template', CD_PIPLINE_YAML));
     logger.info(`parse spec: ${pipLineYaml}`);
     const piplineContext = await core.parseSpec(pipLineYaml);
     logger.debug('piplineContext:\n', JSON.stringify(piplineContext));
     const steps = _.get(piplineContext, 'steps');
+    logger.info(`parse spec success, steps: ${steps}`);
     logger.debug(`start update app`);
-    await otsApp.update(appId, { latest_task: { ...appTaskConfig, completed: context.completed, status: context.status } });
+    await otsApp.update(appId, {
+      latest_task: { ...appTaskConfig, completed: context.completed, status: context.status },
+    });
     logger.debug(`start update app success`);
-    return { steps }
-  }
+    return { steps };
+  };
 
   // 启动 engine
   const appTaskConfig = { taskId, commit, message, ref };
@@ -87,13 +91,15 @@ async function handler(event, _context, callback) {
     inputs: {
       ...customInputs,
       task_id: taskId, // 函数计算的异步任务ID
-      app: { // 应用的关联配置
+      app: {
+        // 应用的关联配置
         owner,
         user_id: userId,
         id: appId,
       },
       secrets,
-      git: { // git 相关的内容
+      git: {
+        // git 相关的内容
         provider, // 托管仓库
         clone_url: cloneUrl, // git 的 url 地址
         ref,
@@ -102,6 +108,7 @@ async function handler(event, _context, callback) {
         message,
         tag,
         event_name, // 触发的事件名称
+        pusher,
       },
       trigger, // 触发 pipline 的配置
     },
@@ -124,7 +131,9 @@ async function handler(event, _context, callback) {
           status: context.status,
           steps: getOTSTaskPayload(context.steps),
         });
-        await otsApp.update(appId, { latest_task: { ...appTaskConfig, completed: context.completed, status: context.status } });
+        await otsApp.update(appId, {
+          latest_task: { ...appTaskConfig, completed: context.completed, status: context.status },
+        });
         logger.info('completed end.');
         callback(null, '');
       },
@@ -142,7 +151,13 @@ async function handler(event, _context, callback) {
   });
   console.log('ots app update');
   // 防止有其他的动作，将等待状态也要set 到 ots
-  await otsApp.update(appId, { latest_task: { ...appTaskConfig, completed: engine.context.completed, status: engine.context.status } })
+  await otsApp.update(appId, {
+    latest_task: {
+      ...appTaskConfig,
+      completed: engine.context.completed,
+      status: engine.context.status,
+    },
+  });
 
   console.log('engine run start');
   await engine.start();
