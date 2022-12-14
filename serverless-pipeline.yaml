@@ -1,31 +1,47 @@
 steps:
-  - run: npm install @serverless-devs/s -g
-  - run: s -v
-  - run: s config add --AccountID ${{secrets.ACCOUNTID}}  --AccessKeyID ${{secrets.ACCESS_KEY_ID}}  --AccessKeySecret ${{secrets.ACCESS_KEY_SECRET}} -a default -f
-  - run: s deploy --use-local -y -t ./src/serverless-cd.yaml
-    env:
-      SESSION_EXPIRATION: ${{secrets.SESSION_EXPIRATION}}
-      DOWNLOAD_CODE_DIR: ${{secrets.DOWNLOAD_CODE_DIR}}
-      CD_PIPLINE_YAML: ${{secrets.CD_PIPLINE_YAML}}
-      REGION: ${{secrets.REGION}}
-      OSS_BUCKET: ${{secrets.OSS_BUCKET}}
-      OTS_INSTANCE_NAME: ${{secrets.OTS_INSTANCE_NAME}}
-      DOMAIN: ${{secrets.DOMAIN}}
-      OTS_TASK_TABLE_NAME: ${{secrets.OTS_TASK_TABLE_NAME}}
-      OTS_USER_TABLE_NAME: ${{secrets.OTS_USER_TABLE_NAME}}
-      OTS_APP_TABLE_NAME: ${{secrets.OTS_APP_TABLE_NAME}}
-      OTS_TOKEN_TABLE_NAME: ${{secrets.OTS_TOKEN_TABLE_NAME}}
-      OTS_SESSION_TABLE_NAME: ${{secrets.OTS_SESSION_TABLE_NAME}}
-      OTS_TASK_INDEX_NAME: ${{secrets.OTS_TASK_INDEX_NAME}}
-      OTS_USER_INDEX_NAME: ${{secrets.OTS_USER_INDEX_NAME}}
-      OTS_APP_INDEX_NAME: ${{secrets.OTS_APP_INDEX_NAME}}
-      OTS_TOKEN_INDEX_NAME: ${{secrets.OTS_TOKEN_INDEX_NAME}}
-      ACCOUNTID: ${{secrets.ACCOUNTID}}
-      ACCESS_KEY_ID: ${{secrets.ACCESS_KEY_ID}}
-      ACCESS_KEY_SECRET: ${{secrets.ACCESS_KEY_SECRET}}
+  # - run: npm install @serverless-devs/s -g
+  # - run: s -v
+  # - run: s config add --AccountID ${{secrets.ACCOUNTID}}  --AccessKeyID ${{secrets.ACCESS_KEY_ID}}  --AccessKeySecret ${{secrets.ACCESS_KEY_SECRET}} -a default -f
+  # - run: s deploy --use-local -y -t ./src/serverless-cd.yaml
+  #   env:
+  #     SESSION_EXPIRATION: ${{secrets.SESSION_EXPIRATION}}
+  #     DOWNLOAD_CODE_DIR: ${{secrets.DOWNLOAD_CODE_DIR}}
+  #     CD_PIPLINE_YAML: ${{secrets.CD_PIPLINE_YAML}}
+  #     REGION: ${{secrets.REGION}}
+  #     OSS_BUCKET: ${{secrets.OSS_BUCKET}}
+  #     OTS_INSTANCE_NAME: ${{secrets.OTS_INSTANCE_NAME}}
+  #     DOMAIN: ${{secrets.DOMAIN}}
+  #     OTS_TASK_TABLE_NAME: ${{secrets.OTS_TASK_TABLE_NAME}}
+  #     OTS_USER_TABLE_NAME: ${{secrets.OTS_USER_TABLE_NAME}}
+  #     OTS_APP_TABLE_NAME: ${{secrets.OTS_APP_TABLE_NAME}}
+  #     OTS_TOKEN_TABLE_NAME: ${{secrets.OTS_TOKEN_TABLE_NAME}}
+  #     OTS_SESSION_TABLE_NAME: ${{secrets.OTS_SESSION_TABLE_NAME}}
+  #     OTS_TASK_INDEX_NAME: ${{secrets.OTS_TASK_INDEX_NAME}}
+  #     OTS_USER_INDEX_NAME: ${{secrets.OTS_USER_INDEX_NAME}}
+  #     OTS_APP_INDEX_NAME: ${{secrets.OTS_APP_INDEX_NAME}}
+  #     OTS_TOKEN_INDEX_NAME: ${{secrets.OTS_TOKEN_INDEX_NAME}}
+  #     ACCOUNTID: ${{secrets.ACCOUNTID}}
+  #     ACCESS_KEY_ID: ${{secrets.ACCESS_KEY_ID}}
+  #     ACCESS_KEY_SECRET: ${{secrets.ACCESS_KEY_SECRET}}
+  # - name: 钉钉通知
+  #   plugin: "@serverless-cd/ding-talk"
+  #   if: ${{ success() }}
+  #   inputs:
+  #     webhook: https://oapi.dingtalk.com/robot/send?access_token=${{secrets.DING_TALK_TOKEN}}
+  #     msgtype: markdown
+  #     secret: ${{secrets.DING_TALK_SECRET}}
+  #     payload:
+  #       title: "Serverless CD"
+  #       text: |+
+  #         ## Serverless CD 部署成功
+  #         ### 触发事件: ${{ git.event_name }}
+  #         ### 分支: ${{ git.branch }}
+  #         ### 提交人: ${{ git.pusher.name }}
+  #         ### commit id: ${{ git.commit }}
+  #         ### commit message: ${{ git.message }}
   - name: 钉钉通知
     plugin: "@serverless-cd/ding-talk"
-    if: ${{ success() }}
+    # if: ${{ failure() }}
     inputs:
       webhook: https://oapi.dingtalk.com/robot/send?access_token=${{secrets.DING_TALK_TOKEN}}
       msgtype: markdown
@@ -33,23 +49,12 @@ steps:
       payload:
         title: "Serverless CD"
         text: |+
-          ## Serverless CD 部署成功
-          ### event_name: ${{ git.event_name }}
-          ### branch: ${{ git.branch }}
-          ### commit: ${{ git.commit }}
-          ### message: ${{ git.message }}
-  - name: 钉钉通知
-    plugin: "@serverless-cd/ding-talk"
-    if: ${{ failure() }}
-    inputs:
-      webhook: https://oapi.dingtalk.com/robot/send?access_token=${{secrets.DING_TALK_TOKEN}}
-      msgtype: markdown
-      secret: ${{secrets.DING_TALK_SECRET}}
-      payload:
-        title: "Serverless CD"
-        text: |+
+          #### 杭州天气 @150XXXXXXXX
+          西北风1级，空气良89，相对温度73%
+          > ![screenshot](https://img.alicdn.com/tfs/TB1NwmBEL9TBuNjy1zbXXXpepXa-2400-1218.png)
+          > ###### 10点20分发布 [天气](https://www.dingtalk.com)
           ## Serverless CD 部署失败
-          ### event_name: ${{ git.event_name }}
-          ### branch: ${{ git.branch }}
-          ### commit: ${{ git.commit }}
-          ### message: ${{ git.message }}
+          ### 触发事件: ${{ git.event_name }}
+          ### 分支: ${{ git.branch }}
+          ### commit id: ${{ git.commit }}
+          ### commit message: ${{ git.message }}
