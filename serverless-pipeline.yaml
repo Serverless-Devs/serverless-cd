@@ -39,10 +39,8 @@ steps:
   #         ### 提交人: ${{ git.pusher.name }}
   #         ### commit id: ${{ git.commit }}
   #         ### commit message: ${{ git.message }}
-  - run: ls -la node_modules/@serverless-cd/ding-talk
-  - run: cat node_modules/@serverless-cd/ding-talk/package.json
   - name: 钉钉通知
-    plugin: "@serverless-cd/ding-talk"
+    plugin: "@serverless-cd/ding-talk@0.0.3"
     # if: ${{ failure() }}
     inputs:
       webhook: https://oapi.dingtalk.com/robot/send?access_token=${{secrets.DING_TALK_TOKEN}}
