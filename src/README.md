@@ -3,7 +3,7 @@
 
 <description>
 
-> ***快速部署一个基于Serverless 架构上的轻量级、易拓展、前端友好的 CI/CD框架**
+> **快速部署一个基于Serverless 架构上的轻量级、易拓展、前端友好的 CI/CD框架**
 
 </description>
 
