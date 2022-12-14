@@ -53,8 +53,3 @@ steps:
           西北风1级，空气良89，相对温度73%
           > ![screenshot](https://img.alicdn.com/tfs/TB1NwmBEL9TBuNjy1zbXXXpepXa-2400-1218.png)
           > ###### 10点20分发布 [天气](https://www.dingtalk.com)
-          ## Serverless CD 部署失败
-          ### 触发事件: ${{ git.event_name }}
-          ### 分支: ${{ git.branch }}
-          ### commit id: ${{ git.commit }}
-          ### commit message: ${{ git.message }}
