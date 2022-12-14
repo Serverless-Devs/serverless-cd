@@ -32,12 +32,12 @@ steps:
       secret: ${{secrets.DING_TALK_SECRET}}
       payload:
         title: "Serverless CD"
-        text: |
-          Serverless CD 部署成功 <br \/>
-          branch: ${{ git.branch }} <br />
-          commit: ${{ git.commit }} <br />
-          ref: ${{ git.ref }} <br />
-          message: ${{ git.message }} <br />
+        text: |+
+          ## Serverless CD 部署成功
+          ### event_name: ${{ git.event_name }}
+          ### branch: ${{ git.branch }}
+          ### commit: ${{ git.commit }}
+          ### message: ${{ git.message }}
   - name: 钉钉通知
     plugin: "@serverless-cd/ding-talk"
     if: ${{ failure() }}
@@ -47,9 +47,9 @@ steps:
       secret: ${{secrets.DING_TALK_SECRET}}
       payload:
         title: "Serverless CD"
-        text: |
-          Serverless CD 部署失败 <br \/>
-          branch: ${{ git.branch }} <br />
-          commit: ${{ git.commit }} <br />
-          ref: ${{ git.ref }} <br />
-          message: ${{ git.message }} <br />
+        text: |+
+          ## Serverless CD 部署失败
+          ### event_name: ${{ git.event_name }}
+          ### branch: ${{ git.branch }}
+          ### commit: ${{ git.commit }}
+          ### message: ${{ git.message }}
