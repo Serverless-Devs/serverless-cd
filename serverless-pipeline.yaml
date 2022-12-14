@@ -40,7 +40,7 @@ steps:
   #         ### commit id: ${{ git.commit }}
   #         ### commit message: ${{ git.message }}
   - name: 钉钉通知
-    plugin: "@serverless-cd/ding-talk@0.0.3"
+    plugin: "@serverless-cd/ding-talk"
     # if: ${{ failure() }}
     inputs:
       webhook: https://oapi.dingtalk.com/robot/send?access_token=${{secrets.DING_TALK_TOKEN}}
