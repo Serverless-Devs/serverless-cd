@@ -34,15 +34,15 @@ steps:
         title: "Serverless CD"
         text: |+
           ## Serverless CD 部署成功, 查看[日志](${{ task.url }})了解更多
-          #### 触发事件
+          ### 触发事件
           ${{ git.event_name }}
-          #### 分支
+          ### 分支
           ${{ git.branch }}
-          #### 提交人
+          ### 提交人
           ${{ git.pusher.name }}
-          #### commit id
+          ### commit id
           ${{ git.commit }}
-          #### commit message: 
+          ### commit message: 
           ${{ git.message }}
   - name: 钉钉失败通知
     plugin: "@serverless-cd/ding-talk"
@@ -55,14 +55,14 @@ steps:
         title: "Serverless CD"
         text: |+
           ## Serverless CD 部署失败， 查看[日志](${{ task.url }})了解更多
-          #### 触发事件
+          ### 触发事件
           ${{ git.event_name }}
-          #### 分支
+          ### 分支
           ${{ git.branch }}
-          #### 提交人
+          ### 提交人
           ${{ git.pusher.name }}
-          #### commit id
+          ### commit id
           ${{ git.commit }}
-          #### commit message: 
+          ### commit message: 
           ${{ git.message }}
 
