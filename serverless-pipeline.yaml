@@ -23,7 +23,7 @@ steps:
       ACCOUNTID: ${{secrets.ACCOUNTID}}
       ACCESS_KEY_ID: ${{secrets.ACCESS_KEY_ID}}
       ACCESS_KEY_SECRET: ${{secrets.ACCESS_KEY_SECRET}}
-  - name: 钉钉通知
+  - name: 钉钉成功通知
     plugin: "@serverless-cd/ding-talk"
     if: ${{ success() }}
     inputs:
@@ -32,13 +32,19 @@ steps:
       secret: ${{secrets.DING_TALK_SECRET}}
       payload:
         title: "Serverless CD"
-        text: |
-          Serverless CD 部署成功 <br \/>
-          branch: ${{ git.branch }} <br />
-          commit: ${{ git.commit }} <br />
-          ref: ${{ git.ref }} <br />
-          message: ${{ git.message }} <br />
-  - name: 钉钉通知
+        text: |+
+          ### Serverless CD 部署成功, 查看[日志](${{ task.url }})了解更多
+          ### 触发事件
+          ${{ git.event_name }}
+          ### 分支
+          ${{ git.branch }}
+          ### 提交人
+          ${{ git.pusher.name }}
+          ### commit id
+          ${{ git.commit }}
+          ### commit message: 
+          ${{ git.message }}
+  - name: 钉钉失败通知
     plugin: "@serverless-cd/ding-talk"
     if: ${{ failure() }}
     inputs:
@@ -47,9 +53,16 @@ steps:
       secret: ${{secrets.DING_TALK_SECRET}}
       payload:
         title: "Serverless CD"
-        text: |
-          Serverless CD 部署失败 <br \/>
-          branch: ${{ git.branch }} <br />
-          commit: ${{ git.commit }} <br />
-          ref: ${{ git.ref }} <br />
-          message: ${{ git.message }} <br />
+        text: |+
+          ### Serverless CD 部署失败， 查看[日志](${{ task.url }})了解更多
+          ### 触发事件
+          ${{ git.event_name }}
+          ### 分支
+          ${{ git.branch }}
+          ### 提交人
+          ${{ git.pusher.name }}
+          ### commit id
+          ${{ git.commit }}
+          ### commit message: 
+          ${{ git.message }}
+
