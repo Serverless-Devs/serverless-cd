@@ -11,7 +11,7 @@
   "dependencies": {
     "@alicloud/fc-open20210406": "^1.1.13",
     "@serverless-cd/core": "^0.0.13",
-    "@serverless-cd/engine": "^0.0.16",
+    "@serverless-cd/engine": "^0.0.17",
     "@serverless-cd/git": "^0.0.2",
     "@serverless-cd/ots-orm": "^1.1.0",
     "dotenv": "^16.0.2",
