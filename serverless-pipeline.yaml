@@ -34,13 +34,19 @@ steps:
         title: "Serverless CD"
         text: |+
           ## Serverless CD 部署成功
-          ### 触发事件: ${{ git.event_name }}
-          ### 分支: ${{ git.branch }}
-          ### 提交人: ${{ git.pusher.name }}
-          ### commit id: ${{ git.commit }}
-          ### commit message: ${{ git.message }}
+          #### 触发事件
+          ${{ git.event_name }}
+          #### 分支
+          ${{ git.branch }}
+          #### 提交人
+          ${{ git.pusher.name }}
+          #### commit id
+          ${{ git.commit }}
+          #### commit message: 
+          ${{ git.message }}
   - name: 钉钉失败通知
     plugin: "@serverless-cd/ding-talk"
+    if: ${{ failure() }}
     inputs:
       webhook: https://oapi.dingtalk.com/robot/send?access_token=${{secrets.DING_TALK_TOKEN}}
       msgtype: markdown
@@ -48,7 +54,14 @@ steps:
       payload:
         title: "Serverless CD"
         text: |+
-          #### 杭州天气 @150XXXXXXX
-          西北风1级，空气良89，相对温度73%
-          > ![screenshot](https://img.alicdn.com/tfs/TB1NwmBEL9TBuNjy1zbXXXpepXa-2400-1218.png)
-          > ###### 10点20分发布 [天气](https://www.dingtalk.com)
+          ## Serverless CD 部署成功
+          #### 触发事件
+          ${{ git.event_name }}
+          #### 分支
+          ${{ git.branch }}
+          #### 提交人
+          ${{ git.pusher.name }}
+          #### commit id
+          ${{ git.commit }}
+          #### commit message: 
+          ${{ git.message }}
