@@ -33,7 +33,7 @@ steps:
       payload:
         title: "Serverless CD"
         text: |+
-          ## Serverless CD 部署成功
+          ## Serverless CD 部署成功, 查看[日志](${{ task.url }})了解更多
           #### 触发事件
           ${{ git.event_name }}
           #### 分支
@@ -54,7 +54,7 @@ steps:
       payload:
         title: "Serverless CD"
         text: |+
-          ## Serverless CD 部署成功
+          ## Serverless CD 部署失败， 查看[日志](${{ task.url }})了解更多
           #### 触发事件
           ${{ git.event_name }}
           #### 分支
@@ -65,3 +65,4 @@ steps:
           ${{ git.commit }}
           #### commit message: 
           ${{ git.message }}
+

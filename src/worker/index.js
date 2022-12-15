@@ -91,6 +91,10 @@ async function handler(event, _context, callback) {
     inputs: {
       ...customInputs,
       task_id: taskId, // 函数计算的异步任务ID
+      task: {
+        id: taskId,
+        url: `http://auto.serverless-cd.1740298130743624.ap-northeast-1.fc.devsapp.net/application/${userId}/detail/${taskId}`,
+      },
       app: {
         // 应用的关联配置
         owner,
