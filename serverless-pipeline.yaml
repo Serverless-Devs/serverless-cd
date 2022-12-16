@@ -32,9 +32,8 @@ steps:
       payload:
         title: "Serverless CD"
         text: |+
-          ### [流水线](${{ task.url }})运行成功
+          ### [流水线](${{ task.url }})(Serverless CD)-运行成功
           ![image](https://img.alicdn.com/imgextra/i3/O1CN01DJ0QXx1iLPt5nGCBT_!!6000000004396-2-tps-468-57.png)
-          <br />
           **触发事件**: ${{ git.event_name }}   
           **分支**: ${{ git.branch }}        
           **提交人**: ${{ git.pusher.name }}
@@ -50,9 +49,8 @@ steps:
       payload:
         title: "Serverless CD"
         text: |+
-          ### [流水线](${{ task.url }})运行失败
+          ### [流水线](${{ task.url }})(Serverless CD)-运行失败
           ![image](https://img.alicdn.com/imgextra/i3/O1CN01DJ0QXx1iLPt5nGCBT_!!6000000004396-2-tps-468-57.png)
-          <br />
           **触发事件**: ${{ git.event_name }}   
           **分支**: ${{ git.branch }}        
           **提交人**: ${{ git.pusher.name }}
