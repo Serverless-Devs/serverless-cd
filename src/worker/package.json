@@ -12,7 +12,7 @@
     "@alicloud/fc-open20210406": "^1.1.13",
     "@serverless-cd/aliyun-client": "^1.1.1",
     "@serverless-cd/core": "^0.0.14",
-    "@serverless-cd/engine": "^0.0.18",
+    "@serverless-cd/engine": "^0.0.19",
     "@serverless-cd/git": "^0.0.2",
     "@serverless-cd/ots-orm": "^1.1.0",
     "@serverless-cd/setup-runtime": "^0.0.1-alpha.1",
