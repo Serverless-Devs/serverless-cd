@@ -32,17 +32,14 @@ steps:
       payload:
         title: "Serverless CD"
         text: |+
-          ### Serverless CD 部署成功, 查看[日志](${{ task.url }})了解更多
-          ### 触发事件
-          ${{ git.event_name }}
-          ### 分支
-          ${{ git.branch }}
-          ### 提交人
-          ${{ git.pusher.name }}
-          ### commit id
-          ${{ git.commit }}
-          ### commit message: 
-          ${{ git.message }}
+          ![image](https://img.alicdn.com/imgextra/i3/O1CN01DJ0QXx1iLPt5nGCBT_!!6000000004396-2-tps-468-57.png)
+          **部署状态**: 成功     
+          **触发事件**: ${{ git.event_name }}   
+          **分支**: ${{ git.branch }}        
+          **提交人**: ${{ git.pusher.name }}
+          **commit id**: ${{ git.commit }}
+          **commit message**: ${{ git.message }}
+          查看[日志](${{ task.url }})了解更多
   - name: 钉钉失败通知
     plugin: "@serverless-cd/ding-talk"
     if: ${{ failure() }}
@@ -53,15 +50,12 @@ steps:
       payload:
         title: "Serverless CD"
         text: |+
-          ### Serverless CD 部署失败， 查看[日志](${{ task.url }})了解更多
-          ### 触发事件
-          ${{ git.event_name }}
-          ### 分支
-          ${{ git.branch }}
-          ### 提交人
-          ${{ git.pusher.name }}
-          ### commit id
-          ${{ git.commit }}
-          ### commit message: 
-          ${{ git.message }}
+          ![image](https://img.alicdn.com/imgextra/i3/O1CN01DJ0QXx1iLPt5nGCBT_!!6000000004396-2-tps-468-57.png)
+          **部署状态**: 失败      
+          **触发事件**: ${{ git.event_name }}   
+          **分支**: ${{ git.branch }}        
+          **提交人**: ${{ git.pusher.name }}
+          **commit id**: ${{ git.commit }}
+          **commit message**: ${{ git.message }}
+          查看[日志](${{ task.url }})了解更多
 
