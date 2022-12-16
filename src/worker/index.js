@@ -22,13 +22,8 @@ async function handler(event, _context, callback) {
     taskId,
     provider,
     cloneUrl,
-    authorization: {
-      userId,
-      owner,
-      appId,
-      accessToken: token,
-      secrets,
-    } = {},
+    pusher,
+    authorization: { userId, owner, appId, accessToken: token, secrets } = {},
     ref,
     commit,
     message,
@@ -66,8 +61,11 @@ async function handler(event, _context, callback) {
     const piplineContext = await core.parseSpec(pipLineYaml);
     logger.debug(`piplineContext:: ${JSON.stringify(piplineContext)}`);
     const steps = _.get(piplineContext, 'steps');
+    logger.info(`parse spec success, steps: ${JSON.stringify(steps)}`);
     logger.debug(`start update app`);
-    await otsApp.update(appId, { latest_task: { ...appTaskConfig, completed: context.completed, status: context.status } });
+    await otsApp.update(appId, {
+      latest_task: { ...appTaskConfig, completed: context.completed, status: context.status },
+    });
     logger.debug(`start update app success`);
 
     const runtimes = _.get(piplineContext, 'runtimes', []);
@@ -108,7 +106,8 @@ async function handler(event, _context, callback) {
         id: appId,
       },
       secrets,
-      git: { // git 相关的内容
+      git: {
+        // git 相关的内容
         provider, // 托管仓库
         clone_url: cloneUrl, // git 的 url 地址
         ref,
@@ -117,6 +116,7 @@ async function handler(event, _context, callback) {
         message,
         tag,
         event_name, // 触发的事件名称
+        pusher,
       },
       trigger, // 触发 pipline 的配置
     },
@@ -139,7 +139,9 @@ async function handler(event, _context, callback) {
           status: context.status,
           steps: getOTSTaskPayload(context.steps),
         });
-        await otsApp.update(appId, { latest_task: { ...appTaskConfig, completed: context.completed, status: context.status } });
+        await otsApp.update(appId, {
+          latest_task: { ...appTaskConfig, completed: context.completed, status: context.status },
+        });
         logger.info('completed end.');
         callback(null, '');
       },
@@ -157,7 +159,13 @@ async function handler(event, _context, callback) {
   });
   console.log('ots app update');
   // 防止有其他的动作，将等待状态也要set 到 ots
-  await otsApp.update(appId, { latest_task: { ...appTaskConfig, completed: engine.context.completed, status: engine.context.status } })
+  await otsApp.update(appId, {
+    latest_task: {
+      ...appTaskConfig,
+      completed: engine.context.completed,
+      status: engine.context.status,
+    },
+  });
 
   console.log('engine run start');
   await engine.start();

@@ -30,6 +30,8 @@ const SecretTable = ({
     <Table
       dataSource={secretList}
       loading={loading}
+      maxBodyHeight={400}
+      fixedHeader
       columns={[
         {
           dataIndex: 'key',
