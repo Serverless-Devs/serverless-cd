@@ -4,17 +4,12 @@ const envPath = path.join(__dirname, '..', '..', '.env');
 if (fse.existsSync(envPath)) {
   require('dotenv').config({ path: envPath });
 }
-const core = require('@serverless-cd/core');
-const checkout = require('@serverless-cd/git').default;
+const core = require("@serverless-cd/core");
+const checkout = require("@serverless-cd/git").default;
+const Setup = require("@serverless-cd/setup-runtime").default;
 const _ = require('lodash');
-const Engine = require('@serverless-cd/engine').default;
-const {
-  CODE_DIR,
-  CD_PIPLINE_YAML,
-  CREDENTIALS,
-  OSS_CONFIG,
-  DEFAULT_UNSET_ENVS,
-} = require('./config');
+const Engine = require("@serverless-cd/engine").default;
+const { DOMAIN, REGION, CODE_DIR, CD_PIPLINE_YAML, CREDENTIALS, OSS_CONFIG, DEFAULT_UNSET_ENVS } = require('./config');
 const { getPayload, getOTSTaskPayload } = require('./utils');
 const otsTask = require('./model/task');
 const otsApp = require('./model/app');
@@ -64,16 +59,27 @@ async function handler(event, _context, callback) {
     const pipLineYaml = path.join(execDir, _.get(trigger, 'template', CD_PIPLINE_YAML));
     logger.info(`parse spec: ${pipLineYaml}`);
     const piplineContext = await core.parseSpec(pipLineYaml);
-    logger.debug('piplineContext:\n', JSON.stringify(piplineContext));
+    logger.debug(`piplineContext:: ${JSON.stringify(piplineContext)}`);
     const steps = _.get(piplineContext, 'steps');
-    logger.info(`parse spec success, steps: ${JSON.stringify(steps)}`);
+    logger.debug(`parse spec success, steps: ${JSON.stringify(steps)}`);
     logger.debug(`start update app`);
     await otsApp.update(appId, {
       latest_task: { ...appTaskConfig, completed: context.completed, status: context.status },
     });
     logger.debug(`start update app success`);
+
+    const runtimes = _.get(piplineContext, 'runtimes', []);
+    logger.info(`start init runtime: ${runtimes}`);
+    const setup = new Setup({
+      runtimes,
+      credentials: CREDENTIALS,
+      region: REGION,
+    });
+    await setup.run();
+    logger.info(`init runtime success`);
+
     return { steps };
-  };
+  }
 
   // 启动 engine
   const appTaskConfig = { taskId, commit, message, ref };
@@ -90,13 +96,11 @@ async function handler(event, _context, callback) {
     },
     inputs: {
       ...customInputs,
-      task_id: taskId, // 函数计算的异步任务ID
       task: {
         id: taskId,
-        url: `http://auto.serverless-cd.1740298130743624.ap-northeast-1.fc.devsapp.net/application/${userId}/detail/${taskId}`,
+        url: `${DOMAIN}/application/${userId}/detail/${taskId}`,
       },
-      app: {
-        // 应用的关联配置
+      app: { // 应用的关联配置
         owner,
         user_id: userId,
         id: appId,

@@ -70,12 +70,19 @@ services:
       function:
         name: ${vars.workerFunctionName}
         description: 执行用户配置的 CD 流程。
-        runtime: nodejs16
+        runtime: custom
         codeUri: ./worker
-        handler: index.handler
+        customRuntimeConfig:
+          command:
+            - node
+            - server
         memorySize: 2048
-        timeout: 600
+        timeout: 3600
+        layers:
+          - acs:fc:${vars.region}:official:layers/Nodejs16/versions/1
         environmentVariables:
+          PATH: /opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
+          DOMAIN: ${env.DOMAIN}
           CD_PIPLINE_YAML: ${env.CD_PIPLINE_YAML}
           DOWNLOAD_CODE_DIR: ${env.DOWNLOAD_CODE_DIR}
           ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
