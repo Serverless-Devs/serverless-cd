@@ -67,7 +67,7 @@ const Details = ({
         ...item,
         rawLog: formatLogs(taskSteps[i]?.rawLog || ''),
         initialize: true,
-        loading: false,
+        loading: false
       };
     });
     if (!pollingStatus.includes(get(task.data, 'status'))) {
@@ -78,7 +78,7 @@ const Details = ({
   }, [task.data]);
 
   const onExpand = (panelItemIndex, type) => {
-    if (type === 'running') return;
+    if (type === 'running' || type === 'skipped') return;
     const panelItem = taskSteps[panelItemIndex];
     if (panelItem && !panelItem.rawLog) {
       panelItem.loading = true;
@@ -152,15 +152,14 @@ const Details = ({
             <Collapse className="task-collaps" expandedKeys={expandedKeys}>
               {map(taskSteps, (step, i) => {
                 const { initialize, loading, rawLog, status } = step;
-
-                const disabledStatus = ['pending', 'skipped', 'cancelled'];
+                const disabledStatus = ['pending', 'cancelled'];
                 const isDisabled = disabledStatus.includes(status);
                 const isRunning = status === 'running';
+                const isSkipped = status === 'skipped';
                 const isRequest = initialize && loading && !rawLog;
                 return (
                   <Panel
-                    className={`task-details-panel ${isDisabled || isRunning || isRequest ? 'task-details-panel-loading' : ''
-                      }`}
+                    className={`task-details-panel ${isDisabled || isSkipped || isRunning || isRequest ? 'task-details-panel-loading' : ''}`}
                     key={i}
                     title={<PanelTitle step={step} isRequest={isRequest} />}
                     disabled={isDisabled}
