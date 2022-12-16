@@ -45,16 +45,11 @@ const SecretConfig = ({
     secretsDrawerRef?.current?.setVisible(true);
   }
 
-  const onCompileSecret = async (value) => {
-    const secretsData = value
+  const onCompileSecret = async (values) => {
     let secretsParams = {}
-    if (secretsDrawerRef?.current?.editType === 'form') {
-      forEach(secretsData || [], ({ key, value }) => {
-        secretsParams[key] = value
-      })
-    } else {
-      secretsParams = value
-    }
+    forEach(values || [], ({ key, value }) => {
+      secretsParams[key] = value
+    })
     const { success } = await request({ secrets: secretsParams, appId, provider })
     if (success) {
       Toast.success('配置成功');

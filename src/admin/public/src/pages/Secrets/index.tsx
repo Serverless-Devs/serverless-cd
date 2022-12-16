@@ -27,16 +27,11 @@ const Secrets = () => {
     }
   }, [secrets])
 
-  const onAddOrCompileSecret = async (value) => {
-    const secretsData = value
+  const onAddOrCompileSecret = async (values) => {
     let secretsParams = {}
-    if (secretsDrawerRef?.current?.editType === 'form') {
-      forEach(secretsData || [], ({ key, value }) => {
-        secretsParams[key] = value
-      })
-    } else {
-      secretsParams = value
-    }
+    forEach(values || [], ({ key, value }) => {
+      secretsParams[key] = value
+    })
     const { success } = await request({ secrets: secretsParams, isAdd: isAddSecret })
     if (success) {
       Toast.success('配置成功');
