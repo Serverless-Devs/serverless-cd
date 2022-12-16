@@ -85,6 +85,7 @@ services:
           DOMAIN: ${env.DOMAIN}
           CD_PIPLINE_YAML: ${env.CD_PIPLINE_YAML}
           DOWNLOAD_CODE_DIR: ${env.DOWNLOAD_CODE_DIR}
+          ACCOUNTID: ${env.ACCOUNTID}
           ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
           ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
           OSS_BUCKET: ${env.OSS_BUCKET}
