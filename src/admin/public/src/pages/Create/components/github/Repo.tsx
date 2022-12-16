@@ -1,11 +1,12 @@
 import React, { useEffect, ReactNode, useState } from 'react';
 import { useRequest } from 'ice';
-import { Select, Icon, Field } from '@alicloud/console-components';
+import { Select, Icon, Field, Form } from '@alicloud/console-components';
 import store from '@/store';
 import { noop, map, find, isEmpty, cloneDeep } from 'lodash';
 import RefreshIcon from '@/components/RefreshIcon';
 import { githubOrgs, githubOrgRepos } from '@/services/git';
 
+const FormItem = Form.Item;
 export interface IRepoItem {
   name: string;
   owner: string;
@@ -46,7 +47,7 @@ const Repos = (props: IProps) => {
   const effectsState = store.useModelEffectsState('user');
   const [refreshLoading, setRefreshLoading] = useState(false);
   const [currentRepoType, setCurrentRepoType] = useState('personal');
-  const { getValue, setValue, init } = field;
+  const { getValue, setValue, init, getError } = field;
 
   useEffect(() => {
     if (!isEmpty(data)) {
@@ -201,34 +202,49 @@ const Repos = (props: IProps) => {
   }
   return (
     <div className='flex-r position-r'>
-      <Select
-        style={{ flexBasis: '30%' }}
-        placeholder="请选择个人/组织"
-        dataSource={getValue('repoTypeList')}
-        {...init('repoTypeValue', {
-          initValue: 'personal',
-          props: {
-            onChange: onRepoTypeChange
-          }
-        })}
-        state={loading ? 'loading' : undefined}
-        disabled={loading}
-      />
-      <Select
-        style={{ flexBasis: '68%' }}
-        className="full-width"
-        placeholder="请选择"
-        showSearch
-        dataSource={getValue('userRepos')}
-        state={(orgRepos.loading || effectsState.getUserRepos.isLoading) ? 'loading' : undefined}
-        disabled={loading || effectsState.getUserRepos.isLoading || orgRepos.loading}
-        value={value?.name}
-        onChange={handleChange}
-        valueRender={valueRender}
-        popupClassName="icon-right"
-      />
+      <Form field={field} className='flex-r position-r' style={{ width: '100%' }}>
+        <FormItem style={{ flexBasis: '30%', marginBottom: getError('repoName') ? 20 : 0 }}>
+          <Select
+            className="full-width"
+            placeholder="请选择个人/组织"
+            dataSource={getValue('repoTypeList')}
+            {...init('repoTypeValue', {
+              initValue: 'personal',
+              props: {
+                onChange: onRepoTypeChange
+              }
+            })}
+            state={loading ? 'loading' : undefined}
+            disabled={loading}
+          />
+        </FormItem>
+        <FormItem style={{ flexBasis: '68%', marginBottom: 0 }}>
+          <Select
+            {...(init('repoName', {
+              rules: [
+                {
+                  required: true,
+                  message: '请选择仓库名称',
+                },
+              ],
+              props: {
+                value: value?.name,
+                onChange: handleChange
+              }
+            }) as any)}
+            className="full-width"
+            placeholder="请选择"
+            showSearch
+            dataSource={getValue('userRepos')}
+            state={(orgRepos.loading || effectsState.getUserRepos.isLoading) ? 'loading' : undefined}
+            disabled={loading || effectsState.getUserRepos.isLoading || orgRepos.loading}
+            valueRender={valueRender}
+            popupClassName="icon-right"
+          />
+        </FormItem>
+      </Form>
       <RefreshIcon
-        style={{ position: 'absolute', right: -20 }}
+        style={{ position: 'absolute', right: -20, top: getError('repoName') ? 5 : 'auto' }}
         refreshCallback={refresh}
         loading={refreshLoading}
       />

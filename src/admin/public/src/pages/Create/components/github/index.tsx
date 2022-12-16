@@ -4,8 +4,7 @@ import { FORM_ITEM_LAYOUT } from '@/constants';
 import AuthDialog from './AuthDialog';
 import Repo from './Repo';
 import Trigger from './Trigger';
-// import Env from './Env';
-import Secret from './Secret';
+import ConfigEdit from '@/components/ConfigEdit'
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -70,14 +69,11 @@ const Github = (props: IProps) => {
         <FormItem label="触发方式" required>
           <Trigger repo={getValue('repo')} {...(init('trigger') as any)} />
         </FormItem>
-        {/* <FormItem label="环境变量">
-          <Env {...init('envs')} />
-        </FormItem> */}
-        <FormItem label="Secrets">
-          <Secret {...init('secrets')} />
-        </FormItem>
         <FormItem label="描述">
           <Input {...init('description')} placeholder="请输入描述" />
+        </FormItem>
+        <FormItem label="Secrets">
+          <ConfigEdit field={field} />
         </FormItem>
       </Form>
     </>
