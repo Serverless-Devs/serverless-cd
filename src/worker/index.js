@@ -61,7 +61,7 @@ async function handler(event, _context, callback) {
     const piplineContext = await core.parseSpec(pipLineYaml);
     logger.debug(`piplineContext:: ${JSON.stringify(piplineContext)}`);
     const steps = _.get(piplineContext, 'steps');
-    logger.info(`parse spec success, steps: ${JSON.stringify(steps)}`);
+    logger.debug(`parse spec success, steps: ${JSON.stringify(steps)}`);
     logger.debug(`start update app`);
     await otsApp.update(appId, {
       latest_task: { ...appTaskConfig, completed: context.completed, status: context.status },
