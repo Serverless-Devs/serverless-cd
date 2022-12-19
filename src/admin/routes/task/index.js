@@ -19,7 +19,7 @@ const getTaskConfig = (taskConfig) => {
 }
 
 router.get("/list", async function (req, res) {
-  const { userId } = req.session;
+  const { userId } = req.user;
   const { appId, currentPage = 1, pageSize = 10 } = req.query;
   if (_.isEmpty(appId)) {
     throw new ValidationError('AppId is empty');
@@ -43,7 +43,7 @@ router.get("/list", async function (req, res) {
 });
 
 router.get("/get", async function (req, res) {
-  const { userId } = req.session;
+  const { userId } = req.user;
   const taskId = _.get(req.query, 'taskId');
   if (_.isEmpty(taskId)) {
     throw new ValidationError('TaskId is empty');
@@ -54,7 +54,7 @@ router.get("/get", async function (req, res) {
 });
 
 router.post("/remove", async function (req, res) {
-  const { userId } = req.session;
+  const { userId } = req.user;
   const taskId = _.get(req.body, 'taskId');
   if (_.isEmpty(taskId)) {
     throw new ValidationError('TaskId is empty');
@@ -79,7 +79,7 @@ router.get("/log", async (req, res) => {
   try {
     const { content } = await ossClient.get(`logs/${taskId}/step_${stepCount}.log`);
     res.json(generateSuccessResult(content.toString('utf8')));
-  } catch(ex) {
+  } catch (ex) {
     console.error(ex.status, ex.code, ex.message);
     throw ex;
   }

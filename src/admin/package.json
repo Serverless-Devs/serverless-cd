@@ -12,8 +12,8 @@
   "dependencies": {
     "@alicloud/fc2": "^2.6.3",
     "@serverless-cd/core": "^0.0.2",
-    "@serverless-cd/express-ots-session": "^1.0.2",
     "@serverless-cd/git": "^0.0.2",
+    "jsonwebtoken": "^8.5.1",
     "@serverless-cd/git-provider": "^0.0.7",
     "@serverless-cd/ots-orm": "^1.1.0",
     "@serverless-devs/core": "^0.1.45",
@@ -25,7 +25,6 @@
     "ejs": "^3.1.8",
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
-    "express-session": "^1.17.3",
     "http-errors": "^2.0.0",
     "nanoid": "^3.3.4",
     "qs": "^6.11.0",

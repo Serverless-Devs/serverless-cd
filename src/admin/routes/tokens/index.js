@@ -17,7 +17,7 @@ const getTokenInfo = async (id) => {
 
 
 router.get("/list", async function (req, res) {
-  const { userId } = req.session;
+  const { userId } = req.user;
 
   console.log(`token list userId: ${userId}`);
 
@@ -30,7 +30,7 @@ router.get("/list", async function (req, res) {
 });
 
 router.post("/create", async function (req, res) {
-  const { userId } = req.session;
+  const { userId } = req.user;
   const { description, expiration } = req.body;
   const cd_token = unionToken();
   const id = unionid();
@@ -45,7 +45,7 @@ router.post("/create", async function (req, res) {
 
   await model.create(id, params);
 
-  res.json(generateSuccessResult({cd_token}));
+  res.json(generateSuccessResult({ cd_token }));
 });
 
 router.post("/delete", async function (req, res) {
