@@ -42,7 +42,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/alibaba-fusion/materials/tree/master/scaffolds/scaffold-lite"
+    "url": "https://github.com/Serverless-Devs/serverless-cd"
   },
   "private": true,
   "originTemplate": "@alifd/scaffold-lite"
