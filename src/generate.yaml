@@ -30,3 +30,4 @@ services:
       ACCESS_KEY_SECRET: 
       GITHUB_CLIENT_ID: 
       GITHUB_CLIENT_SECRET: 
+      COOKIE_SECRET:

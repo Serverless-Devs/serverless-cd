@@ -23,7 +23,12 @@ const {
   WORKER_FUNCTION_NAME,
   SERVICE_NAME,
   REGION,
+  COOKIE_SECRET,
 } = process.env;
+
+if (!COOKIE_SECRET) {
+  throw new Error('Environment variable COOKIE_SECRET is not set');
+}
 
 const supportGithubLogin = !(
   !GITHUB_CLIENT_ID ||
@@ -86,6 +91,6 @@ module.exports = {
     github: supportGithubLogin,
     account: true,
   },
-  COOKIE_SECRET: 'secr3t',
+  COOKIE_SECRET,
   WEBHOOK_EVENTS: ['push', 'pull_request'],
 };

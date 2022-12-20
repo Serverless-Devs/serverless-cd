@@ -177,6 +177,7 @@ services:
           ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
           ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
           OSS_BUCKET: ${env.OSS_BUCKET}
+          COOKIE_SECRET: ${env.COOKIE_SECRET}
           OTS_INSTANCE_NAME: ${env.OTS_INSTANCE_NAME}
           OTS_TASK_TABLE_NAME: ${env.OTS_TASK_TABLE_NAME}
           OTS_TASK_INDEX_NAME: ${env.OTS_TASK_INDEX_NAME}
