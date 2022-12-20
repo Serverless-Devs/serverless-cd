@@ -18,7 +18,6 @@ services:
       OTS_USER_TABLE_NAME: user
       OTS_APP_TABLE_NAME: application
       OTS_TOKEN_TABLE_NAME: token
-      OTS_SESSION_TABLE_NAME: session
       OTS_TASK_INDEX_NAME: task_index
       OTS_USER_INDEX_NAME: user_index
       OTS_APP_INDEX_NAME: application_index
