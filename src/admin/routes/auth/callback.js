@@ -2,7 +2,7 @@ const router = require("express").Router();
 const axios = require("axios");
 const { GITHUB } = require("../../config");
 const _ = require("lodash");
-const { setSession, md5Encrypt, generateErrorResult, generateSuccessResult, unionid, githubRequest } = require("../../util");
+const { setReqConfig, md5Encrypt, generateErrorResult, generateSuccessResult, unionid, githubRequest } = require("../../util");
 const { OTS_USER } = require('../../config');
 const orm = require("../../util/orm")(OTS_USER.name, OTS_USER.index);
 
@@ -48,19 +48,19 @@ router.get("/github", async (req, res) => {
         }
       }
     });
-    setSession(req, {
+    setReqConfig(req, {
       userId: findObj.id,
       providerUid: data.id,
       login_token: login_token,
     });
-    return res.json(generateSuccessResult({}, {status: 302}));
+    return res.json(generateSuccessResult({}, { status: 302 }));
   }
   return res.json(generateSuccessResult({
-      avatar: data.avatar_url,
-      providerId: data.id,
-      login_token: login_token,
-      name: data.login
-    }));
+    avatar: data.avatar_url,
+    providerId: data.id,
+    login_token: login_token,
+    name: data.login
+  }));
 });
 
 router.post("/bindingAccount", async function (req, res, next) {
@@ -77,7 +77,7 @@ router.post("/bindingAccount", async function (req, res, next) {
   } = req.body;
 
   if (status === 'login') {
-    const userResult = await orm.find({username: username});
+    const userResult = await orm.find({ username: username });
     const userInfo = _.get(userResult, "result[0]", {});
     // 验证账号是否存在
     if (!_.isEmpty(userInfo)) {
@@ -100,7 +100,7 @@ router.post("/bindingAccount", async function (req, res, next) {
             }
           }
         });
-        setSession(req, {
+        setReqConfig(req, {
           userId: userInfo.id,
           providerUid: providerId,
           login_token
@@ -133,7 +133,7 @@ router.post("/bindingAccount", async function (req, res, next) {
         }
       }
     );
-    setSession(req, {
+    setReqConfig(req, {
       userId: id,
       providerUid: providerId,
       login_token,

@@ -8,8 +8,8 @@ const orm = require('../util/orm')(OTS_USER.name, OTS_USER.index);
 const applicationOrm = require('../util/orm')(OTS_APPLICATION.name, OTS_APPLICATION.index);
 
 router.get('/repos', async function (req, res, _next) {
-  const userResult = await orm.find({ id: req.session.userId });
-  const applicationResult = await applicationOrm.find({ user_id: req.session.userId });
+  const userResult = await orm.find({ id: req.user.userId });
+  const applicationResult = await applicationOrm.find({ user_id: req.user.userId });
   const applicationList = _.get(applicationResult, 'result', []);
   const useGithubToken = _.get(userResult, 'result[0].third_part.github.access_token', '');
 
@@ -30,7 +30,7 @@ router.get('/repos', async function (req, res, _next) {
 });
 
 router.get('/orgs', async function (req, res, _next) {
-  const userResult = await orm.find({ id: req.session.userId });
+  const userResult = await orm.find({ id: req.user.userId });
   const useGithubToken = _.get(userResult, 'result[0].third_part.github.access_token', '');
   const prioverd = git('github', { access_token: useGithubToken });
   const orgs = await prioverd.listOrgs();
@@ -38,10 +38,10 @@ router.get('/orgs', async function (req, res, _next) {
 });
 
 router.get('/orgRepos', async function (req, res, _next) {
-  const userResult = await orm.find({ id: req.session.userId });
+  const userResult = await orm.find({ id: req.user.userId });
   console.log('orgRepos req.query', JSON.stringify(req.query));
   const { org } = req.query;
-  const applicationResult = await applicationOrm.find({ user_id: req.session.userId });
+  const applicationResult = await applicationOrm.find({ user_id: req.user.userId });
   const applicationList = _.get(applicationResult, 'result', []);
   const useGithubToken = _.get(userResult, 'result[0].third_part.github.access_token', '');
 
@@ -64,7 +64,7 @@ router.get('/orgRepos', async function (req, res, _next) {
 });
 
 router.get('/branches', async function (req, res, _next) {
-  const userResult = await orm.find({ id: req.session.userId });
+  const userResult = await orm.find({ id: req.user.userId });
   const useGithubToken = _.get(userResult, 'result[0].third_part.github.access_token', '');
 
   const prioverd = git('github', { access_token: useGithubToken });
@@ -73,7 +73,7 @@ router.get('/branches', async function (req, res, _next) {
 });
 
 router.post('/putFile', async function (req, res, _next) {
-  const userResult = await orm.find({ id: req.session.userId });
+  const userResult = await orm.find({ id: req.user.userId });
   const useGithubToken = _.get(userResult, 'result[0].third_part.github.access_token', '');
 
   const prioverd = git('github', { access_token: useGithubToken });
@@ -83,7 +83,7 @@ router.post('/putFile', async function (req, res, _next) {
 
 router.post('/checkFile', async function (req, res, _next) {
   console.log('checkFile body:', req.body);
-  const userResult = await orm.find({ id: req.session.userId });
+  const userResult = await orm.find({ id: req.user.userId });
   const useGithubToken = _.get(userResult, 'result[0].third_part.github.access_token', '');
   const rows = await checkFile({ ...req.body, token: useGithubToken, file: CD_PIPLINE_YAML });
   return res.json(generateSuccessResult(rows));

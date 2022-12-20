@@ -34,10 +34,10 @@ const githubRequest = (accessToken) => {
   };
 }
 
-// 公共数据存储到 session
-function setSession(req, data) {
+// 公共数据存储到 req
+function setReqConfig(req, data) {
   for (const key in data) {
-    _.set(req, `session.${key}`, data[key]);
+    _.set(req, `user.${key}`, data[key]);
   }
 }
 
@@ -81,8 +81,8 @@ const formatBranch = (ref) => {
   return ref
 }
 
-module.exports={
-  setSession,
+module.exports = {
+  setReqConfig,
   md5Encrypt,
   generateErrorResult,
   generateSuccessResult,

@@ -1,5 +1,5 @@
 const { lodash: _ } = require('@serverless-cd/core');
-const { setSession, ValidationError, generateErrorResult } = require('../util');
+const { setReqConfig, ValidationError, generateErrorResult } = require('../util');
 const { queryToken, updateActiveToken } = require('../routes/tokens/token.service');
 
 module.exports = async function (req, res, next) {
@@ -17,14 +17,14 @@ module.exports = async function (req, res, next) {
     }
 
     console.log('req.headers.cd_token:: ', req.headers.cd_token);
-    setSession(req, { userId: data.user_id });
+    setReqConfig(req, { userId: data.user_id });
     next();
     return;
   }
 
-  if (!req.session.userId && !req.url.startsWith('/api/auth') && !req.url.startsWith('/login')) {
+  if (!_.get(req, 'user.userId') && !req.url.startsWith('/api/auth') && !req.url.startsWith('/login')) {
     return res.redirect('/login');
-  } else {
-    next();
   }
+
+  next();
 };

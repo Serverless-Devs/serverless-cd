@@ -16,14 +16,18 @@ const {
   OTS_USER_INDEX_NAME,
   OTS_APP_TABLE_NAME,
   OTS_APP_INDEX_NAME,
-  OTS_SESSION_TABLE_NAME,
   OTS_TOKEN_TABLE_NAME,
   OTS_TOKEN_INDEX_NAME,
   SESSION_EXPIRATION,
   WORKER_FUNCTION_NAME,
   SERVICE_NAME,
   REGION,
+  COOKIE_SECRET,
 } = process.env;
+
+if (!COOKIE_SECRET) {
+  throw new Error('Environment variable COOKIE_SECRET is not set');
+}
 
 const supportGithubLogin = !(
   !GITHUB_CLIENT_ID ||
@@ -68,9 +72,6 @@ module.exports = {
     name: OTS_APP_TABLE_NAME,
     index: OTS_APP_INDEX_NAME,
   },
-  OTS_SESSION: {
-    name: OTS_SESSION_TABLE_NAME,
-  },
   OTS_TOKEN: {
     name: OTS_TOKEN_TABLE_NAME,
     index: OTS_TOKEN_INDEX_NAME,
@@ -86,6 +87,6 @@ module.exports = {
     github: supportGithubLogin,
     account: true,
   },
-  COOKIE_SECRET: 'secr3t',
+  COOKIE_SECRET,
   WEBHOOK_EVENTS: ['push', 'pull_request'],
 };
