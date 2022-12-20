@@ -8,7 +8,7 @@ require('express-async-errors');
 const express = require('express');
 const createError = require('http-errors');
 const cookieAuth = require('./middleware/cookie-auth');
-const sessionAuth = require('./middleware/jwd-auth');
+const sessionAuth = require('./middleware/jwt-auth');
 const tokenAuth = require('./middleware/token-auth');
 
 const app = express();
