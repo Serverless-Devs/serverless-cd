@@ -7,7 +7,7 @@
     "prestart": "export WORKER_FUNCTION_NAME=worker && export SERVICE_NAME=serverless-cd && export REGION=cn-hongkong",
     "start": "nodemon index.js"
   },
-  "author": "",
+  "author": "mamba",
   "license": "ISC",
   "dependencies": {
     "@alicloud/fc2": "^2.6.3",

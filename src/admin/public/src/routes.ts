@@ -1,16 +1,26 @@
-import { IRouterConfig} from 'ice';
+import { IRouterConfig, lazy} from 'ice';
 import { BasicLayout } from '@/layouts/BasicLayout';
 import { LoginLayout } from '@/layouts/LoginLayout';
 
-import Dashboard from '@/pages/Dashboard';
-import Login from '@/pages/Login';
-import Signup from '@/pages/Signup';
-import Create from '@/pages/Create';
-import Details from '@/pages/Details';
-import TaskDetails from '@/pages/TaskDetails';
-import Auth from '@/pages/Auth';
-import Tokens from '@/pages/Tokens';
-import Secrets from '@/pages/Secrets';
+// import Dashboard from '@/pages/Dashboard';
+// import Login from '@/pages/Login';
+// import Signup from '@/pages/Signup';
+// import Create from '@/pages/Create';
+// import Details from '@/pages/Details';
+// import TaskDetails from '@/pages/TaskDetails';
+// import Auth from '@/pages/Auth';
+// import Tokens from '@/pages/Tokens';
+// import Secrets from '@/pages/Secrets';
+
+const Dashboard = lazy(() => import(/* webpackChunkName: 'user-login' */'@/pages/Dashboard'));
+const Login = lazy(() => import(/* webpackChunkName: 'Login' */'@/pages/Login'));
+const Signup = lazy(() => import(/* webpackChunkName: 'Signup' */'@/pages/Signup'));
+const Create = lazy(() => import(/* webpackChunkName: 'Create' */'@/pages/Create'));
+const Details = lazy(() => import(/* webpackChunkName: 'Details' */'@/pages/Details'));
+const TaskDetails = lazy(() => import(/* webpackChunkName: 'TaskDetails' */'@/pages/TaskDetails'));
+const Auth = lazy(() => import(/* webpackChunkName: 'Auth' */'@/pages/Auth'));
+const Tokens = lazy(() => import(/* webpackChunkName: 'Tokens' */'@/pages/Tokens'));
+const Secrets = lazy(() => import(/* webpackChunkName: 'Secrets' */'@/pages/Secrets'));
 
 
 const routerConfig: IRouterConfig[] = [
