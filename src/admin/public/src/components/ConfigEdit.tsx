@@ -21,9 +21,9 @@ const ConfigEdit = ({
   const [jsonError, setJsonError] = useState(false);
   const { init, setValue, getValue } = field;
 
-  useEffect(() => {
-    console.log(getValue('secrets'), 'secrets')
-  }, [getValue('secrets')])
+  // useEffect(() => {
+  //   console.log(getValue('secrets'), 'secrets')
+  // }, [getValue('secrets')])
 
   useEffect(() => {
     if (isEmpty(secretsData)) {
