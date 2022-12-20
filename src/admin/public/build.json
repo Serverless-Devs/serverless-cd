@@ -1,6 +1,14 @@
 {
-  "vite": true,
-  "publicPath": "https://serverless-cd-hongkong-website.oss-cn-hongkong.aliyuncs.com/",
+  "router": {
+    "lazy": true
+  },
+  "publicPath": "/build/",
+  "externals": {
+    "moment": "moment",
+    "react": "React",
+    "../moment": "moment",
+    "react-dom": "ReactDOM"
+  },
   "plugins": [
     [
       "build-plugin-moment-locales",
