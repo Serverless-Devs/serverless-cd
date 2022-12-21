@@ -1,5 +1,5 @@
 {
-  "name": "@alifd/scaffold-lite",
+  "name": "@serverless-cd/console",
   "version": "0.1.0",
   "description": "轻量级模板，使用 TypeScript，仅包含基础的 Layout。",
   "dependencies": {
@@ -44,6 +44,5 @@
     "type": "git",
     "url": "https://github.com/Serverless-Devs/serverless-cd"
   },
-  "private": true,
-  "originTemplate": "@alifd/scaffold-lite"
+  "private": true
 }
