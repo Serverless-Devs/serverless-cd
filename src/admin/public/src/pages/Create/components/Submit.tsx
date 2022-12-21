@@ -8,7 +8,7 @@ import { CREATE_TYPE, SERVERLESS_PIPELINE_CONTENT } from './constant';
 import { get, each, map, every, find, uniqWith, isEqual, isEmpty } from 'lodash';
 import { sleep } from '@/utils';
 import { Toast } from '@/components/ToastContainer';
-import MonacoEditor from 'react-monaco-editor';
+import CodeMirror from '@/components/CodeMirror';
 import yaml from 'js-yaml';
 interface IProps {
   field: Field;
@@ -27,8 +27,8 @@ const Submit = (props: IProps) => {
   const { loading, request } = useRequest(createApp);
   const manualDeploy = useRequest(manualDeployApp);
   const field = Field.useField();
-  const { setValue, getValue } = field;
-  const isDeploy = useRef(false)
+  const { init, setValue, getValue } = field;
+  const isDeploy = useRef(false);
 
   const handleCreate = async () => {
     setValue('submitLoading', true);
@@ -201,10 +201,6 @@ const Submit = (props: IProps) => {
     }
   };
 
-  const handleEditorChange = (value) => {
-    setValue('yaml', value);
-  };
-
   const renderResult = () => {
     const errorBranch: IStepItem[] = getValue('errorBranch');
     if (errorBranch?.length > 0) {
@@ -220,18 +216,12 @@ const Submit = (props: IProps) => {
             })}
             您可以编辑yaml文件的默认内容，点击'确定'按钮会将文件commit到您的仓库，然后继续创建应用。
           </div>
-          <MonacoEditor
-            language="yaml"
+          <CodeMirror
             height="300px"
-            defaultValue={yaml.dump(SERVERLESS_PIPELINE_CONTENT)}
-            theme="vs-dark"
-            options={{
-              selectOnLineNumbers: true,
-              minimap: {
-                enabled: false,
-              },
-            }}
-            onChange={handleEditorChange}
+            {...(init('yaml', {
+              initValue: yaml.dump(SERVERLESS_PIPELINE_CONTENT),
+            }) as any)}
+            width={'100%'}
           />
         </>
       );
@@ -241,7 +231,12 @@ const Submit = (props: IProps) => {
 
   return (
     <>
-      <Button className="mt-32 mr-8" type="primary" onClick={() => berforeCreate(false)} loading={loading}>
+      <Button
+        className="mt-32 mr-8"
+        type="primary"
+        onClick={() => berforeCreate(false)}
+        loading={loading}
+      >
         创建
       </Button>
       <Button className="mt-32" onClick={() => berforeCreate(true)} loading={loading}>
@@ -255,16 +250,16 @@ const Submit = (props: IProps) => {
         footer={
           (getValue('errorBranch') as [])?.length > 0
             ? [
-              <Button
-                type="primary"
-                onClick={handleCreate}
-                style={{ marginRight: 8 }}
-                loading={getValue('submitLoading')}
-              >
-                确定
-              </Button>,
-              <Button onClick={() => setValue('showDialog', false)}>取消</Button>,
-            ]
+                <Button
+                  type="primary"
+                  onClick={handleCreate}
+                  style={{ marginRight: 8 }}
+                  loading={getValue('submitLoading')}
+                >
+                  确定
+                </Button>,
+                <Button onClick={() => setValue('showDialog', false)}>取消</Button>,
+              ]
             : []
         }
       >
