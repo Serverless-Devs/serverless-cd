@@ -19,8 +19,7 @@
           "zh-cn"
         ]
       }
-    ],
-    "./build.plugin.js"
+    ]
   ],
   "proxy": {
     "/api": {

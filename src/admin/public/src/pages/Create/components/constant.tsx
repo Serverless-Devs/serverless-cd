@@ -32,9 +32,6 @@ export const SERVERLESS_PIPELINE_CONTENT = {
       run: "echo 'Hi {{ task_id }}'",
     },
     {
-      run: "echo 'Hi {{ app.user_name }}'",
-    },
-    {
       run: "echo 'Hi {{ git.event_name }}'",
     },
     {
