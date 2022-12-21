@@ -58,6 +58,7 @@ export function replaceToken(replaceStr) {
     warn: (key) => `\u001b[33m${key}\u001b[0m`,
     info: (key) => `\u001b[32m${key}\u001b[0m`,
     error: (key) => `\u001b[31m${key}\u001b[0m`,
+    "npm ERR!": (key) => `\u001b[31m${key}\u001b[0m`,
     success: (key) => `\u001b[32m${key}\u001b[0m`,
   }
   _.each(_.keys(logKeys), (logKey: string) => {
