@@ -26,7 +26,7 @@ router.post("/signUp", async function (req, res) {
     }
   );
   setReqConfig(req, { userId: id });
-  const token = jwt.sign({ userId: data.id }, COOKIE_SECRET);
+  const token = await jwt.sign({ userId: id }, COOKIE_SECRET);
   res.cookie('jwt', token, { maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true });
   return res.json(generateSuccessResult());
 })
@@ -40,7 +40,7 @@ router.post("/login", async function (req, res) {
     if (_.get(data, 'password', '') === md5Encrypt(password)) {
       setReqConfig(req, { userId: data.id });
 
-      const token = jwt.sign({ userId: data.id }, COOKIE_SECRET);
+      const token = await jwt.sign({ userId: data.id }, COOKIE_SECRET);
       res.cookie('jwt', token, { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
       return res.json(generateSuccessResult());
     }
