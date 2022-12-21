@@ -14,6 +14,7 @@ router.use('/github', require('./github'));
 router.use('/auth', require('./auth'));
 router.use('/user', require('./user'));
 router.use('/tokens', require('./tokens'));
+router.use('/proxy', require('./proxy'));
 
 router.use(function (err, _req, res, next) {
   if (err.name === 'ValidationError') {
