@@ -1,6 +1,5 @@
 import React, { PureComponent, ReactElement } from 'react';
 import { Grid } from '@alicloud/console-components';
-// import C from '~/constants/common';
 const { Row, Col } = Grid;
 
 type Item = {

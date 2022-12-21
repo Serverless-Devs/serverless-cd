@@ -1,16 +1,12 @@
 import React, { PureComponent } from 'react';
 import { Controlled as CodeMirror } from 'react-codemirror2';
-import 'codemirror/lib/codemirror.css';
 import 'codemirror/addon/lint/lint.css';
 import 'codemirror/addon/lint/lint';
 import 'codemirror/addon/lint/json-lint';
 import 'codemirror/addon/lint/javascript-lint';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/edit/closebrackets';
-// import jsonlint from 'jsonlint-mod';
 import { isJson } from '../utils';
-
-// window.jsonlint = jsonlint;
 
 const DEFAULT_OPTIONS = {
   mode: 'json',
