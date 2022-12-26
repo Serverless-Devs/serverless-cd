@@ -89,4 +89,5 @@ module.exports = {
   },
   COOKIE_SECRET,
   WEBHOOK_EVENTS: ['push', 'pull_request'],
+  EXCLUDE_AUTH_URL: ['/auth/account/login', '/auth/account/supportLoginTypes', '/auth/account/signUp']
 };

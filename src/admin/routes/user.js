@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const _ = require("lodash");
 const { OTS_USER } = require('../config');
-const { generateSuccessResult, generateErrorResult } = require('../util');
+const { generateSuccessResult, generateErrorResult, retryOnce } = require('../util');
 const orm = require("../util/orm")(OTS_USER.name, OTS_USER.index);
 
 router.post("/loginout", async function (req, res, next) {
@@ -11,7 +11,7 @@ router.post("/loginout", async function (req, res, next) {
 });
 
 router.post("/userInfo", async function (req, res, next) {
-  const data = await orm.find({ id: req.user.userId });
+  const data = await retryOnce(orm.find({ id: req.user.userId }), 1000);
   const result = _.get(data, 'result[0]', {});
 
   console.log('获取用户信息', result)
