@@ -1,5 +1,5 @@
 {
-  "name": "@alifd/scaffold-lite",
+  "name": "@serverless-cd/console",
   "version": "0.1.0",
   "description": "轻量级模板，使用 TypeScript，仅包含基础的 Layout。",
   "dependencies": {
@@ -16,11 +16,9 @@
     "react-codemirror2": "^7.2.1",
     "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "^17.0.2",
-    "react-monaco-editor": "^0.50.1",
     "react-toastify": "^9.0.8",
     "ice.js": "^2.0.0",
-    "build-plugin-moment-locales": "^0.1.0",
-    "monaco-editor-webpack-plugin": "^7.0.1"
+    "build-plugin-moment-locales": "^0.1.0"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.5",
@@ -42,8 +40,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/alibaba-fusion/materials/tree/master/scaffolds/scaffold-lite"
+    "url": "https://github.com/Serverless-Devs/serverless-cd"
   },
-  "private": true,
-  "originTemplate": "@alifd/scaffold-lite"
+  "private": true
 }

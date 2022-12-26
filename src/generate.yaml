@@ -3,7 +3,7 @@ name: serverless-cd
 access: {{ access }}
 
 services:
-  generate:
+  generateService:
     component: serverless-cd-tool
     props:
       serviceName: {{ serviceName }}

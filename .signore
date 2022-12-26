@@ -5,4 +5,6 @@ src/example
 .env
 .s
 /s.yaml
+/src/s.dev.yaml
+/src/serverless-cd.yaml
 /Makefile

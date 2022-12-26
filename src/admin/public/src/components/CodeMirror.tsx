@@ -6,7 +6,6 @@ import 'codemirror/addon/lint/json-lint';
 import 'codemirror/addon/lint/javascript-lint';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/edit/closebrackets';
-import { isJson } from '../utils';
 
 const DEFAULT_OPTIONS = {
   mode: 'json',
@@ -25,10 +24,9 @@ type Props = {
   mode?: string;
   lint?: boolean;
   name?: string;
-  showFormatBtn?: boolean;
 };
 
-class JsonEditor extends PureComponent<Props> {
+class MyCodeMirror extends PureComponent<Props> {
   options: any;
   constructor(props) {
     super(props);
@@ -38,38 +36,19 @@ class JsonEditor extends PureComponent<Props> {
   }
 
   render() {
-    const { value, onChange, showFormatBtn = true } = this.props;
+    const { value, onChange } = this.props;
     return (
-      <div className='json-editor' style={{ position: 'relative', border: "1px solid rgb(238, 238, 238)" }}>
+      <div style={{ position: 'relative', border: '1px solid rgb(238, 238, 238)' }}>
         <CodeMirror
           onBeforeChange={(editor, data, value) => {
             onChange(value);
           }}
-          value={value || ''}
+          value={value}
           options={this.options}
         />
-        {value && showFormatBtn && isJson(value) && (
-          <span
-            className="text-description color-primary"
-            style={{
-              position: 'absolute',
-              right: 20,
-              top: 5,
-              zIndex: 25,
-              cursor: 'pointer',
-            }}
-            onClick={() => {
-              if (isJson(value)) {
-                onChange(JSON.stringify(JSON.parse(value), null, 4));
-              }
-            }}
-          >
-            格式化
-          </span>
-        )}
       </div>
     );
   }
 }
 
-export default JsonEditor;
+export default MyCodeMirror;
