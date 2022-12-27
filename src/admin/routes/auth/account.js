@@ -1,9 +1,11 @@
 const router = require("express").Router();
 const _ = require("lodash");
 const jwt = require("jsonwebtoken");
-const { OTS_USER, SUPPORT_LOGIN, COOKIE_SECRET } = require('../../config');
+const { OTS_USER, SUPPORT_LOGIN, COOKIE_SECRET, SESSION_EXPIRATION } = require('../../config');
 const { unionid, setReqConfig, md5Encrypt, generateSuccessResult, generateErrorResult } = require("../../util");
 const orm = require("../../util/orm")(OTS_USER.name, OTS_USER.index);
+
+const SESSION_EXPIRATION_EXP = Math.floor(Date.now() / 1000) + Math.floor(SESSION_EXPIRATION / 1000);
 
 router.post("/signUp", async function (req, res) {
   console.log("账号注册 req.body", JSON.stringify(req.body));
@@ -26,8 +28,8 @@ router.post("/signUp", async function (req, res) {
     }
   );
   setReqConfig(req, { userId: id });
-  const token = await jwt.sign({ userId: id }, COOKIE_SECRET);
-  res.cookie('jwt', token, { maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true });
+  const token = await jwt.sign({ userId: id, exp: SESSION_EXPIRATION_EXP }, COOKIE_SECRET);
+  res.cookie('jwt', token, { maxAge: SESSION_EXPIRATION, httpOnly: true });
   return res.json(generateSuccessResult());
 })
 
@@ -40,8 +42,8 @@ router.post("/login", async function (req, res) {
     if (_.get(data, 'password', '') === md5Encrypt(password)) {
       setReqConfig(req, { userId: data.id });
 
-      const token = await jwt.sign({ userId: data.id }, COOKIE_SECRET);
-      res.cookie('jwt', token, { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
+      const token = await jwt.sign({ userId: data.id, exp: SESSION_EXPIRATION_EXP }, COOKIE_SECRET);
+      res.cookie('jwt', token, { maxAge: SESSION_EXPIRATION, httpOnly: true });
       return res.json(generateSuccessResult());
     }
     return res.json(generateErrorResult('密码不正确'));

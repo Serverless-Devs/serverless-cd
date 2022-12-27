@@ -6,9 +6,11 @@ if (fs.existsSync(envPath)) {
 }
 require('express-async-errors');
 const express = require('express');
-const createError = require('http-errors');
-const cookieAuth = require('./middleware/cookie-auth');
-const sessionAuth = require('./middleware/jwt-auth');
+const { lodash: _ } = require('@serverless-cd/core');
+const cookieParser = require('cookie-parser');
+const jwtAuth = require('./middleware/jwt-auth');
+const { unless } = require('./util/index');
+const { EXCLUDE_AUTH_URL } = require('./config');
 const tokenAuth = require('./middleware/token-auth');
 
 const app = express();
@@ -23,20 +25,18 @@ app.use(express.static('public'));
 app.use(express.raw());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
+app.use(cookieParser());
 // 首页
 app.use('/', require('./routes'));
 
-app.use(cookieAuth);
-app.use(sessionAuth);
-app.use(tokenAuth);
-
-app.use('/api', require('./routes'));
-// fallback
+app.use(
+  '/api',
+  unless((req) => _.includes(EXCLUDE_AUTH_URL, req.url), jwtAuth),
+  unless((req) => _.includes(EXCLUDE_AUTH_URL, req.url), tokenAuth),
+  require('./routes'),
+);
+// 兼容前端brower history
 app.use('/*', require('./routes'));
-app.use(function (req, _res, next) {
-  next(createError(404, `接口没有找到 ${req.path}`));
-});
 
 app.use(function (err, req, res) {
   // set locals, only providing error in development
