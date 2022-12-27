@@ -38,7 +38,7 @@ const supportGithubLogin = !(
 
 module.exports = {
   CD_PIPLINE_YAML,
-  SESSION_EXPIRATION,
+  SESSION_EXPIRATION: SESSION_EXPIRATION || 7 * 24 * 60 * 60 * 1000,
   CODE_DIR: DOWNLOAD_CODE_DIR,
   GITHUB: {
     webhook: WEBHOOKURL,
