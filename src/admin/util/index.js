@@ -3,6 +3,9 @@ const axios = require("axios");
 const crypto = require('crypto');
 const { lodash: _ } = require('@serverless-cd/core');
 
+const UID_TOKEN = "1234567890abcdefghijklmnopqrstuvwxyz";
+const UID_TOKEN_UPPERCASE = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 class ValidationError extends Error {
   constructor(message) {
@@ -81,14 +84,48 @@ const formatBranch = (ref) => {
   return ref
 }
 
+/**
+ * unless middleware
+ * @param pred
+ * @param middleware
+ * @returns {(function(*, *, *): void)|*}
+ */
+function unless(pred, middleware) {
+  return (req, res, next) => {
+    if (pred(req)) {
+      next();
+    }
+    else {
+      middleware(req, res, next);
+    }
+  }
+}
+
+/**
+ * 异步重试一次
+ * @param promiseFun
+ * @param timer
+ * @returns {Promise<*>}
+ */
+async function retryOnce(promiseFun, timer= 500) {
+  try {
+    return await promiseFun;
+  } catch (error) {
+    sleep(timer);
+    return await promiseFun;
+  }
+}
+
 module.exports = {
   setReqConfig,
   md5Encrypt,
   generateErrorResult,
   generateSuccessResult,
-  unionid: customAlphabet("1234567890abcdefghijklmnopqrstuvwxyz", 16),
-  unionToken: customAlphabet("1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", 40),
+  unionid: customAlphabet(UID_TOKEN, 16),
+  unionToken: customAlphabet(UID_TOKEN_UPPERCASE, 40),
   githubRequest,
   ValidationError,
-  formatBranch
+  formatBranch,
+  retryOnce,
+  unless
 }
