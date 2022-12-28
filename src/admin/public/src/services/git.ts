@@ -26,3 +26,9 @@ export const checkFile = async (body) => {
   const { data } = await request.post('/api/github/checkFile', body);
   return data;
 };
+
+export const getCardData = async (body) => {
+  const { data } = await request.post('/api/proxy/appCenter', body);
+  console.log('11111122222',data)
+  return data;
+}

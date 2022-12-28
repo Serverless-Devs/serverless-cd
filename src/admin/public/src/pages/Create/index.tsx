@@ -4,6 +4,7 @@ import PageLayout from '@/layouts/PageLayout';
 import CreateType, { CREATE_TYPE } from './components/CreateType';
 import Github from './components/github/index';
 import Submit from './components/Submit';
+import Application from './components/application';
 import './index.less';
 
 const Create = () => {
@@ -32,7 +33,7 @@ export const CreateAppLication = () => {
     <div className="appliaction-create-container">
       <CreateType {...init('createType', { initValue: CREATE_TYPE.Repository })} />
       {getValue('createType') === CREATE_TYPE.Repository && <Github field={field} />}
-      {getValue('createType') === CREATE_TYPE.Template && <h1>敬请期待...</h1>}
+      {getValue('createType') === CREATE_TYPE.Template && <Application field={field} />}
       {getValue('createType') === CREATE_TYPE.Repository && <Submit field={field} />}
     </div>
   );
