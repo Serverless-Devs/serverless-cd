@@ -17,11 +17,10 @@ const getTokenInfo = async (id) => {
 
 
 router.get("/list", async function (req, res) {
-  const { userId } = req.user;
 
-  console.log(`token list userId: ${userId}`);
+  console.log(`token list userId: ${req.userId}`);
 
-  const tokenList = await model.find({ user_id: userId });
+  const tokenList = await model.find({ user_id: req.userId });
   const result = _.get(tokenList, 'result', []).map((tokenItem) => _.omit(tokenItem, 'cd_token'))
   console.log('token list result', result);
   res.json(generateSuccessResult({
@@ -30,7 +29,6 @@ router.get("/list", async function (req, res) {
 });
 
 router.post("/create", async function (req, res) {
-  const { userId } = req.user;
   const { description, expiration } = req.body;
   const cd_token = unionToken();
   const id = unionid();
@@ -39,7 +37,7 @@ router.post("/create", async function (req, res) {
   const params = {
     description,
     expire_time: expiration === -1 ? expiration : Date.now() + expiration,
-    user_id: userId,
+    user_id: req.userId,
     cd_token
   }
 

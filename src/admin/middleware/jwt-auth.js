@@ -1,7 +1,7 @@
 const { COOKIE_SECRET } = require('../config');
 const { lodash: _ } = require('@serverless-cd/core');
 const jwt = require("jsonwebtoken");
-const { setReqConfig, generateErrorResult} = require('../util');
+const { generateErrorResult} = require('../util');
 
 module.exports = async function (req, res, next) {
   if (_.isEmpty(req.headers.cd_token)) {
@@ -9,12 +9,12 @@ module.exports = async function (req, res, next) {
     if (token) {
       try {
         const user = await jwt.verify(token, COOKIE_SECRET);
-        // userId不存在
+        // userId 不存在
         if(_.isEmpty(user.userId)) {
           return res.status(401).json(generateErrorResult(error.message));
         }
         console.log('verify user:: ', user);
-        setReqConfig(req, { userId: user.userId });
+        req.userId = user.userId;
         next();
       } catch (error) {
         return res.status(401).json(generateErrorResult(error.message));
