@@ -9,7 +9,6 @@ module.exports = async function (req, res, next) {
     if (token) {
       try {
         const user = await jwt.verify(token, COOKIE_SECRET);
-        // userId 不存在
         if(_.isEmpty(user.userId)) {
           return res.status(401).json(generateErrorResult(error.message));
         }

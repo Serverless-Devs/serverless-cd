@@ -1,5 +1,6 @@
 const { lodash: _ } = require('@serverless-cd/core');
 const { generateErrorResult } = require('../util');
+
 const { queryToken, updateActiveToken } = require('../routes/tokens/token.service');
 module.exports = async function (req, res, next) {
   if (!_.isEmpty(req.headers.cd_token)) {
@@ -12,7 +13,6 @@ module.exports = async function (req, res, next) {
       return res.status(401).json(generateErrorResult('token 已过期'));
     }
     // 记录登陆token时间
-    // TODO: 缓存&&过期
     await updateActiveToken(data.id);
 
     console.log('req.headers.cd_token:: ', req.headers.cd_token);
