@@ -26,7 +26,7 @@ router.post('/create', async function (req, res, next) {
     envs,
     secrets,
   } = req.body;
-  const { userId } = req.user || {};
+  const userId = req.userId;
 
   const userInfo = await userOrm.find({ id: userId });
   console.log('用户信息', JSON.stringify(userInfo, null, 2));
@@ -76,8 +76,8 @@ router.post('/create', async function (req, res, next) {
 });
 
 router.get('/list', async function (req, res, next) {
-  console.log('application list req.user', JSON.stringify(req.user));
-  const { userId } = req.user || {};
+  console.log('application list req.user', req.userId);
+  const userId = req.userId;
   const applicationResult = await orm.findAll({
     user_id: userId,
     orderKeys: ['updated_time', 'created_time'],
@@ -104,7 +104,7 @@ router.get('/detail', async function (req, res, next) {
 router.delete('/delete', async function (req, res) {
   console.log('DETELE /delete app QUERY ', JSON.stringify(req.query));
   const { appId } = req.query;
-  const { userId } = req.user || {};
+  const userId = req.userId;
   const app = await orm.findOne({ id: appId });
   if (_.isEmpty(app)) {
     return res.json(generateErrorResult('没有找到此应用'));
