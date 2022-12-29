@@ -37,13 +37,6 @@ const githubRequest = (accessToken) => {
   };
 }
 
-// 公共数据存储到 req
-function setReqConfig(req, data) {
-  for (const key in data) {
-    _.set(req, `user.${key}`, data[key]);
-  }
-}
-
 /**
  * MD5 加密
  */
@@ -117,7 +110,6 @@ async function retryOnce(promiseFun, timer= 500) {
 }
 
 module.exports = {
-  setReqConfig,
   md5Encrypt,
   generateErrorResult,
   generateSuccessResult,

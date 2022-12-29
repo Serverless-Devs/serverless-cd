@@ -4,7 +4,6 @@ const { region, serviceName, functionName } = FC.workerFunction;
 
 async function asyncInvoke(payload) {
   console.log('gen task id is: ', payload.taskId);
-
   return await Client.fc(region).invokeFunction(
     serviceName,
     functionName,

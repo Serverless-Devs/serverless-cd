@@ -1,5 +1,6 @@
 const { lodash: _ } = require('@serverless-cd/core');
-const { setReqConfig, generateErrorResult } = require('../util');
+const { generateErrorResult } = require('../util');
+
 const { queryToken, updateActiveToken } = require('../routes/tokens/token.service');
 module.exports = async function (req, res, next) {
   if (!_.isEmpty(req.headers.cd_token)) {
@@ -15,7 +16,7 @@ module.exports = async function (req, res, next) {
     await updateActiveToken(data.id);
 
     console.log('req.headers.cd_token:: ', req.headers.cd_token);
-    setReqConfig(req, { userId: data.user_id });
+    req.userId = data.user_id;
     next();
   } else{
     next();
