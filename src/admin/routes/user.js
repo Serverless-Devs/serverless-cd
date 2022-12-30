@@ -1,13 +1,13 @@
 const router = require("express").Router();
 const _ = require("lodash");
 const { OTS_USER } = require('../config');
-const { generateSuccessResult, generateErrorResult } = require('../util');
+const { Result, ValidationError } = require('../util');
 const userOrm = require("../util/orm")(OTS_USER.name, OTS_USER.index);
 
 router.post("/loginout", async function (req, res, next) {
   req.userId = null;
   res.cookie('jwt', '', { httpOnly: true });
-  return res.json(generateSuccessResult());
+  return res.json(Result.ofSuccess());
 });
 
 router.post("/userInfo", async function (req, res, next) {
@@ -21,7 +21,7 @@ router.post("/userInfo", async function (req, res, next) {
     github_name: _.get(result, 'third_part.github.owner', '')
   } : {}
 
-  return res.json(generateSuccessResult(params));
+  return res.json(Result.ofSuccess(params));
 });
 
 router.post("/updateUserProviderToken", async function (req, res, next) {
@@ -40,7 +40,7 @@ router.post("/updateUserProviderToken", async function (req, res, next) {
     }
   });
 
-  return res.json(generateSuccessResult());
+  return res.json(Result.ofSuccess());
 });
 
 router.post('/addOrCompileSecrets', async function (req, res) {
@@ -50,7 +50,7 @@ router.post('/addOrCompileSecrets', async function (req, res) {
   await userOrm.update([{ id: req.userId }], {
     secrets: isAdd ? _.assign(currentSecrets, secrets) : secrets
   });
-  return res.json(generateSuccessResult());
+  return res.json(Result.ofSuccess());
 })
 
 router.get('/globalSecrets', async function (req, res, next) {
@@ -58,12 +58,12 @@ router.get('/globalSecrets', async function (req, res, next) {
   console.log('获取用户信息', result)
 
   if (_.isEmpty(result)) {
-    return res.json(generateErrorResult('当前用户信息不存在'))
+    throw new ValidationError('当前用户信息不存在');
   }
 
   const params = { secrets: _.get(result, 'secrets', {}) }
 
-  return res.json(generateSuccessResult(params));
+  return res.json(Result.ofSuccess(params));
 })
 
 module.exports = router;
