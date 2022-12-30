@@ -27,13 +27,17 @@ const Create = () => {
 
 export const CreateAppLication = () => {
   const field = Field.useField();
-  const { init, getValue } = field;
+  const { init, getValue, setValue } = field;
+
+  const changeTab = () => {
+    setValue('createType',CREATE_TYPE.Repository)
+  }
 
   return (
     <div className="appliaction-create-container">
       <CreateType {...init('createType', { initValue: CREATE_TYPE.Repository })} />
       {getValue('createType') === CREATE_TYPE.Repository && <Github field={field} />}
-      {getValue('createType') === CREATE_TYPE.Template && <Application field={field} />}
+      {getValue('createType') === CREATE_TYPE.Template && <Application field={field} changeTab={changeTab}/>}
       {getValue('createType') === CREATE_TYPE.Repository && <Submit field={field} />}
     </div>
   );

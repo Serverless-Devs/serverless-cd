@@ -5,6 +5,7 @@ import store from '@/store';
 import { noop, map, find, isEmpty, cloneDeep } from 'lodash';
 import RefreshIcon from '@/components/RefreshIcon';
 import { githubOrgs, githubOrgRepos } from '@/services/git';
+import { getParams } from '@/utils';
 
 const FormItem = Form.Item;
 export interface IRepoItem {
@@ -240,6 +241,7 @@ const Repos = (props: IProps) => {
             disabled={loading || effectsState.getUserRepos.isLoading || orgRepos.loading}
             valueRender={valueRender}
             popupClassName="icon-right"
+            defaultValue={location?.search && getParams('appName')}
           />
         </FormItem>
       </Form>

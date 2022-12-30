@@ -2,10 +2,45 @@
     visibility: hidden;
 }
 .templateCard {
+    position: relative;
+    min-width: 240px;
+    width: calc(33.33333% - 16px);
+    padding: 8px;
+    margin: 8px;
+    border: 1px solid #e3e4e6;
+    .imgDiv {
+        height: 30px;
+        img {
+            height: 34px
+        }
+    }
+    .cardTitle {
+        h2{
+            display: inline;
+        }
+        .tagSpan {
+            margin-left: 5px;
+            border: 0px;
+            background-color: rgb(238, 241, 245);
+            color: rgb(128, 153, 178);
+            border-radius: 12px;
+            padding: 0 8px;
+            min-width: 28px;
+        }
+    }
+    
     &:hover{
-        border-color: blue;
+        border: 1px solid #07c;
         .actionButtons{
+            position: absolute;
+            bottom:0;
             visibility: initial;
+            height: 73px;
+            padding-top: 30px;
+            background-image: -webkit-gradient(linear,left top,left bottom,from(rgba(247,249,250,0)),color-stop(63%,#fff));
+            .button{
+                margin-right: 8px;
+            }
         }
     }
 }
