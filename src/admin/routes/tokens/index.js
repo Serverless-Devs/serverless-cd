@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const { lodash: _ } = require("@serverless-cd/core");
 const model = require('./model');
-const { generateSuccessResult, unionToken, unionid, generateErrorResult } = require('../../util');
+const { Result, unionToken, unionid, ValidationError } = require('../../util');
 
 const getTokenInfo = async (id) => {
   const result = await model.findOne(id);
@@ -9,10 +9,10 @@ const getTokenInfo = async (id) => {
   console.log(`token info : ${JSON.stringify(result)}`);
 
   if (_.isEmpty(result)) {
-    return generateErrorResult('当前token 不存在')
+    throw new ValidationError('当前token 不存在');
   }
 
-  return generateSuccessResult(result)
+  return Result.ofSuccess(result)
 }
 
 
@@ -23,7 +23,7 @@ router.get("/list", async function (req, res) {
   const tokenList = await model.find({ user_id: req.userId });
   const result = _.get(tokenList, 'result', []).map((tokenItem) => _.omit(tokenItem, 'cd_token'))
   console.log('token list result', result);
-  res.json(generateSuccessResult({
+  res.json(Result.ofSuccess({
     result
   }));
 });
@@ -43,7 +43,7 @@ router.post("/create", async function (req, res) {
 
   await model.create(id, params);
 
-  res.json(generateSuccessResult({ cd_token }));
+  res.json(Result.ofSuccess({ cd_token }));
 });
 
 router.post("/delete", async function (req, res) {
@@ -52,11 +52,13 @@ router.post("/delete", async function (req, res) {
   console.log(`delete token body: ${JSON.stringify(req.body)}`);
 
   const { success, data: result, message } = await getTokenInfo(id);
-  if (!success) return res.json(generateErrorResult(message));
+  if (!success) {
+    throw new Error(message);
+  }
 
   await model.remove(result.id);
 
-  res.json(generateSuccessResult());
+  res.json(Result.ofSuccess());
 });
 
 router.post("/update", async function (req, res) {
@@ -65,13 +67,15 @@ router.post("/update", async function (req, res) {
   console.log(`update token body: ${JSON.stringify(req.body)}`);
 
   const { success, data: result, message } = await getTokenInfo(id);
-  if (!success) return res.json(generateErrorResult(message));
+  if (!success){
+    throw new Error(message);
+  }
   console.log('update tokenInfo', result)
   await model.update(result.id, {
     expire_time: expiration === -1 ? expiration : Date.now() + expiration,
   });
 
-  res.json(generateSuccessResult());
+  res.json(Result.ofSuccess());
 });
 
 module.exports = router;

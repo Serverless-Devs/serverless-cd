@@ -2,7 +2,7 @@ const router = require("express").Router();
 const _ = require("lodash");
 const jwt = require("jsonwebtoken");
 const { OTS_USER, SUPPORT_LOGIN, COOKIE_SECRET, SESSION_EXPIRATION } = require('../../config');
-const { unionid, md5Encrypt, generateSuccessResult, generateErrorResult } = require("../../util");
+const { unionid, md5Encrypt, Result, ValidationError } = require("../../util");
 const userOrm = require("../../util/orm")(OTS_USER.name, OTS_USER.index);
 
 const SESSION_EXPIRATION_EXP = Math.floor(Date.now() / 1000) + Math.floor(SESSION_EXPIRATION / 1000);
@@ -13,7 +13,7 @@ router.post("/signUp", async function (req, res) {
   const userResult = await userOrm.find({ username: username });
   const data = _.get(userResult, "result[0]", {});
   if (_.get(data, 'username', '')) {
-    return res.json(generateErrorResult('用户名已存在'));
+    throw new ValidationError('用户名已存在');
   }
   const id = unionid();
   await userOrm.create(
@@ -30,7 +30,7 @@ router.post("/signUp", async function (req, res) {
   req.userId = userId.id;
   const token = await jwt.sign({ userId: id, exp: SESSION_EXPIRATION_EXP }, COOKIE_SECRET);
   res.cookie('jwt', token, { maxAge: SESSION_EXPIRATION, httpOnly: true });
-  return res.json(generateSuccessResult());
+  return res.json(Result.ofSuccess());
 })
 
 router.post("/login", async function (req, res) {
@@ -43,15 +43,15 @@ router.post("/login", async function (req, res) {
       req.userId = data.id;
       const token = await jwt.sign({ userId: data.id, exp: SESSION_EXPIRATION_EXP }, COOKIE_SECRET);
       res.cookie('jwt', token, { maxAge: SESSION_EXPIRATION, httpOnly: true });
-      return res.json(generateSuccessResult());
+      return res.json(Result.ofSuccess());
     }
-    return res.json(generateErrorResult('密码不正确'));
+    throw new ValidationError('密码不正确');
   }
-  return res.json(generateErrorResult('用户名不存在'))
+  throw new ValidationError('用户名不存在');
 })
 
 router.get("/supportLoginTypes", (_req, res) => {
-  res.json(generateSuccessResult(SUPPORT_LOGIN))
+  res.json(Result.ofSuccess(SUPPORT_LOGIN))
 })
 
 module.exports = router;

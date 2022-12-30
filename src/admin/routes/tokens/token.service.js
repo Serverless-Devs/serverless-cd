@@ -1,5 +1,5 @@
 const { lodash: _ } = require('@serverless-cd/core');
-const { generateErrorResult, generateSuccessResult } = require('../../util');
+const { ValidationError, Result } = require('../../util');
 const model = require('./model');
 
 async function queryToken(cd_token) {
@@ -7,9 +7,9 @@ async function queryToken(cd_token) {
   const result = _.get(tokenInfo, 'result[0]', {});
   console.log('tokens find', result);
   if (_.isEmpty(result)) {
-    return generateErrorResult('token 不存在');
+    throw new ValidationError('token 不存在');
   }
-  return generateSuccessResult(result);
+  return Result.ofSuccess(result);
 }
 
 async function updateActiveToken(id) {
@@ -17,7 +17,7 @@ async function updateActiveToken(id) {
     active_time: Date.now(),
   });
 
-  return generateSuccessResult();
+  return Result.ofSuccess();
 }
 
 module.exports = {

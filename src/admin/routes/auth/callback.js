@@ -2,7 +2,7 @@ const router = require("express").Router();
 const axios = require("axios");
 const { GITHUB } = require("../../config");
 const _ = require("lodash");
-const { md5Encrypt, generateErrorResult, generateSuccessResult, unionid, githubRequest } = require("../../util");
+const { md5Encrypt, ValidationError, Result, unionid, githubRequest } = require("../../util");
 const { OTS_USER } = require('../../config');
 const orm = require("../../util/orm")(OTS_USER.name, OTS_USER.index);
 
@@ -25,7 +25,7 @@ router.get("/github", async (req, res) => {
   const login_token = _.get(tokenResult, "data.access_token");
   console.log("login_token", login_token);
   if (!login_token) {
-    return res.json(generateErrorResult("授权失效或过期，请重新授权"));
+    throw new ValidationError('授权失效或过期，请重新授权');
   }
   const githubFetch = githubRequest(login_token);
   const userResult = await githubFetch("GET /user");
@@ -49,9 +49,9 @@ router.get("/github", async (req, res) => {
       }
     });
     req.userId = findObj.id;
-    return res.json(generateSuccessResult({}, { status: 302 }));
+    return res.json(Result.ofSuccess({}, 302));
   }
-  return res.json(generateSuccessResult({
+  return res.json(Result.ofSuccess({
     avatar: data.avatar_url,
     providerId: data.id,
     login_token: login_token,
@@ -79,7 +79,7 @@ router.post("/bindingAccount", async function (req, res, next) {
     if (!_.isEmpty(userInfo)) {
       // 账号是否已被绑定
       if (_.get(userInfo, 'github_unionid', '')) {
-        return res.json(generateErrorResult('绑定失败，该账号已被绑定'));
+        throw new ValidationError('绑定失败，该账号已被绑定');
       }
       // 密码是否正确
       if (_.get(userInfo, 'password', '') === md5Encrypt(password)) {
@@ -97,11 +97,11 @@ router.post("/bindingAccount", async function (req, res, next) {
           }
         });
         req.userId = userInfo.id;
-        return res.json(generateSuccessResult());
+        return res.json(Result.ofSuccess());
       }
-      return res.json(generateErrorResult('密码不正确'));
+      throw new ValidationError('密码不正确');
     }
-    return res.json(generateErrorResult('用户不存在'))
+    throw new ValidationError('用户不存在');
   } else {
     // 否则创建login_token
     const id = unionid();
@@ -126,7 +126,7 @@ router.post("/bindingAccount", async function (req, res, next) {
       }
     );
     req.userId = id;
-    return res.json(generateSuccessResult());
+    return res.json(Result.ofSuccess());
   }
 })
 

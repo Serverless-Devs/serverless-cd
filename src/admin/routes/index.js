@@ -1,6 +1,7 @@
 const router = require('express').Router();
-const { generateErrorResult } = require('../util');
+const { Result } = require('../util');
 const { CD_PIPLINE_YAML } = require('../config');
+const { ValidationError, NotFoundError } = require('../util/custom-errors');
 
 router.get('/', function (req, res, next) {
   res.render('index', { CD_PIPLINE_YAML });
@@ -17,11 +18,12 @@ router.use('/tokens', require('./tokens'));
 router.use('/proxy', require('./proxy'));
 
 router.use(function (err, _req, res, next) {
-  if (err.name === 'ValidationError') {
-    return res.status(422).json(generateErrorResult(err.message));
+  if (err.name === ValidationError.name) {
+    return res.json(Result.ofError(err.message, ValidationError));
+  } else if (err.name === NotFoundError.name) {
+    return res.json(Result.ofError(err.message, NotFoundError));
   }
-
-  res.status(500).json(generateErrorResult(err.message));
+  return res.json(Result.ofError(err.message));
 });
 
 module.exports = router;

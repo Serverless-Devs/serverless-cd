@@ -3,7 +3,7 @@ const git = require('@serverless-cd/git-provider');
 const { checkFile } = require('@serverless-cd/git');
 const { lodash: _ } = require('@serverless-cd/core');
 const { OTS_USER, OTS_APPLICATION, CD_PIPLINE_YAML } = require('../config');
-const { generateSuccessResult } = require('../util');
+const { Result } = require('../util');
 const orm = require('../util/orm')(OTS_USER.name, OTS_USER.index);
 const applicationOrm = require('../util/orm')(OTS_APPLICATION.name, OTS_APPLICATION.index);
 
@@ -24,9 +24,9 @@ router.get('/repos', async function (req, res, _next) {
         return item;
       });
     });
-    return res.json(generateSuccessResult(mapRows));
+    return res.json(Result.ofSuccess(mapRows));
   }
-  return res.json(generateSuccessResult(rows));
+  return res.json(Result.ofSuccess(rows));
 });
 
 router.get('/orgs', async function (req, res, _next) {
@@ -34,7 +34,7 @@ router.get('/orgs', async function (req, res, _next) {
   const useGithubToken = _.get(userResult, 'result[0].third_part.github.access_token', '');
   const prioverd = git('github', { access_token: useGithubToken });
   const orgs = await prioverd.listOrgs();
-  return res.json(generateSuccessResult(orgs));
+  return res.json(Result.ofSuccess(orgs));
 });
 
 router.get('/orgRepos', async function (req, res, _next) {
@@ -57,10 +57,10 @@ router.get('/orgRepos', async function (req, res, _next) {
       });
     });
     console.log('orgRepos response:', mapRows);
-    return res.json(generateSuccessResult(mapRows));
+    return res.json(Result.ofSuccess(mapRows));
   }
   console.log('orgRepos response:', rows);
-  return res.json(generateSuccessResult(rows));
+  return res.json(Result.ofSuccess(rows));
 });
 
 router.get('/branches', async function (req, res, _next) {
@@ -69,7 +69,7 @@ router.get('/branches', async function (req, res, _next) {
 
   const prioverd = git('github', { access_token: useGithubToken });
   const rows = await prioverd.listBranches(req.query);
-  return res.json(generateSuccessResult(rows));
+  return res.json(Result.ofSuccess(rows));
 });
 
 router.post('/putFile', async function (req, res, _next) {
@@ -78,7 +78,7 @@ router.post('/putFile', async function (req, res, _next) {
 
   const prioverd = git('github', { access_token: useGithubToken });
   const rows = await prioverd.putFile(req.body);
-  return res.json(generateSuccessResult(rows));
+  return res.json(Result.ofSuccess(rows));
 });
 
 router.post('/checkFile', async function (req, res, _next) {
@@ -86,7 +86,7 @@ router.post('/checkFile', async function (req, res, _next) {
   const userResult = await orm.find({ id: req.userId });
   const useGithubToken = _.get(userResult, 'result[0].third_part.github.access_token', '');
   const rows = await checkFile({ ...req.body, token: useGithubToken, file: CD_PIPLINE_YAML });
-  return res.json(generateSuccessResult(rows));
+  return res.json(Result.ofSuccess(rows));
 });
 
 module.exports = router;
