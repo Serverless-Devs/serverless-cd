@@ -10,19 +10,23 @@ const appConfig: IAppConfig = {
     interceptors: {
       response: {
         onConfig: (response) => {
+          if (response.data.code === 302) {
+            history?.push('/');
+          }
+          if (response.data.code === 401) {
+            history?.push('/login');
+          }
           if (!response.data.success && response.data.message) {
             Toast.error(response.data.message);
-          }
-          if (response.data.success && response.data.status === 302) {
-            history?.push('/');
           }
           return response;
         },
         onError: (error: any) => {
           if (error.response.status === 401) {
             history?.push('/login');
+          } else {
+            error.response.data.message && Toast.error(error.response.data.message);
           }
-          (error.response.data.message && error.response.status !== 401) && Toast.error(error.response.data.message);
           return Promise.reject(error);
         },
       },
