@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prestart": "export WORKER_FUNCTION_NAME=worker && export SERVICE_NAME=serverless-cd && export REGION=cn-hongkong",
-    "start": "nodemon index.js"
+    "start": "WORKER_FUNCTION_NAME=worker SERVICE_NAME=serverless-cd nodemon index.js"
   },
   "author": "mamba",
   "license": "ISC",

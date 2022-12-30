@@ -8,11 +8,10 @@ const {
   ValidationError,
 } = require('../../util');
 const { asyncInvoke, stopStatefulAsyncInvocations } = require('../../util/invoke');
-const { OTS_APPLICATION, OTS_USER, OTS_SESSION, OTS_TASK } = require('../../config');
+const { OTS_APPLICATION, OTS_USER, OTS_TASK } = require('../../config');
 const appOrm = require('../../util/orm')(OTS_APPLICATION.name, OTS_APPLICATION.index);
 const userOrm = require('../../util/orm')(OTS_USER.name, OTS_USER.index);
 const taskOrm = require('../../util/orm')(OTS_TASK.name, OTS_TASK.index);
-
 
 const invokingWorker = async (payload, res) => {
   const taskId = unionid();
@@ -45,8 +44,7 @@ router.post('/manual', async function (req, res) {
   if (_.isNil(ref)) {
     return res.json(generateErrorResult('ref 必填'));
   }
-  const { userId } = req.user || {};
-
+  const userId = req.userId;
   const applicationResult = await appOrm.findByPrimary([{ id: appId }]);
   if (_.isEmpty(applicationResult)) {
     return res.json(generateErrorResult('没有查到应用信息'));
@@ -120,7 +118,7 @@ router.post('/redeploy', async function (req, res) {
     return res.json(generateErrorResult('taskId 必填'));
   }
 
-  const { userId } = req.user || {};
+  const userId = req.userId;
 
   const taskResult = await taskOrm.findByPrimary([{ id: taskId }]);
   if (_.isEmpty(taskResult)) {
@@ -152,7 +150,7 @@ router.post('/cancel', async function (req, res) {
     return res.json(generateErrorResult('没有查到部署信息'));
   }
   const { user_id, steps, app_id, trigger_payload } = taskResult;
-  if (user_id !== req.user.userId) {
+  if (user_id !== req.userId) {
     return res.json(generateErrorResult('无权操作此应用'));
   }
 
