@@ -27,7 +27,7 @@ export const checkFile = async (body) => {
   return data;
 };
 
-export const getCardData = async (body) => {
+export const getGithubData = async (body) => {
   const { data } = await request.post('/api/proxy/appCenter', body);
   return data;
 }
