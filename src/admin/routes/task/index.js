@@ -2,7 +2,7 @@ const router = require("express").Router();
 const { lodash: _ } = require("@serverless-cd/core");
 const Client = require("../../util/client");
 const model = require('./model');
-const { generateSuccessResult, ValidationError, formatBranch } = require('../../util');
+const { Result, ValidationError, NotFoundError, formatBranch } = require('../../util');
 
 const getTaskConfig = (taskConfig) => {
   const result = _.omit(taskConfig, 'trigger_payload');
@@ -36,7 +36,7 @@ router.get("/list", async function (req, res) {
   console.log('task list request params:', params);
   const taskList = await model.find(params);
   console.log('taskList::', taskList);
-  return res.json(generateSuccessResult({
+  return res.json(Result.ofSuccess({
     ...taskList,
     result: _.get(taskList, 'result', []).map(getTaskConfig)
   }));
@@ -50,7 +50,7 @@ router.get("/get", async function (req, res) {
   }
   console.log(`task get userId: ${userId}, query: ${JSON.stringify(req.query)}`);
   const taskConfig = await model.findOne(taskId);
-  res.json(generateSuccessResult(getTaskConfig(taskConfig)));
+  res.json(Result.ofSuccess(getTaskConfig(taskConfig)));
 });
 
 router.post("/remove", async function (req, res) {
@@ -62,7 +62,7 @@ router.post("/remove", async function (req, res) {
   console.log(`task delete userId: ${userId}, body: ${JSON.stringify(req.body)}`);
   const removeResult = await model.remove(taskId);
   console.log('task remove response', removeResult);
-  res.json(generateSuccessResult());
+  res.json(Result.ofSuccess());
 });
 
 
@@ -78,8 +78,11 @@ router.get("/log", async (req, res) => {
   const ossClient = Client.oss();
   try {
     const { content } = await ossClient.get(`logs/${taskId}/step_${stepCount}.log`);
-    res.json(generateSuccessResult(content.toString('utf8')));
+    res.json(Result.ofSuccess(content.toString('utf8')));
   } catch (ex) {
+    if(ex.status === 404) {
+      throw new NotFoundError("The logs for this run have expired and are no longer available.")
+    }
     console.error(ex.status, ex.code, ex.message);
     throw ex;
   }
