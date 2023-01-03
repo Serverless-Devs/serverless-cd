@@ -26,3 +26,8 @@ export const checkFile = async (body) => {
   const { data } = await request.post('/api/github/checkFile', body);
   return data;
 };
+
+export const getGithubData = async (body) => {
+  const { data } = await request.post('/api/proxy/appCenter', body);
+  return data;
+}
