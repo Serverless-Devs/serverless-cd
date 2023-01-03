@@ -1,7 +1,6 @@
 const getCode = (arg) => (arg instanceof Error ? arg.code : arg);
 
 class Result {
-  demo = dankun
   static ofError(message, code) {
     return {
       code: code ? getCode(code) || 500 : 500,
