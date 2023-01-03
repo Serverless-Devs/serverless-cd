@@ -10,14 +10,14 @@ let dataList:any = []
 
 const Application = (props) => {
   const [userState, userDispatchers] = store.useModel('user');
-  const GetGithubData = useRequest(getGithubData, { pollingInterval: 5000 });
+  const GetGithubData = useRequest(getGithubData);
 
   useEffect(() => {
     GetGithubData.request({ type:'github', urlPath:'orgs/serverless-cd-demo/repos' });
   },[])
 
   useEffect(() => {
-    dataList = get(GetGithubData.data,'data',[])
+    dataList = get(GetGithubData.data,'appCenterList',[])
   },[GetGithubData.data])
   
   const buildApp = ( app ) => {

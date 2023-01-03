@@ -29,7 +29,7 @@ router.post('/appCenter', async function (req, res, _next) {
       console.log('proxy url:', githubUrl);
       const response = await httpx.request(githubUrl, {
         method: 'GET',
-        timeout: 0,
+        timeout: 3000,
         headers: {
          "User-Agent": 'serverless-cd' 
         }
