@@ -70,7 +70,7 @@ const Github = (props: IProps) => {
         <FormItem label="环境名称" required>
           <Env
             {...(init('environment', {
-              initValue: { name: 'default', description: 'test' },
+              initValue: { name: 'default', description: 'testing' },
               rules: [
                 {
                   validator: validteEnv,

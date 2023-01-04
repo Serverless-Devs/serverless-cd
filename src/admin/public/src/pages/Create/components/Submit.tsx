@@ -62,6 +62,7 @@ const Submit = (props: IProps) => {
     });
 
     const environment = get(values, 'environment', {});
+    const created_time = Date.now();
     const dataMap = {
       [CREATE_TYPE.Repository]: {
         provider: get(values, 'gitType'),
@@ -70,9 +71,11 @@ const Submit = (props: IProps) => {
         repo: get(values, 'repo.name'),
         owner: get(values, 'repo.owner'),
         provider_repo_id: String(get(values, 'repo.id')),
+        created_time,
         environment: {
           [environment.name]: {
             description: environment.description,
+            created_time,
             trigger_spec,
             secrets,
           },

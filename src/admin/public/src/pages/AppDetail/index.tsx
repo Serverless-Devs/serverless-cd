@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import { useRequest, history } from 'ice';
-import { Button, Dialog, Loading } from '@alicloud/console-components';
+import { useRequest, history, Link } from 'ice';
+import { Button, Dialog, Loading, Table } from '@alicloud/console-components';
 import PageLayout from '@/layouts/PageLayout';
+import EnvType from '@/components/EnvType';
 import BasicInfoDetail from '@/components/BasicInfoDetail';
 import { applicationDetail, deleteApp } from '@/services/applist';
 import { Toast } from '@/components/ToastContainer';
-import { sleep } from '@/utils';
+import { sleep, formatTime } from '@/utils';
 import { get } from 'lodash';
 
 const Details = ({
@@ -57,6 +58,48 @@ const Details = ({
     });
   };
 
+  console.log(detailInfo, 'detailInfo');
+  const getEnvData = () => {
+    const data: any = [];
+    const environment = get(detailInfo, 'data.environment', {});
+    for (const key in environment) {
+      const element = environment[key];
+      data.push({
+        envName: key,
+        description: get(element, 'description'),
+      });
+    }
+    return data;
+  };
+
+  console.log(getEnvData(), 'getEnvData');
+
+  const columns = [
+    {
+      key: 'envName',
+      title: '环境名称',
+      dataIndex: 'envName',
+      cell: (value, _index, record) => (
+        <>
+          <Link to={`/application/${appId}/detail/${value}`}>{value}</Link>
+        </>
+      ),
+      width: 160,
+    },
+    {
+      key: 'description',
+      title: '环境描述',
+      dataIndex: 'description',
+      cell: (value, _index, record) => <EnvType type={value} />,
+    },
+    {
+      key: 'created_time',
+      title: '创建时间',
+      dataIndex: 'created_time',
+      cell: (value, _index, record) => formatTime(value),
+    },
+  ];
+
   return (
     <PageLayout
       title="应用详情"
@@ -71,15 +114,21 @@ const Details = ({
         },
       ]}
       breadcrumbExtra={
-        <Button type="primary" warning onClick={deleteApplication}>
-          删除应用
-        </Button>
+        <>
+          <Button type="primary" onClick={deleteApplication}>
+            创建环境
+          </Button>
+          <Button className="ml-8" type="primary" warning onClick={deleteApplication}>
+            删除应用
+          </Button>
+        </>
       }
     >
       <Loading visible={loading} inline={false}>
         <BasicInfoDetail data={get(detailInfo, 'data', {})} refreshCallback={refresh} />
+        <hr className="mb-20 mt-20" />
+        <Table dataSource={getEnvData()} columns={columns} />
       </Loading>
-      <hr className="mb-20 mt-20" />
     </PageLayout>
   );
 };

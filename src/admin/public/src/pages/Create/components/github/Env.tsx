@@ -36,8 +36,8 @@ const Env = (props: IProps) => {
           className="full-width"
           {...init('description', { initValue: initValue.description })}
           dataSource={[
-            { label: '测试环境', value: 'test' },
-            { label: '预发环境', value: 'pre' },
+            { label: '测试环境', value: 'testing' },
+            { label: '预发环境', value: 'staging' },
             { label: '生产环境', value: 'production' },
           ]}
         />

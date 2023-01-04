@@ -1,11 +1,11 @@
 import React from 'react';
-import moment from 'moment';
 import { get } from 'lodash';
 import BasicInfo from '@/components/BasicInfo';
 import ExternalLink from '@/components/ExternalLink';
 import CommitId from '@/components/CommitId';
 import { C_REPOSITORY } from '@/constants/repository';
-import RefreshButton from '@/pages/AppDetail/components/RefreshButton';
+import RefreshButton from '@/components/RefreshButton';
+import { formatTime } from '@/utils';
 interface Props {
   data: object;
   refreshCallback: Function;
@@ -15,7 +15,7 @@ const BasicInfoDetail = (props: Props) => {
   const { data, refreshCallback } = props;
 
   const description = get(data, 'description', '_');
-  const created_time = moment(get(data, 'created_time')).format('YYYY-MM-DD HH:mm:ss');
+  const created_time = formatTime(get(data, 'created_time'));
   const provider = get(data, 'provider');
   const repo_url = get(data, 'repo_url');
   const repo_name = get(data, 'repo_name');
