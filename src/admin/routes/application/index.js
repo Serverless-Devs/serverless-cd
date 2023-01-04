@@ -15,17 +15,7 @@ const getApplicationConfig = (applicationList) => {
 
 router.post('/create', async function (req, res, next) {
   console.log('application create req.body', JSON.stringify(req.body));
-  const {
-    repo,
-    owner,
-    repo_url,
-    provider_repo_id,
-    description,
-    provider,
-    trigger_spec,
-    envs,
-    secrets,
-  } = req.body;
+  const { repo, owner, repo_url, provider_repo_id, description, provider, environment } = req.body;
   const userId = req.userId;
 
   const userInfo = await userOrm.find({ id: userId });
@@ -46,11 +36,7 @@ router.post('/create', async function (req, res, next) {
   }
 
   console.log('add app');
-  let webHookSecret = _.get(trigger_spec, `${provider}.secret`);
-  if (!webHookSecret) {
-    webHookSecret = unionid();
-    _.set(trigger_spec, `${provider}.secret`, webHookSecret);
-  }
+  const webHookSecret = unionid();
   const id = unionid();
   await webhook.add(owner, repo, token, webHookSecret, id);
 
@@ -62,9 +48,8 @@ router.post('/create', async function (req, res, next) {
     owner,
     description,
     repo_url,
-    trigger_spec,
-    envs,
-    secrets,
+    environment,
+    webhook_secret: webHookSecret,
   });
 
   return res.json(Result.ofSuccess({ id }));
