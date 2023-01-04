@@ -6,7 +6,7 @@ import { LoginLayout } from '@/layouts/LoginLayout';
 // import Login from '@/pages/Login';
 // import Signup from '@/pages/Signup';
 // import Create from '@/pages/Create';
-// import Details from '@/pages/Details';
+// import AppDetail from '@/pages/AppDetail';
 // import TaskDetails from '@/pages/TaskDetails';
 // import Auth from '@/pages/Auth';
 // import Tokens from '@/pages/Tokens';
@@ -16,7 +16,8 @@ const AppList = lazy(() => import(/* webpackChunkName: 'user-login' */ '@/pages/
 const Login = lazy(() => import(/* webpackChunkName: 'Login' */ '@/pages/Login'));
 const Signup = lazy(() => import(/* webpackChunkName: 'Signup' */ '@/pages/Signup'));
 const Create = lazy(() => import(/* webpackChunkName: 'Create' */ '@/pages/Create'));
-const Details = lazy(() => import(/* webpackChunkName: 'Details' */ '@/pages/AppDetail'));
+const AppDetail = lazy(() => import(/* webpackChunkName: 'AppDetail' */ '@/pages/AppDetail'));
+const EnvDetail = lazy(() => import(/* webpackChunkName: 'AppDetail' */ '@/pages/EnvDetail'));
 const TaskDetails = lazy(() => import(/* webpackChunkName: 'TaskDetails' */ '@/pages/TaskDetails'));
 const Auth = lazy(() => import(/* webpackChunkName: 'Auth' */ '@/pages/Auth'));
 const Tokens = lazy(() => import(/* webpackChunkName: 'Tokens' */ '@/pages/Tokens'));
@@ -79,10 +80,15 @@ const routerConfig: IRouterConfig[] = [
       {
         path: '/detail',
         exact: true,
-        component: Details,
+        component: AppDetail,
       },
       {
-        path: '/detail/:taskId',
+        path: '/detail/:envName',
+        exact: true,
+        component: EnvDetail,
+      },
+      {
+        path: '/detail/:envName/:taskId',
         exact: true,
         component: TaskDetails,
       },

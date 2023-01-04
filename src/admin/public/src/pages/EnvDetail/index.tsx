@@ -2,19 +2,26 @@ import React, { useEffect } from 'react';
 import { useRequest, history } from 'ice';
 import { Button, Dialog, Loading } from '@alicloud/console-components';
 import PageLayout from '@/layouts/PageLayout';
+import CommitList from './components/CommitList';
 import BasicInfoDetail from '@/components/BasicInfoDetail';
 import { applicationDetail, deleteApp } from '@/services/applist';
 import { Toast } from '@/components/ToastContainer';
+import PageInfo from '@/components/PageInfo';
 import { sleep } from '@/utils';
 import { get } from 'lodash';
+import SecretConfig from './components/SecretCofing';
+import TriggerConfig from './components/TriggerConfig';
 
 const Details = ({
   match: {
-    params: { appId },
+    params: { appId, envName },
   },
 }) => {
   const { loading, data: detailInfo, request, refresh } = useRequest(applicationDetail);
-  const repo_name = get(detailInfo, 'data.repo_name', '');
+  const provider = get(detailInfo, 'data.provider');
+  const trigger_spec = get(detailInfo, `data.trigger_spec`, {});
+  const taskId = get(detailInfo, 'data.latest_task.taskId', '');
+  const secrets = get(detailInfo, 'data.secrets', {});
 
   useEffect(() => {
     request({ id: appId });
@@ -41,26 +48,10 @@ const Details = ({
     }
   }, [detailInfo]);
 
-  const deleteApplication = () => {
-    const dialog = Dialog.alert({
-      title: `删除应用：${repo_name}`,
-      content: '您确定删除当前应用吗?',
-      onOk: async () => {
-        const { success } = await deleteApp({ appId });
-        if (success) {
-          Toast.success('应用删除成功');
-          await sleep(800);
-          history?.push('/');
-        }
-        dialog.hide();
-      },
-    });
-  };
-
   return (
     <PageLayout
-      title="应用详情"
-      subhead={repo_name}
+      title="环境详情"
+      subhead={envName}
       breadcrumbs={[
         {
           name: '应用列表',
@@ -70,16 +61,33 @@ const Details = ({
           name: appId,
         },
       ]}
-      breadcrumbExtra={
-        <Button type="primary" warning onClick={deleteApplication}>
-          删除应用
-        </Button>
-      }
     >
-      <Loading visible={loading} inline={false}>
+      <Loading visible={loading} style={{ width: '100%' }}>
         <BasicInfoDetail data={get(detailInfo, 'data', {})} refreshCallback={refresh} />
+        <hr className="mb-20" />
+        <TriggerConfig
+          triggerSpec={trigger_spec}
+          provider={provider}
+          appId={appId}
+          refreshCallback={refresh}
+        />
+        <hr className="mb-20" />
+        <SecretConfig
+          secrets={secrets}
+          provider={provider}
+          appId={appId}
+          refreshCallback={refresh}
+        />
+        <hr className="mb-20 mt-20" />
       </Loading>
-      <hr className="mb-20 mt-20" />
+      <PageInfo title="部署历史">
+        <CommitList
+          appId={appId}
+          application={get(detailInfo, 'data', {})}
+          latestTaskId={taskId}
+          refreshCallback={refresh}
+        />
+      </PageInfo>
     </PageLayout>
   );
 };

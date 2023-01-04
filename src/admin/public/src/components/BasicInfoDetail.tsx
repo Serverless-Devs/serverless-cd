@@ -1,12 +1,10 @@
 import React from 'react';
-import { Link } from 'ice';
 import moment from 'moment';
 import { get } from 'lodash';
 import BasicInfo from '@/components/BasicInfo';
 import ExternalLink from '@/components/ExternalLink';
 import CommitId from '@/components/CommitId';
 import { C_REPOSITORY } from '@/constants/repository';
-import Status from '@/components/DeployStatus';
 import RefreshButton from '@/pages/AppDetail/components/RefreshButton';
 interface Props {
   data: object;
@@ -18,14 +16,11 @@ const BasicInfoDetail = (props: Props) => {
 
   const description = get(data, 'description', '_');
   const created_time = moment(get(data, 'created_time')).format('YYYY-MM-DD HH:mm:ss');
-  const status = get(data, 'latest_task.status', 'init');
   const provider = get(data, 'provider');
   const repo_url = get(data, 'repo_url');
   const repo_name = get(data, 'repo_name');
   const owner = get(data, 'owner');
   const commit = get(data, 'latest_task.commit');
-  const taskId = get(data, 'latest_task.taskId');
-  const appId = get(data, 'id');
   return (
     <BasicInfo
       title={'基本信息'}
@@ -50,19 +45,6 @@ const BasicInfoDetail = (props: Props) => {
             value: created_time,
           },
           {
-            text: '部署状态',
-            value: (
-              <div className="flex-r" style={{ justifyContent: 'flex-start' }}>
-                <Status status={status as any} />
-                {taskId && (
-                  <Link className="ml-8" to={`/application/${appId}/detail/${taskId}`}>
-                    查看
-                  </Link>
-                )}
-              </div>
-            ),
-          },
-          {
             text: '代码源',
             value: (
               <div className="align-center">
@@ -83,7 +65,7 @@ const BasicInfoDetail = (props: Props) => {
                 <CommitId
                   className="ml-4"
                   url={`https://${provider}.com/${owner}/${repo_name}/commit/${commit}`}
-                  label={get(data, 'latest_task.commit') as string}
+                  label={get(data, 'latest_task.commit', '')}
                   message={get(data, 'latest_task.message')}
                   icon={false}
                 />
