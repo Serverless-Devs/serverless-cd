@@ -30,7 +30,11 @@ const Env = (props: IProps) => {
   return (
     <Row gutter={16} className="mb-8">
       <Col span="12">
-        <Input {...init('name', { initValue: initValue.name })} className="full-width" />
+        <Input
+          {...init('name', { initValue: initValue.name })}
+          placeholder="请输入环境名称"
+          className="full-width"
+        />
       </Col>
       <Col span="12">
         <Select

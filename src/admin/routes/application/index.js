@@ -107,23 +107,13 @@ router.delete('/delete', async function (req, res) {
 
 router.post('/update', async function (req, res) {
   console.log('POST /update app ', JSON.stringify(req.body));
-  const { appId, secrets, trigger_spec = {}, provider } = req.body;
+  const { appId, secrets, environment } = req.body;
 
   const app = await orm.findOne({ id: appId });
   if (_.isEmpty(app)) {
     throw new ValidationError('没有找到此应用');
   }
-
-  const params = {};
-  if (!_.isEmpty(trigger_spec)) {
-    let webHookSecret = _.get(app, `trigger_spec.${provider}.secret`);
-    _.set(trigger_spec, `${provider}.secret`, webHookSecret);
-    params.trigger_spec = trigger_spec;
-  }
-  if (secrets) {
-    params.secrets = secrets;
-  }
-
+  const params = { environment };
   console.log('/update app params ', params);
 
   await orm.update([{ id: app.id }], params);

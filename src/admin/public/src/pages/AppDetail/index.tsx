@@ -3,6 +3,7 @@ import { useRequest, history, Link } from 'ice';
 import { Button, Dialog, Loading, Table } from '@alicloud/console-components';
 import PageLayout from '@/layouts/PageLayout';
 import EnvType from '@/components/EnvType';
+import CreateEnv from '@/pages/EnvDetail/components/CreateEnv';
 import BasicInfoDetail from '@/components/BasicInfoDetail';
 import { applicationDetail, deleteApp } from '@/services/applist';
 import { Toast } from '@/components/ToastContainer';
@@ -58,7 +59,6 @@ const Details = ({
     });
   };
 
-  console.log(detailInfo, 'detailInfo');
   const getEnvData = () => {
     const data: any = [];
     const environment = get(detailInfo, 'data.environment', {});
@@ -72,8 +72,6 @@ const Details = ({
     }
     return data;
   };
-
-  console.log(getEnvData(), 'getEnvData');
 
   const columns = [
     {
@@ -115,9 +113,9 @@ const Details = ({
       ]}
       breadcrumbExtra={
         <>
-          <Button type="primary" onClick={deleteApplication}>
-            创建环境
-          </Button>
+          <CreateEnv data={get(detailInfo, 'data', {})} appId={appId} refresh={refresh}>
+            <Button type="primary">创建环境</Button>
+          </CreateEnv>
           <Button className="ml-8" type="primary" warning onClick={deleteApplication}>
             删除应用
           </Button>

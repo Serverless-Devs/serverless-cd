@@ -57,6 +57,10 @@ const Details = ({
         },
         {
           name: appId,
+          path: `/application/${appId}/detail`,
+        },
+        {
+          name: envName,
         },
       ]}
     >
@@ -68,17 +72,21 @@ const Details = ({
         />
         <hr className="mb-20" />
         <TriggerConfig
+          data={get(detailInfo, 'data', {})}
           triggerSpec={trigger_spec}
           provider={provider}
           appId={appId}
           refreshCallback={refresh}
+          envName={envName}
         />
         <hr className="mb-20" />
         <SecretConfig
+          data={get(detailInfo, 'data', {})}
           secrets={secrets}
           provider={provider}
           appId={appId}
           refreshCallback={refresh}
+          envName={envName}
         />
         <hr className="mb-20 mt-20" />
       </Loading>

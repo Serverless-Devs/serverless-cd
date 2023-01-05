@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Input, Button, Icon } from '@alicloud/console-components';
 import { map, uniqueId, filter, noop, isEmpty } from 'lodash';
+import './index.less';
 
 const { Row, Col } = Grid;
 
@@ -81,7 +82,7 @@ const Secret = (props: IProps) => {
                 onChange={(value) => handleChangeKey(value, item)}
               />
             </Col>
-            <Col span="12" className='env-value'>
+            <Col span="12" className="env-value">
               <Input
                 innerBefore="值"
                 placeholder="请输入"
