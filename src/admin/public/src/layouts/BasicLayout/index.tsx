@@ -70,7 +70,8 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
   const [userState, userDispatchers] = store.useModel('user');
   const avatar = get(userState, 'userInfo.avatar');
   const username = get(userState, 'userInfo.username', '');
-  const showMenu = !['/application', '/create', '/'].includes(pathname);
+  // const showMenu = !['/application', '/create', '/'].includes(pathname);
+  const showMenu = false;
 
   useEffect(() => {
     setTimeout(() => {

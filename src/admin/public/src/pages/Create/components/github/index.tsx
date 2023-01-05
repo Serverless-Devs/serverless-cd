@@ -6,6 +6,7 @@ import Repo from './Repo';
 import Trigger from './Trigger';
 import Env, { validteEnv } from './Env';
 import ConfigEdit from '@/components/ConfigEdit';
+import { TYPE as ENV_TYPE } from '@/components/EnvType';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -67,10 +68,10 @@ const Github = (props: IProps) => {
             }) as any)}
           />
         </FormItem>
-        <FormItem label="环境名称" required>
+        <FormItem label="环境" required>
           <Env
             {...(init('environment', {
-              initValue: { name: 'default', description: 'testing' },
+              initValue: { name: 'default', type: ENV_TYPE.TESTING },
               rules: [
                 {
                   validator: validteEnv,

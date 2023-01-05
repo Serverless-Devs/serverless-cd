@@ -3,11 +3,9 @@ import { useRequest, history } from 'ice';
 import { Button, Dialog, Loading } from '@alicloud/console-components';
 import PageLayout from '@/layouts/PageLayout';
 import CommitList from './components/CommitList';
-import BasicInfoDetail from '@/components/BasicInfoDetail';
-import { applicationDetail, deleteApp } from '@/services/applist';
-import { Toast } from '@/components/ToastContainer';
+import BasicInfoDetail from './components/BasicInfoDetail';
+import { applicationDetail } from '@/services/applist';
 import PageInfo from '@/components/PageInfo';
-import { sleep } from '@/utils';
 import { get } from 'lodash';
 import SecretConfig from './components/SecretCofing';
 import TriggerConfig from './components/TriggerConfig';
@@ -19,9 +17,9 @@ const Details = ({
 }) => {
   const { loading, data: detailInfo, request, refresh } = useRequest(applicationDetail);
   const provider = get(detailInfo, 'data.provider');
-  const trigger_spec = get(detailInfo, `data.trigger_spec`, {});
+  const trigger_spec = get(detailInfo, `data.environment.${envName}.trigger_spec`, {});
   const taskId = get(detailInfo, 'data.latest_task.taskId', '');
-  const secrets = get(detailInfo, 'data.secrets', {});
+  const secrets = get(detailInfo, `data.environment.${envName}.secrets`, {});
 
   useEffect(() => {
     request({ id: appId });
@@ -63,7 +61,11 @@ const Details = ({
       ]}
     >
       <Loading visible={loading} style={{ width: '100%' }}>
-        <BasicInfoDetail data={get(detailInfo, 'data', {})} refreshCallback={refresh} />
+        <BasicInfoDetail
+          data={get(detailInfo, 'data', {})}
+          refreshCallback={refresh}
+          envName={envName}
+        />
         <hr className="mb-20" />
         <TriggerConfig
           triggerSpec={trigger_spec}

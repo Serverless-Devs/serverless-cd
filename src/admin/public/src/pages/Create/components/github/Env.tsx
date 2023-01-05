@@ -1,6 +1,7 @@
 import React from 'react';
 import { Grid, Input, Select, Field } from '@alicloud/console-components';
 import { noop, isEmpty } from 'lodash';
+import { TYPE as ENV_TYPE } from '@/components/EnvType';
 
 const { Row, Col } = Grid;
 
@@ -34,11 +35,11 @@ const Env = (props: IProps) => {
       <Col span="12">
         <Select
           className="full-width"
-          {...init('description', { initValue: initValue.description })}
+          {...init('type', { initValue: initValue.type })}
           dataSource={[
-            { label: '测试环境', value: 'testing' },
-            { label: '预发环境', value: 'staging' },
-            { label: '生产环境', value: 'production' },
+            { label: '测试环境', value: ENV_TYPE.TESTING },
+            { label: '预发环境', value: ENV_TYPE.STAGING },
+            { label: '生产环境', value: ENV_TYPE.PRODUCTION },
           ]}
         />
       </Col>

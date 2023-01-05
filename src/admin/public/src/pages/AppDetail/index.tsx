@@ -65,8 +65,9 @@ const Details = ({
     for (const key in environment) {
       const element = environment[key];
       data.push({
-        envName: key,
-        description: get(element, 'description'),
+        name: key,
+        type: get(element, 'type'),
+        created_time: get(element, 'created_time') || get(detailInfo, 'data.created_time'),
       });
     }
     return data;
@@ -76,20 +77,19 @@ const Details = ({
 
   const columns = [
     {
-      key: 'envName',
+      key: 'name',
       title: '环境名称',
-      dataIndex: 'envName',
+      dataIndex: 'name',
       cell: (value, _index, record) => (
         <>
           <Link to={`/application/${appId}/detail/${value}`}>{value}</Link>
         </>
       ),
-      width: 160,
     },
     {
-      key: 'description',
-      title: '环境描述',
-      dataIndex: 'description',
+      key: 'type',
+      title: '环境类型',
+      dataIndex: 'type',
       cell: (value, _index, record) => <EnvType type={value} />,
     },
     {

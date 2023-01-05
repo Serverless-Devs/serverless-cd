@@ -8,7 +8,7 @@ const userOrm = require('../../util/orm')(OTS_USER.name, OTS_USER.index);
 const taskOrm = require('../../util/orm')(OTS_TASK.name, OTS_TASK.index);
 
 const getApplicationConfig = (applicationList) => {
-  const omitList = [];
+  const omitList = ['webhook_secret'];
   result = _.map(applicationList, (item) => _.omit(item, omitList));
   return result;
 };
