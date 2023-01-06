@@ -75,6 +75,8 @@ exports.handler = (req, resp, context) => {
           commit: _.get(triggerConfig, 'data.commit.id'),
           message: _.get(triggerConfig, 'data.commit.message'),
           authorization,
+          envName: key,
+          environment,
         };
         console.log('workerPayload:', JSON.stringify(workerPayload, null, 2));
         // 调用 worker

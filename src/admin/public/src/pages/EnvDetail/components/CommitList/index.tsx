@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useEffect, useState, FC } from 'react';
 import { Loading, Grid, Button, Drawer, Tag } from '@alicloud/console-components';
 import { Link, useRequest } from 'ice';
 import { getTaskList } from '@/services/task';
@@ -17,15 +17,16 @@ import './index.less';
 let taskListInterval: any = null;
 
 const { Row, Col } = Grid;
-interface Props {
+interface IProps {
   appId: string;
+  envName: string;
   latestTaskId?: string;
   refreshCallback?: Function;
   application: object;
 }
 
-const CommitList = (props: Props) => {
-  const { appId, latestTaskId, application, refreshCallback } = props;
+const CommitList: FC<IProps> = (props) => {
+  const { appId, latestTaskId, application, refreshCallback, envName } = props;
   const { loading, data, request, refresh } = useRequest(getTaskList);
   const [visible, setVisible] = useState(false);
   const [isLoops, setIsLoops] = useState(false);
@@ -44,7 +45,7 @@ const CommitList = (props: Props) => {
   );
 
   useEffect(() => {
-    request({ appId, currentPage: 1, pageSize: 4 });
+    request({ appId, envName, currentPage: 1, pageSize: 4 });
   }, [appId]);
 
   useEffect(() => {
@@ -64,7 +65,7 @@ const CommitList = (props: Props) => {
   const loopsTaskList = () => {
     if (taskListInterval) clearInterval(taskListInterval);
     taskListInterval = setInterval(async () => {
-      const { result } = await getTaskList({ appId, currentPage: 1, pageSize: 4 });
+      const { result } = await getTaskList({ appId, envName, currentPage: 1, pageSize: 4 });
       const notDeployList = filter(result, (item: any) => isHideStatus.includes(item.status));
       if (isEmpty(notDeployList)) {
         clearInterval(taskListInterval);
@@ -76,13 +77,15 @@ const CommitList = (props: Props) => {
     }, 5000);
   };
 
+  console.log(taskList, isLoops);
+
   return (
     <Loading visible={loading} style={{ width: '100%' }}>
       <div className="flex-r mt-8" style={{ justifyContent: 'space-between' }}>
         <div>
           <Redeploy
             disabled={isEmpty(taskList) || isLoops}
-            taskId={get(application, 'latest_task.taskId', '') as string}
+            taskId={get(application, `environment.${envName}.latest_task.taskId`, '') as string}
             appId={appId}
             repoName={get(application, 'repo_name', '') as string}
             refreshCallback={refresh}
@@ -90,11 +93,12 @@ const CommitList = (props: Props) => {
           <Rollback
             disabled={isEmpty(taskList) || isLoops}
             appId={appId}
+            envName={envName}
             refreshCallback={refresh}
             application={application}
           />
           <Button
-            className='mr-8 ml-8'
+            className="mr-8 ml-8"
             disabled={!(taskList && taskList.length > 0)}
             onClick={() => setVisible(true)}
           >
@@ -116,28 +120,26 @@ const CommitList = (props: Props) => {
               return (
                 <Col span="6">
                   <div className="deploy-item mb-8">
-                    <div className='flex-r'>
-                      <div className='copy-trigger flex-r' style={{ justifyContent: 'flex-start' }}>
+                    <div className="flex-r">
+                      <div className="copy-trigger flex-r" style={{ justifyContent: 'flex-start' }}>
                         <Link
                           className="commit-description text-nowrap-1 mr-8"
-                          to={`/application/${appId}/detail/${taskId}`}
+                          to={`/application/${appId}/detail/${envName}/${taskId}`}
                         >
                           {taskId}
                         </Link>
                         <CopyIcon content={taskId} size="xs" />
                       </div>
 
-                      {
-                        !isLoops && latestTaskId === taskId && (
-                          <Tag color="orange" size="small" style={{ fontStyle: 'italic' }}>
-                            Latest
-                          </Tag>
-                        )
-                      }
+                      {!isLoops && latestTaskId === taskId && (
+                        <Tag color="orange" size="small" style={{ fontStyle: 'italic' }}>
+                          Latest
+                        </Tag>
+                      )}
                     </div>
 
                     <div style={{ fontSize: 12, marginBottom: 5 }}>
-                      <div className='text-nowrap-1'>{message}</div>
+                      <div className="text-nowrap-1">{message}</div>
                       <span style={{ color: '#888', lineHeight: 2 }}>{updatedTime}</span>
                     </div>
                     <div className="flex-r">
@@ -152,7 +154,13 @@ const CommitList = (props: Props) => {
                       ) : (
                         <CancelDeploy
                           isText
-                          taskId={get(application, 'latest_task.taskId', '') as string}
+                          taskId={
+                            get(
+                              application,
+                              `environment.${envName}.latest_task.taskId`,
+                              '',
+                            ) as string
+                          }
                           appId={appId}
                           repoName={get(application, 'repo_name', '') as string}
                           refreshCallback={refresh}
@@ -171,7 +179,7 @@ const CommitList = (props: Props) => {
             visible={visible}
             onClose={() => setVisible(false)}
           >
-            <CommitTable appId={appId} latestTaskId={latestTaskId} />
+            <CommitTable appId={appId} latestTaskId={latestTaskId} envName={envName} />
           </Drawer>
         </>
       ) : (

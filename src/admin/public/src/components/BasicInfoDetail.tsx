@@ -2,7 +2,6 @@ import React from 'react';
 import { get } from 'lodash';
 import BasicInfo from '@/components/BasicInfo';
 import ExternalLink from '@/components/ExternalLink';
-import CommitId from '@/components/CommitId';
 import { C_REPOSITORY } from '@/constants/repository';
 import RefreshButton from '@/components/RefreshButton';
 import { formatTime } from '@/utils';
@@ -20,7 +19,6 @@ const BasicInfoDetail = (props: Props) => {
   const repo_url = get(data, 'repo_url');
   const repo_name = get(data, 'repo_name');
   const owner = get(data, 'owner');
-  const commit = get(data, 'latest_task.commit');
   return (
     <BasicInfo
       title={'基本信息'}
@@ -53,21 +51,6 @@ const BasicInfoDetail = (props: Props) => {
                   className="color-link cursor-pointer ml-4"
                   url={repo_url}
                   label={repo_name}
-                />
-              </div>
-            ),
-          },
-          commit && {
-            text: 'Commit',
-            value: (
-              <div className="align-center">
-                {C_REPOSITORY[provider as any]?.svg(16)}
-                <CommitId
-                  className="ml-4"
-                  url={`https://${provider}.com/${owner}/${repo_name}/commit/${commit}`}
-                  label={get(data, 'latest_task.commit', '')}
-                  message={get(data, 'latest_task.message')}
-                  icon={false}
                 />
               </div>
             ),

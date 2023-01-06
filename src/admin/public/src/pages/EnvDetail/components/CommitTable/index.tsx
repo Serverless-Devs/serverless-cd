@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useEffect, useState, FC } from 'react';
 import { Table, Pagination, Search, Tag } from '@alicloud/console-components';
 import { Link, useRequest } from 'ice';
 import { getTaskList } from '@/services/task';
@@ -9,19 +9,20 @@ import Status from '@/components/DeployStatus';
 import DeleteCommit from '../DeleteCommit';
 import RefreshButton from '../RefreshButton';
 
-interface Props {
+interface IProps {
   appId: string;
-  latestTaskId?: string
+  envName: string;
+  latestTaskId?: string;
 }
 
-const CommitTable = (props: Props) => {
-  const { appId, latestTaskId } = props;
+const CommitTable: FC<IProps> = (props) => {
+  const { appId, latestTaskId, envName } = props;
   const { loading, data, request, refresh } = useRequest(getTaskList);
   const [taskList, setTaskList] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
-    request({ appId, currentPage: 1 });
+    request({ appId, envName, currentPage: 1 });
   }, [appId]);
 
   useEffect(() => {
@@ -36,16 +37,17 @@ const CommitTable = (props: Props) => {
       cell: (value) => {
         return (
           <>
-            <Link className="commit-description" to={`/application/${appId}/detail/${value}`}>
+            <Link
+              className="commit-description"
+              to={`/application/${appId}/detail/${envName}/${value}`}
+            >
               {value}
             </Link>
-            {
-              latestTaskId === value && (
-                <Tag color="orange" size="small" style={{ fontStyle: 'italic', marginLeft: 8 }}>
-                  Latest
-                </Tag>
-              )
-            }
+            {latestTaskId === value && (
+              <Tag color="orange" size="small" style={{ fontStyle: 'italic', marginLeft: 8 }}>
+                Latest
+              </Tag>
+            )}
           </>
         );
       },
@@ -96,8 +98,15 @@ const CommitTable = (props: Props) => {
       title: '操作',
       dataIndex: 'id',
       cell: (value, i, item) => {
-        const updatedTime = moment(get(item, 'updated_time')).format('YYYY-MM-DD HH:mm:ss')
-        return <DeleteCommit appId={appId} taskId={value} refreshCallback={refresh} updatedTime={updatedTime} />;
+        const updatedTime = moment(get(item, 'updated_time')).format('YYYY-MM-DD HH:mm:ss');
+        return (
+          <DeleteCommit
+            appId={appId}
+            taskId={value}
+            refreshCallback={refresh}
+            updatedTime={updatedTime}
+          />
+        );
       },
     },
   ];

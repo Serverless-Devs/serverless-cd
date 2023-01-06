@@ -4,8 +4,10 @@ import { get } from 'lodash';
 import BasicInfo from '@/components/BasicInfo';
 import Status from '@/components/DeployStatus';
 import RefreshButton from '@/components/RefreshButton';
+import CommitId from '@/components/CommitId';
 import { formatTime } from '@/utils';
 import EnvType from '@/components/EnvType';
+import { C_REPOSITORY } from '@/constants/repository';
 
 interface Props {
   data: object;
@@ -15,11 +17,17 @@ interface Props {
 
 const BasicInfoDetail = (props: Props) => {
   const { data, refreshCallback, envName } = props;
+  const provider = get(data, 'provider');
   const envInfo = get(data, `environment.${envName}`);
+  const repo_name = get(data, 'repo_name');
+  const owner = get(data, 'owner');
   const type = get(envInfo, 'type', '_');
   const created_time = formatTime(get(envInfo, 'created_time'));
-  const status = get(data, 'latest_task.status', 'init');
-  const taskId = get(data, 'latest_task.taskId');
+  const latest_task = get(data, `environment.${envName}.latest_task`, {});
+  const status = get(latest_task, 'status', 'init');
+  const taskId = get(latest_task, 'taskId');
+  const commit = get(latest_task, 'commit');
+
   const appId = get(data, 'id');
   return (
     <BasicInfo
@@ -46,10 +54,25 @@ const BasicInfoDetail = (props: Props) => {
               <div className="flex-r" style={{ justifyContent: 'flex-start' }}>
                 <Status status={status as any} />
                 {taskId && (
-                  <Link className="ml-8" to={`/application/${appId}/detail/${taskId}`}>
+                  <Link className="ml-8" to={`/application/${appId}/detail/${envName}/${taskId}`}>
                     查看
                   </Link>
                 )}
+              </div>
+            ),
+          },
+          commit && {
+            text: 'Commit',
+            value: (
+              <div className="align-center">
+                {C_REPOSITORY[provider as any]?.svg(16)}
+                <CommitId
+                  className="ml-4"
+                  url={`https://${provider}.com/${owner}/${repo_name}/commit/${commit}`}
+                  label={get(latest_task, 'commit', '')}
+                  message={get(latest_task, 'message')}
+                  icon={false}
+                />
               </div>
             ),
           },

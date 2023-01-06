@@ -1,6 +1,6 @@
-const router = require("express").Router();
-const { lodash: _ } = require("@serverless-cd/core");
-const Client = require("../../util/client");
+const router = require('express').Router();
+const { lodash: _ } = require('@serverless-cd/core');
+const Client = require('../../util/client');
 const model = require('./model');
 const { Result, ValidationError, NotFoundError, formatBranch } = require('../../util');
 
@@ -16,33 +16,40 @@ const getTaskConfig = (taskConfig) => {
   result.branch = formatBranch(result.ref);
 
   return result;
-}
+};
 
-router.get("/list", async function (req, res) {
+router.get('/list', async function (req, res) {
   const userId = req.userId;
-  const { appId, currentPage = 1, pageSize = 10 } = req.query;
+  const { appId, envName, currentPage = 1, pageSize = 10 } = req.query;
   if (_.isEmpty(appId)) {
     throw new ValidationError('AppId is empty');
   }
-  console.log(`task list userId: ${userId}, query: ${JSON.stringify(req.query)}`);
+  if (_.isEmpty(envName)) {
+    throw new ValidationError('envName is empty');
+  }
+  console.log(
+    `task list userId: ${userId}, envName: ${envName}, query: ${JSON.stringify(req.query)}`,
+  );
   const params = {
     user_id: userId,
     app_id: appId,
+    env_name: envName,
     orderKeys: ['updated_time', 'created_time'],
     currentPage: Number(currentPage),
-    pageSize: Number(pageSize)
-  }
-  _.filter(params, (value, key) => !value && delete params[key]);
+    pageSize: Number(pageSize),
+  };
   console.log('task list request params:', params);
   const taskList = await model.find(params);
   console.log('taskList::', taskList);
-  return res.json(Result.ofSuccess({
-    ...taskList,
-    result: _.get(taskList, 'result', []).map(getTaskConfig)
-  }));
+  return res.json(
+    Result.ofSuccess({
+      ...taskList,
+      result: _.get(taskList, 'result', []).map(getTaskConfig),
+    }),
+  );
 });
 
-router.get("/get", async function (req, res) {
+router.get('/get', async function (req, res) {
   const userId = req.userId;
   const taskId = _.get(req.query, 'taskId');
   if (_.isEmpty(taskId)) {
@@ -53,7 +60,7 @@ router.get("/get", async function (req, res) {
   res.json(Result.ofSuccess(getTaskConfig(taskConfig)));
 });
 
-router.post("/remove", async function (req, res) {
+router.post('/remove', async function (req, res) {
   const userId = req.userId;
   const taskId = _.get(req.body, 'taskId');
   if (_.isEmpty(taskId)) {
@@ -65,8 +72,7 @@ router.post("/remove", async function (req, res) {
   res.json(Result.ofSuccess());
 });
 
-
-router.get("/log", async (req, res) => {
+router.get('/log', async (req, res) => {
   const taskId = _.get(req.query, 'taskId');
   const stepCount = _.get(req.query, 'stepCount');
   if (_.isEmpty(taskId)) {
@@ -80,12 +86,12 @@ router.get("/log", async (req, res) => {
     const { content } = await ossClient.get(`logs/${taskId}/step_${stepCount}.log`);
     res.json(Result.ofSuccess(content.toString('utf8')));
   } catch (ex) {
-    if(ex.status === 404) {
-      throw new NotFoundError("The logs for this run have expired and are no longer available.")
+    if (ex.status === 404) {
+      throw new NotFoundError('The logs for this run have expired and are no longer available.');
     }
     console.error(ex.status, ex.code, ex.message);
     throw ex;
   }
-})
+});
 
 module.exports = router;

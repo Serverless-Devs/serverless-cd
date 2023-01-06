@@ -34,14 +34,14 @@ const Dashboard = () => {
     if (!data) return;
     setLoading(false);
     if (data?.length > 0) {
-      const notDeployList = filter(data, (item: any) => !get(item, 'latest_task.completed'))
+      const notDeployList = filter(data, (item: any) => !get(item, 'latest_task.completed'));
       if (isEmpty(notDeployList)) {
-        cancel()
+        cancel();
       }
       setApplist(data);
       setSourceApplist(data);
     } else {
-      cancel()
+      cancel();
     }
   }, [data]);
 
@@ -51,7 +51,7 @@ const Dashboard = () => {
       setApplist(filter(sourceApplist, (item) => includes(item.repo_name, value)));
     }
   };
-  const debounceSearch = debounce(onSearch, 250, { 'maxWait': 1000 });
+  const debounceSearch = debounce(onSearch, 250, { maxWait: 1000 });
 
   const onCreateApp = () => {
     history?.push('/create');
@@ -66,46 +66,37 @@ const Dashboard = () => {
       ]}
       hideBackground
     >
-      {
-
-        loading ? (
-          <Loading visible={loading} style={{ width: '100%' }} />
-        ) : (
-          data && data.length > 0 ? (
-            <>
-              <Box spacing={10} direction="row">
-                <Search
-                  size="large"
-                  shape="simple"
-                  placeholder="Search"
-                  onChange={debounceSearch}
-                  style={{ flex: 1 }}
-                />
-                <Button
-                  size="large"
-                  type="primary"
-                  onClick={onCreateApp}
-                >
-                  创建应用
-                </Button>
-              </Box>
-              {
-                applist.length > 0 ? (
-                  <Row wrap className="mt-24" gutter={24}>
-                    {map(applist, (item) => (
-                      <Col span="6" className='applist-col'>
-                        <ProjectCard key={item.providerUid} item={item} />
-                      </Col>
-                    ))}
-                  </Row>
-                ) : (
-                  <NotAppliaction queryKey={queryKey} />
-                )
-              }
-            </>
-          ) : <CreateAppLication />
-        )
-      }
+      {loading ? (
+        <Loading visible={loading} style={{ width: '100%' }} />
+      ) : data && data.length > 0 ? (
+        <>
+          <Box spacing={10} direction="row">
+            <Search
+              size="large"
+              shape="simple"
+              placeholder="Search"
+              onChange={debounceSearch}
+              style={{ flex: 1 }}
+            />
+            <Button size="large" type="primary" onClick={onCreateApp}>
+              创建应用
+            </Button>
+          </Box>
+          {applist.length > 0 ? (
+            <Row wrap className="mt-24" gutter={24}>
+              {map(applist, (item) => (
+                <Col span="6" className="applist-col">
+                  <ProjectCard key={item.providerUid} item={item} />
+                </Col>
+              ))}
+            </Row>
+          ) : (
+            <NotAppliaction queryKey={queryKey} />
+          )}
+        </>
+      ) : (
+        <CreateAppLication />
+      )}
     </PageLayout>
   );
 };

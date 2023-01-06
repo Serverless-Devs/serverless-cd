@@ -123,6 +123,7 @@ router.post('/cancel', async function (req, res) {
   if (_.isEmpty(taskResult)) {
     throw new ValidationError('没有查到部署信息');
   }
+  console.log('taskResult: ', JSON.stringify(taskResult));
   const { user_id, steps, app_id, trigger_payload } = taskResult;
   if (user_id !== req.userId) {
     throw new NoPermissionError('无权操作此应用');
@@ -149,16 +150,18 @@ router.post('/cancel', async function (req, res) {
     })),
   });
 
-  const { commit, message, ref } = trigger_payload || {};
+  const { commit, message, ref, environment, envName } = trigger_payload || {};
+
+  environment[envName].latest_task = {
+    taskId,
+    commit,
+    message,
+    ref,
+    completed: true,
+    status: cancelStatus,
+  };
   await appOrm.update([{ id: app_id }], {
-    latest_task: {
-      taskId,
-      commit,
-      message,
-      ref,
-      completed: true,
-      status: cancelStatus,
-    },
+    environment,
   });
 
   return res.json(Result.ofSuccess());

@@ -21,8 +21,6 @@ type IProps = {
 };
 
 const CreateEnv: FC<IProps> = (props) => {
-  console.log('CreateEnv props', props);
-
   const { children, data, appId, refresh = noop } = props;
   const { request, loading } = useRequest(updateApp);
   const [visible, setVisible] = React.useState(false);

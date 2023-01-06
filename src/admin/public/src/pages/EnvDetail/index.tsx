@@ -18,7 +18,7 @@ const Details = ({
   const { loading, data: detailInfo, request, refresh } = useRequest(applicationDetail);
   const provider = get(detailInfo, 'data.provider');
   const trigger_spec = get(detailInfo, `data.environment.${envName}.trigger_spec`, {});
-  const taskId = get(detailInfo, 'data.latest_task.taskId', '');
+  const taskId = get(detailInfo, `data.environment.${envName}.latest_task.taskId`, '');
   const secrets = get(detailInfo, `data.environment.${envName}.secrets`, {});
 
   useEffect(() => {
@@ -96,6 +96,7 @@ const Details = ({
           application={get(detailInfo, 'data', {})}
           latestTaskId={taskId}
           refreshCallback={refresh}
+          envName={envName}
         />
       </PageInfo>
     </PageLayout>
