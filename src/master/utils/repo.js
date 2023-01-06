@@ -14,7 +14,7 @@ async function getRepoConfig(provider, appId) {
   const repoId = _.get(applicationResult, '[0].provider_repo_id', null);
   const app_id = _.get(applicationResult, '[0].id');
   if (_.isEmpty(app_id, null)) {
-    throw new Error("Applicationn not found");
+    throw new Error('Applicationn not found');
   }
   console.log('find application success');
 
@@ -37,13 +37,15 @@ async function getRepoConfig(provider, appId) {
     accessToken,
     userId,
     owner: _.get(applicationResult, '[0].owner', ''),
-    trigger_spec: _.get(applicationResult, '[0].trigger_spec', {}),
     secrets: _.assign(
       _.get(userConfig, 'secrets', {}),
-      _.get(applicationResult, '[0].secrets', {}))
+      _.get(applicationResult, '[0].secrets', {}),
+    ),
+    environment: _.get(applicationResult, '[0].environment', {}),
+    webhook_secret: _.get(applicationResult, '[0].webhook_secret', ''),
   };
 }
 
 module.exports = {
   getRepoConfig,
-}
+};

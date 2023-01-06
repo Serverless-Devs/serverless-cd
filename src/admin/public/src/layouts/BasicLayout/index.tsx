@@ -17,6 +17,8 @@ import { get } from 'lodash';
 import ToastContainer from '@/components/ToastContainer';
 import './index.css';
 
+const menuConfig = ['/settings/tokens', '/settings/secrets'];
+
 (function () {
   const throttle = function (type: string, name: string, obj: Window = window) {
     let running = false;
@@ -70,8 +72,7 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
   const [userState, userDispatchers] = store.useModel('user');
   const avatar = get(userState, 'userInfo.avatar');
   const username = get(userState, 'userInfo.username', '');
-  // const showMenu = !['/application', '/create', '/'].includes(pathname);
-  const showMenu = false;
+  const showMenu = menuConfig.includes(pathname);
 
   useEffect(() => {
     setTimeout(() => {

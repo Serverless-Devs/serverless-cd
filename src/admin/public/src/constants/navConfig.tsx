@@ -17,12 +17,12 @@ export const getMenuConfig = (appId) => {
         icon: 'Directory-tree',
       },
     ],
-    [PATH.APPLICATION]: [
-      {
-        name: '应用详情',
-        path: `/application/${appId}/detail`,
-        icon: 'detail',
-      },
-    ],
+    // [PATH.APPLICATION]: [
+    //   {
+    //     name: '应用详情',
+    //     path: `/application/${appId}/detail`,
+    //     icon: 'detail',
+    //   },
+    // ],
   };
 };
