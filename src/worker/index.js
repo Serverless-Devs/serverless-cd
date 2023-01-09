@@ -39,7 +39,6 @@ async function handler(event, _context, callback) {
     tag,
     execDir = CODE_DIR,
     event_name,
-    trigger,
     customInputs = {},
     environment = {},
     envName,
@@ -74,7 +73,7 @@ async function handler(event, _context, callback) {
     logger.info('checkout success');
 
     // 解析 pipline
-    const pipLineYaml = path.join(execDir, _.get(trigger, 'template', CD_PIPLINE_YAML));
+    const pipLineYaml = path.join(execDir, CD_PIPLINE_YAML);
     logger.info(`parse spec: ${pipLineYaml}`);
     const piplineContext = core.parseSpec(pipLineYaml);
     logger.debug(`piplineContext:: ${JSON.stringify(piplineContext)}`);
@@ -137,7 +136,6 @@ async function handler(event, _context, callback) {
         event_name, // 触发的事件名称
         pusher,
       },
-      trigger, // 触发 pipline 的配置
     },
     events: {
       onInit,

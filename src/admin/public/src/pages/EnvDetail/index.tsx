@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRequest, history } from 'ice';
 import { Button, Dialog, Loading } from '@alicloud/console-components';
 import PageLayout from '@/layouts/PageLayout';
@@ -6,7 +6,7 @@ import CommitList from './components/CommitList';
 import BasicInfoDetail from './components/BasicInfoDetail';
 import { applicationDetail, updateApp } from '@/services/applist';
 import PageInfo from '@/components/PageInfo';
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 import SecretConfig from './components/SecretCofing';
 import TriggerConfig from './components/TriggerConfig';
 import CreateEnv from './components/CreateEnv';
@@ -17,21 +17,45 @@ const Details = ({
     params: { appId, envName },
   },
 }) => {
-  const { loading, data: detailInfo, request, refresh } = useRequest(applicationDetail);
+  const {
+    data: detailInfo,
+    request,
+    refresh,
+    cancel,
+  } = useRequest(applicationDetail, { pollingInterval: 5000 });
+  const [loading, setLoading] = useState(false);
+
   const provider = get(detailInfo, 'data.provider');
   const trigger_spec = get(detailInfo, `data.environment.${envName}.trigger_spec`, {});
   const taskId = get(detailInfo, `data.environment.${envName}.latest_task.taskId`, '');
   const secrets = get(detailInfo, `data.environment.${envName}.secrets`, {});
 
-  useEffect(() => {
-    request({ id: appId });
-  }, []);
+  const fetchData = async () => {
+    setLoading(true);
+    await request({ id: appId });
+    setLoading(false);
+  };
 
   useEffect(() => {
-    if (detailInfo && !detailInfo.success) {
+    fetchData();
+  }, []);
+
+  const handleRefresh = async () => {
+    setLoading(true);
+    await refresh();
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (isEmpty(detailInfo)) return;
+    if (detailInfo.success) {
+      const completed = get(detailInfo, `data.environment.${envName}.latest_task.completed`);
+      completed && cancel();
+    } else {
+      cancel();
       const dialog = Dialog.alert({
-        title: `详情信息出错`,
-        content: '当前应用详情出错/删除',
+        title: `环境详情信息出错`,
+        content: '当前环境详情出错/删除',
         footer: [
           <Button
             type="primary"
@@ -102,7 +126,7 @@ const Details = ({
       <Loading visible={loading} style={{ width: '100%' }}>
         <BasicInfoDetail
           data={get(detailInfo, 'data', {})}
-          refreshCallback={refresh}
+          refreshCallback={handleRefresh}
           envName={envName}
         />
         <hr className="mb-20" />
@@ -111,7 +135,7 @@ const Details = ({
           triggerSpec={trigger_spec}
           provider={provider}
           appId={appId}
-          refreshCallback={refresh}
+          refreshCallback={handleRefresh}
           envName={envName}
         />
         <hr className="mb-20" />
@@ -120,7 +144,7 @@ const Details = ({
           secrets={secrets}
           provider={provider}
           appId={appId}
-          refreshCallback={refresh}
+          refreshCallback={handleRefresh}
           envName={envName}
         />
         <hr className="mb-20 mt-20" />
@@ -130,7 +154,7 @@ const Details = ({
           appId={appId}
           application={get(detailInfo, 'data', {})}
           latestTaskId={taskId}
-          refreshCallback={refresh}
+          refreshCallback={handleRefresh}
           envName={envName}
         />
       </PageInfo>

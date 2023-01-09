@@ -24,8 +24,7 @@ router.post('/manual', async function (req, res) {
   if (_.isEmpty(applicationResult)) {
     throw new ValidationError('没有查到应用信息');
   }
-  const { owner, provider, repo_name, repo_url, secrets, trigger_spec, user_id } =
-    applicationResult;
+  const { owner, provider, repo_name, repo_url, secrets, environment, user_id } = applicationResult;
   if (user_id !== userId) {
     throw new ValidationError('无权操作此应用');
   }
@@ -72,11 +71,8 @@ router.post('/manual', async function (req, res) {
     ref,
     message: msg,
     commit,
-    trigger_spec,
-    trigger: {
-      interceptor: 'manual_dispatch',
-      template: 'serverless-pipeline.yaml',
-    },
+    environment,
+    envName: _.first(_.keys(environment)),
     customInputs: inputs,
   };
 
@@ -108,7 +104,7 @@ router.post('/redeploy', async function (req, res) {
   console.log('invoke payload: ', trigger_payload);
 
   trigger_payload.redelivery = taskId;
-  invokWorker(trigger_payload, res);
+  await invokWorker(trigger_payload, res);
 });
 
 // 取消部署

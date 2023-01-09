@@ -54,7 +54,7 @@ const Details = ({
     } else {
       cancel();
       const dialog = Dialog.alert({
-        title: `详情信息出错`,
+        title: `应用详情信息出错`,
         content: '当前应用详情出错/删除',
         footer: [
           <Button

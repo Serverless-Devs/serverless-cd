@@ -63,7 +63,7 @@ router.get('/list', async function (req, res, next) {
     orderKeys: ['updated_time', 'created_time'],
   });
   const applicationList = _.get(applicationResult, 'result', []);
-  console.log('应用列表信息', applicationResult);
+  console.log('应用列表信息', JSON.stringify(applicationList, null, 2));
 
   res.json(Result.ofSuccess(getApplicationConfig(applicationList)));
 });
@@ -72,7 +72,7 @@ router.get('/detail', async function (req, res, next) {
   console.log('application detail req.query', JSON.stringify(req.query));
   const { id } = req.query;
   const applicationResult = await orm.findByPrimary([{ id }]);
-  console.log('当前应用信息', applicationResult);
+  console.log('/detail 当前应用信息', JSON.stringify(applicationResult, null, 2));
 
   if (_.isEmpty(applicationResult)) {
     throw new ValidationError('暂无应用信息');

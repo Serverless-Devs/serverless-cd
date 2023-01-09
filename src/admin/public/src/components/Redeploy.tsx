@@ -21,27 +21,23 @@ const Redeploy = (props: Props) => {
 
   const onClose = () => {
     setVisible(false);
-  }
+  };
 
   const submit = async () => {
     setLoading(true);
     const { success, data } = await request({ taskId });
     if (success) {
-      await sleep(2800);
+      await sleep(3000);
       Toast.success('部署成功');
       refreshCallback && refreshCallback(data.taskId);
     }
     setLoading(false);
     onClose();
-  }
+  };
 
   return (
     <>
-      <Button
-        disabled={disabled}
-        onClick={() => setVisible(true)}
-        type="primary"
-      >
+      <Button disabled={disabled} onClick={() => setVisible(true)} type="primary">
         重新部署
       </Button>
       <Dialog
@@ -57,26 +53,21 @@ const Redeploy = (props: Props) => {
         onClose={onClose}
         style={{ width: 600 }}
         footer={[
-          <Button
-            type="primary"
-            onClick={submit}
-            loading={loading as boolean}
-          >
+          <Button type="primary" onClick={submit} loading={loading as boolean}>
             确定
           </Button>,
           <Button type="normal" onClick={onClose} disabled={loading as boolean}>
             取消
-          </Button>
+          </Button>,
         ]}
       >
         <p style={{ margin: 0 }}>
           当前操作将基于版本
-          <span className='color-link ml-5 mr-5'>{taskId}</span>
+          <span className="color-link ml-5 mr-5">{taskId}</span>
           创建一个新的部署版本，您确认要重新部署吗？
         </p>
       </Dialog>
     </>
-  )
-
-}
-export default Redeploy
+  );
+};
+export default Redeploy;
