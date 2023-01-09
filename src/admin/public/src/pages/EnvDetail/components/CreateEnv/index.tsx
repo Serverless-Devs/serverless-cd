@@ -10,7 +10,7 @@ import Env, { validteEnv } from '@/pages/Create/components/github/Env';
 import ConfigEdit from '@/components/ConfigEdit';
 import { TYPE as ENV_TYPE } from '@/components/EnvType';
 import { Toast } from '@/components/ToastContainer';
-import { get, noop, each } from 'lodash';
+import { get, each, keys } from 'lodash';
 
 const FormItem = Form.Item;
 
@@ -84,7 +84,11 @@ const CreateEnv: FC<IProps> = (props) => {
                 initValue: { name: '', type: ENV_TYPE.TESTING },
                 rules: [
                   {
-                    validator: validteEnv,
+                    validator: (rule, values, callback) => {
+                      validteEnv(rule, values, callback, {
+                        existEnvs: keys(get(data, 'environment')),
+                      });
+                    },
                   },
                 ],
               }) as any)}
