@@ -17,11 +17,11 @@ const FormItem = Form.Item;
 type IProps = {
   data: any;
   appId: string;
-  refresh?: () => void;
+  callback: () => Promise<any>;
 };
 
 const CreateEnv: FC<IProps> = (props) => {
-  const { children, data, appId, refresh = noop } = props;
+  const { children, data, appId, callback } = props;
   const { request, loading } = useRequest(updateApp);
   const [visible, setVisible] = React.useState(false);
   const field = Field.useField();
@@ -55,9 +55,9 @@ const CreateEnv: FC<IProps> = (props) => {
         const { success } = await request({ environment, appId, provider });
         if (success) {
           Toast.success('创建环境成功');
-          refresh();
           setVisible(false);
           resetToDefault();
+          await callback();
         }
       } catch (error) {
         Toast.error(error.message);

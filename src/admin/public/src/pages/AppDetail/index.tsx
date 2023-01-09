@@ -1,29 +1,58 @@
-import React, { useEffect } from 'react';
-import { useRequest, history, Link } from 'ice';
-import { Button, Dialog, Loading, Table } from '@alicloud/console-components';
+import React, { useEffect, useState } from 'react';
+import { useRequest, history } from 'ice';
+import { Button, Dialog, Loading } from '@alicloud/console-components';
 import PageLayout from '@/layouts/PageLayout';
-import EnvType from '@/components/EnvType';
 import CreateEnv from '@/pages/EnvDetail/components/CreateEnv';
 import BasicInfoDetail from '@/components/BasicInfoDetail';
 import { applicationDetail, deleteApp } from '@/services/applist';
 import { Toast } from '@/components/ToastContainer';
-import { sleep, formatTime } from '@/utils';
-import { get } from 'lodash';
+import EnvList from './components/EnvList';
+import { sleep } from '@/utils';
+import { get, isEmpty } from 'lodash';
 
 const Details = ({
   match: {
     params: { appId },
   },
 }) => {
-  const { loading, data: detailInfo, request, refresh } = useRequest(applicationDetail);
+  const {
+    data: detailInfo,
+    request,
+    refresh,
+    cancel,
+  } = useRequest(applicationDetail, { pollingInterval: 5000 });
+  const [loading, setLoading] = useState(false);
   const repo_name = get(detailInfo, 'data.repo_name', '');
 
-  useEffect(() => {
-    request({ id: appId });
-  }, []);
+  const fetchData = async () => {
+    setLoading(true);
+    await request({ id: appId });
+    setLoading(false);
+  };
 
   useEffect(() => {
-    if (detailInfo && !detailInfo.success) {
+    fetchData();
+  }, []);
+
+  const handleRefresh = async () => {
+    setLoading(true);
+    await refresh();
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (isEmpty(detailInfo)) return;
+    if (detailInfo.success) {
+      const data: any = [];
+      const environment = get(detailInfo, 'data.environment', {});
+      for (const key in environment) {
+        const ele = environment[key];
+        const completed = get(ele, 'latest_task.completed');
+        !completed && data.push(completed);
+      }
+      data.length === 0 && cancel();
+    } else {
+      cancel();
       const dialog = Dialog.alert({
         title: `详情信息出错`,
         content: '当前应用详情出错/删除',
@@ -59,45 +88,6 @@ const Details = ({
     });
   };
 
-  const getEnvData = () => {
-    const data: any = [];
-    const environment = get(detailInfo, 'data.environment', {});
-    for (const key in environment) {
-      const element = environment[key];
-      data.push({
-        name: key,
-        type: get(element, 'type'),
-        created_time: get(element, 'created_time') || get(detailInfo, 'data.created_time'),
-      });
-    }
-    return data;
-  };
-
-  const columns = [
-    {
-      key: 'name',
-      title: '环境名称',
-      dataIndex: 'name',
-      cell: (value, _index, record) => (
-        <>
-          <Link to={`/application/${appId}/detail/${value}`}>{value}</Link>
-        </>
-      ),
-    },
-    {
-      key: 'type',
-      title: '环境类型',
-      dataIndex: 'type',
-      cell: (value, _index, record) => <EnvType type={value} />,
-    },
-    {
-      key: 'created_time',
-      title: '创建时间',
-      dataIndex: 'created_time',
-      cell: (value, _index, record) => formatTime(value),
-    },
-  ];
-
   return (
     <PageLayout
       title="应用详情"
@@ -113,7 +103,7 @@ const Details = ({
       ]}
       breadcrumbExtra={
         <>
-          <CreateEnv data={get(detailInfo, 'data', {})} appId={appId} refresh={refresh}>
+          <CreateEnv data={get(detailInfo, 'data', {})} appId={appId} callback={handleRefresh}>
             <Button type="primary">创建环境</Button>
           </CreateEnv>
           <Button className="ml-8" type="primary" warning onClick={deleteApplication}>
@@ -123,9 +113,9 @@ const Details = ({
       }
     >
       <Loading visible={loading} inline={false}>
-        <BasicInfoDetail data={get(detailInfo, 'data', {})} refreshCallback={refresh} />
+        <BasicInfoDetail data={get(detailInfo, 'data', {})} refreshCallback={handleRefresh} />
         <hr className="mb-20 mt-20" />
-        <Table dataSource={getEnvData()} columns={columns} />
+        <EnvList appId={appId} data={get(detailInfo, 'data', {})} refresh={refresh} />
       </Loading>
     </PageLayout>
   );

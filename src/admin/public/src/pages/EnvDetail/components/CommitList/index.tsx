@@ -77,8 +77,6 @@ const CommitList: FC<IProps> = (props) => {
     }, 5000);
   };
 
-  console.log(taskList, isLoops);
-
   return (
     <Loading visible={loading} style={{ width: '100%' }}>
       <div className="flex-r mt-8" style={{ justifyContent: 'space-between' }}>

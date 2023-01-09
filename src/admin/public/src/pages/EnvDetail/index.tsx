@@ -4,11 +4,13 @@ import { Button, Dialog, Loading } from '@alicloud/console-components';
 import PageLayout from '@/layouts/PageLayout';
 import CommitList from './components/CommitList';
 import BasicInfoDetail from './components/BasicInfoDetail';
-import { applicationDetail } from '@/services/applist';
+import { applicationDetail, updateApp } from '@/services/applist';
 import PageInfo from '@/components/PageInfo';
 import { get } from 'lodash';
 import SecretConfig from './components/SecretCofing';
 import TriggerConfig from './components/TriggerConfig';
+import CreateEnv from './components/CreateEnv';
+import { Toast } from '@/components/ToastContainer';
 
 const Details = ({
   match: {
@@ -46,6 +48,25 @@ const Details = ({
     }
   }, [detailInfo]);
 
+  const handleDelete = async () => {
+    const dialog = Dialog.alert({
+      title: `删除环境：${envName}`,
+      content: '您确定删除当前环境吗?',
+      onOk: async () => {
+        const data = get(detailInfo, 'data', {});
+        const provider = get(data, 'provider');
+        const environment = get(data, 'environment', {});
+        delete environment[envName];
+        const { success } = await updateApp({ environment, appId, provider });
+        if (success) {
+          Toast.success('环境删除成功');
+          history?.push(`/application/${appId}/detail`);
+        }
+        dialog.hide();
+      },
+    });
+  };
+
   return (
     <PageLayout
       title="环境详情"
@@ -63,6 +84,20 @@ const Details = ({
           name: envName,
         },
       ]}
+      breadcrumbExtra={
+        <>
+          <CreateEnv
+            data={get(detailInfo, 'data', {})}
+            appId={appId}
+            callback={async () => history?.push(`/application/${appId}/detail`)}
+          >
+            <Button type="primary">创建环境</Button>
+          </CreateEnv>
+          <Button className="ml-8" type="primary" warning onClick={handleDelete}>
+            删除环境
+          </Button>
+        </>
+      }
     >
       <Loading visible={loading} style={{ width: '100%' }}>
         <BasicInfoDetail
