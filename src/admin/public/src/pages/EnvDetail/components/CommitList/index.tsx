@@ -83,7 +83,7 @@ const CommitList: FC<IProps> = (props) => {
         <div>
           <Redeploy
             disabled={isEmpty(taskList) || isLoops}
-            taskId={get(application, `environment.${envName}.latest_task.taskId`, '') as string}
+            taskId={latestTaskId as string}
             appId={appId}
             repoName={get(application, 'repo_name', '') as string}
             refreshCallback={refresh}
@@ -143,22 +143,18 @@ const CommitList: FC<IProps> = (props) => {
                     <div className="flex-r">
                       <Status status={status} />
                       {!isHideStatus.includes(status) ? (
-                        <DeleteCommit
-                          appId={appId}
-                          taskId={taskId}
-                          updatedTime={updatedTime}
-                          refreshCallback={refresh}
-                        />
+                        latestTaskId !== taskId && (
+                          <DeleteCommit
+                            appId={appId}
+                            taskId={taskId}
+                            updatedTime={updatedTime}
+                            refreshCallback={refresh}
+                          />
+                        )
                       ) : (
                         <CancelDeploy
                           isText
-                          taskId={
-                            get(
-                              application,
-                              `environment.${envName}.latest_task.taskId`,
-                              '',
-                            ) as string
-                          }
+                          taskId={latestTaskId as string}
                           appId={appId}
                           repoName={get(application, 'repo_name', '') as string}
                           refreshCallback={refresh}

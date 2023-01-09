@@ -82,6 +82,7 @@ async function handler(event, _context, callback) {
     logger.debug(`parse spec success, steps: ${JSON.stringify(steps)}`);
     logger.debug(`start update app`);
     environment[envName].latest_task = getEnvData(context);
+    logger.info(`update app in engine onInit: ${JSON.stringify(environment)}`);
     await otsApp.update(appId, {
       environment,
     });
@@ -178,9 +179,9 @@ async function handler(event, _context, callback) {
     status: engine.context.status,
     trigger_payload: inputs,
   });
-  console.log('ots app update');
-  // 防止有其他的动作，将等待状态也要set 到 ots
   environment[envName].latest_task = getEnvData(engine.context);
+  console.log('ots app update environment', JSON.stringify(environment));
+  // 防止有其他的动作，将等待状态也要set 到 ots
   await otsApp.update(appId, {
     environment,
   });

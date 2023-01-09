@@ -123,7 +123,6 @@ router.post('/cancel', async function (req, res) {
   if (_.isEmpty(taskResult)) {
     throw new ValidationError('没有查到部署信息');
   }
-  console.log('taskResult: ', JSON.stringify(taskResult));
   const { user_id, steps, app_id, trigger_payload } = taskResult;
   if (user_id !== req.userId) {
     throw new NoPermissionError('无权操作此应用');
