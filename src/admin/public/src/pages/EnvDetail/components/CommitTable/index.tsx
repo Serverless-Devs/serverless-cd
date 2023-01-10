@@ -8,6 +8,7 @@ import moment from 'moment';
 import Status from '@/components/DeployStatus';
 import DeleteCommit from '../DeleteCommit';
 import RefreshButton from '../RefreshButton';
+import { pollingStatus } from '@/constants';
 
 interface IProps {
   appId: string;
@@ -34,7 +35,7 @@ const CommitTable: FC<IProps> = (props) => {
     {
       title: '部署版本',
       dataIndex: 'id',
-      cell: (value) => {
+      cell: (value, index, record) => {
         return (
           <>
             <Link
@@ -43,7 +44,7 @@ const CommitTable: FC<IProps> = (props) => {
             >
               {value}
             </Link>
-            {latestTaskId === value && (
+            {!pollingStatus.includes(record.status) && latestTaskId === value && (
               <Tag color="orange" size="small" style={{ fontStyle: 'italic', marginLeft: 8 }}>
                 Latest
               </Tag>

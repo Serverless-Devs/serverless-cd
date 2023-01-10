@@ -14,7 +14,7 @@ interface Props {
 }
 
 const Redeploy = (props: Props) => {
-  const { taskId, disabled, repoName, refreshCallback } = props;
+  const { taskId, disabled, repoName, refreshCallback, appId } = props;
   const [visible, setVisible] = useState<Boolean>(false);
   const [loading, setLoading] = useState<Boolean>(false);
   const { request } = useRequest(redeployTask);
@@ -25,7 +25,7 @@ const Redeploy = (props: Props) => {
 
   const submit = async () => {
     setLoading(true);
-    const { success, data } = await request({ taskId });
+    const { success, data } = await request({ taskId, appId });
     if (success) {
       await sleep(3000);
       Toast.success('部署成功');

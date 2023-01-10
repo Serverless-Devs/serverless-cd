@@ -84,9 +84,13 @@ router.post('/manual', async function (req, res) {
 //  重新 / 回滚
 router.post('/redeploy', async function (req, res) {
   console.log('disaptch redeploy req.body', JSON.stringify(req.body));
-  const { taskId } = req.body;
+  const { taskId, appId } = req.body;
   if (_.isEmpty(taskId)) {
     throw new ValidationError('taskId 必填');
+  }
+
+  if (_.isEmpty(appId)) {
+    throw new ValidationError('appId 必填');
   }
 
   const userId = req.userId;
@@ -100,6 +104,14 @@ router.post('/redeploy', async function (req, res) {
   if (user_id !== userId) {
     throw new ValidationError('无权操作此应用');
   }
+
+  const applicationResult = await appOrm.findByPrimary([{ id: appId }]);
+  if (_.isEmpty(applicationResult)) {
+    throw new ValidationError('没有查到应用信息');
+  }
+  const { environment } = applicationResult;
+
+  trigger_payload.environment = { ...environment, ...trigger_payload.environment };
 
   console.log('invoke payload: ', trigger_payload);
 

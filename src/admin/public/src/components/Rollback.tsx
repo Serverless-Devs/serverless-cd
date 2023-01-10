@@ -35,7 +35,7 @@ const Rollback: FC<IProps> = (props) => {
 
   const submit = async () => {
     setLoading(true);
-    const { success, data } = await request({ taskId: rollBackId });
+    const { success, data } = await request({ taskId: rollBackId, appId });
     if (success) {
       await sleep(2800);
       Toast.success('部署成功');

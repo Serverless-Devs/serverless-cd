@@ -12,6 +12,7 @@ import CopyIcon from '@/components/CopyIcon';
 import Redeploy from '@/components/Redeploy';
 import Rollback from '@/components/Rollback';
 import CancelDeploy from '@/components/CancelDeploy';
+import { pollingStatus } from '@/constants';
 import './index.less';
 
 const { Row, Col } = Grid;
@@ -33,11 +34,8 @@ const CommitList: FC<IProps> = (props) => {
   const [visible, setVisible] = useState(false);
   const [taskList, setTaskList] = useState([]);
   const [totalCount, setTotalCount] = useState(null);
-  const isHideStatus = ['pending', 'running'];
 
   const fetchData = async (appId: string) => {
-    console.log(appId, 'appid');
-
     setLoading(true);
     request({ appId, envName, currentPage: 1, pageSize: 4 });
     setLoading(false);
@@ -52,7 +50,7 @@ const CommitList: FC<IProps> = (props) => {
     const result = get(data, 'result', []);
     setTaskList(result);
     setTotalCount(get(data, 'totalCount', 0));
-    const deployList = filter(result, (item: any) => isHideStatus.includes(item.status));
+    const deployList = filter(result, (item: any) => pollingStatus.includes(item.status));
     if (result.length === 0 || deployList.length === 0) {
       cancel();
     }
@@ -65,9 +63,9 @@ const CommitList: FC<IProps> = (props) => {
     setLoading(false);
   };
 
-  const getDisabled = () => {
+  const getDeploying = () => {
     if (isEmpty(taskList)) return true;
-    const deployList = filter(taskList, (item: any) => isHideStatus.includes(item.status));
+    const deployList = filter(taskList, (item: any) => pollingStatus.includes(item.status));
     return deployList.length > 0;
   };
 
@@ -76,14 +74,14 @@ const CommitList: FC<IProps> = (props) => {
       <div className="flex-r mt-8" style={{ justifyContent: 'space-between' }}>
         <div>
           <Redeploy
-            disabled={getDisabled()}
+            disabled={getDeploying()}
             taskId={latestTaskId as string}
             appId={appId}
             repoName={get(application, 'repo_name', '') as string}
             refreshCallback={handleRefresh}
           />
           <Rollback
-            disabled={getDisabled()}
+            disabled={getDeploying()}
             appId={appId}
             envName={envName}
             refreshCallback={handleRefresh}
@@ -98,7 +96,7 @@ const CommitList: FC<IProps> = (props) => {
           </Button>
           {!!totalCount && <span>共{totalCount}个部署版本</span>}
         </div>
-        <RefreshButton refreshCallback={refresh} />
+        <RefreshButton refreshCallback={handleRefresh} />
       </div>
       {taskList && taskList.length > 0 ? (
         <>
@@ -123,7 +121,7 @@ const CommitList: FC<IProps> = (props) => {
                         <CopyIcon content={taskId} size="xs" />
                       </div>
 
-                      {latestTaskId === taskId && (
+                      {!getDeploying() && latestTaskId === taskId && (
                         <Tag color="orange" size="small" style={{ fontStyle: 'italic' }}>
                           Latest
                         </Tag>
@@ -136,7 +134,7 @@ const CommitList: FC<IProps> = (props) => {
                     </div>
                     <div className="flex-r">
                       <Status status={status} />
-                      {!isHideStatus.includes(status) ? (
+                      {!pollingStatus.includes(status) ? (
                         latestTaskId !== taskId && (
                           <DeleteCommit
                             appId={appId}
