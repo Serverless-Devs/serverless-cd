@@ -24,8 +24,7 @@ router.post('/manual', async function (req, res) {
   if (_.isEmpty(applicationResult)) {
     throw new ValidationError('没有查到应用信息');
   }
-  const { owner, provider, repo_name, repo_url, secrets, trigger_spec, user_id } =
-    applicationResult;
+  const { owner, provider, repo_name, repo_url, secrets, environment, user_id } = applicationResult;
   if (user_id !== userId) {
     throw new ValidationError('无权操作此应用');
   }
@@ -72,11 +71,8 @@ router.post('/manual', async function (req, res) {
     ref,
     message: msg,
     commit,
-    trigger_spec,
-    trigger: {
-      interceptor: 'manual_dispatch',
-      template: 'serverless-pipeline.yaml',
-    },
+    environment,
+    envName: _.first(_.keys(environment)),
     customInputs: inputs,
   };
 
@@ -88,9 +84,13 @@ router.post('/manual', async function (req, res) {
 //  重新 / 回滚
 router.post('/redeploy', async function (req, res) {
   console.log('disaptch redeploy req.body', JSON.stringify(req.body));
-  const { taskId } = req.body;
+  const { taskId, appId } = req.body;
   if (_.isEmpty(taskId)) {
     throw new ValidationError('taskId 必填');
+  }
+
+  if (_.isEmpty(appId)) {
+    throw new ValidationError('appId 必填');
   }
 
   const userId = req.userId;
@@ -105,10 +105,18 @@ router.post('/redeploy', async function (req, res) {
     throw new ValidationError('无权操作此应用');
   }
 
+  const applicationResult = await appOrm.findByPrimary([{ id: appId }]);
+  if (_.isEmpty(applicationResult)) {
+    throw new ValidationError('没有查到应用信息');
+  }
+  const { environment } = applicationResult;
+
+  trigger_payload.environment = { ...environment, ...trigger_payload.environment };
+
   console.log('invoke payload: ', trigger_payload);
 
   trigger_payload.redelivery = taskId;
-  invokWorker(trigger_payload, res);
+  await invokWorker(trigger_payload, res);
 });
 
 // 取消部署
@@ -149,16 +157,18 @@ router.post('/cancel', async function (req, res) {
     })),
   });
 
-  const { commit, message, ref } = trigger_payload || {};
+  const { commit, message, ref, environment, envName } = trigger_payload || {};
+
+  environment[envName].latest_task = {
+    taskId,
+    commit,
+    message,
+    ref,
+    completed: true,
+    status: cancelStatus,
+  };
   await appOrm.update([{ id: app_id }], {
-    latest_task: {
-      taskId,
-      commit,
-      message,
-      ref,
-      completed: true,
-      status: cancelStatus,
-    },
+    environment,
   });
 
   return res.json(Result.ofSuccess());

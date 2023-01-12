@@ -1,37 +1,60 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRequest, history } from 'ice';
 import { Button, Dialog, Loading } from '@alicloud/console-components';
 import PageLayout from '@/layouts/PageLayout';
-import CommitList from './components/CommitList';
+import CreateEnv from '@/pages/EnvDetail/components/CreateEnv';
 import BasicInfoDetail from '@/components/BasicInfoDetail';
 import { applicationDetail, deleteApp } from '@/services/applist';
 import { Toast } from '@/components/ToastContainer';
-import PageInfo from '@/components/PageInfo';
+import EnvList from './components/EnvList';
 import { sleep } from '@/utils';
-import { get } from 'lodash';
-import SecretConfig from './components/SecretCofing';
-import TriggerConfig from './components/TriggerConfig';
+import { get, isEmpty } from 'lodash';
 
 const Details = ({
   match: {
     params: { appId },
   },
 }) => {
-  const { loading, data: detailInfo, request, refresh } = useRequest(applicationDetail);
-  const provider = get(detailInfo, 'data.provider');
-  const trigger_spec = get(detailInfo, `data.trigger_spec`, {});
-  const taskId = get(detailInfo, 'data.latest_task.taskId', '');
+  const {
+    data: detailInfo,
+    request,
+    refresh,
+    cancel,
+  } = useRequest(applicationDetail, { pollingInterval: 5000 });
+  const [loading, setLoading] = useState(false);
   const repo_name = get(detailInfo, 'data.repo_name', '');
-  const secrets = get(detailInfo, 'data.secrets', {});
+
+  const fetchData = async () => {
+    setLoading(true);
+    await request({ id: appId });
+    setLoading(false);
+  };
 
   useEffect(() => {
-    request({ id: appId });
+    fetchData();
   }, []);
 
+  const handleRefresh = async () => {
+    setLoading(true);
+    await refresh();
+    setLoading(false);
+  };
+
   useEffect(() => {
-    if (detailInfo && !detailInfo.success) {
+    if (isEmpty(detailInfo)) return;
+    if (detailInfo.success) {
+      const data: any = [];
+      const environment = get(detailInfo, 'data.environment', {});
+      for (const key in environment) {
+        const ele = environment[key];
+        const completed = get(ele, 'latest_task.completed');
+        !completed && data.push(completed);
+      }
+      data.length === 0 && cancel();
+    } else {
+      cancel();
       const dialog = Dialog.alert({
-        title: `详情信息出错`,
+        title: `应用详情信息出错`,
         content: '当前应用详情出错/删除',
         footer: [
           <Button
@@ -79,37 +102,21 @@ const Details = ({
         },
       ]}
       breadcrumbExtra={
-        <Button type="primary" warning onClick={deleteApplication}>
-          删除应用
-        </Button>
+        <>
+          <CreateEnv data={get(detailInfo, 'data', {})} appId={appId} callback={handleRefresh}>
+            <Button type="primary">创建环境</Button>
+          </CreateEnv>
+          <Button className="ml-8" type="primary" warning onClick={deleteApplication}>
+            删除应用
+          </Button>
+        </>
       }
     >
-      <Loading visible={loading} style={{ width: '100%' }}>
-        <BasicInfoDetail data={get(detailInfo, 'data', {})} refreshCallback={refresh} />
-        <hr className="mb-20" />
-        <TriggerConfig
-          triggerSpec={trigger_spec}
-          provider={provider}
-          appId={appId}
-          refreshCallback={refresh}
-        />
-        <hr className="mb-20" />
-        <SecretConfig
-          secrets={secrets}
-          provider={provider}
-          appId={appId}
-          refreshCallback={refresh}
-        />
+      <Loading visible={loading} inline={false}>
+        <BasicInfoDetail data={get(detailInfo, 'data', {})} refreshCallback={handleRefresh} />
         <hr className="mb-20 mt-20" />
+        <EnvList appId={appId} data={get(detailInfo, 'data', {})} refresh={refresh} />
       </Loading>
-      <PageInfo title="部署历史">
-        <CommitList
-          appId={appId}
-          application={get(detailInfo, 'data', {})}
-          latestTaskId={taskId}
-          refreshCallback={refresh}
-        />
-      </PageInfo>
     </PageLayout>
   );
 };

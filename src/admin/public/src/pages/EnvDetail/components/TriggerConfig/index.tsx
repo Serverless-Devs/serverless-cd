@@ -7,7 +7,20 @@ import { updateApp } from '@/services/applist';
 import { get, noop, isEmpty, uniqueId } from 'lodash';
 import Trigger from '@serverless-cd/trigger-ui';
 
-const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback }) => {
+export const validateTrigger = (rule, value, callback) => {
+  if (isEmpty(get(value, 'push')) && isEmpty(get(value, 'pr'))) {
+    return callback('请选择触发方式');
+  } else if (
+    isEmpty(get(value, 'push.branches')) &&
+    isEmpty(get(value, 'push.tags')) &&
+    isEmpty(get(value, 'pr.branches'))
+  ) {
+    return callback('触发方式数据填写不完整');
+  }
+  callback();
+};
+
+const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, envName }) => {
   const { request, loading } = useRequest(updateApp);
   const [visible, setVisible] = useState(false);
   const [triggerKey, setTriggerKey] = useState(uniqueId());
@@ -17,11 +30,12 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback }) => {
   const onSubmit = () => {
     validate(async (errors, values) => {
       if (errors) return;
-      const trigger_spec: any = {
+      const environment = get(data, 'environment');
+      environment[envName].trigger_spec = {
         [provider]: values['trigger'],
       };
       try {
-        const { success } = await request({ trigger_spec, appId, provider });
+        const { success } = await request({ environment, appId, provider });
         if (success) {
           Toast.success('配置成功');
           refreshCallback && refreshCallback();
@@ -38,22 +52,9 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback }) => {
     resetToDefault();
   };
 
-  const validateTrigger = (rule, value, callback) => {
-    if (isEmpty(get(value, 'push')) && isEmpty(get(value, 'pr'))) {
-      return callback('请选择触发方式');
-    } else if (
-      isEmpty(get(value, 'push.branches')) &&
-      isEmpty(get(value, 'push.tags')) &&
-      isEmpty(get(value, 'pr.branches'))
-    ) {
-      return callback('触发方式数据填写不完整');
-    }
-    callback();
-  };
-
   useEffect(() => {
     setTriggerKey(uniqueId());
-  }, [triggerSpec])
+  }, [triggerSpec]);
 
   return (
     <PageInfo
@@ -72,7 +73,7 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback }) => {
       <Drawer
         title="编辑触发配置"
         placement="right"
-        width="80%"
+        width="60%"
         style={{ margin: 0 }}
         visible={visible}
         onClose={onClose}

@@ -16,16 +16,18 @@ const PageHeader = (props) => {
         </Breadcrumb>
       ) : null}
 
-      <div className='flex-r' style={{ alignItems: 'self-end' }}>
+      <div className="flex-r" style={{ alignItems: 'self-end' }}>
         {title && (
-          <div className='flex-r' style={{alignItems: 'flex-start'}}>
-            <Typography.Text className={styles.title}>
-              {title}
-            </Typography.Text>
-            {subhead && <span className='ml-8' style={{lineHeight: '24px'}}>{subhead}</span>}
+          <div className="flex-r" style={{ alignItems: 'flex-start' }}>
+            <Typography.Text className={styles.title}>{title}</Typography.Text>
+            {subhead && (
+              <span className="ml-8" style={{ lineHeight: '24px' }}>
+                {subhead}
+              </span>
+            )}
           </div>
         )}
-        {breadcrumbExtra && breadcrumbExtra}
+        <div> {breadcrumbExtra && breadcrumbExtra}</div>
       </div>
 
       {description && (

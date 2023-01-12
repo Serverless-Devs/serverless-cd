@@ -8,24 +8,14 @@ const userOrm = require('../../util/orm')(OTS_USER.name, OTS_USER.index);
 const taskOrm = require('../../util/orm')(OTS_TASK.name, OTS_TASK.index);
 
 const getApplicationConfig = (applicationList) => {
-  const omitList = [];
+  const omitList = ['webhook_secret'];
   result = _.map(applicationList, (item) => _.omit(item, omitList));
   return result;
 };
 
 router.post('/create', async function (req, res, next) {
   console.log('application create req.body', JSON.stringify(req.body));
-  const {
-    repo,
-    owner,
-    repo_url,
-    provider_repo_id,
-    description,
-    provider,
-    trigger_spec,
-    envs,
-    secrets,
-  } = req.body;
+  const { repo, owner, repo_url, provider_repo_id, description, provider, environment } = req.body;
   const userId = req.userId;
 
   const userInfo = await userOrm.find({ id: userId });
@@ -46,11 +36,7 @@ router.post('/create', async function (req, res, next) {
   }
 
   console.log('add app');
-  let webHookSecret = _.get(trigger_spec, `${provider}.secret`);
-  if (!webHookSecret) {
-    webHookSecret = unionid();
-    _.set(trigger_spec, `${provider}.secret`, webHookSecret);
-  }
+  const webHookSecret = unionid();
   const id = unionid();
   await webhook.add(owner, repo, token, webHookSecret, id);
 
@@ -62,9 +48,8 @@ router.post('/create', async function (req, res, next) {
     owner,
     description,
     repo_url,
-    trigger_spec,
-    envs,
-    secrets,
+    environment,
+    webhook_secret: webHookSecret,
   });
 
   return res.json(Result.ofSuccess({ id }));
@@ -78,7 +63,7 @@ router.get('/list', async function (req, res, next) {
     orderKeys: ['updated_time', 'created_time'],
   });
   const applicationList = _.get(applicationResult, 'result', []);
-  console.log('应用列表信息', applicationResult);
+  console.log('应用列表信息', JSON.stringify(applicationList, null, 2));
 
   res.json(Result.ofSuccess(getApplicationConfig(applicationList)));
 });
@@ -87,7 +72,7 @@ router.get('/detail', async function (req, res, next) {
   console.log('application detail req.query', JSON.stringify(req.query));
   const { id } = req.query;
   const applicationResult = await orm.findByPrimary([{ id }]);
-  console.log('当前应用信息', applicationResult);
+  console.log('/detail 当前应用信息', JSON.stringify(applicationResult, null, 2));
 
   if (_.isEmpty(applicationResult)) {
     throw new ValidationError('暂无应用信息');
@@ -122,23 +107,13 @@ router.delete('/delete', async function (req, res) {
 
 router.post('/update', async function (req, res) {
   console.log('POST /update app ', JSON.stringify(req.body));
-  const { appId, secrets, trigger_spec = {}, provider } = req.body;
+  const { appId, secrets, environment } = req.body;
 
   const app = await orm.findOne({ id: appId });
   if (_.isEmpty(app)) {
     throw new ValidationError('没有找到此应用');
   }
-
-  const params = {};
-  if (!_.isEmpty(trigger_spec)) {
-    let webHookSecret = _.get(app, `trigger_spec.${provider}.secret`);
-    _.set(trigger_spec, `${provider}.secret`, webHookSecret);
-    params.trigger_spec = trigger_spec;
-  }
-  if (secrets) {
-    params.secrets = secrets;
-  }
-
+  const params = { environment };
   console.log('/update app params ', params);
 
   await orm.update([{ id: app.id }], params);

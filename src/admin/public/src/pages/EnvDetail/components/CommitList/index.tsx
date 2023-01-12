@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useEffect, useState, FC } from 'react';
 import { Loading, Grid, Button, Drawer, Tag } from '@alicloud/console-components';
 import { Link, useRequest } from 'ice';
 import { getTaskList } from '@/services/task';
@@ -12,68 +12,61 @@ import CopyIcon from '@/components/CopyIcon';
 import Redeploy from '@/components/Redeploy';
 import Rollback from '@/components/Rollback';
 import CancelDeploy from '@/components/CancelDeploy';
+import { pollingStatus } from '@/constants';
 import './index.less';
 
-let taskListInterval: any = null;
-
 const { Row, Col } = Grid;
-interface Props {
+interface IProps {
   appId: string;
+  envName: string;
+  refreshCallback: () => Promise<any>;
   latestTaskId?: string;
-  refreshCallback?: Function;
   application: object;
 }
 
-const CommitList = (props: Props) => {
-  const { appId, latestTaskId, application, refreshCallback } = props;
-  const { loading, data, request, refresh } = useRequest(getTaskList);
+const CommitList: FC<IProps> = (props) => {
+  const { appId, latestTaskId, application, refreshCallback, envName } = props;
+  const { data, request, refresh, cancel } = useRequest(getTaskList, {
+    pollingInterval: 5000,
+  });
+  const [loading, setLoading] = useState(false);
+
   const [visible, setVisible] = useState(false);
-  const [isLoops, setIsLoops] = useState(false);
   const [taskList, setTaskList] = useState([]);
   const [totalCount, setTotalCount] = useState(null);
-  const isHideStatus = ['pending', 'running'];
 
-  useEffect(
-    () => () => {
-      if (taskListInterval) {
-        clearInterval(taskListInterval);
-        taskListInterval = null;
-      }
-    },
-    [],
-  );
+  const fetchData = async (appId: string) => {
+    setLoading(true);
+    request({ appId, envName, currentPage: 1, pageSize: 4 });
+    setLoading(false);
+  };
 
   useEffect(() => {
-    request({ appId, currentPage: 1, pageSize: 4 });
+    fetchData(appId);
   }, [appId]);
 
   useEffect(() => {
-    setTaskList(get(data, 'result', []));
+    if (isEmpty(data)) return;
+    const result = get(data, 'result', []);
+    setTaskList(result);
     setTotalCount(get(data, 'totalCount', 0));
+    const deployList = filter(result, (item: any) => pollingStatus.includes(item.status));
+    if (result.length === 0 || deployList.length === 0) {
+      cancel();
+    }
   }, [data]);
 
-  useEffect(() => {
-    const notDeployList = filter(taskList, (item: any) => isHideStatus.includes(item.status));
-    if (!isEmpty(notDeployList) && !taskListInterval) {
-      refreshCallback && refreshCallback();
-      setIsLoops(true);
-      loopsTaskList();
-    }
-  }, [taskList]);
+  const handleRefresh = async () => {
+    setLoading(true);
+    await refreshCallback();
+    await refresh();
+    setLoading(false);
+  };
 
-  const loopsTaskList = () => {
-    if (taskListInterval) clearInterval(taskListInterval);
-    taskListInterval = setInterval(async () => {
-      const { result } = await getTaskList({ appId, currentPage: 1, pageSize: 4 });
-      const notDeployList = filter(result, (item: any) => isHideStatus.includes(item.status));
-      if (isEmpty(notDeployList)) {
-        clearInterval(taskListInterval);
-        taskListInterval = null;
-        refreshCallback && refreshCallback();
-        setIsLoops(false);
-      }
-      setTaskList(result);
-    }, 5000);
+  const getDeploying = () => {
+    if (isEmpty(taskList)) return true;
+    const deployList = filter(taskList, (item: any) => pollingStatus.includes(item.status));
+    return deployList.length > 0;
   };
 
   return (
@@ -81,20 +74,21 @@ const CommitList = (props: Props) => {
       <div className="flex-r mt-8" style={{ justifyContent: 'space-between' }}>
         <div>
           <Redeploy
-            disabled={isEmpty(taskList) || isLoops}
-            taskId={get(application, 'latest_task.taskId', '') as string}
+            disabled={getDeploying()}
+            taskId={latestTaskId as string}
             appId={appId}
             repoName={get(application, 'repo_name', '') as string}
-            refreshCallback={refresh}
+            refreshCallback={handleRefresh}
           />
           <Rollback
-            disabled={isEmpty(taskList) || isLoops}
+            disabled={getDeploying()}
             appId={appId}
-            refreshCallback={refresh}
+            envName={envName}
+            refreshCallback={handleRefresh}
             application={application}
           />
           <Button
-            className='mr-8 ml-8'
+            className="mr-8 ml-8"
             disabled={!(taskList && taskList.length > 0)}
             onClick={() => setVisible(true)}
           >
@@ -102,7 +96,7 @@ const CommitList = (props: Props) => {
           </Button>
           {!!totalCount && <span>共{totalCount}个部署版本</span>}
         </div>
-        <RefreshButton refreshCallback={refresh} />
+        <RefreshButton refreshCallback={handleRefresh} />
       </div>
       {taskList && taskList.length > 0 ? (
         <>
@@ -116,43 +110,43 @@ const CommitList = (props: Props) => {
               return (
                 <Col span="6">
                   <div className="deploy-item mb-8">
-                    <div className='flex-r'>
-                      <div className='copy-trigger flex-r' style={{ justifyContent: 'flex-start' }}>
+                    <div className="flex-r">
+                      <div className="copy-trigger flex-r" style={{ justifyContent: 'flex-start' }}>
                         <Link
                           className="commit-description text-nowrap-1 mr-8"
-                          to={`/application/${appId}/detail/${taskId}`}
+                          to={`/application/${appId}/detail/${envName}/${taskId}`}
                         >
                           {taskId}
                         </Link>
                         <CopyIcon content={taskId} size="xs" />
                       </div>
 
-                      {
-                        !isLoops && latestTaskId === taskId && (
-                          <Tag color="orange" size="small" style={{ fontStyle: 'italic' }}>
-                            Latest
-                          </Tag>
-                        )
-                      }
+                      {!getDeploying() && latestTaskId === taskId && (
+                        <Tag color="orange" size="small" style={{ fontStyle: 'italic' }}>
+                          Latest
+                        </Tag>
+                      )}
                     </div>
 
                     <div style={{ fontSize: 12, marginBottom: 5 }}>
-                      <div className='text-nowrap-1'>{message}</div>
+                      <div className="text-nowrap-1">{message}</div>
                       <span style={{ color: '#888', lineHeight: 2 }}>{updatedTime}</span>
                     </div>
                     <div className="flex-r">
                       <Status status={status} />
-                      {!isHideStatus.includes(status) ? (
-                        <DeleteCommit
-                          appId={appId}
-                          taskId={taskId}
-                          updatedTime={updatedTime}
-                          refreshCallback={refresh}
-                        />
+                      {!pollingStatus.includes(status) ? (
+                        latestTaskId !== taskId && (
+                          <DeleteCommit
+                            appId={appId}
+                            taskId={taskId}
+                            updatedTime={updatedTime}
+                            refreshCallback={refresh}
+                          />
+                        )
                       ) : (
                         <CancelDeploy
                           isText
-                          taskId={get(application, 'latest_task.taskId', '') as string}
+                          taskId={latestTaskId as string}
                           appId={appId}
                           repoName={get(application, 'repo_name', '') as string}
                           refreshCallback={refresh}
@@ -171,7 +165,7 @@ const CommitList = (props: Props) => {
             visible={visible}
             onClose={() => setVisible(false)}
           >
-            <CommitTable appId={appId} latestTaskId={latestTaskId} />
+            <CommitTable appId={appId} latestTaskId={latestTaskId} envName={envName} />
           </Drawer>
         </>
       ) : (
