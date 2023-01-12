@@ -27,7 +27,7 @@ router.post("/signUp", async function (req, res) {
       password: md5Encrypt(password),
     }
   );
-  req.userId = userId.id;
+  req.userId = id;
   const token = await jwt.sign({ userId: id, exp: SESSION_EXPIRATION_EXP }, COOKIE_SECRET);
   res.cookie('jwt', token, { maxAge: SESSION_EXPIRATION, httpOnly: true });
   return res.json(Result.ofSuccess());
