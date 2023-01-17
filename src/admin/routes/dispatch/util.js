@@ -11,11 +11,9 @@ module.exports = {
     try {
       asyncInvokeRes = await asyncInvoke(payload);
     } catch (ex) {
-      console.log(`invoke worker function error: ${ex}. Retry`);
       asyncInvokeRes = await asyncInvoke(payload);
     }
 
-    console.log('asyncInvokeRes:: ', asyncInvokeRes);
     res.json(
       Result.ofSuccess({
         'x-fc-request-id': _.get(asyncInvokeRes, 'headers[x-fc-request-id]'),

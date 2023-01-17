@@ -21,4 +21,5 @@ module.exports = class Client {
       timeout: 60 * 1000,
     })
   }
+
 }

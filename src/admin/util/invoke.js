@@ -3,7 +3,6 @@ const Client = require('./client');
 const { region, serviceName, functionName } = FC.workerFunction;
 
 async function asyncInvoke(payload) {
-  console.log('gen task id is: ', payload.taskId);
   return await Client.fc(region).invokeFunction(
     serviceName,
     functionName,
@@ -17,7 +16,6 @@ async function asyncInvoke(payload) {
 }
 
 async function stopStatefulAsyncInvocations(statefulAsyncInvocationId) {
-  console.log('stateful async invocation id(task id) is: ', statefulAsyncInvocationId);
   const path = `/services/${serviceName}/functions/${functionName}/stateful-async-invocations/${statefulAsyncInvocationId}`;
   return await Client.fc(region).put(path);
 }

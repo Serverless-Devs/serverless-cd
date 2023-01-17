@@ -3,15 +3,14 @@ const gitProvider = require('@serverless-cd/git-provider');
 const { lodash: _ } = require('@serverless-cd/core');
 const { Result, ValidationError, NoPermissionError } = require('../../util');
 const { stopStatefulAsyncInvocations } = require('../../util/invoke');
-const { OTS_APPLICATION, OTS_USER, OTS_TASK } = require('../../config');
+const { OTS_APPLICATION, OTS_TASK } = require('../../config');
 const appOrm = require('../../util/orm')(OTS_APPLICATION.name, OTS_APPLICATION.index);
-const userOrm = require('../../util/orm')(OTS_USER.name, OTS_USER.index);
 const taskOrm = require('../../util/orm')(OTS_TASK.name, OTS_TASK.index);
+const accountModel = require('../../model/account.mode');
 const { invokWorker } = require('./util');
 
 // 手动部署
 router.post('/manual', async function (req, res) {
-  console.log('disaptch manual req.body', JSON.stringify(req.body));
   const { appId, commitId, ref, message, inputs } = req.body;
   if (_.isEmpty(appId)) {
     throw new ValidationError('appId 必填');
@@ -29,15 +28,12 @@ router.post('/manual', async function (req, res) {
     throw new ValidationError('无权操作此应用');
   }
 
-  console.log('find provider access token');
-  const userResult = await userOrm.findByPrimary([{ id: userId }]);
+  const userResult = await accountModel.getUserById(userId);
   const providerToken = _.get(userResult, `third_part.${provider}.access_token`, '');
   if (_.isEmpty(providerToken)) {
     throw new ValidationError(`Provider access token not found`);
   }
-  console.log('find provider access token end');
 
-  console.log('get commit config');
   let commit = commitId;
   let msg = message || '';
   if (!commit) {
@@ -56,8 +52,6 @@ router.post('/manual', async function (req, res) {
       throw new ValidationError(`获取 ${provider} 信息失败: ${ex}`);
     }
   }
-  console.log('get commit config end');
-
   const payload = {
     provider,
     cloneUrl: repo_url,
@@ -76,14 +70,11 @@ router.post('/manual', async function (req, res) {
     customInputs: inputs,
   };
 
-  console.log('invoke payload: ', payload);
-
   invokWorker(payload, res);
 });
 
 //  重新 / 回滚
 router.post('/redeploy', async function (req, res) {
-  console.log('disaptch redeploy req.body', JSON.stringify(req.body));
   const { taskId, appId } = req.body;
   if (_.isEmpty(taskId)) {
     throw new ValidationError('taskId 必填');
@@ -113,15 +104,12 @@ router.post('/redeploy', async function (req, res) {
 
   trigger_payload.environment = { ...environment, ...trigger_payload.environment };
 
-  console.log('invoke payload: ', trigger_payload);
-
   trigger_payload.redelivery = taskId;
   await invokWorker(trigger_payload, res);
 });
 
 // 取消部署
 router.post('/cancel', async function (req, res) {
-  console.log('disaptch cancel req.body', JSON.stringify(req.body));
   const { taskId } = req.body;
   if (_.isEmpty(taskId)) {
     throw new ValidationError('taskId 必填');
@@ -139,7 +127,6 @@ router.post('/cancel', async function (req, res) {
   try {
     await stopStatefulAsyncInvocations(taskId);
   } catch (e) {
-    console.log('cancel task error: ', e);
     if (e.code === 412) {
       throw new ValidationError('任务运行已经被停止');
     }
