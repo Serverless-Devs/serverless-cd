@@ -1,29 +1,39 @@
 const router = require('express').Router();
-const { Result } = require('../util');
 const { CD_PIPLINE_YAML } = require('../config');
-const { ValidationError, NotFoundError } = require('../util/custom-errors');
 
 router.get('/', function (req, res, next) {
   res.render('index', { CD_PIPLINE_YAML });
 });
 
-router.use('/flow/application', require('./application'));
-router.use('/flow/task', require('./task'));
-router.use('/flow/dispatch', require('./dispatch'));
-
-router.use('/github', require('./github'));
-router.use('/auth', require('./auth'));
-router.use('/user', require('./user'));
-router.use('/tokens', require('./tokens'));
-router.use('/proxy', require('./proxy'));
-
-router.use(function (err, _req, res, next) {
-  if (err.name === ValidationError.name) {
-    return res.json(Result.ofError(err.message, ValidationError));
-  } else if (err.name === NotFoundError.name) {
-    return res.json(Result.ofError(err.message, NotFoundError));
+const defaultRoutes = [
+  {
+    path: '/auth',
+    route: require('./auth'),
+  },
+  {
+    path: '/tokens',
+    route: require('./tokens'),
+  },
+  {
+    path: '/github',
+    route: require('./github'),
+  },
+  {
+    path: '/application',
+    route: require('./application'),
+  },
+  {
+    path: '/task',
+    route: require('./task'),
+  },
+  {
+    path: '/deploy',
+    route: require('./dispatch'),
   }
-  return res.json(Result.ofError(err.message));
+]
+
+defaultRoutes.forEach((route) => {
+  router.use(route.path, route.route);
 });
 
 module.exports = router;

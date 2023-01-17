@@ -14,8 +14,6 @@ module.exports = async function (req, res, next) {
     }
     // 记录登陆token时间
     await updateActiveToken(data.id);
-
-    console.log('req.headers.cd_token:: ', req.headers.cd_token);
     req.userId = data.user_id;
     next();
   } else{

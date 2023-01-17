@@ -27,9 +27,6 @@ router.get('/list', async function (req, res) {
   if (_.isEmpty(envName)) {
     throw new ValidationError('envName is empty');
   }
-  console.log(
-    `task list userId: ${userId}, envName: ${envName}, query: ${JSON.stringify(req.query)}`,
-  );
   const params = {
     user_id: userId,
     app_id: appId,
@@ -38,9 +35,7 @@ router.get('/list', async function (req, res) {
     currentPage: Number(currentPage),
     pageSize: Number(pageSize),
   };
-  console.log('task list request params:', params);
   const taskList = await model.find(params);
-  console.log('taskList::', taskList);
   return res.json(
     Result.ofSuccess({
       ...taskList,
@@ -55,7 +50,6 @@ router.get('/get', async function (req, res) {
   if (_.isEmpty(taskId)) {
     throw new ValidationError('TaskId is empty');
   }
-  console.log(`task get userId: ${userId}, query: ${JSON.stringify(req.query)}`);
   const taskConfig = await model.findOne(taskId);
   res.json(Result.ofSuccess(getTaskConfig(taskConfig)));
 });
@@ -66,9 +60,7 @@ router.post('/remove', async function (req, res) {
   if (_.isEmpty(taskId)) {
     throw new ValidationError('TaskId is empty');
   }
-  console.log(`task delete userId: ${userId}, body: ${JSON.stringify(req.body)}`);
   const removeResult = await model.remove(taskId);
-  console.log('task remove response', removeResult);
   res.json(Result.ofSuccess());
 });
 
