@@ -10,4 +10,4 @@ module.exports = function (req, res, next) {
     debug('通过 token 进行鉴权: ', req.headers.cd_token);
     next();
   }
-}
+};

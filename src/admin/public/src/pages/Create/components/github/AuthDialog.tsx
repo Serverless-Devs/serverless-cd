@@ -149,7 +149,7 @@ const AuthDialog = (props: IProps) => {
 
   return (
     <>
-      <div className='flex-r position-r'>
+      <div className="flex-r position-r">
         <Select
           className="full-width"
           placeholder="请选择"

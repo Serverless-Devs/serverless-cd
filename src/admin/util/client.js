@@ -1,6 +1,6 @@
 const OssClient = require('ali-oss');
 const Fc = require('@alicloud/fc2');
-const { CREDENTIALS, OSS_CONFIG } = require("../config");
+const { CREDENTIALS, OSS_CONFIG } = require('../config/config');
 
 module.exports = class Client {
   static oss() {
@@ -10,7 +10,7 @@ module.exports = class Client {
       bucket: OSS_CONFIG.bucket,
       region: OSS_CONFIG.region,
       timeout: `${1 * 60 * 1000}`, // min
-    })
+    });
   }
 
   static fc(region) {
@@ -19,7 +19,6 @@ module.exports = class Client {
       accessKeySecret: CREDENTIALS.accessKeySecret,
       region,
       timeout: 60 * 1000,
-    })
+    });
   }
-
-}
+};

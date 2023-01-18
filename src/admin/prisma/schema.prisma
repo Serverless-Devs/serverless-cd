@@ -23,23 +23,23 @@ model User {
 model Org {
   id    String     @id
   user_id String
-  role String
-  name String
+  name String             // username
+  role String             // owner / member
   description String?
 }
 
 model Application {
-    id String @id
-    org_id String
-    description String?
-    owner String
-    provider String
-    environment String
-    provider_repo_id String
-    repo_name String
-    repo_url String
-    latest_task String?
-    webhook_secret String?
-    created_time DateTime  @default(now())
-    updated_time DateTime  @updatedAt
+  id String @id
+  org_id String
+  description String?
+  owner String
+  provider String
+  environment String
+  provider_repo_id String
+  repo_name String
+  repo_url String
+  latest_task String?
+  webhook_secret String?
+  created_time DateTime  @default(now())
+  updated_time DateTime  @updatedAt
 }

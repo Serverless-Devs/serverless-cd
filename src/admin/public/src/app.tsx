@@ -34,7 +34,7 @@ const appConfig: IAppConfig = {
   },
   router: {
     type: 'browser',
-    fallback: <div></div>
+    fallback: <div></div>,
   },
 };
 

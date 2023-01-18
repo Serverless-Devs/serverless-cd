@@ -137,7 +137,7 @@ const Tokens = () => {
         columns={columns(request)}
       ></Table>
 
-      <Dialog size='small' title="创建Token" footer={false} visible={visible} onClose={onClose}>
+      <Dialog size="small" title="创建Token" footer={false} visible={visible} onClose={onClose}>
         <Message type="notice" className="dialog-message">
           个人访问令牌的功能与普通OAuth访问令牌类似。它们可以用来代替HTTPS上的Git的密码，也可以用来通过基本身份验证对API进行身份验证。
         </Message>
@@ -176,7 +176,7 @@ const Tokens = () => {
       </Dialog>
 
       <Dialog
-        size='small'
+        size="small"
         title="生成Token"
         footer={[<Button onClick={() => setGenerateVisble(false)}>取消</Button>]}
         visible={generateVisble}
@@ -190,7 +190,6 @@ const Tokens = () => {
           <CopyIcon content={token} />
         </div>
       </Dialog>
-
     </PageLayout>
   );
 };

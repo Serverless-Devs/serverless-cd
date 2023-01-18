@@ -1,4 +1,4 @@
-const { FC } = require('../config');
+const { FC } = require('../config/config');
 const Client = require('./client');
 const { region, serviceName, functionName } = FC.workerFunction;
 

@@ -11,4 +11,3 @@ async function find(params = {}) {
 module.exports = {
   find,
 };
-

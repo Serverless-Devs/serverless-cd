@@ -1,12 +1,11 @@
-const {lodash: _} = require('@serverless-cd/core');
+const { lodash: _ } = require('@serverless-cd/core');
 
 const getCode = (arg) => {
-  if(_.isObject(arg)) {
-    return arg.code
+  if (_.isObject(arg)) {
+    return arg.code;
   } else {
     return arg;
   }
-
 };
 
 class Result {
@@ -27,4 +26,3 @@ class Result {
 }
 
 module.exports = Result;
-

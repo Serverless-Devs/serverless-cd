@@ -28,4 +28,4 @@ async function update(appId, params = {}) {
 
 module.exports = {
   update,
-}
+};

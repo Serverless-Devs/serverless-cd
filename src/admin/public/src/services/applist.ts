@@ -17,12 +17,10 @@ export const applicationDetail = async (params) => {
 
 export const deleteApp = async (params) => {
   return await request.delete('/api/application/delete', {
-    params
+    params,
   });
 };
 
 export const updateApp = async (body) => {
   return await request.post('/api/application/update', body);
 };
-
-

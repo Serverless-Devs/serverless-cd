@@ -3,7 +3,6 @@ import { Button, Box } from '@alicloud/console-components';
 import { useRequest, Link } from 'ice';
 import { githubAuth } from '@/services/auth';
 import { get, map } from 'lodash';
-// import { LOGO_URL } from '@/constants/public';
 import { C_REPOSITORY } from '@/constants/repository';
 import { Toast } from '@/components/ToastContainer';
 import './index.css';
@@ -39,7 +38,7 @@ const LoginorsignupBase = (props: any) => {
     try {
       const { data } = await request();
       window.location.href = data;
-      setPlatformBtn(changeLoading(type, false))
+      setPlatformBtn(changeLoading(type, false));
     } catch (error) {
       setPlatformBtn(changeLoading(type, false));
     }
@@ -95,7 +94,9 @@ const LoginorsignupBase = (props: any) => {
           );
         })}
       </Box>
-      <Link to="/signUp" style={{ textDecoration: 'underline' }}>没有账号？ 去注册</Link>
+      <Link to="/signUp" style={{ textDecoration: 'underline' }}>
+        没有账号？ 去注册
+      </Link>
     </div>
   );
 };

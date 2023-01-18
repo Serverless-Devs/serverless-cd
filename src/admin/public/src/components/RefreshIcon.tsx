@@ -16,12 +16,11 @@ const RefreshButton = (props: Props) => {
 
   return (
     <div className="refresh-icon" style={style}>
-      {
-        loading ? (<Icon type="loading" size='xs' />
-        ) : (
-          <Icon type="redo" size='xs' className="cursor-pointer" onClick={onRefresh} />
-        )
-      }
+      {loading ? (
+        <Icon type="loading" size="xs" />
+      ) : (
+        <Icon type="redo" size="xs" className="cursor-pointer" onClick={onRefresh} />
+      )}
     </div>
   );
 };

@@ -1,0 +1,23 @@
+{
+  "name": "serverless-cd",
+  "version": "1.0.0",
+  "description": "<description>",
+  "main": "prettier.config.js",
+  "scripts": {
+    "prettier": "prettier --write . && prettier --check .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wss-org/serverless-cd.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://github.com/wss-org/serverless-cd#readme",
+  "devDependencies": {
+    "husky": "^8.0.3",
+    "lint-staged": "^13.1.0",
+    "pretty-quick": "^3.1.3"
+  }
+}

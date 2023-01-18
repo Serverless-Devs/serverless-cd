@@ -25,4 +25,4 @@ async function find(id) {
 module.exports = {
   make,
   find,
-}
+};
