@@ -17,12 +17,14 @@
 <body>
   <div id="ice-container"></div>
   <script>
-    var SUPPORT_LOGIN = {
-      account: true,
-      // github: true,
-      github: false,
-    };
-    var CD_PIPLINE_YAML = 'serverless-pipeline.yaml';
+    var CONFIG = {
+      SUPPORT_LOGIN: {
+        account: true,
+        // github: true,
+        github: false,
+      },
+      CD_PIPLINE_YAML: 'serverless-pipeline.yaml'
+    }
     if (window && !window.global) {
       window.global = window;
     }

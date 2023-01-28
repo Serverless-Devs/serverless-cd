@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { GITHUB } = require('../../config/config');
 const { Result } = require('../../util');
 
-router.get('/github', (req, res) => {
+router.get('/github', (_req, res) => {
   const authorize_uri = 'https://github.com/login/oauth/authorize';
   const redirect_uri = GITHUB.redirectUrl;
   res.json(

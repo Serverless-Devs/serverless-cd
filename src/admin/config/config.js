@@ -39,10 +39,9 @@ module.exports = {
   SESSION_EXPIRATION: SESSION_EXPIRATION || 7 * 24 * 60 * 60 * 1000,
   CODE_DIR: DOWNLOAD_CODE_DIR,
   GITHUB: {
-    webhook: WEBHOOKURL,
     clientId: GITHUB_CLIENT_ID,
     secret: GITHUB_CLIENT_SECRET,
-    redirectUrl: GITHUB_REDIRECT_URI,
+    redirectUrl: `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_REDIRECT_URI}`
   },
   WEBHOOKURL,
   CREDENTIALS: {

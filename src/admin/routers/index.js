@@ -1,8 +1,13 @@
 const router = require('express').Router();
-const { CD_PIPLINE_YAML, SUPPORT_LOGIN } = require('../config/config');
+const { CD_PIPLINE_YAML, SUPPORT_LOGIN, GITHUB } = require('../config/config');
 
 router.get('/', function (_req, res, _next) {
-  res.render('index', { CD_PIPLINE_YAML, SUPPORT_LOGIN });
+  const config = {
+    CD_PIPLINE_YAML,
+    SUPPORT_LOGIN,
+    REDIRECT_URL: GITHUB.redirectUrl,
+  };
+  res.render('index', { CONFIG: config });
 });
 
 const defaultRoutes = [

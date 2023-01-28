@@ -2,7 +2,7 @@ const router = require('express').Router();
 const axios = require('axios');
 const { GITHUB } = require('../../config/config');
 const _ = require('lodash');
-const { md5Encrypt, ValidationError, Result, unionid, githubRequest } = require('../../util');
+const { md5Encrypt, ValidationError, Result, githubRequest } = require('../../util');
 const userModel = require('../../models/account.mode');
 
 router.get('/github', async (req, res) => {
@@ -57,6 +57,7 @@ router.get('/github', async (req, res) => {
   );
 });
 
+// TODO: 
 router.post('/bindingAccount', async function (req, res, next) {
   const {
     providerInfo: { providerId, login_token, avatar, name },

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Link, history } from 'ice';
 import { Button, Box, Field } from '@alicloud/console-components';
 import AccountForm from '../AccountForm';
+import { getConsoleConfig } from '@/utils';
 
 const PAGE_CONFIG = {
   login: {
@@ -22,7 +23,7 @@ const PAGE_CONFIG = {
   },
 };
 
-const supportLoginTypes = (window as any).SUPPORT_LOGIN;
+const supportLoginTypes = getConsoleConfig('SUPPORT_LOGIN', {});
 
 interface Props {
   pageType: string;

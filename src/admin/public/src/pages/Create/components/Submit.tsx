@@ -6,7 +6,7 @@ import { checkFile, githubPutFile } from '@/services/git';
 import { useRequest, history } from 'ice';
 import { CREATE_TYPE, SERVERLESS_PIPELINE_CONTENT } from './constant';
 import { get, each, map, every, find, uniqWith, isEqual, isEmpty } from 'lodash';
-import { sleep } from '@/utils';
+import { getConsoleConfig, sleep } from '@/utils';
 import { Toast } from '@/components/ToastContainer';
 import CodeMirror from '@/components/CodeMirror';
 import yaml from 'js-yaml';
@@ -23,7 +23,7 @@ interface IStepItem {
 }
 
 const Submit = (props: IProps) => {
-  const CD_PIPLINE_YAML = get(window, 'CD_PIPLINE_YAML', 'serverless-pipeline.yaml');
+  const CD_PIPLINE_YAML = getConsoleConfig('CD_PIPLINE_YAML', 'serverless-pipeline.yaml');
   const { loading, request } = useRequest(createApp);
   const manualDeploy = useRequest(manualDeployApp);
   const field = Field.useField();

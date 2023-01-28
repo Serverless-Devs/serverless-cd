@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button, Box } from '@alicloud/console-components';
-import { useRequest, Link } from 'ice';
-import { githubAuth } from '@/services/auth';
+import { Link } from 'ice';
 import { get, map } from 'lodash';
 import { C_REPOSITORY } from '@/constants/repository';
-import { Toast } from '@/components/ToastContainer';
 import './index.css';
+import { getConsoleConfig } from '@/utils';
 
 const loginBtnConfigs = [
   {
@@ -27,21 +26,11 @@ const loginBtnConfigs = [
 const LoginorsignupBase = (props: any) => {
   const { setIsLogin } = props;
   const [platformBtn, setPlatformBtn] = useState<any[]>(loginBtnConfigs);
-  const { request, error } = useRequest(githubAuth);
-
-  useEffect(() => {
-    error && Toast.error(error.message);
-  }, [error]);
 
   const githubLoginClick = async (type) => {
     setPlatformBtn(changeLoading(type, true));
-    try {
-      const { data } = await request();
-      window.location.href = data;
-      setPlatformBtn(changeLoading(type, false));
-    } catch (error) {
-      setPlatformBtn(changeLoading(type, false));
-    }
+    window.location.href = getConsoleConfig('REDIRECT_URL', '');
+    setPlatformBtn(changeLoading(type, false));
   };
 
   const accountLoginClick = async () => {

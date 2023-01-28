@@ -1,9 +1,5 @@
 import { request } from 'ice';
 
-export const githubAuth = async () => {
-  return await request.get('/api/auth/url/github');
-};
-
 export const accountLogin = async (body) => {
   return await request.post('/api/auth/account/login', body);
 };

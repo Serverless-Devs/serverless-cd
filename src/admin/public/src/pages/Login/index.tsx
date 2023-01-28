@@ -6,12 +6,12 @@ import { LOGIN_LOGO_URL } from '@/constants/public';
 import LoginorsignupBase from '@/pages/components/LoginorsignupBase';
 import AccountLoginOrSignUp from '@/pages/components/AccountLoginOrSignUp';
 import { accountLogin } from '@/services/auth';
-import { getParams } from '@/utils';
+import { getConsoleConfig, getParams } from '@/utils';
 import '@/pages/components/LoginorsignupBase/index.css';
 
-const { github } = get(window, 'SUPPORT_LOGIN', {} as any);
+const { github } = getConsoleConfig('SUPPORT_LOGIN', {});
 
-const Login = ({ location: { search }}) => {
+const Login = ({ location: { search } }) => {
   const [isLogin, setIsLogin] = useState(false);
   const login = useRequest(accountLogin);
   const showLogin = get(getParams(search), 'type') === 'account';

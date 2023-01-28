@@ -18,8 +18,7 @@
 <body>
   <div id="ice-container"></div>
   <script>
-    var SUPPORT_LOGIN = JSON.parse(decodeURI(`<%- encodeURI(JSON.stringify(SUPPORT_LOGIN)) %>`))
-    var CD_PIPLINE_YAML = "<%=CD_PIPLINE_YAML%>"
+    var CONFIG = JSON.parse(decodeURI(`<%- encodeURI(JSON.stringify(CONFIG)) %>`));
     if (window && !window.global) {
       window.global = window;
     }
