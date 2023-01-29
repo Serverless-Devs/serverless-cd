@@ -17,14 +17,14 @@ model User {
   password String?
   secrets String?
   github_unionid String?
-  third_part String?
+  third_part String?  @db.Text
 }
 
 model Org {
   id    String     @id
   user_id String
   name String             // username
-  role String             // owner / member
+  role String             // owner / admin / member
   description String?
 }
 
@@ -34,12 +34,23 @@ model Application {
   description String?
   owner String
   provider String
-  environment String
+  environment String @db.Text
   provider_repo_id String
   repo_name String
   repo_url String
-  latest_task String?
   webhook_secret String?
+  created_time DateTime  @default(now())
+  updated_time DateTime  @updatedAt
+}
+
+model Task {
+  id String @id
+  env_name String
+  app_id String
+  status String?
+  steps String? @db.Text
+  user_id String?       // 记录谁操作的
+  trigger_payload  String @db.Text
   created_time DateTime  @default(now())
   updated_time DateTime  @updatedAt
 }

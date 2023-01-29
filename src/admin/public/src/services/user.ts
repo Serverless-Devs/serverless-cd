@@ -1,17 +1,12 @@
 import { request } from 'ice';
 
-export const loginOut = async () => {
-  const res = await request.post('/api/auth/user/loginout');
-  return res.data;
-};
-
 export const userInfo = async () => {
-  const res = await request.post('/api/auth/user/userInfo');
+  const res = await request.get('/api/user/info');
   return res.data;
 };
 
-export const updateUserInfo = async (params) => {
-  const res = await request.post('/api/auth/user/updateUserProviderToken', {
+export const updateUserProviderToken = async (params) => {
+  const res = await request.put('/api/user/token', {
     data: params,
   });
   return res.data;

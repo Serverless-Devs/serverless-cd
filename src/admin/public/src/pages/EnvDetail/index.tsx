@@ -6,7 +6,7 @@ import CommitList from './components/CommitList';
 import BasicInfoDetail from './components/BasicInfoDetail';
 import { applicationDetail, updateApp } from '@/services/applist';
 import PageInfo from '@/components/PageInfo';
-import { get, isEmpty } from 'lodash';
+import { get, isEmpty, isBoolean } from 'lodash';
 import SecretConfig from './components/SecretCofing';
 import TriggerConfig from './components/TriggerConfig';
 import CreateEnv from './components/CreateEnv';
@@ -50,7 +50,9 @@ const Details = ({
     if (isEmpty(detailInfo)) return;
     if (detailInfo.success) {
       const completed = get(detailInfo, `data.environment.${envName}.latest_task.completed`);
-      completed && cancel();
+      if (!isBoolean(completed) || (isBoolean(completed) && completed)) {
+        cancel();
+      }
     } else {
       cancel();
       const dialog = Dialog.alert({

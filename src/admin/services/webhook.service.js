@@ -1,11 +1,16 @@
 const git = require('@serverless-cd/git-provider');
 const { lodash: _ } = require('@serverless-cd/core');
-const { WEBHOOKURL, WEBHOOK_EVENTS } = require('../../config/config');
+const debug = require('debug')('serverless-cd:webhook');
+
+const { WEBHOOK_URL } = require('../config/env');
+const { WEBHOOK_EVENTS, PROVIDER } = require('../config/constants');
 
 async function add(owner, repo, access_token, secret, appId) {
-  const provider = git('github', { access_token });
+  const provider = git(PROVIDER.GITHUB, { access_token });
   const webhooks = await provider.listWebhook({ owner, repo });
-  const url = `${WEBHOOKURL}?app_id=${appId}`;
+  const url = `${WEBHOOK_URL}?app_id=${appId}`;
+  debug(`webhook url is ${url}`);
+  debug(`webhooks is ${JSON.stringify(webhooks)}`);
   for (const row of webhooks) {
     if (row.url === url) {
       await provider.updateWebhook({
@@ -24,12 +29,14 @@ async function add(owner, repo, access_token, secret, appId) {
 
 async function remove(owner, repo, access_token, appId) {
   try {
-    const provider = git('github', { access_token });
+    const provider = git(PROVIDER.GITHUB, { access_token });
     const webhooks = await provider.listWebhook({ owner, repo });
-    const url = `${WEBHOOKURL}?app_id=${appId}`;
+    const url = `${WEBHOOK_URL}?app_id=${appId}`;
+    debug(`webhook url is ${url}`);
     for (const row of webhooks) {
       if (row.url === url) {
-        await provider.deleteWebhook({ owner, repo, url, hook_id: row.id });
+        debug(`remove webhook: ${JSON.stringify({ owner, repo, hook_id: row.id })}`);
+        await provider.deleteWebhook({ owner, repo, hook_id: row.id });
         return;
       }
     }

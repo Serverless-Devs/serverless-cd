@@ -1,6 +1,6 @@
 const OssClient = require('ali-oss');
 const Fc = require('@alicloud/fc2');
-const { CREDENTIALS, OSS_CONFIG } = require('../config/config');
+const { CREDENTIALS, OSS_CONFIG } = require('../config/env');
 
 module.exports = class Client {
   static oss() {

@@ -31,7 +31,7 @@ app.use('/', require('./routers'));
 
 app.use('/api', jwtAuth, logger, require('./routers'));
 
-// 兼容前端brower history
+// 兼容前端 brower history
 app.use('/*', require('./routers'));
 
 app.use(errorHandler);

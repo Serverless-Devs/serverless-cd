@@ -1,30 +1,29 @@
+const { ValidationError } = require('../util/custom-errors');
+
 const {
-  DOWNLOAD_CODE_DIR,
-  CD_PIPLINE_YAML,
+  // 用于支持 github 登陆
   GITHUB_CLIENT_ID,
   GITHUB_CLIENT_SECRET,
   GITHUB_REDIRECT_URI,
+  // 创建 webhook 的回调地址
   WEBHOOKURL,
-  ACCOUNTID,
+  // 用于调用函数计算函数，需要用到的点：重新部署、使用了 OTS
+  ACCOUNTID: ACCOUNT_ID,
   ACCESS_KEY_ID,
   ACCESS_KEY_SECRET,
+  // 查询 Task 存储在 OSS 的日志
   OSS_BUCKET,
-  OTS_INSTANCE_NAME,
-  OTS_TASK_TABLE_NAME,
-  OTS_TASK_INDEX_NAME,
-  OTS_APP_TABLE_NAME,
-  OTS_APP_INDEX_NAME,
-  OTS_TOKEN_TABLE_NAME,
-  OTS_TOKEN_INDEX_NAME,
-  SESSION_EXPIRATION,
-  WORKER_FUNCTION_NAME,
-  SERVICE_NAME,
+  // 函数部署的地区和服务名称
   REGION,
-  COOKIE_SECRET,
+  SERVICE_NAME,
+  // 运行engine的函数名称
+  WORKER_FUNCTION_NAME,
+  // JWT 鉴权 Token
+  COOKIE_SECRET: JWT_SECRET,
 } = process.env;
 
 if (!COOKIE_SECRET) {
-  throw new Error('Environment variable COOKIE_SECRET is not set');
+  throw new ValidationError('未设置环境变量COOKIE_SECRET');
 }
 
 const supportGithubLogin = !(
@@ -35,39 +34,20 @@ const supportGithubLogin = !(
 );
 
 module.exports = {
-  CD_PIPLINE_YAML,
-  SESSION_EXPIRATION: SESSION_EXPIRATION || 7 * 24 * 60 * 60 * 1000,
-  CODE_DIR: DOWNLOAD_CODE_DIR,
   GITHUB: {
     clientId: GITHUB_CLIENT_ID,
     secret: GITHUB_CLIENT_SECRET,
     redirectUrl: `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_REDIRECT_URI}`
   },
-  WEBHOOKURL,
+  WEBHOOK_URL: WEBHOOKURL || `http://${process.env.DOMAIN}`,
   CREDENTIALS: {
-    accountId: ACCOUNTID,
+    accountId: ACCOUNT_ID,
     accessKeyId: ACCESS_KEY_ID,
     accessKeySecret: ACCESS_KEY_SECRET,
   },
   OSS_CONFIG: {
     bucket: OSS_BUCKET,
     region: `oss-${REGION}`,
-  },
-  OTS: {
-    region: REGION,
-    instanceName: OTS_INSTANCE_NAME,
-  },
-  OTS_TASK: {
-    name: OTS_TASK_TABLE_NAME,
-    index: OTS_TASK_INDEX_NAME,
-  },
-  OTS_APPLICATION: {
-    name: OTS_APP_TABLE_NAME,
-    index: OTS_APP_INDEX_NAME,
-  },
-  OTS_TOKEN: {
-    name: OTS_TOKEN_TABLE_NAME,
-    index: OTS_TOKEN_INDEX_NAME,
   },
   FC: {
     workerFunction: {
@@ -80,7 +60,5 @@ module.exports = {
     github: supportGithubLogin,
     account: true,
   },
-  COOKIE_SECRET,
-  WEBHOOK_EVENTS: ['push', 'pull_request'],
-  EXCLUDE_AUTH_URL: ['/auth/account/login', '/auth/account/signUp'],
+  JWT_SECRET,
 };

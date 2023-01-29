@@ -23,7 +23,7 @@ interface IStepItem {
 }
 
 const Submit = (props: IProps) => {
-  const CD_PIPLINE_YAML = getConsoleConfig('CD_PIPLINE_YAML', 'serverless-pipeline.yaml');
+  const CD_PIPELINE_YAML = getConsoleConfig('CD_PIPELINE_YAML', 'serverless-pipeline.yaml');
   const { loading, request } = useRequest(createApp);
   const manualDeploy = useRequest(manualDeployApp);
   const field = Field.useField();
@@ -38,8 +38,8 @@ const Submit = (props: IProps) => {
       await githubPutFile({
         owner: get(values, 'repo.owner'),
         repo: get(values, 'repo.name'),
-        path: CD_PIPLINE_YAML,
-        message: `add ${CD_PIPLINE_YAML} by Serverless CD`,
+        path: CD_PIPELINE_YAML,
+        message: `add ${CD_PIPELINE_YAML} by Serverless CD`,
         content: getValue('yaml'),
         branch: item.branch,
       });
@@ -107,7 +107,7 @@ const Submit = (props: IProps) => {
       const stepData: IStepItem[] = map(branchList, (branch, index) => {
         return {
           key: branch,
-          title: `检查${branch}分支是否存在${CD_PIPLINE_YAML}文件`,
+          title: `检查${branch}分支是否存在${CD_PIPELINE_YAML}文件`,
           status: 'pending',
           current: Number(index),
           branch,
@@ -216,7 +216,7 @@ const Submit = (props: IProps) => {
             {map(errorBranch, (item) => {
               return (
                 <div>
-                  检测到{item.branch}分支不存在{CD_PIPLINE_YAML}文件。
+                  检测到{item.branch}分支不存在{CD_PIPELINE_YAML}文件。
                 </div>
               );
             })}

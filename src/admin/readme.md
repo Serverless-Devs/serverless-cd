@@ -56,3 +56,10 @@ npm run start
 cd public
 npm run start
 ```
+
+## 讨论点
+
+- 一个组织只能拥有一个owner，但是一个用户是多个组织的 owner
+- 用户如果不是组织的`owner`，是不允许授权和取消代码仓库的`token`的。
+- 用户如果不是`管理员权限`是不允许创建应用的。
+- 通过admin项目操作应用，是需要获取的`组织owner`的`用户id`。

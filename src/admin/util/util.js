@@ -94,6 +94,6 @@ module.exports = {
   formatBranch,
   md5Encrypt,
   githubRequest,
-  unionid: customAlphabet(UID_TOKEN, 16),
+  unionId: customAlphabet(UID_TOKEN, 16),
   unionToken: customAlphabet(UID_TOKEN_UPPERCASE, 40),
 };

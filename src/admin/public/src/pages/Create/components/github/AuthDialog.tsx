@@ -2,7 +2,7 @@ import React, { useEffect, useState, ReactNode } from 'react';
 import { Form, Select, Button, Dialog, Input, Field, Message } from '@alicloud/console-components';
 import store from '@/store';
 import { get, noop, find } from 'lodash';
-import { updateUserInfo } from '@/services/user';
+import { updateUserProviderToken } from '@/services/user';
 import { useRequest } from 'ice';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import { Toast } from '@/components/ToastContainer';
@@ -30,7 +30,7 @@ const AuthDialog = (props: IProps) => {
   const { value, onChange = noop, reset = noop } = props;
   const [visible, setVisible] = useState(false);
   const [refreshLoading, setRefreshLoading] = useState(false);
-  const { loading, request } = useRequest(updateUserInfo);
+  const { loading, request } = useRequest(updateUserProviderToken);
   const [userState, userDispatchers] = store.useModel('user');
   const effectsState = store.useModelEffectsState('user');
 

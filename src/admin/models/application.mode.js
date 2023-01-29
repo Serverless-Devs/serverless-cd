@@ -1,7 +1,8 @@
 const _ = require('lodash');
-const { OTS_APPLICATION } = require('../config/config');
-const appOrm = require('../util/orm')(OTS_APPLICATION.name, OTS_APPLICATION.index);
+const { TABLE } = require('../config/constants');
 const { prisma, getModel } = require('../util');
+
+const applicationPrisma = prisma[TABLE.APPLICATION];
 
 const getAppInfo = (result) => {
   if (!result) {
@@ -11,53 +12,22 @@ const getAppInfo = (result) => {
     result = _.first(result);
   }
   result.environment = _.isString(result.environment)
-    ? result.environment
-    : JSON.parse(result.environment);
+    ? JSON.parse(result.environment)
+    : result.environment;
   return result;
 };
 
-const otsModel = {
-  async getAppById(id) {
-    return await appOrm.findByPrimary([{ id }]);
-  },
-  async getAppByProvider({ userId, provider, providerRepoId }) {
-    const application = await appOrm.findOne({
-      user_id: userId,
-      provider,
-      provider_repo_id: providerRepoId,
-    });
-    return getAppInfo(application);
-  },
-  async createApp(params) {
-    const { id, ...apps } = params;
-    return await appOrm.create([{ id }], apps);
-  },
-  async listAppByUserId(userId) {
-    const applicationResult = await appOrm.findAll({
-      user_id: userId,
-      orderKeys: ['updated_time', 'created_time'],
-    });
-    return _.get(applicationResult, 'result', []);
-  },
-  async deleteAppById(appId) {
-    const result = await appOrm.delete([{ id: appId }]);
-    return getAppInfo(result);
-  },
-  async updateAppById(id, params) {
-    const result = await appOrm.update([{ id }], params);
-    return result;
-  },
-};
+const otsModel = {};
 
 const prismaModel = {
   async getAppById(id) {
-    const result = await prisma.application.findUnique({ where: { id } });
+    const result = await applicationPrisma.findUnique({ where: { id } });
     return getAppInfo(result);
   },
-  async getAppByProvider({ userId, provider, providerRepoId }) {
-    const application = await prisma.application.findFirst({
+  async getAppByProvider({ orgId, provider, providerRepoId }) {
+    const application = await applicationPrisma.findFirst({
       where: {
-        user_id: userId,
+        org_id: orgId,
         provider,
         provider_repo_id: providerRepoId,
       },
@@ -65,32 +35,35 @@ const prismaModel = {
     return getAppInfo(application);
   },
   async createApp(data) {
-    return await prisma.application.create({
+    return await applicationPrisma.create({
       data: {
         ...data,
         environment: JSON.stringify(data.environment),
       },
     });
   },
-  async listAppByUserId(userId) {
-    const applicationResult = await prisma.application.findMany({
+  async listAppByOrgId(orgId) {
+    const applicationResult = await applicationPrisma.findMany({
       where: {
-        user_id: userId,
+        org_id: orgId,
       },
       orderBy: {
         updated_time: 'desc',
       },
     });
-    return _.get(applicationResult, 'result', []);
+    return applicationResult;
   },
   async deleteAppById(appId) {
-    const result = await prisma.application.delete({
+    const result = await applicationPrisma.delete({
       where: { id: appId },
     });
     return result;
   },
-  async updateAppById(id, params) {
-    const result = prisma.application.update({ where: { id }, params });
+  async updateAppById(id, data) {
+    if (_.isPlainObject(data.environment)) {
+      data.environment = JSON.stringify(data.environment);
+    }
+    const result = applicationPrisma.update({ where: { id }, data });
     return result;
   },
 };

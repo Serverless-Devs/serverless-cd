@@ -1,4 +1,5 @@
-const { COOKIE_SECRET, EXCLUDE_AUTH_URL } = require('../config/config');
+const { JWT_SECRET } = require('../config/env');
+const { EXCLUDE_AUTH_URL } = require('../config/constants');
 const { lodash: _ } = require('@serverless-cd/core');
 const jwt = require('jsonwebtoken');
 const { NoPermissionError } = require('../util');
@@ -13,12 +14,13 @@ module.exports = async function (req, res, next) {
     const token = _.get(req, 'cookies.jwt');
     if (token) {
       try {
-        const user = await jwt.verify(token, COOKIE_SECRET);
-        if (_.isNil(user.userId)) {
-          next(new NoPermissionError(error.message));
+        const user = await jwt.verify(token, JWT_SECRET);
+        if (_.isNil(user.userId) || _.isNil(user.orgId)) {
+          next(new NoPermissionError('没有用户或者组织信息'));
         }
         debug('verify user:: ', user);
         req.userId = user.userId;
+        req.orgId = user.orgId;
         next();
       } catch (error) {
         next(new NoPermissionError(error.message));
