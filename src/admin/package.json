@@ -10,19 +10,19 @@
   "author": "mamba",
   "license": "ISC",
   "dependencies": {
-    "@alicloud/fc2": "^2.6.3",
     "@prisma/client": "^4.8.1",
+    "@serverless-cd/config": "latest",
     "@serverless-cd/core": "^0.0.2",
     "@serverless-cd/git": "^0.0.2",
     "@serverless-cd/git-provider": "^0.0.7",
     "@serverless-cd/ots-orm": "latest",
+    "@serverless-cd/srm-aliyun-fc2": "^0.0.2",
     "@serverless-devs/core": "^0.1.45",
     "ali-oss": "^6.17.1",
     "axios": "^0.27.2",
     "cookie-parser": "^1.4.6",
     "crypto": "^1.0.1",
     "debug": "^4.3.4",
-    "dotenv": "^16.0.1",
     "ejs": "^3.1.8",
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
@@ -30,8 +30,7 @@
     "nanoid": "^3.3.4",
     "qs": "^6.11.0",
     "rimraf": "^3.0.2",
-    "simple-git": "^3.13.0",
-    "tablestore": "^5.2.1"
+    "simple-git": "^3.13.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.19",

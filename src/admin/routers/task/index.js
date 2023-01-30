@@ -4,7 +4,7 @@ const debug = require('debug')('serverless-cd:task');
 
 const { Result, NoPermissionError, ValidationError } = require('../../util');
 const auth = require('../../middleware/auth');
-const { ADMIN_ROLE_KEYS } = require('../../config/constants');
+const { ADMIN_ROLE_KEYS } = require('@serverless-cd/config');
 const taskService = require('../../services/task.service');
 
 /**

@@ -1,4 +1,4 @@
-const { FC } = require('../config/env');
+const { FC } = require('@serverless-cd/config');
 const Client = require('./client');
 const { region, serviceName, functionName } = FC.workerFunction;
 

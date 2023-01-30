@@ -5,7 +5,7 @@ const git = require('@serverless-cd/git-provider');
 const debug = require('debug')('serverless-cd:provider-github');
 
 const { Result, ValidationError } = require('../../../util');
-const { PROVIDER, ADMIN_ROLE_KEYS, CD_PIPELINE_YAML } = require('../../../config/constants');
+const { PROVIDER, ADMIN_ROLE_KEYS, CD_PIPELINE_YAML } = require('@serverless-cd/config');
 const auth = require('../../../middleware/auth');
 const userService = require('../../../services/user.service');
 const appService = require('../../../services/application.service');
