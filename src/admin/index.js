@@ -1,10 +1,5 @@
 const path = require('path');
-const fs = require('fs');
 const debug = require('debug')('serverless-cd:server');
-const envPath = path.join(__dirname, '..', '.env');
-if (fs.existsSync(envPath)) {
-  require('dotenv').config({ path: envPath });
-}
 require('express-async-errors');
 const express = require('express');
 const { lodash: _ } = require('@serverless-cd/core');

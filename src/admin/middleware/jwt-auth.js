@@ -1,5 +1,4 @@
-const { JWT_SECRET } = require('../config/env');
-const { EXCLUDE_AUTH_URL } = require('../config/constants');
+const { JWT_SECRET, EXCLUDE_AUTH_URL } = require('@serverless-cd/config');
 const { lodash: _ } = require('@serverless-cd/core');
 const jwt = require('jsonwebtoken');
 const { NoPermissionError } = require('../util');

@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const { TABLE } = require('../config/constants');
+const { TABLE } = require('@serverless-cd/config');
 const { prisma, getModel } = require('../util');
 
 const applicationPrisma = prisma[TABLE.APPLICATION];
