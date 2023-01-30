@@ -8,8 +8,8 @@ export const githubOrgs = () => {
   return request.get('/api/github/orgs');
 };
 
-export const githubOrgRepos= (params) => {
-  return request.get('/api/github/orgRepos', {params});
+export const githubOrgRepos = (params) => {
+  return request.get('/api/github/orgRepos', { params });
 };
 
 export const githubBranches = async (params) => {

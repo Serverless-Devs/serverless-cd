@@ -36,12 +36,12 @@ export default {
       });
       return data;
     },
-    async removeStateInfo () {
+    async removeStateInfo() {
       dispatch.user.update({
         userRepos: [],
         userInfo: {},
-        isAuth: false
+        isAuth: false,
       });
-    }
+    },
   }),
 };

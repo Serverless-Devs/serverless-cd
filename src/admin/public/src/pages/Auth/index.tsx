@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRequest, history, Link } from 'ice';
 import _, { get, isEmpty } from 'lodash';
-import { Avatar, Icon, Field, Button, Loading, } from '@alicloud/console-components';
+import { Avatar, Icon, Field, Button, Loading } from '@alicloud/console-components';
 import { C_REPOSITORY } from '@/constants/repository';
 import { accountBinding, getAuthGithub } from '@/services/auth';
 import AccountForm from '../components/AccountForm';
@@ -81,7 +81,9 @@ const Login = ({ location: { search } }) => {
           >
             {bindingStatus ? '已有帐号？ 点此绑定' : '没有帐号？ 注册一个'}
           </a>
-          <Link to={'/login'} className="mt-10" style={{ display: 'block' }}>更多登录方式</Link>
+          <Link to={'/login'} className="mt-10" style={{ display: 'block' }}>
+            更多登录方式
+          </Link>
         </div>
       )}
     </>

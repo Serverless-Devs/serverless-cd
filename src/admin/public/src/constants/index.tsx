@@ -52,9 +52,8 @@ export const DEPLOY_STATUS = {
   },
   [DEPLOY.RUNNING]: {
     icon: 'loading',
-    label: '部署中'
-  }
+    label: '部署中',
+  },
 };
-
 
 export const pollingStatus = ['pending', 'running'];

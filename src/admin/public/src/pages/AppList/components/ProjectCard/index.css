@@ -5,12 +5,12 @@
   height: 150px;
 }
 .project-card:hover {
-  box-shadow: 0px 0px 15px rgba(0,0,0,.12);
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.12);
   /* border: 1px solid #3600E6; */
   /* transition: all .1s; */
 }
-.project-card  a:hover {
-  color: #209BFA !important;
+.project-card a:hover {
+  color: #209bfa !important;
   text-decoration: underline;
 }
 .project-skip {

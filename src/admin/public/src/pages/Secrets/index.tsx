@@ -18,48 +18,52 @@ const Secrets = () => {
   const secrets = get(globalSecrets.data, 'data.secrets', {});
   const secretsDrawerRef: any = useRef();
   useEffect(() => {
-    globalSecrets.request()
-  }, [])
+    globalSecrets.request();
+  }, []);
 
   useEffect(() => {
     if (!isEmpty(secrets)) {
       setSecretList(formaSecrets(secrets));
     }
-  }, [secrets])
+  }, [secrets]);
 
   const onAddOrCompileSecret = async (values) => {
-    let secretsParams = {}
+    let secretsParams = {};
     forEach(values || [], ({ key, value }) => {
-      secretsParams[key] = value
-    })
-    const { success } = await request({ secrets: secretsParams, isAdd: isAddSecret })
+      secretsParams[key] = value;
+    });
+    const { success } = await request({ secrets: secretsParams, isAdd: isAddSecret });
     if (success) {
       Toast.success('配置成功');
       secretsDrawerRef?.current?.closeDrawer();
-      globalSecrets.request()
+      globalSecrets.request();
     }
-  }
+  };
 
   const showDrawer = (triggerType) => {
     setIsAddSecret(triggerType);
     if (!triggerType) secretsDrawerRef?.current?.setValue('secrets', secretList);
     secretsDrawerRef?.current?.setVisible(true);
-  }
+  };
 
   const formaSecrets = (secrets) => {
     return map(keys(secrets), (key) => {
       return {
         key,
         value: secrets[key],
-        showPassword: false
-      }
-    })
-  }
+        showPassword: false,
+      };
+    });
+  };
 
   return (
     <PageLayout
       title="Secrets"
-      breadcrumbExtra={<Button type="primary" onClick={() => showDrawer(true)}>新增Secret</Button>}
+      breadcrumbExtra={
+        <Button type="primary" onClick={() => showDrawer(true)}>
+          新增Secret
+        </Button>
+      }
       breadcrumbs={[
         {
           name: '设置',
@@ -71,13 +75,18 @@ const Secrets = () => {
     >
       <PageInfo
         title="密钥配置"
-        extra={<Button type="primary" text onClick={() => showDrawer(false)}>编辑</Button>}
-        endExtra={<Copy content={JSON.stringify(secrets)} type="button" text='复制全部密钥' />}
+        extra={
+          <Button type="primary" text onClick={() => showDrawer(false)}>
+            编辑
+          </Button>
+        }
+        endExtra={<Copy content={JSON.stringify(secrets)} type="button" text="复制全部密钥" />}
       >
         <SecretTable
           secretList={secretList}
           loading={globalSecrets.loading}
-          setSecretList={setSecretList} />
+          setSecretList={setSecretList}
+        />
       </PageInfo>
       <SecretDrawer
         title={isAddSecret ? '新增Secrets' : '编辑Secrets'}
@@ -88,6 +97,6 @@ const Secrets = () => {
       />
     </PageLayout>
   );
-}
+};
 
-export default Secrets
+export default Secrets;

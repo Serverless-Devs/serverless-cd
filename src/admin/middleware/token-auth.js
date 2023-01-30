@@ -16,7 +16,7 @@ module.exports = async function (req, res, next) {
     await updateActiveToken(data.id);
     req.userId = data.user_id;
     next();
-  } else{
+  } else {
     next();
   }
 };

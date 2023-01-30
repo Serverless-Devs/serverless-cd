@@ -1,14 +1,14 @@
 import React, { memo } from 'react';
 import ExternalLink from './ExternalLink';
 import { Balloon } from '@alicloud/console-components';
-const Tooltip = Balloon.Tooltip
+const Tooltip = Balloon.Tooltip;
 interface Props {
   url: string;
   label: string;
   icon: boolean;
   className?: string;
   message?: string;
-};
+}
 const CommitId = ({ url, label, icon = false, className, message }: Props) => {
   return (
     <ExternalLink

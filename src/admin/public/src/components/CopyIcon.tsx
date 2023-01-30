@@ -19,15 +19,13 @@ const CopyIcon = ({ content, size = 'medium', type = 'icon', text }: Props) => {
         }
       }}
     >
-      {
-        type === 'icon' ? (
-          <Icon type="copy" className="cursor-pointer copy-icon" size={size} />
-        ) : (
-          <Button className='mr-8' type="primary" text>
-            {text}
-          </Button>
-        )
-      }
+      {type === 'icon' ? (
+        <Icon type="copy" className="cursor-pointer copy-icon" size={size} />
+      ) : (
+        <Button className="mr-8" type="primary" text>
+          {text}
+        </Button>
+      )}
     </CopyToClipboard>
   );
 };

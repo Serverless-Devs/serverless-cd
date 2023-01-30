@@ -24,14 +24,14 @@ steps:
       ACCESS_KEY_SECRET: ${{secrets.ACCESS_KEY_SECRET}}
       COOKIE_SECRET: ${{secrets.COOKIE_SECRET}}
   - name: 钉钉成功通知
-    plugin: "@serverless-cd/ding-talk"
+    plugin: '@serverless-cd/ding-talk'
     if: ${{ success() }}
     inputs:
       webhook: https://oapi.dingtalk.com/robot/send?access_token=${{secrets.DING_TALK_TOKEN}}
       msgtype: markdown
       secret: ${{secrets.DING_TALK_SECRET}}
       payload:
-        title: "Serverless CD"
+        title: 'Serverless CD'
         text: |+
           ### [流水线](${{ task.url }})(Serverless CD)-运行成功
           ![image](https://img.alicdn.com/imgextra/i3/O1CN01DJ0QXx1iLPt5nGCBT_!!6000000004396-2-tps-468-57.png)
@@ -42,14 +42,14 @@ steps:
           **commit id**: ${{ git.commit }}
           **commit message**: ${{ git.message }}
   - name: 钉钉失败通知
-    plugin: "@serverless-cd/ding-talk"
+    plugin: '@serverless-cd/ding-talk'
     if: ${{ failure() }}
     inputs:
       webhook: https://oapi.dingtalk.com/robot/send?access_token=${{secrets.DING_TALK_TOKEN}}
       msgtype: markdown
       secret: ${{secrets.DING_TALK_SECRET}}
       payload:
-        title: "Serverless CD"
+        title: 'Serverless CD'
         text: |+
           ### [流水线](${{ task.url }})(Serverless CD)-运行失败
           ![image](https://img.alicdn.com/imgextra/i3/O1CN01DJ0QXx1iLPt5nGCBT_!!6000000004396-2-tps-468-57.png)

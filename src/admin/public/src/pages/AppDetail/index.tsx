@@ -8,7 +8,7 @@ import { applicationDetail, deleteApp } from '@/services/applist';
 import { Toast } from '@/components/ToastContainer';
 import EnvList from './components/EnvList';
 import { sleep } from '@/utils';
-import { get, isEmpty } from 'lodash';
+import { get, isEmpty, isBoolean } from 'lodash';
 
 const Details = ({
   match: {
@@ -48,9 +48,14 @@ const Details = ({
       for (const key in environment) {
         const ele = environment[key];
         const completed = get(ele, 'latest_task.completed');
-        !completed && data.push(completed);
+        if (isBoolean(completed) && !completed) {
+          data.push(completed);
+        }
       }
-      data.length === 0 && cancel();
+
+      if (data.length === 0) {
+        cancel();
+      }
     } else {
       cancel();
       const dialog = Dialog.alert({

@@ -5,7 +5,7 @@ class ValidationError extends Error {
 }
 ValidationError.code = 424;
 
-class NotFoundError extends Error {  
+class NotFoundError extends Error {
   constructor(message) {
     super(message);
   }
@@ -18,7 +18,6 @@ class NoPermissionError extends Error {
   }
 }
 NoPermissionError.code = 401;
-
 
 module.exports = {
   ValidationError,

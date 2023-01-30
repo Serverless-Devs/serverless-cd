@@ -38,5 +38,5 @@ module.exports = {
       serviceName: SERVICE_NAME,
       functionName: WORKER_FUNCTION_NAME,
     },
-  }
-}
+  },
+};
