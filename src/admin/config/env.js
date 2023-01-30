@@ -7,7 +7,7 @@ const {
   GITHUB_REDIRECT_URI,
   // 创建 webhook 的回调地址
   WEBHOOKURL,
-  // 用于调用函数计算函数，需要用到的点：重新部署、使用了 OTS
+  // 用于调用函数计算函数，需要用到的点：重新部署、使用了 OTS、读 TASK
   ACCOUNTID: ACCOUNT_ID,
   ACCESS_KEY_ID,
   ACCESS_KEY_SECRET,
@@ -22,7 +22,7 @@ const {
   COOKIE_SECRET: JWT_SECRET,
 } = process.env;
 
-if (!COOKIE_SECRET) {
+if (!JWT_SECRET) {
   throw new ValidationError('未设置环境变量COOKIE_SECRET');
 }
 

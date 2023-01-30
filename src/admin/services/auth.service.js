@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const debug = require('debug')('serverless-cd:auth');
 const _ = require('lodash');
-const { JWT_SECRET, SESSION_EXPIRATION } = require('../config/env');
+const { JWT_SECRET } = require('../config/env');
 const { ROLE, ADMIN_ROLE_KEYS, SESSION_EXPIRATION } = require('../config/constants');
 const accountModel = require('../models/account.mode');
 const { md5Encrypt, ValidationError } = require('../util');
