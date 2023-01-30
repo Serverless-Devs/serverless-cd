@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const accountModel = require('../models/account.mode');
 
-const { ROLE } = require('../config/constants');
+const { ROLE } = require('@serverless-cd/config');
 const { NoPermissionError, ValidationError } = require('../util');
 
 async function getUserById(userId = '') {

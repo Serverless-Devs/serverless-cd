@@ -1,9 +1,7 @@
 const git = require('@serverless-cd/git-provider');
 const { lodash: _ } = require('@serverless-cd/core');
 const debug = require('debug')('serverless-cd:webhook');
-
-const { WEBHOOK_URL } = require('../config/env');
-const { WEBHOOK_EVENTS, PROVIDER } = require('../config/constants');
+const { WEBHOOK_URL, WEBHOOK_EVENTS, PROVIDER } = require('@serverless-cd/config');
 
 async function add(owner, repo, access_token, secret, appId) {
   const provider = git(PROVIDER.GITHUB, { access_token });

@@ -1,6 +1,5 @@
 const router = require('express').Router();
-const { SUPPORT_LOGIN, GITHUB } = require('../config/env');
-const { CD_PIPELINE_YAML } = require('../config/constants');
+const { CD_PIPELINE_YAML, SUPPORT_LOGIN, GITHUB } = require('@serverless-cd/config');
 
 router.get('/', function (req, res, _next) {
   const config = {

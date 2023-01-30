@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const { ROLE, TABLE } = require('../config/constants');
+const { ROLE, TABLE } = require('@serverless-cd/config');
 const { unionId, md5Encrypt, prisma, getModel } = require('../util');
 
 const orgPrisma = prisma[TABLE.ORG];
