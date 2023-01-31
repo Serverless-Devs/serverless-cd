@@ -15,8 +15,11 @@
     "master"
   ],
   "dependencies": {
+    "@serverless-cd/config": "latest",
     "@serverless-cd/ots-orm": "^1.1.0",
+    "@serverless-cd/srm-aliyun-fc2": "^0.0.2",
     "@serverless-cd/trigger": "^0.0.11",
+    "lodash": "^4.17.21",
     "nanoid": "^3.3.4"
   },
   "author": "mamba",

@@ -1,23 +1,11 @@
-const path = require('path');
-const fs = require('fs');
-const envPath = path.join(__dirname, '..', '.env');
-if (fs.existsSync(envPath)) {
-  require('dotenv').config({ path: envPath });
-}
 const getRawBody = require('raw-body');
-const { verifyLegitimacy, getProvider } = require('@serverless-cd/trigger');
-const { customAlphabet } = require('nanoid');
 const _ = require('lodash');
+const { verifyLegitimacy, getProvider } = require('@serverless-cd/trigger');
+
 const { asyncInvoke } = require('./utils/invoke');
 const { getRepoConfig } = require('./utils/repo');
 
-const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
-
-const tryfun = async (fn, ...args) => {
-  try {
-    return await fn(...args);
-  } catch (ex) {}
-};
+const { nanoid, tryFun } = require('./utils');
 
 exports.handler = (req, resp, context) => {
   console.log('req.queries:: ', req.queries);
@@ -56,7 +44,7 @@ exports.handler = (req, resp, context) => {
         eventConfig[provider].secret = _.get(authorization, 'webhook_secret');
         console.log('eventConfig: ', JSON.stringify(eventConfig));
         // 验证是否被触发
-        const triggerConfig = await tryfun(verifyLegitimacy, eventConfig, triggerInputs);
+        const triggerConfig = await tryFun(verifyLegitimacy, eventConfig, triggerInputs);
         if (!_.get(triggerConfig, 'success')) {
           console.log(`env ${key} validate trigger failed`);
           continue;

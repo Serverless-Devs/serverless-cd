@@ -1,6 +1,6 @@
-const Fc = require('@alicloud/fc2');
+const { CREDENTIALS, FC } = require('@serverless-cd/config');
+const Fc = require('@serverless-cd/srm-aliyun-fc2');
 
-const { CREDENTIALS, FC } = require('../config');
 const { region, serviceName, functionName } = FC.workerFunction;
 
 const fcClient = new Fc(CREDENTIALS.accountId, {
@@ -25,6 +25,4 @@ async function asyncInvoke(payload) {
   );
 }
 
-module.exports = {
-  asyncInvoke,
-};
+module.exports = asyncInvoke;
