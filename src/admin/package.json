@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^4.8.1",
-    "@serverless-cd/config": "latest",
+    "@serverless-cd/config": "^0.0.5",
     "@serverless-cd/core": "^0.0.2",
     "@serverless-cd/git": "^0.0.2",
     "@serverless-cd/git-provider": "^0.0.7",

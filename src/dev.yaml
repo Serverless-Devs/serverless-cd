@@ -20,6 +20,8 @@ services:
       pre-deploy:
         - run: npm install --registry=https://registry.npmmirror.com
           path: "./master"
+        - run: npx prisma generate
+          path: "./master"
     props:
       region: ${vars.region}
       service: ${vars.service}
@@ -33,6 +35,8 @@ services:
         timeout: 12
         instanceConcurrency: 20
         environmentVariables:
+          # 用于链接数据库
+          DATABASE_URL: ${env.DATABASE_URL}
           # 阿里云密钥
           ACCOUNT_ID: ${env.ACCOUNT_ID}
           ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
