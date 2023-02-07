@@ -27,6 +27,7 @@ exports.handler = (req, resp) => {
       // 获取应用的相关信息
       const authorization = await getAppConfig(provider, appId);
       const environment = _.get(authorization, 'environment', {});
+      _.unset(authorization, 'environment');
       for (const key in environment) {
         const ele = environment[key];
         const eventConfig = _.get(ele, 'trigger_spec');

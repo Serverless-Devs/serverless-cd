@@ -55,6 +55,52 @@ services:
             methods:
               - POST
 
+  worker:
+    component: fc
+    actions:
+      pre-deploy:
+        - run: npm install --registry=https://registry.npmmirror.com
+          path: "./worker"
+        - run: npx prisma generate
+          path: "./worker"
+      post-deploy:
+        - component: fc api UpdateFunction --region ${vars.region} --header '{"x-fc-disable-container-reuse":"True"}' --path '{"serviceName":"${vars.service.name}","functionName":"${vars.workerFunctionName}"}'
+    props:
+      region: ${vars.region}
+      service: ${vars.service}
+      function:
+        name: ${vars.workerFunctionName}
+        description: 执行用户配置的 CD 流程。
+        runtime: custom
+        codeUri: ./worker
+        customRuntimeConfig:
+          command:
+            - node
+            - server
+        memorySize: 2048
+        timeout: 3600
+        layers:
+          - acs:fc:${vars.region}:official:layers/Nodejs16/versions/1
+        environmentVariables:
+          PATH: /opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
+          # 用于给用户显示日志链接地址
+          DOMAIN: ${env.DOMAIN}
+          # 阿里云密钥
+          ACCOUNT_ID: ${env.ACCOUNT_ID}
+          ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
+          ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
+          # 上传的OSS地址
+          OSS_BUCKET: ${env.OSS_BUCKET}
+          # 部署的区域
+          REGION: ${vars.region}
+          # 用于链接数据库
+          DATABASE_URL: ${env.DATABASE_URL}
+        asyncConfiguration:
+          maxAsyncRetryAttempts: 0
+          statefulInvocation: true
+        #   destination:
+        #     onFailure: acs:fc:::services/${vars.service.name}/functions/${vars.workerDeliverFunctionName}
+
   admin: # Admin 控制台提供Api Server函数
     component: fc
     actions:
@@ -67,13 +113,12 @@ services:
           path: "./admin"
         - run: npx prisma generate
           path: "./admin"
-
-    # - plugin: get-http-function-url # 获取依赖的 trigger 函数的触发器地址，会覆盖 environmentVariables 的 WEBHOOK_URL
-    #   args:
-    #     region: ${vars.region}
-    #     serviceName: ${vars.service.name}
-    #     functionName: ${vars.masterFunctionName}
-    #     envKey: WEBHOOK_URL
+        - plugin: get-http-function-url # 获取依赖的 trigger 函数的触发器地址，会覆盖 environmentVariables 的 WEBHOOK_URL
+          args:
+            region: ${vars.region}
+            serviceName: ${vars.service.name}
+            functionName: ${vars.masterFunctionName}
+            envKey: WEBHOOK_URL
     props:
       region: ${vars.region}
       service: ${vars.service}

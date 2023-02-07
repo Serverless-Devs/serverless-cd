@@ -22,7 +22,7 @@ module.exports = async function (provider, appId) {
   return {
     appId,
     accessToken,
-    userId: _.get(userConfig, 'id', ''),
+    userId: _.get(userConfig, 'id', ''), // TODO: webhook 是否需要填写这个 userId
     secrets: _.get(userConfig, 'secrets', {}),
     repoId: _.get(applicationResult, 'provider_repo_id', ''),
     environment: _.get(applicationResult, 'environment', {}),
