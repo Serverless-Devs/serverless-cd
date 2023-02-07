@@ -6,6 +6,7 @@ const { region, serviceName, functionName } = FC.workerFunction;
 const fcClient = new FcClient(CREDENTIALS.accountId, {
   accessKeyID: CREDENTIALS.accessKeyId,
   accessKeySecret: CREDENTIALS.accessKeySecret,
+  securityToken: CREDENTIALS.securityToken,
   region,
   timeout: 60 * 1000,
 });
