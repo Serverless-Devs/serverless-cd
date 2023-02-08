@@ -98,8 +98,45 @@ services:
         asyncConfiguration:
           maxAsyncRetryAttempts: 0
           statefulInvocation: true
-        #   destination:
-        #     onFailure: acs:fc:::services/${vars.service.name}/functions/${vars.workerDeliverFunctionName}
+          destination:
+            onFailure: acs:fc:::services/${vars.service.name}/functions/${vars.workerDeliverFunctionName}
+
+  worker-deliver:
+    component: fc
+    # actions:
+    #   pre-deploy:
+    #     - run: npm install --registry=https://registry.npmmirror.com
+    #       path: "./worker"
+    #     - run: npx prisma generate
+    #       path: "./worker"
+    props:
+      region: ${vars.region}
+      service: ${vars.service}
+      function:
+        name: ${vars.workerDeliverFunctionName}
+        description: 执行用户配置的 CD 流程。
+        runtime: nodejs14
+        codeUri: ./worker
+        handler: deliver.handler
+        memorySize: 640
+        timeout: 600
+        environmentVariables:
+          # 部署的区域
+          REGION: ${vars.region}
+          # 部署函数的服务名称
+          SERVICE_NAME: ${vars.service.name}
+          # worker 函数的名称
+          WORKER_FUNCTION_NAME: ${vars.workerFunctionName}
+          # 用于链接数据库
+          DATABASE_URL: ${env.DATABASE_URL}
+          # 阿里云密钥
+          ACCOUNT_ID: ${env.ACCOUNT_ID}
+          ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
+          ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
+          # # 上传的OSS地址
+          # OSS_BUCKET: ${env.OSS_BUCKET}
+        asyncConfiguration:
+          maxAsyncRetryAttempts: 0
 
   admin: # Admin 控制台提供Api Server函数
     component: fc
