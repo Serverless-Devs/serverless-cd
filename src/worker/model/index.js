@@ -13,7 +13,7 @@ const applicationPrisma = prisma[TABLE.APPLICATION];
 const taskPrisma = prisma[TABLE.TASK];
 
 const makeSetTaskData = (data) => {
-  if (!_.isEmpty(data.steps)) {
+  if (_.isArray(data.steps)) {
     data.steps = JSON.stringify(data.steps);
   }
   if (_.isPlainObject(data.trigger_payload)) {

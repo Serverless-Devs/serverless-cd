@@ -37,6 +37,10 @@ const defaultRoutes = [
     route: require('./task'),
   },
   {
+    path: '/dispatch',
+    route: require('./dispatch'),
+  },
+  {
     path: '/github',
     route: require('./code-provider/github'),
   },

@@ -6,7 +6,6 @@ const { Result, ValidationError } = require('../../util');
 const auth = require('../../middleware/auth');
 const appService = require('../../services/application.service');
 const userService = require('../../services/user.service');
-const taskService = require('../../services/task.service');
 const { ADMIN_ROLE_KEYS } = require('@serverless-cd/config');
 
 /**

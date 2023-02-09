@@ -22,6 +22,16 @@ const getTaskInfo = (result) => {
   return result;
 };
 
+const makeSetTaskData = (data) => {
+  if (_.isArray(data.steps)) {
+    data.steps = JSON.stringify(data.steps);
+  }
+  if (_.isPlainObject(data.trigger_payload)) {
+    data.trigger_payload = JSON.stringify(data.trigger_payload);
+  }
+  return data;
+}
+
 module.exports = {
   async getTaskById(id) {
     const result = await taskPrisma.findUnique({ where: { id } });;
@@ -59,5 +69,8 @@ module.exports = {
         app_id: appId,
       },
     })
+  },
+  async updateTask(id, data) {
+    return await taskPrisma.update({ where: { id }, data: makeSetTaskData(data) });
   },
 };;
