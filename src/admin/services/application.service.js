@@ -53,6 +53,25 @@ async function getAppById(appId = '') {
   return await appModel.getAppById(appId);
 }
 
+async function removeEnv(appId, envName) {
+  const appDetail = await appModel.getAppById(appId);
+  if (_.isEmpty(appDetail)) {
+    throw new ValidationError('暂无应用信息');
+  }
+
+  const { environment } = appDetail;
+  if (_.has(environment, envName)) {
+    debug('Start remove task');
+    const taskList = await taskModel.deleteByAppIdAndEnvName(appId, envName);
+    debug(`Delete by appId: ${JSON.stringify(taskList)}`);
+  }
+
+  debug('Start update app');
+  _.unset(environment, envName);
+  await appModel.updateAppById(appId, { ...appDetail, environment });
+  debug('Update app successfully');
+}
+
 async function update(appId, params) {
   const appDetail = await getAppById(appId);
   if (_.isEmpty(appDetail)) {
@@ -90,5 +109,6 @@ module.exports = {
   create,
   update,
   remove,
+  removeEnv,
   getAppById,
 };

@@ -4,7 +4,7 @@ import { Button, Dialog, Loading } from '@alicloud/console-components';
 import PageLayout from '@/layouts/PageLayout';
 import CommitList from './components/CommitList';
 import BasicInfoDetail from './components/BasicInfoDetail';
-import { applicationDetail, updateApp } from '@/services/applist';
+import { applicationDetail, removeEnv } from '@/services/applist';
 import PageInfo from '@/components/PageInfo';
 import { get, isEmpty, isBoolean } from 'lodash';
 import SecretConfig from './components/SecretCofing';
@@ -79,11 +79,7 @@ const Details = ({
       title: `删除环境：${envName}`,
       content: '您确定删除当前环境吗?',
       onOk: async () => {
-        const data = get(detailInfo, 'data', {});
-        const provider = get(data, 'provider');
-        const environment = get(data, 'environment', {});
-        delete environment[envName];
-        const { success } = await updateApp({ environment, appId, provider });
+        const { success } = await removeEnv({ envName, appId });
         if (success) {
           Toast.success('环境删除成功');
           history?.push(`/application/${appId}/detail`);

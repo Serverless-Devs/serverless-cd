@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { Link, useRequest } from 'ice';
-import { updateApp } from '@/services/applist';
+import { removeEnv } from '@/services/applist';
 import { Button, Table, Dialog } from '@alicloud/console-components';
 import EnvType from '@/components/EnvType';
 import Status from '@/components/DeployStatus';
@@ -18,7 +18,7 @@ type Props = {
 
 const EnvList: FC<Props> = (props) => {
   const { data, appId, refresh = noop } = props;
-  const { loading, request } = useRequest(updateApp);
+  const { loading, request } = useRequest(removeEnv);
   const getEnvData = () => {
     const list: any = [];
     const environment = get(data, 'environment', {});
@@ -49,10 +49,7 @@ const EnvList: FC<Props> = (props) => {
       title: `删除环境：${envName}`,
       content: '您确定删除当前环境吗?',
       onOk: async () => {
-        const provider = get(data, 'provider');
-        const environment = get(data, 'environment', {});
-        delete environment[envName];
-        const { success } = await request({ environment, appId, provider });
+        const { success } = await request({ envName, appId });
         if (success) {
           Toast.success('环境删除成功');
           refresh();

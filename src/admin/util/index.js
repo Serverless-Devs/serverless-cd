@@ -9,7 +9,5 @@ module.exports = {
   ...util,
   Result,
   prisma,
-  getModel(otsModel, prismaModel) {
-    return process.env.DATABASE_URL ? prismaModel : otsModel;
-  },
+  Client: require('./client'),
 };

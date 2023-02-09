@@ -8,7 +8,7 @@ export const getTaskList = async (params) => {
 };
 
 export const getTask = async (params) => {
-  const { data } = await request.get('/api/task/get', {
+  const { data } = await request.get('/api/task/detail', {
     params,
   });
   return data;

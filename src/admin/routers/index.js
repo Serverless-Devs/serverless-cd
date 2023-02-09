@@ -1,15 +1,21 @@
 const router = require('express').Router();
+const jwtAuth = require('../middleware/jwt-auth');
 const { CD_PIPELINE_YAML, SUPPORT_LOGIN, GITHUB } = require('@serverless-cd/config');
+const debug = require('debug')('serverless-cd:root');
+const orgService = require('../services/org.service');
 
-router.get('/', function (req, res, _next) {
+// TODO:
+// 手动调用｜重拾
+
+router.get('/', jwtAuth, async function (req, res, _next) {
+  const { role: ROLE } = await orgService.getOrgById(req.orgId);
   const config = {
     CD_PIPELINE_YAML,
     SUPPORT_LOGIN,
+    ROLE,
     REDIRECT_URL: GITHUB.redirectUrl,
-    // TODO:
-    //   遇到问题， vm 貌似仅仅第一返回给前端，然后注册之后怎么办
-    // ROLE: 
   };
+  debug(`set index config: ${JSON.stringify(config)}`);
   res.render('index', { CONFIG: config });
 });
 

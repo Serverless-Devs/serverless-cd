@@ -6,6 +6,7 @@ const { Result, ValidationError } = require('../../util');
 const auth = require('../../middleware/auth');
 const appService = require('../../services/application.service');
 const userService = require('../../services/user.service');
+const taskService = require('../../services/task.service');
 const { ADMIN_ROLE_KEYS } = require('@serverless-cd/config');
 
 /**
@@ -57,6 +58,18 @@ router.delete('/delete', auth(ADMIN_ROLE_KEYS), async function (req, res) {
 router.post('/update', auth(ADMIN_ROLE_KEYS), async function (req, res) {
   const { appId, environment } = req.body;
   await appService.update(appId, { environment });
+  res.json(Result.ofSuccess());
+});
+
+/**
+ * 删除环境
+ */
+router.post('/removeEnv', auth(ADMIN_ROLE_KEYS), async function (req, res) {
+  const { appId, envName } = req.body;
+  if (!(appId || envName)) {
+    throw new ValidationError(`appId 和 envName 必填。appId: ${appId}, envName: ${envName}`);
+  }
+  await appService.removeEnv(appId, envName);
   res.json(Result.ofSuccess());
 });
 

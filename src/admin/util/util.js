@@ -43,7 +43,7 @@ async function retryOnce(promiseFun, timer = 500) {
  * "refs/tags/xxx"
  * @param {string} ref
  */
-const formatBranch = (ref) => {
+const formatBranch = (ref = '') => {
   const tagsForma = 'refs/tags/';
   const headsForma = 'refs/heads/';
   if (ref.includes(tagsForma)) {
