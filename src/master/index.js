@@ -1,43 +1,18 @@
-const path = require('path');
-const fs = require('fs');
-const envPath = path.join(__dirname, '..', '.env');
-if (fs.existsSync(envPath)) {
-  require('dotenv').config({ path: envPath });
-}
 const getRawBody = require('raw-body');
-const { verifyLegitimacy, getProvider } = require('@serverless-cd/trigger');
-const { customAlphabet } = require('nanoid');
 const _ = require('lodash');
-const { asyncInvoke } = require('./utils/invoke');
-const { getRepoConfig } = require('./utils/repo');
+const { verifyLegitimacy, getProvider } = require('@serverless-cd/trigger');
+const { nanoid, asyncInvoke, getAppConfig, ValidationError, SystemError, ignoreRunFunctionError } = require('./utils');
 
-const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
-
-const tryfun = async (fn, ...args) => {
-  try {
-    return await fn(...args);
-  } catch (ex) {}
-};
-
-exports.handler = (req, resp, context) => {
+exports.handler = (req, resp) => {
   console.log('req.queries:: ', req.queries);
   const { app_id: appId } = req.queries || {};
   if (!appId) {
-    console.log('Not a standard Serverless-cd trigger, lacks app_id');
-    resp.statusCode = 400;
-    resp.send(
-      JSON.stringify({
-        success: false,
-        message: 'Not a standard Serverless-cd trigger, lacks app_id',
-      }),
-    );
-    return;
+    const message = 'Not a standard Serverless-cd trigger, lacks app_id';
+    return ValidationError(resp, message);
   }
   getRawBody(req, async function (err, body) {
     if (err) {
-      resp.statusCode = 400;
-      resp.send(err.message);
-      return;
+      return ValidationError(resp, err.message);
     }
 
     try {
@@ -45,18 +20,21 @@ exports.handler = (req, resp, context) => {
         headers: req.headers,
         body: JSON.parse(body.toString()),
       };
+      // 通过输入获取厂商
       console.log('triggerInputs: ', JSON.stringify(triggerInputs));
       const provider = getProvider(triggerInputs);
       console.log('provider is: ', provider);
-      const authorization = await getRepoConfig(provider, appId);
+      // 获取应用的相关信息
+      const authorization = await getAppConfig(provider, appId);
       const environment = _.get(authorization, 'environment', {});
+      _.unset(authorization, 'environment');
       for (const key in environment) {
         const ele = environment[key];
         const eventConfig = _.get(ele, 'trigger_spec');
         eventConfig[provider].secret = _.get(authorization, 'webhook_secret');
         console.log('eventConfig: ', JSON.stringify(eventConfig));
         // 验证是否被触发
-        const triggerConfig = await tryfun(verifyLegitimacy, eventConfig, triggerInputs);
+        const triggerConfig = await ignoreRunFunctionError(verifyLegitimacy, eventConfig, triggerInputs);
         if (!_.get(triggerConfig, 'success')) {
           console.log(`env ${key} validate trigger failed`);
           continue;
@@ -88,10 +66,9 @@ exports.handler = (req, resp, context) => {
         }
       }
 
-      resp.send(JSON.stringify(environment));
+      resp.send(JSON.stringify({ success: true, message: 'OK' }));
     } catch (ex) {
-      resp.statusCode = 500;
-      resp.send(ex.toString());
+      SystemError(resp, ex);
     }
   });
 };

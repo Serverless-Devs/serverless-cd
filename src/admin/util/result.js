@@ -1,4 +1,12 @@
-const getCode = (arg) => (arg instanceof Error ? arg.code : arg);
+const { lodash: _ } = require('@serverless-cd/core');
+
+const getCode = (arg) => {
+  if (_.isObject(arg)) {
+    return arg.code;
+  } else {
+    return arg;
+  }
+};
 
 class Result {
   static ofError(message, code) {
@@ -18,4 +26,3 @@ class Result {
 }
 
 module.exports = Result;
-

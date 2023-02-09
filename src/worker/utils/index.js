@@ -7,10 +7,15 @@ function getPayload(event) {
 
 function getOTSTaskPayload(steps = []) {
   console.log('steps:: ', steps);
-  return steps.map(({ run, name, process_time, stepCount, status }) => ({ run: name || run, process_time, stepCount, status }))
+  return steps.map(({ run, name, process_time, stepCount, status }) => ({
+    run: name || run,
+    process_time,
+    stepCount,
+    status,
+  }));
 }
 
 module.exports = {
   getPayload,
   getOTSTaskPayload,
-}
+};

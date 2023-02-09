@@ -21,12 +21,18 @@ export function replaceAll(string, search, replace) {
 }
 
 /**
+ * 获取配置
+ */
+export function getConsoleConfig(key: string, defaultValue?: any) {
+  return _.get(window, `CONFIG.${key}`, defaultValue);
+}
+
+/**
  * 日志关键字高亮处理
  * @param logs
  * @param requestId
  * @returns
  */
-
 export function formatLogs(log, requestId = '') {
   let l = log;
   if (requestId) {
@@ -54,7 +60,6 @@ export function formatLogs(log, requestId = '') {
  * @param replaceStr
  * @returns
  */
-
 export function replaceToken(replaceStr) {
   const logKeys = {
     warn: (key) => `\u001b[33m${key}\u001b[0m`,

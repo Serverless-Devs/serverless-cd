@@ -1,12 +1,10 @@
-const { customAlphabet } = require('nanoid');
 const axios = require('axios');
 const crypto = require('crypto');
 const { lodash: _ } = require('@serverless-cd/core');
+const { customAlphabet } = require('nanoid');
+const { UID_TOKEN, UID_TOKEN_UPPERCASE } = require('@serverless-cd/config');
 
-const UID_TOKEN = '1234567890abcdefghijklmnopqrstuvwxyz';
-const UID_TOKEN_UPPERCASE = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 
 /**
  * unless middleware
@@ -23,7 +21,6 @@ function unless(pred, middleware) {
     }
   };
 }
-
 
 /**
  * 异步重试一次
@@ -96,6 +93,6 @@ module.exports = {
   formatBranch,
   md5Encrypt,
   githubRequest,
-  unionid: customAlphabet(UID_TOKEN, 16),
+  unionId: customAlphabet(UID_TOKEN, 16),
   unionToken: customAlphabet(UID_TOKEN_UPPERCASE, 40),
-}
+};

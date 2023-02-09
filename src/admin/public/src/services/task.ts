@@ -1,41 +1,38 @@
-import { request } from "ice";
+import { request } from 'ice';
 
 export const getTaskList = async (params) => {
-  const { data } = await request.get("/api/flow/task/list", {
-    params
+  const { data } = await request.get('/api/task/list', {
+    params,
   });
-  return data
+  return data;
 };
 
 export const getTask = async (params) => {
-  const { data } = await request.get("/api/flow/task/get", {
-    params
+  const { data } = await request.get('/api/task/get', {
+    params,
   });
-  return data
+  return data;
 };
 
 export const getTaskLog = async (params) => {
-  const { data } = await request.get("/api/flow/task/log", {
-    params
+  const { data } = await request.get('/api/task/log', {
+    params,
   });
-  return data
+  return data;
 };
 
 export const removeTaskCommit = async (body) => {
-  return await request.post("/api/flow/task/remove", body);
+  return await request.post('/api/task/remove', body);
 };
 
 export const redeployTask = async (body) => {
-  return await request.post("/api/flow/dispatch/redeploy", body);
+  return await request.post('/api/deploy/redeploy', body);
 };
 
 export const manualDeployApp = async (body) => {
-  return await request.post('/api/flow/dispatch/manual', body);
+  return await request.post('/api/deploy/manual', body);
 };
 
 export const cancelDeployTask = async (body) => {
-  return await request.post('/api/flow/dispatch/cancel', body);
+  return await request.post('/api/deploy/cancel', body);
 };
-
-
-

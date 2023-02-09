@@ -10,7 +10,6 @@
     "ansi-to-html": "^0.7.2",
     "build-plugin-moment-locales": "^0.1.0",
     "codemirror": "^5.65.10",
-    "ice": "^3.7.80",
     "ice.js": "^2.0.0",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
