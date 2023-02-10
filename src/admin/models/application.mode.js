@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const { TABLE } = require('@serverless-cd/config');
-const { prisma, getModel } = require('../util');
+const { prisma } = require('../util');
 
 const applicationPrisma = prisma[TABLE.APPLICATION];
 
@@ -17,9 +17,7 @@ const getAppInfo = (result) => {
   return result;
 };
 
-const otsModel = {};
-
-const prismaModel = {
+module.exports = {
   async getAppById(id) {
     const result = await applicationPrisma.findUnique({ where: { id } });
     return getAppInfo(result);
@@ -67,5 +65,3 @@ const prismaModel = {
     return result;
   },
 };
-
-module.exports = getModel(otsModel, prismaModel);

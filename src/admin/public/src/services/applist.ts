@@ -24,3 +24,7 @@ export const deleteApp = async (params) => {
 export const updateApp = async (body) => {
   return await request.post('/api/application/update', body);
 };
+
+export const removeEnv = async (body) => {
+  return await request.post('/api/application/removeEnv', body);
+};

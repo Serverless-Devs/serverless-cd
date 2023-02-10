@@ -28,6 +28,7 @@ exports.handler = (req, resp) => {
       const authorization = await getAppConfig(provider, appId);
       const environment = _.get(authorization, 'environment', {});
       _.unset(authorization, 'environment');
+      const taskId = nanoid();
       for (const key in environment) {
         const ele = environment[key];
         const eventConfig = _.get(ele, 'trigger_spec');
@@ -42,7 +43,7 @@ exports.handler = (req, resp) => {
         console.log(`env ${key} validate trigger success`);
         console.log('triggerConfig: ', JSON.stringify(triggerConfig));
         const workerPayload = {
-          taskId: nanoid(),
+          taskId,
           cloneUrl: _.get(triggerConfig, 'data.url'),
           provider,
           event_name: _.get(triggerConfig, 'data.push') ? 'push' : 'pull_request',
@@ -66,7 +67,7 @@ exports.handler = (req, resp) => {
         }
       }
 
-      resp.send(JSON.stringify({ success: true, message: 'OK' }));
+      resp.send(JSON.stringify({ taskId, success: true, message: 'OK' }));
     } catch (ex) {
       SystemError(resp, ex);
     }

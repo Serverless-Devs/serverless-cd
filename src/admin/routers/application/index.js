@@ -60,4 +60,16 @@ router.post('/update', auth(ADMIN_ROLE_KEYS), async function (req, res) {
   res.json(Result.ofSuccess());
 });
 
+/**
+ * 删除环境
+ */
+router.post('/removeEnv', auth(ADMIN_ROLE_KEYS), async function (req, res) {
+  const { appId, envName } = req.body;
+  if (!(appId || envName)) {
+    throw new ValidationError(`appId 和 envName 必填。appId: ${appId}, envName: ${envName}`);
+  }
+  await appService.removeEnv(appId, envName);
+  res.json(Result.ofSuccess());
+});
+
 module.exports = router;

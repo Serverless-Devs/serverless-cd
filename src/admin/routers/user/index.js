@@ -4,7 +4,6 @@ const { Result, NoPermissionError } = require('../../util');
 const { OWNER_ROLE_KEYS } = require('@serverless-cd/config');
 const auth = require('../../middleware/auth');
 const userService = require('../../services/user.service');
-const authService = require('../../services/auth.service');
 
 /**
  * 用户信息

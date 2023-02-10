@@ -103,12 +103,12 @@ services:
 
   worker-deliver:
     component: fc
-    # actions:
-    #   pre-deploy:
-    #     - run: npm install --registry=https://registry.npmmirror.com
-    #       path: "./worker"
-    #     - run: npx prisma generate
-    #       path: "./worker"
+    actions:
+      pre-deploy:
+        - run: npm install --registry=https://registry.npmmirror.com
+          path: "./worker"
+        - run: npx prisma generate
+          path: "./worker"
     props:
       region: ${vars.region}
       service: ${vars.service}
@@ -133,8 +133,6 @@ services:
           ACCOUNT_ID: ${env.ACCOUNT_ID}
           ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
           ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
-          # # 上传的OSS地址
-          # OSS_BUCKET: ${env.OSS_BUCKET}
         asyncConfiguration:
           maxAsyncRetryAttempts: 0
 
@@ -191,6 +189,8 @@ services:
           SERVICE_NAME: ${vars.service.name}
           # worker 函数的名称
           WORKER_FUNCTION_NAME: ${vars.workerFunctionName}
+          # 上传的OSS地址
+          OSS_BUCKET: ${env.OSS_BUCKET}
           JWT_SECRET: ${env.JWT_SECRET}
       triggers:
         - name: http-trigger

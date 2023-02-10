@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const { ROLE, TABLE } = require('@serverless-cd/config');
-const { unionId, md5Encrypt, prisma, getModel } = require('../util');
+const { unionId, md5Encrypt, prisma } = require('../util');
 
 const orgPrisma = prisma[TABLE.ORG];
 const userPrisma = prisma[TABLE.USER];
@@ -18,9 +18,7 @@ const getUserInfo = (result) => {
   return result;
 };
 
-const otsModel = {};
-
-const prismaModel = {
+module.exports = {
   async getOrgFirst(where) {
     const result = await orgPrisma.findFirst({ where });
     return result;
@@ -78,5 +76,3 @@ const prismaModel = {
     return result;
   },
 };
-
-module.exports = getModel(otsModel, prismaModel);

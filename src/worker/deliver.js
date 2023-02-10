@@ -1,10 +1,9 @@
 const _ = require('lodash');
 const { default: Client } = require('@alicloud/fc-open20210406');
-const { CREDENTIALS, FC: { workerFunction } } = require('@serverless-cd/config');
+const { CREDENTIALS, FC: { workerFunction }, TASK_STATUS } = require('@serverless-cd/config');
 const { updateAppById, getTask, makeTask } = require('./model');
 
-const RUNNING = 'running';
-const FAILED_STATUS = 'failure';
+const { RUNNING, FAILURE: FAILED_STATUS } = TASK_STATUS;
 
 const qualifier = 'LATEST';
 const { region, serviceName, functionName } = workerFunction;

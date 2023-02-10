@@ -16,6 +16,8 @@ interface IProps {
   latestTaskId?: string;
 }
 
+const PAGE_SIZE = 2;
+
 const CommitTable: FC<IProps> = (props) => {
   const { appId, latestTaskId, envName } = props;
   const { loading, data, request, refresh } = useRequest(getTaskList);
@@ -23,7 +25,7 @@ const CommitTable: FC<IProps> = (props) => {
   const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
-    request({ appId, envName, currentPage: 1 });
+    request({ appId, envName, pageSize: PAGE_SIZE, currentPage: 1 });
   }, [appId]);
 
   useEffect(() => {
@@ -113,11 +115,11 @@ const CommitTable: FC<IProps> = (props) => {
   ];
 
   const onSearch = (taskId: string) => {
-    request({ appId, currentPage: 1, taskId });
+    request({ appId, envName, pageSize: PAGE_SIZE, currentPage: 1, taskId });
   };
 
   const onChangePage = (currentPage) => {
-    request({ appId, currentPage });
+    request({ appId, envName, pageSize: PAGE_SIZE, currentPage });
   };
 
   return (
@@ -142,6 +144,7 @@ const CommitTable: FC<IProps> = (props) => {
         style={{ margin: '10px 0 15px' }}
       />
       <Pagination
+        pageSize={PAGE_SIZE}
         showJump={false}
         total={totalCount}
         onChange={onChangePage}
