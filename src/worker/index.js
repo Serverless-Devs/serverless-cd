@@ -40,7 +40,7 @@ async function handler(event, _context, callback) {
   } = inputs;
 
   const cwdPath = path.join(execDir, taskId);
-  const logPrefix = `/logs/${taskId}`;
+  const logPrefix = `/mnt/auto/logs/${taskId}`;
   core.fs.emptyDirSync(logPrefix);
   console.log('start task, uuid: ', taskId);
 
@@ -99,10 +99,10 @@ async function handler(event, _context, callback) {
     cwd: cwdPath,
     logConfig: {
       logPrefix,
-      ossConfig: {
-        ...CREDENTIALS,
-        ...OSS_CONFIG,
-      },
+      // ossConfig: {
+      //   ...CREDENTIALS,
+      //   ...OSS_CONFIG,
+      // },
       // logLevel: 'debug',
     },
     inputs: {

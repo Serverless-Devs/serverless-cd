@@ -1,3 +1,14 @@
+# 环境准备（不一定全）
+
+安装 sqlite 环境（fc线上安装apt包有点复杂）
+  可以使用公共层
+  或者我们将包放到 oss，然后加速
+初始化 db 数据库
+  项目 install prisma
+  创建 DB 文件
+  npx prisma generate
+  npx prisma migrate dev --name init
+
 # serverless-cd 帮助文档
 
 <description>

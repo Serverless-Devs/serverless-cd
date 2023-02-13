@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const _ = require('lodash');
+const fs = require('fs');
 const debug = require('debug')('serverless-cd:task');
 
 const { Result, Client, ValidationError } = require('../../util');
@@ -38,10 +39,9 @@ router.get('/log', async function (req, res) {
   if (_.isEmpty(stepCount)) {
     throw new ValidationError('StepCount is empty');
   }
-  const ossClient = Client.oss();
+  const logPath = `/mnt/auto/logs/${taskId}/step_${stepCount}.log`;
   try {
-    const { content } = await ossClient.get(`logs/${taskId}/step_${stepCount}.log`);
-    res.json(Result.ofSuccess(content.toString('utf8')));
+    res.json(Result.ofSuccess(fs.readFileSync(logPath, 'utf8')));
   } catch (ex) {
     if (ex.status === 404) {
       throw new NotFoundError('The logs for this run have expired and are no longer available.');

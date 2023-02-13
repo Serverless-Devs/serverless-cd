@@ -5,13 +5,29 @@ access: dankun
 vars:
   region: ${env.REGION}
   service:
-    name: serverless-cd
+    name: ${env.SERVICE_NAME}
     description: Serverless-cd 应用
+    # role: '' # invoke fc ｜ sls | 投递日志（nas  oss）
     logConfig: auto
+    vpcConfig:
+      securityGroupId: sg-j6c3tx86c5bmqkrxqje5
+      vpcId: vpc-j6c2i8puxjnpgcn9iyozu
+      vswitchIds:
+        - vsw-j6cxtxs9bj47q3xm7g4dm
+    nasConfig:
+      userId: 0
+      groupId: 0
+      mountPoints:
+        - serverAddr: 12eb804bf71-mog39.cn-hongkong.nas.aliyuncs.com
+          nasDir: /serverless-cd-wss
+          fcDir: /mnt/auto
   masterFunctionName: master
   workerFunctionName: worker
   adminFunctionName: admin
   workerDeliverFunctionName: workerDeliver
+  domain: ${env.DOMAIN}
+  sqliteLayer: acs:fc:cn-hongkong:1740298130743624:layers/sqlite3x16/versions/1 # 落泥
+  path: /opt:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/var/fc/lang/nodejs14_alinode/bin:/opt/bin
 
 services:
   master:
@@ -34,7 +50,10 @@ services:
         memorySize: 640
         timeout: 12
         instanceConcurrency: 20
+        layers:
+          - ${vars.sqliteLayer}
         environmentVariables:
+          PATH: ${vars.path}
           # 用于链接数据库
           DATABASE_URL: ${env.DATABASE_URL}
           # 阿里云密钥
@@ -81,10 +100,11 @@ services:
         timeout: 3600
         layers:
           - acs:fc:${vars.region}:official:layers/Nodejs16/versions/1
+          - ${vars.sqliteLayer}
         environmentVariables:
-          PATH: /opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
+          PATH: /opt/nodejs16/bin:/opt:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
           # 用于给用户显示日志链接地址
-          DOMAIN: ${env.DOMAIN}
+          DOMAIN: ${vars.domain}
           # 阿里云密钥
           ACCOUNT_ID: ${env.ACCOUNT_ID}
           ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
@@ -120,7 +140,10 @@ services:
         handler: deliver.handler
         memorySize: 640
         timeout: 600
+        layers:
+          - ${vars.sqliteLayer}
         environmentVariables:
+          PATH: ${vars.path}
           # 部署的区域
           REGION: ${vars.region}
           # 部署函数的服务名称
@@ -173,8 +196,9 @@ services:
             - index.js
         layers:
           - acs:fc:cn-hongkong:official:layers/Nodejs16/versions/2
+          - ${vars.sqliteLayer}
         environmentVariables:
-          PATH: /opt/nodejs16/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/bin
+          PATH: /opt/nodejs16/bin:/opt:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/bin
           # 用于链接数据库
           DATABASE_URL: ${env.DATABASE_URL}
           # 回调地址
@@ -206,7 +230,7 @@ services:
               - PUT
               - PATCH
       customDomains:
-        - domainName: ${env.DOMAIN}
+        - domainName: ${vars.domain}
           protocol: HTTP
           routeConfigs:
             - path: /*
