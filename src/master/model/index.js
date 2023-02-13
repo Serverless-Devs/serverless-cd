@@ -44,7 +44,7 @@ async function getUserById(id) {
 }
 
 /**
- * 根据 orgId 获取组织信息
+ * 根据 orgId 获取团队信息
  * @param {*} id 
  * @returns 
  */
@@ -54,7 +54,7 @@ async function getOrgById(id) {
 }
 
 /**
- * 根据条件获取组织的第一条信息
+ * 根据条件获取团队的第一条信息
  * @param {*} where 
  * @returns 
  */
@@ -64,11 +64,11 @@ async function getOrgFirst(where) {
 }
 
 /**
- * 根据组织Id拿到拥有者用户数据
+ * 根据团队Id拿到拥有者用户数据
  */
 async function getOrganizationOwnerIdByOrgId(orgId) {
   let ownerUserId = '';
-  // 当前用户在此组织的数据
+  // 当前用户在此团队的数据
   const orgData = await getOrgById(orgId);
   const { role, name = '' } = orgData || {};
   if (role === ROLE.OWNER) {
@@ -78,7 +78,7 @@ async function getOrganizationOwnerIdByOrgId(orgId) {
     ownerUserId = ownerOrgData.user_id;
   }
 
-  // 此组织拥有者的数据：一个组织只能拥有一个 owner
+  // 此团队拥有者的数据：一个团队只能拥有一个 owner
   return await getUserById(ownerUserId);
 }
 

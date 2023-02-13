@@ -4,6 +4,7 @@ const { Result, NoPermissionError } = require('../../util');
 const { OWNER_ROLE_KEYS } = require('@serverless-cd/config');
 const auth = require('../../middleware/auth');
 const userService = require('../../services/user.service');
+const orgService = require('../../services/org.service');
 
 /**
  * 用户信息
@@ -37,6 +38,15 @@ router.put('/token', auth(OWNER_ROLE_KEYS), async function (req, res) {
 
   await userService.updateUserById(userId, data);
   return res.json(Result.ofSuccess());
+});
+
+/**
+ * 显示个人所有的团队
+ */
+router.get('/listOrgs', async (req, res) => {
+  const { userId } = req;
+  const result = await orgService.listByUserId(userId);
+  res.json(Result.ofSuccess(result));
 });
 
 module.exports = router;

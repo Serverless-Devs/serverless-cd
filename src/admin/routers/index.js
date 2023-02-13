@@ -26,6 +26,10 @@ const defaultRoutes = [
     route: require('./user'),
   },
   {
+    path: '/org',
+    route: require('./org'),
+  },
+  {
     path: '/application',
     route: require('./application'),
   },

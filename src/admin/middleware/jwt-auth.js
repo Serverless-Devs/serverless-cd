@@ -15,7 +15,7 @@ module.exports = async function (req, res, next) {
       try {
         const user = await jwt.verify(token, JWT_SECRET);
         if (_.isNil(user.userId) || _.isNil(user.orgId)) {
-          next(new NoPermissionError('没有用户或者组织信息'));
+          next(new NoPermissionError('没有用户或者团队信息'));
         }
         debug('verify user:: ', user);
         req.userId = user.userId;

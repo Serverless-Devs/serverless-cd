@@ -2,20 +2,21 @@ const jwt = require('jsonwebtoken');
 const debug = require('debug')('serverless-cd:auth');
 const _ = require('lodash');
 const { JWT_SECRET, ROLE, ADMIN_ROLE_KEYS, SESSION_EXPIRATION } = require('@serverless-cd/config');
-const accountModel = require('../models/account.mode');
+const userModel = require('../models/user.mode');
+const orgModel = require('../models/org.mode');
 const { md5Encrypt, ValidationError } = require('../util');
 
 /**
  * 注册用户
  */
 async function initUser({ username, password }) {
-  const data = await accountModel.getUserByName(username);
+  const data = await userModel.getUserByName(username);
   if (_.get(data, 'username', '')) {
     throw new ValidationError('用户名已存在');
   }
 
-  const { id: userId } = await accountModel.createUser({ username, password });
-  const { id: orgId } = await accountModel.createOrg({ userId, name: username });
+  const { id: userId } = await userModel.createUser({ username, password });
+  const { id: orgId } = await orgModel.createOrg({ userId, name: username });
 
   return { userId, orgId };
 }
@@ -24,14 +25,14 @@ async function initUser({ username, password }) {
  * 通过密码登陆账户
  */
 async function loginWithPassword({ username, password }) {
-  const data = await accountModel.getUserByName(username);
+  const data = await userModel.getUserByName(username);
   const isTrue = _.get(data, 'password', '') === md5Encrypt(password);
   if (!isTrue) {
     throw new ValidationError('用户名或密码不正确');
   }
 
   const userId = data.id;
-  const { id: orgId } = await accountModel.getOrgFirst({ user_id: userId, role: ROLE.OWNER });
+  const { id: orgId } = await orgModel.getOrgFirst({ user_id: userId, role: ROLE.OWNER });
   return { userId, orgId };
 }
 
@@ -60,7 +61,7 @@ async function setJwt({ userId, orgId }, res) {
  * 检测用户是否拥有调用的权限
  */
 async function checkOrganizationRole(orgId, orgRoleKeys = ADMIN_ROLE_KEYS) {
-  const { role } = await accountModel.getOrgById(orgId);
+  const { role } = await orgModel.getOrgById(orgId);
   return orgRoleKeys.includes(role);
 }
 

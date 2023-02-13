@@ -2,7 +2,6 @@ const _ = require('lodash');
 const { ROLE, TABLE } = require('@serverless-cd/config');
 const { unionId, md5Encrypt, prisma } = require('../util');
 
-const orgPrisma = prisma[TABLE.ORG];
 const userPrisma = prisma[TABLE.USER];
 
 const getUserInfo = (result) => {
@@ -19,18 +18,6 @@ const getUserInfo = (result) => {
 };
 
 module.exports = {
-  async getOrgFirst(where) {
-    const result = await orgPrisma.findFirst({ where });
-    return result;
-  },
-  async getOrgMany(where = {}) {
-    const result = await orgPrisma.findMany({ where });
-    return result;
-  },
-  async getOrgById(id) {
-    const result = await orgPrisma.findUnique({ where: { id } });
-    return result;
-  },
   async getUserById(id) {
     const result = await userPrisma.findUnique({ where: { id } });
     return getUserInfo(result);
@@ -59,18 +46,6 @@ module.exports = {
         id: userId,
         ...data,
         password: data.password ? md5Encrypt(data.password) : '',
-      },
-    });
-    return result;
-  },
-  async createOrg({ userId, name, role }) {
-    const orgId = unionId();
-    const result = await orgPrisma.create({
-      data: {
-        id: orgId,
-        user_id: userId,
-        name,
-        role: role || ROLE.OWNER,
       },
     });
     return result;

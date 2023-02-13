@@ -57,6 +57,10 @@ module.exports = {
     });
     return result;
   },
+  async deleteAppByOrgId(orgId = '') {
+    const result = await applicationPrisma.deleteMany({ where: { org_id: orgId } });
+    return result;
+  },
   async updateAppById(id, data) {
     if (_.isPlainObject(data.environment)) {
       data.environment = JSON.stringify(data.environment);
