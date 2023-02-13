@@ -4,9 +4,6 @@ const { CD_PIPELINE_YAML, SUPPORT_LOGIN, GITHUB } = require('@serverless-cd/conf
 const debug = require('debug')('serverless-cd:root');
 const orgService = require('../services/org.service');
 
-// TODO:
-// 手动调用｜重拾
-
 router.get('/', jwtAuth, async function (req, res, _next) {
   const { role: ROLE } = await orgService.getOrgById(req.orgId);
   const config = {
@@ -27,6 +24,10 @@ const defaultRoutes = [
   {
     path: '/user',
     route: require('./user'),
+  },
+  {
+    path: '/org',
+    route: require('./org'),
   },
   {
     path: '/application',

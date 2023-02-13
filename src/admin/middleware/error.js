@@ -1,4 +1,4 @@
-const { ValidationError, Result, NotFoundError, NoPermissionError } = require('../util');
+const { ValidationError, Result, NotFoundError, NoPermissionError, NeedLogin } = require('../util');
 
 const errorHandler = (err, req, res, next) => {
   let errorRes = {};
@@ -8,8 +8,11 @@ const errorHandler = (err, req, res, next) => {
     errorRes = Result.ofError(err.message, NotFoundError);
   } else if (err instanceof NoPermissionError) {
     errorRes = Result.ofError(err.message, NoPermissionError);
+  } else if (err instanceof NeedLogin) {
+    errorRes = Result.ofError(err.message, NeedLogin);
   } else {
-    errorRes = Result.ofError(err.message, err.code || 500);
+    console.log('非预期错误，统一 500');
+    errorRes = Result.ofError(err.message, 500);
   }
   console.log(err);
   res.json(errorRes);

@@ -1,11 +1,12 @@
 const _ = require('lodash');
-const accountModel = require('../models/account.mode');
+const userModel = require('../models/user.mode');
+const orgModel = require('../models/org.mode');
 
 const { ROLE } = require('@serverless-cd/config');
 const { NoPermissionError, ValidationError } = require('../util');
 
 async function getUserById(userId = '') {
-  const data = await accountModel.getUserById(userId);
+  const data = await userModel.getUserById(userId);
   if (_.isNil(data)) {
     return {};
   }
@@ -13,30 +14,30 @@ async function getUserById(userId = '') {
 }
 
 async function updateUserById(userId, data) {
-  return await accountModel.updateUserById(userId, data);
+  return await userModel.updateUserById(userId, data);
 }
 
 /**
- * 根据组织Id拿到拥有者用户数据
+ * 根据团队Id拿到拥有者用户数据
  */
 async function getOrganizationOwnerIdByOrgId(orgId) {
   let ownerUserId = '';
-  // 当前用户在此组织的数据
-  const orgData = await accountModel.getOrgById(orgId);
+  // 当前用户在此团队的数据
+  const orgData = await orgModel.getOrgById(orgId);
   const { role, name = '' } = orgData || {};
   if (role === ROLE.OWNER) {
     ownerUserId = orgData.user_id;
   } else {
-    const ownerOrgData = await accountModel.getOrgFirst({ name, role: ROLE.OWNER });
+    const ownerOrgData = await orgModel.getOrgFirst({ name, role: ROLE.OWNER });
     ownerUserId = ownerOrgData.user_id;
   }
 
-  // 此组织拥有者的数据：一个组织只能拥有一个 owner
+  // 此团队拥有者的数据：一个团队只能拥有一个 owner
   return await getUserById(ownerUserId);
 }
 
 /**
- * 根据组织Id获取拥有者用户Token
+ * 根据团队Id获取拥有者用户Token
  */
 async function getProviderToken(orgId, userId, provider) {
   const userInfo = await getOrganizationOwnerIdByOrgId(orgId);
