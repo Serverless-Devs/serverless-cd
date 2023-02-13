@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const _ = require('lodash');
 const debug = require('debug')('serverless-cd:org');
-const orgService = require('../../services/org.service');
 
 const { Result } = require('../../util');
 const { OWNER_ROLE_KEYS, ADMIN_ROLE_KEYS } = require('@serverless-cd/config');

@@ -22,8 +22,15 @@ router.get('/orgs', auth(ADMIN_ROLE_KEYS), async function (req, res) {
   }
 
   const provider = git(PROVIDER.GITHUB, { access_token: githubToken });
-  const orgs = await provider.listOrgs();
-  return res.json(Result.ofSuccess(orgs));
+  try {
+    const orgs = await provider.listOrgs();
+    return res.json(Result.ofSuccess(orgs));
+  } catch (err) {
+    if (err === 401 && err.message === 'Bad credentials') {
+      throw new ValidationError('Github token 无效，请重新配置');
+    }
+    throw err;
+  }
 });
 
 /**
@@ -42,19 +49,26 @@ router.get('/repos', auth(ADMIN_ROLE_KEYS), async function (req, res) {
   const applicationList = _.get(applicationResult, 'result', []);
 
   const provider = git(PROVIDER.GITHUB, { access_token: githubToken });
-  const rows = await provider.listRepos();
+  try {
+    const rows = await provider.listRepos();
 
-  if (!_.isEmpty(applicationList)) {
-    let mapRows = [];
-    _.forEach(applicationList, (applicationItem) => {
-      mapRows = _.map(rows, (item) => {
-        item.disabled = item.id === Number(applicationItem.provider_repo_id);
-        return item;
+    if (!_.isEmpty(applicationList)) {
+      let mapRows = [];
+      _.forEach(applicationList, (applicationItem) => {
+        mapRows = _.map(rows, (item) => {
+          item.disabled = item.id === Number(applicationItem.provider_repo_id);
+          return item;
+        });
       });
-    });
-    return res.json(Result.ofSuccess(mapRows));
+      return res.json(Result.ofSuccess(mapRows));
+    }
+    return res.json(Result.ofSuccess(rows));
+  } catch (err) {
+    if (err === 401 && err.message === 'Bad credentials') {
+      throw new ValidationError('Github token 无效，请重新配置');
+    }
+    throw err;
   }
-  return res.json(Result.ofSuccess(rows));
 });
 
 /**
