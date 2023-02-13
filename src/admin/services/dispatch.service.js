@@ -98,7 +98,7 @@ async function cancelTask(body = {}) {
       status: status === RUNNING ? CANCEL : status,
     })),
   };
-  console.log('updateTaskPayload: ', updateTaskPayload);
+  debug(`updateTaskPayload: ${JSON.stringify(updateTaskPayload)}`);
   await taskModel.updateTask(taskId, updateTaskPayload);
 
   const { commit, message, ref, environment, envName } = trigger_payload || {};

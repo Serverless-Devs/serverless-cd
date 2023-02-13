@@ -26,7 +26,7 @@ router.get('/orgs', auth(ADMIN_ROLE_KEYS), async function (req, res) {
     const orgs = await provider.listOrgs();
     return res.json(Result.ofSuccess(orgs));
   } catch (err) {
-    if (err === 401 && err.message === 'Bad credentials') {
+    if (err.code === 401 && err.message === 'Bad credentials') {
       throw new ValidationError('Github token 无效，请重新配置');
     }
     throw err;
@@ -64,7 +64,7 @@ router.get('/repos', auth(ADMIN_ROLE_KEYS), async function (req, res) {
     }
     return res.json(Result.ofSuccess(rows));
   } catch (err) {
-    if (err === 401 && err.message === 'Bad credentials') {
+    if (err.code === 401 && err.message === 'Bad credentials') {
       throw new ValidationError('Github token 无效，请重新配置');
     }
     throw err;

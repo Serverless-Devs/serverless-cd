@@ -10,7 +10,6 @@ const getCode = (arg) => {
 
 class Result {
   static ofError(message, code) {
-    console.error(message, code.code);
     return {
       code: code ? getCode(code) || 500 : 500,
       success: false,
