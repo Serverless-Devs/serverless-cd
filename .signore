@@ -10,3 +10,11 @@ src/example
 /Makefile
 /package.json
 /package-lock.json
+
+/README.md
+_mock
+.git
+.github
+.prettierignore
+prettier.config.js
+serverless-pipeline.yaml

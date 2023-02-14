@@ -6,14 +6,17 @@ const { accessKeyId, accessKeySecret, accountId, securityToken } = CREDENTIALS;
 
 module.exports = class Client {
   static oss() {
-    return new OssClient({
-      accessKeyId,
-      accessKeySecret,
-      stsToken: securityToken,
-      bucket: OSS_CONFIG.bucket,
-      region: OSS_CONFIG.region,
-      timeout: `${1 * 60 * 1000}`, // min
-    });
+    if (OSS_CONFIG) {
+      return new OssClient({
+        accessKeyId,
+        accessKeySecret,
+        stsToken: securityToken,
+        bucket: OSS_CONFIG.bucket,
+        region: OSS_CONFIG.region,
+        timeout: `${1 * 60 * 1000}`, // min
+      });
+    }
+    console.warn('没有配置 OSS bucket');
   }
 
   static fc(region) {

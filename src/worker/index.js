@@ -8,6 +8,7 @@ const {
   CREDENTIALS,
   OSS_CONFIG,
   DEFAULT_UNSET_ENVS,
+  LOG_LOCAL_PATH_PREFIX,
 } = require('@serverless-cd/config');
 
 const checkout = require('@serverless-cd/git').default;
@@ -40,7 +41,7 @@ async function handler(event, _context, callback) {
   } = inputs;
 
   const cwdPath = path.join(execDir, taskId);
-  const logPrefix = `/logs/${taskId}`;
+  const logPrefix = `${LOG_LOCAL_PATH_PREFIX}/${taskId}`;
   core.fs.emptyDirSync(logPrefix);
   console.log('start task, uuid: ', taskId);
 
@@ -99,10 +100,10 @@ async function handler(event, _context, callback) {
     cwd: cwdPath,
     logConfig: {
       logPrefix,
-      ossConfig: {
+      ossConfig: OSS_CONFIG ? {
         ...CREDENTIALS,
         ...OSS_CONFIG,
-      },
+      } : undefined,
       // logLevel: 'debug',
     },
     inputs: {
