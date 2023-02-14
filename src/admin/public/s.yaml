@@ -1,20 +1,20 @@
 edition: 1.0.0
-access: "serverless-devs"
+access: 'serverless-devs'
 
 services:
-  ui:  # 前端UI
+  ui: # 前端UI
     component: oss
     actions:
       pre-deploy:
         - run: npm install --registry=https://registry.npmmirror.com
-          path: "./ui"
+          path: './ui'
         - run: npm run build
-          path: "./ui"
+          path: './ui'
     props:
       bucket: ${env.OSS_BUCKET}-website
-      codeUri: "./ui/build"
+      codeUri: './ui/build'
       acl: public-read
       region: ${vars.region}
       cors: # OSS 设置跨域资源共享规则
-        - allowedOrigin: ["*.fc.devsapp.net"]
+        - allowedOrigin: ['*.fc.devsapp.net']
           allowedMethod: ['GET', 'PUT', 'DELETE', 'POST', 'HEAD']

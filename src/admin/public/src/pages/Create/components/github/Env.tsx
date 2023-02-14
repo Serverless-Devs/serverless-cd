@@ -12,7 +12,6 @@ interface IProps {
 
 export const validteEnv = (rule, value, callback, args) => {
   const existEnvs = get(args, 'existEnvs', []);
-  console.log(existEnvs);
 
   if (isEmpty(value.name)) return callback('请输入环境名称');
   if (includes(existEnvs, value.name)) return callback('当前环境已存在，请勿重复创建。');

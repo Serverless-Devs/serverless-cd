@@ -16,7 +16,14 @@ const DeleteCommit = (props: Props) => {
 
   const onDelete = () => {
     Dialog.confirm({
-      title: <h3 style={{ margin: 0 }}>{`删除版本 ${taskId}`}<span className='fz-12' style={{color: '#787878'}}>({updatedTime})</span></h3>,
+      title: (
+        <h3 style={{ margin: 0 }}>
+          {`删除版本 ${taskId}`}
+          <span className="fz-12" style={{ color: '#787878' }}>
+            ({updatedTime})
+          </span>
+        </h3>
+      ),
       content: (
         <span style={{ fontSize: 12 }}>
           当前操作仅删除部署记录，不会影响已部署的环境资源，您确定要删除版本记录

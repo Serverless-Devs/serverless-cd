@@ -11,15 +11,13 @@ interface Props {
 const PageInfo = (props: Props) => {
   const { title, extra, children, endExtra } = props;
   return (
-    <Box spacing={8} >
+    <Box spacing={8}>
       <div className="box-hd flex-r" style={{ justifyContent: 'space-between' }}>
-        <div className='flex-r'>
-          <h3 className='mr-10'>{title}</h3>
+        <div className="flex-r">
+          <h3 className="mr-10">{title}</h3>
           {extra}
         </div>
-        <div>
-          {endExtra}
-        </div>
+        <div>{endExtra}</div>
       </div>
       {children}
     </Box>

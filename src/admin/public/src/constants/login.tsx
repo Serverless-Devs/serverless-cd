@@ -12,7 +12,7 @@ export const PAGE_CONFIG = {
     description: 'Sign up with your email and a password.',
     btnText: 'Sign Up',
     type: 'signUp',
-    linkTo: '/login?type=account',
-    linkText: 'Already have an account? Log in'
-  }
-}
+    linkTo: '/login',
+    linkText: 'Already have an account? Log in',
+  },
+};

@@ -11,10 +11,10 @@ const appConfig: IAppConfig = {
       response: {
         onConfig: (response) => {
           if (response.data.code === 302) {
-            history?.push('/');
+            return history?.push('/');
           }
           if (response.data.code === 401) {
-            history?.push('/login');
+            return history?.push('/login');
           }
           if (!response.data.success && response.data.message) {
             Toast.error(response.data.message);
@@ -34,7 +34,7 @@ const appConfig: IAppConfig = {
   },
   router: {
     type: 'browser',
-    fallback: <div></div>
+    fallback: <div></div>,
   },
 };
 

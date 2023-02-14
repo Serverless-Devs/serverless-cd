@@ -8,3 +8,5 @@ src/example
 /src/s.dev.yaml
 /src/serverless-cd.yaml
 /Makefile
+/package.json
+/package-lock.json

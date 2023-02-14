@@ -1,5 +1,10 @@
 const Orm = require('@serverless-cd/ots-orm');
-const { CREDENTIALS, OTS } = require('../config');
+const { CREDENTIALS } = require('@serverless-cd/config');
+
+const OTS = {
+  region: 'REGION',
+  instanceName: 'OTS_INSTANCE_NAME',
+};
 
 const config = {
   ...CREDENTIALS,

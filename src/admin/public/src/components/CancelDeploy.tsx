@@ -20,7 +20,7 @@ const CancelDeploy = (props: Props) => {
 
   const onClose = () => {
     setVisible(false);
-  }
+  };
 
   const submit = async () => {
     setLoading(true);
@@ -31,15 +31,11 @@ const CancelDeploy = (props: Props) => {
     }
     setLoading(false);
     onClose();
-  }
+  };
 
   return (
     <>
-      <Button
-        onClick={() => setVisible(true)}
-        type="primary"
-        text={isText}
-      >
+      <Button onClick={() => setVisible(true)} type="primary" text={isText}>
         取消部署
       </Button>
       <Dialog
@@ -55,16 +51,12 @@ const CancelDeploy = (props: Props) => {
         onClose={onClose}
         style={{ width: 600 }}
         footer={[
-          <Button
-            type="primary"
-            onClick={submit}
-            loading={loading as boolean}
-          >
+          <Button type="primary" onClick={submit} loading={loading as boolean}>
             确定
           </Button>,
           <Button type="normal" onClick={onClose} disabled={loading as boolean}>
             取消
-          </Button>
+          </Button>,
         ]}
       >
         <p style={{ margin: 0 }}>
@@ -72,7 +64,6 @@ const CancelDeploy = (props: Props) => {
         </p>
       </Dialog>
     </>
-  )
-
-}
-export default CancelDeploy
+  );
+};
+export default CancelDeploy;

@@ -88,11 +88,11 @@ services:
     actions:
       pre-deploy:
         - run: npm install --force
-          path: "./admin/public"
+          path: './admin/public'
         - run: npm run build
-          path: "./admin/public"
+          path: './admin/public'
         - run: npm install
-          path: "./admin"
+          path: './admin'
         - plugin: get-http-function-url # 获取依赖的 trigger 函数的触发器地址，也可以直接修改 environmentVariables 的 WEBHOOKURL
           args:
             region: ${vars.region}
@@ -122,7 +122,7 @@ services:
           WORKER_FUNCTION_NAME: ${vars.workerFunctionName} # worker 函数的名称
           DOWNLOAD_CODE_DIR: ${env.DOWNLOAD_CODE_DIR}
           CD_PIPLINE_YAML: ${env.CD_PIPLINE_YAML}
-          GITHUB_CLIENT_ID: ${env.GITHUB_CLIENT_ID} # 
+          GITHUB_CLIENT_ID: ${env.GITHUB_CLIENT_ID} #
           GITHUB_CLIENT_SECRET: ${env.GITHUB_CLIENT_SECRET} # 是不是在 运行 init 之后在让用户手动填写比较好，因为我们能提示到下面的 callback
           GITHUB_REDIRECT_URI: http://${env.DOMAIN}/auth/github/callback
           ACCOUNTID: ${env.ACCOUNTID}
@@ -159,7 +159,7 @@ services:
     actions:
       pre-deploy:
         - run: npm install
-          path: "./worker"
+          path: './worker'
       post-deploy:
         - component: fc api UpdateFunction --region ${vars.region} --header '{"x-fc-disable-container-reuse":"True"}' --path '{"serviceName":"${vars.service.name}","functionName":"${vars.workerFunctionName}"}'
     props:
@@ -214,6 +214,5 @@ services:
           - path: /api
             serviceName: ${vars.service.name}
             functionName: ${worker.props.function.name}
-
 # s admin deploy
 # s compose deploy --patch
