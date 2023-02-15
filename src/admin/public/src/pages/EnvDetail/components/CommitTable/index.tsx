@@ -40,10 +40,7 @@ const CommitTable: FC<IProps> = (props) => {
       cell: (value, index, record) => {
         return (
           <>
-            <Link
-              className="commit-description"
-              to={`/application/${appId}/detail/${envName}/${value}`}
-            >
+            <Link className="commit-description" to={`/application/${appId}/${envName}/${value}`}>
               {value}
             </Link>
             {!pollingStatus.includes(record.status) && latestTaskId === value && (

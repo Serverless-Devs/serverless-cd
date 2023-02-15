@@ -78,17 +78,17 @@ const routerConfig: IRouterConfig[] = [
     component: BasicLayout,
     children: [
       {
-        path: '/detail',
+        path: '/',
         exact: true,
         component: AppDetail,
       },
       {
-        path: '/detail/:envName',
+        path: '/:envName',
         exact: true,
         component: EnvDetail,
       },
       {
-        path: '/detail/:envName/:taskId',
+        path: '/:envName/:taskId',
         exact: true,
         component: TaskDetails,
       },
