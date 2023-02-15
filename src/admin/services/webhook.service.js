@@ -3,15 +3,15 @@ const { lodash: _ } = require('@serverless-cd/core');
 const debug = require('debug')('serverless-cd:webhook');
 const { WEBHOOK_URL, WEBHOOK_EVENTS, PROVIDER } = require('@serverless-cd/config');
 
-async function add(owner, repo, access_token, secret, appId) {
-  const provider = git(PROVIDER.GITHUB, { access_token });
-  const webhooks = await provider.listWebhook({ owner, repo });
+async function add({ owner, repo, token: access_token, webHookSecret: secret, appId, provider }) {
+  const providerClient = git(provider, { access_token });
+  const webhooks = await providerClient.listWebhook({ owner, repo });
   const url = `${WEBHOOK_URL}?app_id=${appId}`;
   debug(`webhook url is ${url}`);
   debug(`webhooks is ${JSON.stringify(webhooks)}`);
   for (const row of webhooks) {
     if (row.url === url) {
-      await provider.updateWebhook({
+      await providerClient.updateWebhook({
         owner,
         repo,
         url,
@@ -22,19 +22,19 @@ async function add(owner, repo, access_token, secret, appId) {
       return;
     }
   }
-  return await provider.createWebhook({ owner, repo, url, secret, events: WEBHOOK_EVENTS });
+  return await providerClient.createWebhook({ owner, repo, url, secret, events: WEBHOOK_EVENTS });
 }
 
-async function remove(owner, repo, access_token, appId) {
+async function remove({ owner, repo_name: repo, token: access_token, appId, provider }) {
   try {
-    const provider = git(PROVIDER.GITHUB, { access_token });
-    const webhooks = await provider.listWebhook({ owner, repo });
+    const providerClient = git(provider, { access_token });
+    const webhooks = await providerClient.listWebhook({ owner, repo });
     const url = `${WEBHOOK_URL}?app_id=${appId}`;
     debug(`webhook url is ${url}`);
     for (const row of webhooks) {
       if (row.url === url) {
         debug(`remove webhook: ${JSON.stringify({ owner, repo, hook_id: row.id })}`);
-        await provider.deleteWebhook({ owner, repo, hook_id: row.id });
+        await providerClient.deleteWebhook({ owner, repo, hook_id: row.id });
         return;
       }
     }
