@@ -11,7 +11,7 @@
   "dependencies": {
     "@prisma/client": "^4.8.1",
     "@alicloud/fc-open20210406": "^1.1.13",
-    "@serverless-cd/config": "^0.0.10",
+    "@serverless-cd/config": "^0.0.11",
     "@serverless-cd/core": "^0.0.14",
     "@serverless-cd/engine": "^0.0.19",
     "@serverless-cd/git": "^0.0.2",
