@@ -10,12 +10,14 @@ import {
 import PageNav from './components/PageNav';
 import Logo from './components/Logo';
 import { LOGO_URL } from '@/constants/public';
-import { loginOut } from '@/services/user';
+import { logout } from '@/services/auth';
 import { history, useRequest } from 'ice';
 import store from '@/store';
 import { get } from 'lodash';
 import ToastContainer from '@/components/ToastContainer';
 import './index.css';
+
+const menuConfig = ['/settings/tokens', '/settings/secrets'];
 
 (function () {
   const throttle = function (type: string, name: string, obj: Window = window) {
@@ -66,11 +68,11 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
 
   const [device, setDevice] = useState(getDevice(NaN));
   const [isCollapse, setIsCollapse] = useState<any>(false);
-  const { request } = useRequest(loginOut);
+  const { request } = useRequest(logout);
   const [userState, userDispatchers] = store.useModel('user');
   const avatar = get(userState, 'userInfo.avatar');
   const username = get(userState, 'userInfo.username', '');
-  const showMenu = !['/application', '/create', '/'].includes(pathname);
+  const showMenu = menuConfig.includes(pathname);
 
   useEffect(() => {
     setTimeout(() => {
@@ -81,7 +83,7 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
   const menu = () => {
     const onItemClick = (key) => {
       if (key === 'username') return;
-      if (key === 'loginout') {
+      if (key === 'logout') {
         request();
         userDispatchers.removeStateInfo();
         history?.push('/login');
@@ -106,7 +108,7 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
           Settings
         </Menu.Item>
         <Divider key="divider3" className="m-t-b-10" />
-        <Menu.Item key="loginout">Login Out</Menu.Item>
+        <Menu.Item key="logout">Login Out</Menu.Item>
       </Menu>
     );
   };

@@ -29,16 +29,18 @@ interface IProps {
 const initRepoTypeList = [
   {
     label: '个人仓库',
-    children: [{
-      value: 'personal',
-      label: '个人仓库'
-    }]
+    children: [
+      {
+        value: 'personal',
+        label: '个人仓库',
+      },
+    ],
   },
   {
     label: '组织仓库',
-    children: []
+    children: [],
   },
-]
+];
 
 const Repos = (props: IProps) => {
   const { value, onChange = noop, field } = props;
@@ -56,24 +58,24 @@ const Repos = (props: IProps) => {
       const newRepoTypeList = cloneDeep(initRepoTypeList);
       const orgList = map(orgs, ({ org, id }) => ({ label: org, value: org, id }));
       newRepoTypeList[1].children = orgList as any;
-      setValue('repoTypeList', newRepoTypeList)
+      setValue('repoTypeList', newRepoTypeList);
     }
-  }, [data])
+  }, [data]);
 
   useEffect(() => {
     if (!getValue('repoTypeList')) {
-      setValue('repoTypeList', initRepoTypeList)
+      setValue('repoTypeList', initRepoTypeList);
     }
-  }, [getValue('repoTypeList')])
+  }, [getValue('repoTypeList')]);
 
   useEffect(() => {
     if (!userState.isAuth) return;
-    onRepoTypeChange('personal')
+    onRepoTypeChange('personal');
     request();
   }, [userState.isAuth]);
 
   const valueRender = ({ value }) => {
-    const userRepos = getValue('userRepos') as IRepoItem[] || [] as IRepoItem[]
+    const userRepos = (getValue('userRepos') as IRepoItem[]) || ([] as IRepoItem[]);
     const item = find(userRepos, (obj: IRepoItem) => obj.name === value);
     if (!item) return null;
     return (
@@ -177,11 +179,11 @@ const Repos = (props: IProps) => {
 
   const refresh = async () => {
     setRefreshLoading(true);
-    await request()
+    await request();
     if (currentRepoType === 'personal') {
       await fetchUserRepos();
     } else {
-      await fetchOrgRepos(currentRepoType)
+      await fetchOrgRepos(currentRepoType);
     }
     setRefreshLoading(false);
   };
@@ -194,16 +196,16 @@ const Repos = (props: IProps) => {
     if (!value) return;
     setValue('userRepos', []);
     if (value === 'personal') {
-      fetchUserRepos()
+      fetchUserRepos();
     } else {
-      fetchOrgRepos(value)
+      fetchOrgRepos(value);
     }
     setCurrentRepoType(value);
     onChange({});
-  }
+  };
   return (
-    <div className='flex-r position-r'>
-      <Form field={field} className='flex-r position-r' style={{ width: '100%' }}>
+    <div className="flex-r position-r">
+      <Form field={field} className="flex-r position-r" style={{ width: '100%' }}>
         <FormItem style={{ flexBasis: '30%', marginBottom: getError('repoName') ? 20 : 0 }}>
           <Select
             className="full-width"
@@ -212,8 +214,8 @@ const Repos = (props: IProps) => {
             {...init('repoTypeValue', {
               initValue: 'personal',
               props: {
-                onChange: onRepoTypeChange
-              }
+                onChange: onRepoTypeChange,
+              },
             })}
             state={loading ? 'loading' : undefined}
             disabled={loading}
@@ -230,14 +232,14 @@ const Repos = (props: IProps) => {
               ],
               props: {
                 value: value?.name,
-                onChange: handleChange
-              }
+                onChange: handleChange,
+              },
             }) as any)}
             className="full-width"
             placeholder="请选择"
             showSearch
             dataSource={getValue('userRepos')}
-            state={(orgRepos.loading || effectsState.getUserRepos.isLoading) ? 'loading' : undefined}
+            state={orgRepos.loading || effectsState.getUserRepos.isLoading ? 'loading' : undefined}
             disabled={loading || effectsState.getUserRepos.isLoading || orgRepos.loading}
             valueRender={valueRender}
             popupClassName="icon-right"

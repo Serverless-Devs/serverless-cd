@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Link, withRouter, useRouteMatch } from 'ice';
 import { Nav } from '@alicloud/console-components';
 import { getMenuConfig } from '@/constants/navConfig';
+import { find } from 'lodash';
 
 const { SubNav } = Nav;
 const NavItem = Nav.Item;
@@ -77,7 +78,7 @@ const Navigation = (props, context) => {
   const { isCollapse } = context;
 
   useEffect(() => {
-    const curSubNav = asideMenuConfig.find((menuConfig) => {
+    const curSubNav = find(asideMenuConfig, (menuConfig) => {
       return menuConfig.children && checkChildPathExists(menuConfig);
     });
 

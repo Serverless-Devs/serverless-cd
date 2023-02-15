@@ -6,7 +6,7 @@ import { checkFile, githubPutFile } from '@/services/git';
 import { useRequest, history } from 'ice';
 import { CREATE_TYPE, SERVERLESS_PIPELINE_CONTENT } from './constant';
 import { get, each, map, every, find, uniqWith, isEqual, isEmpty } from 'lodash';
-import { sleep } from '@/utils';
+import { getConsoleConfig, sleep } from '@/utils';
 import { Toast } from '@/components/ToastContainer';
 import CodeMirror from '@/components/CodeMirror';
 import yaml from 'js-yaml';
@@ -23,7 +23,7 @@ interface IStepItem {
 }
 
 const Submit = (props: IProps) => {
-  const CD_PIPLINE_YAML = get(window, 'CD_PIPLINE_YAML', 'serverless-pipeline.yaml');
+  const CD_PIPELINE_YAML = getConsoleConfig('CD_PIPELINE_YAML', 'serverless-pipeline.yaml');
   const { loading, request } = useRequest(createApp);
   const manualDeploy = useRequest(manualDeployApp);
   const field = Field.useField();
@@ -38,8 +38,8 @@ const Submit = (props: IProps) => {
       await githubPutFile({
         owner: get(values, 'repo.owner'),
         repo: get(values, 'repo.name'),
-        path: CD_PIPLINE_YAML,
-        message: `add ${CD_PIPLINE_YAML} by Serverless CD`,
+        path: CD_PIPELINE_YAML,
+        message: `add ${CD_PIPELINE_YAML} by Serverless CD`,
         content: getValue('yaml'),
         branch: item.branch,
       });
@@ -61,6 +61,7 @@ const Submit = (props: IProps) => {
       }
     });
 
+    const environment = get(values, 'environment', {});
     const dataMap = {
       [CREATE_TYPE.Repository]: {
         provider: get(values, 'gitType'),
@@ -69,8 +70,13 @@ const Submit = (props: IProps) => {
         repo: get(values, 'repo.name'),
         owner: get(values, 'repo.owner'),
         provider_repo_id: String(get(values, 'repo.id')),
-        trigger_spec,
-        secrets,
+        environment: {
+          [environment.name]: {
+            type: environment.type,
+            trigger_spec,
+            secrets,
+          },
+        },
       },
     };
     try {
@@ -101,7 +107,7 @@ const Submit = (props: IProps) => {
       const stepData: IStepItem[] = map(branchList, (branch, index) => {
         return {
           key: branch,
-          title: `检查${branch}分支是否存在${CD_PIPLINE_YAML}文件`,
+          title: `检查${branch}分支是否存在${CD_PIPELINE_YAML}文件`,
           status: 'pending',
           current: Number(index),
           branch,
@@ -210,7 +216,7 @@ const Submit = (props: IProps) => {
             {map(errorBranch, (item) => {
               return (
                 <div>
-                  检测到{item.branch}分支不存在{CD_PIPLINE_YAML}文件。
+                  检测到{item.branch}分支不存在{CD_PIPELINE_YAML}文件。
                 </div>
               );
             })}

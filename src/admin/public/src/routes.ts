@@ -1,89 +1,94 @@
-import { IRouterConfig, lazy} from 'ice';
+import { IRouterConfig, lazy } from 'ice';
 import { BasicLayout } from '@/layouts/BasicLayout';
 import { LoginLayout } from '@/layouts/LoginLayout';
 
-// import Dashboard from '@/pages/Dashboard';
+// import AppList from '@/pages/AppList';
 // import Login from '@/pages/Login';
 // import Signup from '@/pages/Signup';
 // import Create from '@/pages/Create';
-// import Details from '@/pages/Details';
+// import AppDetail from '@/pages/AppDetail';
 // import TaskDetails from '@/pages/TaskDetails';
 // import Auth from '@/pages/Auth';
 // import Tokens from '@/pages/Tokens';
 // import Secrets from '@/pages/Secrets';
 
-const Dashboard = lazy(() => import(/* webpackChunkName: 'user-login' */'@/pages/Dashboard'));
-const Login = lazy(() => import(/* webpackChunkName: 'Login' */'@/pages/Login'));
-const Signup = lazy(() => import(/* webpackChunkName: 'Signup' */'@/pages/Signup'));
-const Create = lazy(() => import(/* webpackChunkName: 'Create' */'@/pages/Create'));
-const Details = lazy(() => import(/* webpackChunkName: 'Details' */'@/pages/Details'));
-const TaskDetails = lazy(() => import(/* webpackChunkName: 'TaskDetails' */'@/pages/TaskDetails'));
-const Auth = lazy(() => import(/* webpackChunkName: 'Auth' */'@/pages/Auth'));
-const Tokens = lazy(() => import(/* webpackChunkName: 'Tokens' */'@/pages/Tokens'));
-const Secrets = lazy(() => import(/* webpackChunkName: 'Secrets' */'@/pages/Secrets'));
-
+const AppList = lazy(() => import(/* webpackChunkName: 'user-login' */ '@/pages/AppList'));
+const Login = lazy(() => import(/* webpackChunkName: 'Login' */ '@/pages/Login'));
+const Signup = lazy(() => import(/* webpackChunkName: 'Signup' */ '@/pages/Signup'));
+const Create = lazy(() => import(/* webpackChunkName: 'Create' */ '@/pages/Create'));
+const AppDetail = lazy(() => import(/* webpackChunkName: 'AppDetail' */ '@/pages/AppDetail'));
+const EnvDetail = lazy(() => import(/* webpackChunkName: 'AppDetail' */ '@/pages/EnvDetail'));
+const TaskDetails = lazy(() => import(/* webpackChunkName: 'TaskDetails' */ '@/pages/TaskDetails'));
+const Auth = lazy(() => import(/* webpackChunkName: 'Auth' */ '@/pages/Auth'));
+const Tokens = lazy(() => import(/* webpackChunkName: 'Tokens' */ '@/pages/Tokens'));
+const Secrets = lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Secrets'));
 
 const routerConfig: IRouterConfig[] = [
   {
-    path: "/login",
+    path: '/login',
     component: LoginLayout,
     children: [
       {
-        path: "/",
+        path: '/',
         exact: true,
         component: Login,
       },
     ],
   },
   {
-    path: "/signUp",
+    path: '/signUp',
     component: LoginLayout,
     children: [
       {
-        path: "/",
+        path: '/',
         exact: true,
         component: Signup,
       },
     ],
   },
   {
-    path: "/auth",
+    path: '/auth',
     component: LoginLayout,
     children: [
       {
-        path: "/:provider/callback",
+        path: '/:provider/callback',
         exact: true,
         component: Auth,
       },
     ],
   },
   {
-    path: "/settings",
+    path: '/settings',
     component: BasicLayout,
     children: [
       {
-        path: "/tokens",
+        path: '/tokens',
         exact: true,
         component: Tokens,
       },
       {
-        path: "/secrets",
+        path: '/secrets',
         exact: true,
-        component: Secrets
+        component: Secrets,
       },
     ],
   },
   {
-    path: "/application/:appId",
+    path: '/application/:appId',
     component: BasicLayout,
     children: [
       {
-        path: "/detail",
+        path: '/detail',
         exact: true,
-        component: Details,
+        component: AppDetail,
       },
       {
-        path: "/detail/:taskId",
+        path: '/detail/:envName',
+        exact: true,
+        component: EnvDetail,
+      },
+      {
+        path: '/detail/:envName/:taskId',
         exact: true,
         component: TaskDetails,
       },
@@ -95,16 +100,16 @@ const routerConfig: IRouterConfig[] = [
     ],
   },
   {
-    path: "/",
+    path: '/',
     component: BasicLayout,
     children: [
       {
-        path: "/application",
+        path: '/application',
         exact: true,
-        component: Dashboard,
+        component: AppList,
       },
       {
-        path: "/create",
+        path: '/create',
         exact: true,
         component: Create,
       },
@@ -114,6 +119,6 @@ const routerConfig: IRouterConfig[] = [
         redirect: '/application',
       },
     ],
-  }
+  },
 ];
 export default routerConfig;

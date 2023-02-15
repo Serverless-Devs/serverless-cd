@@ -1,6 +1,8 @@
-import _ from "lodash";
+import _ from 'lodash';
 import moment from 'moment';
 const DATE_TIME_REG = /^\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d(?:\.\d+)?Z?/;
+
+export const formatTime = (date, fmt = 'YYYY-MM-DD HH:mm:ss') => moment(date).format(fmt);
 
 export function getParams(search = '') {
   let obj = {};
@@ -19,12 +21,18 @@ export function replaceAll(string, search, replace) {
 }
 
 /**
+ * 获取配置
+ */
+export function getConsoleConfig(key: string, defaultValue?: any) {
+  return _.get(window, `CONFIG.${key}`, defaultValue);
+}
+
+/**
  * 日志关键字高亮处理
  * @param logs
  * @param requestId
  * @returns
  */
-
 export function formatLogs(log, requestId = '') {
   let l = log;
   if (requestId) {
@@ -43,7 +51,7 @@ export function formatLogs(log, requestId = '') {
   }
   l = tokens.join(' ');
 
-  replaceToken(l)
+  replaceToken(l);
 
   return replaceToken(l);
 }
@@ -52,28 +60,26 @@ export function formatLogs(log, requestId = '') {
  * @param replaceStr
  * @returns
  */
-
 export function replaceToken(replaceStr) {
   const logKeys = {
     warn: (key) => `\u001b[33m${key}\u001b[0m`,
     info: (key) => `\u001b[32m${key}\u001b[0m`,
     error: (key) => `\u001b[31m${key}\u001b[0m`,
-    "npm ERR!": (key) => `\u001b[31m${key}\u001b[0m`,
+    'npm ERR!': (key) => `\u001b[31m${key}\u001b[0m`,
     success: (key) => `\u001b[32m${key}\u001b[0m`,
-  }
+  };
   _.each(_.keys(logKeys), (logKey: string) => {
     const replaceFn = logKeys[logKey];
     const toLowerKey = _.toLower(logKey); // 字符串转为小写
     const toUpperKey = _.toUpper(logKey); // 字符串转为大写
     const capitalizeKey = _.capitalize(toLowerKey); // 字符串首字母转为大写
-    replaceStr = replaceAll(replaceStr, toLowerKey, replaceFn(toLowerKey))
-    replaceStr = replaceAll(replaceStr, toUpperKey, replaceFn(toUpperKey))
-    replaceStr = replaceAll(replaceStr, capitalizeKey, replaceFn(capitalizeKey))
-  })
+    replaceStr = replaceAll(replaceStr, toLowerKey, replaceFn(toLowerKey));
+    replaceStr = replaceAll(replaceStr, toUpperKey, replaceFn(toUpperKey));
+    replaceStr = replaceAll(replaceStr, capitalizeKey, replaceFn(capitalizeKey));
+  });
 
-  return replaceStr
+  return replaceStr;
 }
-
 
 /**
  * 解析部署分支字段 （ref）
@@ -85,9 +91,8 @@ export const formatTag = (ref) => {
   if (matchRef) {
     return matchRef[1];
   }
-  return ref
-}
-
+  return ref;
+};
 
 /**
  * 解析部署分支字段 （ref）
@@ -107,8 +112,7 @@ export const formatBranch = (ref) => {
   }
 
   return ref;
-}
-
+};
 
 export function isJson(str) {
   try {

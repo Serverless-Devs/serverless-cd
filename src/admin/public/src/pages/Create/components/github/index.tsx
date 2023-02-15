@@ -4,7 +4,9 @@ import { FORM_ITEM_LAYOUT } from '@/constants';
 import AuthDialog from './AuthDialog';
 import Repo from './Repo';
 import Trigger from './Trigger';
-import ConfigEdit from '@/components/ConfigEdit'
+import Env, { validteEnv } from './Env';
+import ConfigEdit from '@/components/ConfigEdit';
+import { TYPE as ENV_TYPE } from '@/components/EnvType';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -61,6 +63,18 @@ const Github = (props: IProps) => {
                 {
                   required: true,
                   message: '请选择仓库名称',
+                },
+              ],
+            }) as any)}
+          />
+        </FormItem>
+        <FormItem label="环境" required>
+          <Env
+            {...(init('environment', {
+              initValue: { name: 'default', type: ENV_TYPE.TESTING },
+              rules: [
+                {
+                  validator: validteEnv,
                 },
               ],
             }) as any)}

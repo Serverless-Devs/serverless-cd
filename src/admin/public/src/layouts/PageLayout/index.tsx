@@ -13,14 +13,33 @@ interface PageLayoutProps {
   description?: string;
 }
 
-const PageLayout = ({ children, breadcrumbs, title, breadcrumbExtra, hideBackground = false, subhead, description }: PageLayoutProps) => {
+const PageLayout = ({
+  children,
+  breadcrumbs,
+  title,
+  breadcrumbExtra,
+  hideBackground = false,
+  subhead,
+  description,
+}: PageLayoutProps) => {
   return (
     <ResponsiveGrid gap={20}>
       <Cell colSpan={12}>
-        <PageHeader breadcrumbs={breadcrumbs} title={title} breadcrumbExtra={breadcrumbExtra} subhead={subhead} description={description} />
+        <PageHeader
+          breadcrumbs={breadcrumbs}
+          title={title}
+          breadcrumbExtra={breadcrumbExtra}
+          subhead={subhead}
+          description={description}
+        />
       </Cell>
       <Cell colSpan={12}>
-        <div className="page-content" style={{backgroundColor: hideBackground ? 'transparent' : '#fff'}}>{children}</div>
+        <div
+          className="page-content"
+          style={{ backgroundColor: hideBackground ? 'transparent' : '#fff' }}
+        >
+          {children}
+        </div>
       </Cell>
     </ResponsiveGrid>
   );

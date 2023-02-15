@@ -1,3 +1,5 @@
 node_modules
 .s
 admin/public/build
+migrations
+.env

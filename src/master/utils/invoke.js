@@ -1,11 +1,12 @@
-const Fc = require('@alicloud/fc2');
+const FcClient = require('@serverless-cd/srm-aliyun-fc2');
 
-const { CREDENTIALS, FC } = require('../config');
+const { CREDENTIALS, FC } = require('@serverless-cd/config');
 const { region, serviceName, functionName } = FC.workerFunction;
 
-const fcClient = new Fc(CREDENTIALS.accountId, {
+const fcClient = new FcClient(CREDENTIALS.accountId, {
   accessKeyID: CREDENTIALS.accessKeyId,
   accessKeySecret: CREDENTIALS.accessKeySecret,
+  securityToken: CREDENTIALS.securityToken,
   region,
   timeout: 60 * 1000,
 });

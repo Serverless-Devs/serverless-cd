@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Link, history } from 'ice';
 import { Button, Box, Field } from '@alicloud/console-components';
 import AccountForm from '../AccountForm';
+import { getConsoleConfig } from '@/utils';
 
 const PAGE_CONFIG = {
   login: {
@@ -22,11 +23,12 @@ const PAGE_CONFIG = {
   },
 };
 
+const supportLoginTypes = getConsoleConfig('SUPPORT_LOGIN', {});
+
 interface Props {
   pageType: string;
   request: any;
   setIsLogin?: Function;
-  supportLoginTypes?: object | any;
 }
 
 const AccountLoginOrSignUp = (props: Props) => {
@@ -34,7 +36,6 @@ const AccountLoginOrSignUp = (props: Props) => {
     pageType,
     request: { loading, data, request },
     setIsLogin,
-    supportLoginTypes
   } = props;
   const { title, btnText, linkTo, linkText } = PAGE_CONFIG[pageType];
   const field = Field.useField();
@@ -60,7 +61,6 @@ const AccountLoginOrSignUp = (props: Props) => {
   return (
     <Box>
       <h1 style={{ color: '#000', marginBottom: 20 }}>{title}</h1>
-      {/* <h3 style={{ marginTop: '30px' }}>{description}</h3> */}
       <AccountForm init={init} getError={getError} />
       <Button
         className="base-login-button"
@@ -72,23 +72,23 @@ const AccountLoginOrSignUp = (props: Props) => {
       >
         {btnText}
       </Button>
-      <Link to={linkTo} style={{ textDecoration: 'underline' }}>{linkText}</Link>
-      {
-        supportLoginTypes?.github ? (
-          pageType === 'signUp' ? (
-            <Link to={'/login'}>更多登录方式</Link>
-          ) : (
-            <a
-              href="javascript:;"
-              onClick={() => {
-                setIsLogin && setIsLogin(false)
-              }}>
-              更多登录方式
-            </a>
-          )
-        ) : null
-      }
-
+      <Link to={linkTo} style={{ textDecoration: 'underline' }}>
+        {linkText}
+      </Link>
+      {supportLoginTypes?.github ? (
+        pageType === 'signUp' ? (
+          <Link to={'/login'}>更多登录方式</Link>
+        ) : (
+          <a
+            href="javascript:;"
+            onClick={() => {
+              setIsLogin && setIsLogin(false);
+            }}
+          >
+            更多登录方式
+          </a>
+        )
+      ) : null}
     </Box>
   );
 };

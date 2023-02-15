@@ -4,18 +4,12 @@ import { map } from 'lodash';
 import Copy from '@/components/CopyIcon';
 
 interface Props {
-  secretList: any[],
-  loading?: boolean,
-  setSecretList: Function
+  secretList: any[];
+  loading?: boolean;
+  setSecretList: Function;
 }
 
-const SecretTable = ({
-  secretList,
-  loading = false,
-  setSecretList
-}: Props) => {
-
-
+const SecretTable = ({ secretList, loading = false, setSecretList }: Props) => {
   const handleshowPassword = (item) => {
     const newList = map(secretList, (i) => {
       if (i.key === item.key) {
@@ -39,9 +33,11 @@ const SecretTable = ({
           width: '35%',
           cell: (value) => {
             return (
-              <span className='mr-16 copy-trigger'>{value} <Copy content={value} size="xs" /></span>
-            )
-          }
+              <span className="mr-16 copy-trigger">
+                {value} <Copy content={value} size="xs" />
+              </span>
+            );
+          },
         },
         {
           dataIndex: 'value',
@@ -49,23 +45,23 @@ const SecretTable = ({
           title: '值',
           cell: (value, index, item) => {
             return (
-              <div className='flex-r' style={{ justifyContent: 'flex-start' }}>
-                {
-                  item.showPassword ? (
-                    <span className='mr-16 copy-trigger'>{value} <Copy content={value} size="xs" /></span>
-                  ) : (
-                    <span className='mr-16'>***************</span>
-                  )
-                }
+              <div className="flex-r" style={{ justifyContent: 'flex-start' }}>
+                {item.showPassword ? (
+                  <span className="mr-16 copy-trigger">
+                    {value} <Copy content={value} size="xs" />
+                  </span>
+                ) : (
+                  <span className="mr-16">***************</span>
+                )}
                 <Icon
                   className="mr-8 cursor-pointer"
-                  size='small'
+                  size="small"
                   type={item.showPassword ? 'eye-slash' : 'eye'}
                   onClick={() => handleshowPassword(item)}
                 />
               </div>
-            )
-          }
+            );
+          },
         },
         {
           title: '操作',
@@ -73,12 +69,13 @@ const SecretTable = ({
           cell: (_, index, { key, value }) => {
             return (
               <>
-                <Copy content={JSON.stringify({ [key]: value })} type="button" text='复制' />
+                <Copy content={JSON.stringify({ [key]: value })} type="button" text="复制" />
               </>
-            )
-          }
-        }
-      ]} />
+            );
+          },
+        },
+      ]}
+    />
   );
 };
 

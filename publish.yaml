@@ -2,7 +2,7 @@ Type: Application
 Name: serverless-cd
 Provider:
   - 阿里云
-Version: 0.0.34
+Version: dev
 Description: Serverless-cd 是一款运行在 Serverless 架构上的轻量、低成本、易拓展的 CI/CD框架，该框架基于 Serverless Devs 开发者工具打造，通过使用 Serverless-cd，开发者可以快速打造高性能、低成本的 Serverless CI/CD 能力，并对建设私有化的 Serverless 应用管理平台提供帮助
 HomePage: https://github.com/serverless-cd/serverless-cd
 Tags:
@@ -12,14 +12,19 @@ Service:
   函数计算:
     Authorities:
       - AliyunFCFullAccess
+  对象存储:
+    Authorities:
+      - AliyunOSSFullAccess
 Parameters:
   type: object
   additionalProperties: false # 不允许增加其他属性
   required: # 必填项
     - region
     - serviceName
-    - instanceName
-    - ossBukect
+    - ossBucket
+    - domain
+    - JWT_SECRET
+    - DATABASE_URL
   properties:
     region:
       title: 地域
@@ -35,36 +40,37 @@ Parameters:
         - cn-zhangjiakou
         - ap-southeast-1
         - us-west-1
-    ossBukect:
-      title: 对象存储 bukect 名称
-      type: string
-      default: auto
-      description: 用于存放执行日志，填写auto默认会生成OSS bukect
     serviceName:
       title: 服务名
       type: string
       default: serverless-cd
       pattern: "^[a-zA-Z_][a-zA-Z0-9-_]{0,127}$"
       description: 应用所属的函数计算服务, 只能包含字母、数字、下划线和中划线。不能以数字、中划线开头。长度在 1-128 之间
-    instanceName:
-      title: Tablestore 实例名称
+    ossBucket:
+      title: 对象存储 bucket 名称
       type: string
-      default: serverless-cd
-      pattern: "^[a-zA-Z][a-zA-Z0-9-_]{2,15}$"
-      description: 用于存储持久化数据，请前往https://otsnext.console.aliyun.com 创建实例
-    dbPrefix:
-      title: 表名称前缀
-      type: string
-      default: cd
-      pattern: "^[a-zA-Z][a-zA-Z0-9_]{0,15}$"
-      description: 只能包含字母、数字和下划线。必须以字母或下划线(_)开头。长度在 1-16 之间
+      description: 用于存放执行日志
     domain:
       title: 自定义域名
       type: string
       default: auto
       description: 填写auto 系统会生成一个测试域名
-    cdPipLineYaml:
-      title: 配置文件
-      type: string
-      default: serverless-pipeline.yaml
-      description: serverless-pipline 默认的配置文件
+
+    JWT_SECRET:
+      title: 登陆签名密钥
+      type: secret
+      default: auto
+      description: 填写auto系统会生成一个密钥串
+    DATABASE_URL:
+      title: 数据库链接地址
+      type: secret
+      description: 用于链接数据库，示例：mysql://USER:PASSWORD@HOST:PORT/DATABASE
+    # ACCOUNT_ID:
+    #   title: 阿里云
+    #   type: secret
+    # ACCESS_KEY_ID:
+    #   title: 阿里云
+    #   type: secret
+    # ACCESS_KEY_SECRET:
+    #   title: 阿里云
+    #   type: secret
