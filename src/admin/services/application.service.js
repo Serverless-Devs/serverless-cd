@@ -31,7 +31,7 @@ async function create(orgId, token, body) {
   const appId = unionId();
   const webHookSecret = unionId();
   debug('start add webhook');
-  await webhookService.add(owner, repo, token, webHookSecret, appId);
+  await webhookService.add({ owner, repo, token, webHookSecret, appId, provider });
   debug('start create app');
   await appModel.createApp({
     id: appId,
@@ -100,7 +100,7 @@ async function remove(orgId, userId, appId) {
   debug('Removed app successfully');
 
   debug(`Removed webhook:\nowner: ${owner}, repo_name: ${repo_name}, appId: ${appId}`);
-  await webhookService.remove(owner, repo_name, token, appId);
+  await webhookService.remove({ owner, repo_name, token, appId, provider });
   debug(`Removed webhook successfully`);
 }
 

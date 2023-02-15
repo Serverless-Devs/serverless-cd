@@ -14,6 +14,10 @@ async function initUser({ username, password }) {
   if (_.get(data, 'username', '')) {
     throw new ValidationError('用户名已存在');
   }
+  const orgData = await orgModel.getOrgFirst({ name: username });
+  if (_.get(orgData, 'name', '')) {
+    throw new ValidationError('组织名称已存在');
+  }
 
   const { id: userId } = await userModel.createUser({ username, password });
   const { id: orgId } = await orgModel.createOrg({ userId, name: username });

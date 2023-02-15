@@ -24,7 +24,7 @@ model User {
 model Org {
   id    String     @id
   user_id String
-  name String             // username
+  name String             // 
   role String             // owner / admin / member
   description String?
 }

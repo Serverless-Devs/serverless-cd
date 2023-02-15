@@ -5,11 +5,9 @@ const debug = require('debug')('serverless-cd:root');
 const orgService = require('../services/org.service');
 
 router.get('/', jwtAuth, async function (req, res, _next) {
-  const { role: ROLE } = await orgService.getOrgById(req.orgId);
   const config = {
     CD_PIPELINE_YAML,
     SUPPORT_LOGIN,
-    ROLE,
     REDIRECT_URL: GITHUB_REDIRECT_URI,
   };
   debug(`set index config: ${JSON.stringify(config)}`);

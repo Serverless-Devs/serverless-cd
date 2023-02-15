@@ -7,6 +7,13 @@ const { OWNER_ROLE_KEYS, ADMIN_ROLE_KEYS } = require('@serverless-cd/config');
 const auth = require('../../middleware/auth');
 const orgService = require('../../services/org.service');
 
+// 查看用户当前信息
+router.get('/detail', async (req, res) => {
+  const { orgId } = req;
+  const result = await orgService.getOrgById(orgId);
+  res.json(Result.ofSuccess(result));
+});
+
 // 显示团队成员
 router.get('/listUsers', async (req, res) => {
   const { orgId } = req;
