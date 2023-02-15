@@ -36,7 +36,6 @@ async function getProviderRepos(orgId, provider, { org } = {}) {
   const providerClient = git(provider, { access_token: token });
 
   const applicationResult = await appService.listByOrgId(orgId);
-  const applicationList = _.get(applicationResult, 'result', []);
 
   try {
     let rows;
@@ -46,15 +45,16 @@ async function getProviderRepos(orgId, provider, { org } = {}) {
       rows = await providerClient.listRepos();
     }
 
-    if (!_.isEmpty(applicationList)) {
-      let mapRows = [];
-      _.forEach(applicationList, (applicationItem) => {
-        mapRows = _.map(rows, (item) => {
-          item.disabled = item.id === Number(applicationItem.provider_repo_id);
-          return item;
-        });
+    if (!_.isEmpty(applicationResult)) {
+      return _.map(rows, (item) => {
+        for (const applicationItem of applicationResult) {
+          if (item.id === Number(applicationItem.provider_repo_id)) {
+            item.disabled = true;
+            return item;
+          }
+        }
+        return item;
       });
-      return mapRows;
     }
     return rows;
   } catch (err) {
