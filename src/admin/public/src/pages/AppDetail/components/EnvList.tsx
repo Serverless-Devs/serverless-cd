@@ -13,7 +13,7 @@ import { get, noop } from 'lodash';
 type Props = {
   appId: string;
   data: any;
-  refresh: () => Promise<any>;
+  refresh?: () => Promise<any>;
 };
 
 const EnvList: FC<Props> = (props) => {

@@ -75,7 +75,7 @@ const Details = ({
         ],
       });
     }
-  }, [detailInfo]);
+  }, [JSON.stringify(detailInfo)]);
 
   const deleteApplication = () => {
     const dialog = Dialog.alert({

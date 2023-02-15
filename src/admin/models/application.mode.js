@@ -49,7 +49,7 @@ module.exports = {
         updated_time: 'desc',
       },
     });
-    return _.map(applicationResult, item => getAppInfo(item));
+    return _.map(applicationResult, (item) => getAppInfo(item));
   },
   async deleteAppById(appId) {
     const result = await applicationPrisma.delete({
