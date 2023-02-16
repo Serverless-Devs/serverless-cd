@@ -7,32 +7,6 @@ const applicationPrisma = prisma[TABLE.APPLICATION];
 const orgPrisma = prisma[TABLE.ORG];
 const userPrisma = prisma[TABLE.USER];
 
-const getUserInfo = (result) => {
-  if (!result) {
-    return null;
-  }
-  if (_.isArray(result)) {
-    result = _.first(result);
-  }
-  result.third_part = _.isString(result.third_part)
-    ? JSON.parse(result.third_part)
-    : result.third_part;
-  return result;
-};
-
-const getAppInfo = (result) => {
-  if (!result) {
-    return null;
-  }
-  if (_.isArray(result)) {
-    result = _.first(result);
-  }
-  result.environment = _.isString(result.environment)
-    ? JSON.parse(result.environment)
-    : result.environment;
-  return result;
-};
-
 /**
  * 根据 userId 获取用户信息
  * @param {*} id 
@@ -40,7 +14,10 @@ const getAppInfo = (result) => {
  */
 async function getUserById(id) {
   const result = await userPrisma.findUnique({ where: { id } });
-  return getUserInfo(result);
+  if (result && result.third_part) {
+    result.third_part = JSON.parse(result.third_part);
+  }
+  return result;
 }
 
 /**
@@ -50,16 +27,9 @@ async function getUserById(id) {
  */
 async function getOrgById(id) {
   const result = await orgPrisma.findUnique({ where: { id } });
-  return result;
-}
-
-/**
- * 根据条件获取团队的第一条信息
- * @param {*} where 
- * @returns 
- */
-async function getOrgFirst(where) {
-  const result = await orgPrisma.findFirst({ where });
+  if (result && result.secrets) {
+    result.secrets = JSON.parse(result.secrets);
+  }
   return result;
 }
 
@@ -74,12 +44,17 @@ async function getOrganizationOwnerIdByOrgId(orgId) {
   if (role === ROLE.OWNER) {
     ownerUserId = orgData.user_id;
   } else {
-    const ownerOrgData = await getOrgFirst({ name, role: ROLE.OWNER });
+    const ownerOrgData = await orgPrisma.findFirst({ where: { name, role: ROLE.OWNER } });
     ownerUserId = ownerOrgData.user_id;
   }
 
+  // TODO
   // 此团队拥有者的数据：一个团队只能拥有一个 owner
-  return await getUserById(ownerUserId);
+  const userConfig = await getUserById(ownerUserId);
+  return {
+    ...userConfig,
+    secrets: orgData.secrets,
+  };
 }
 
 /**
@@ -89,7 +64,10 @@ async function getOrganizationOwnerIdByOrgId(orgId) {
  */
 async function getAppById(id) {
   const result = await applicationPrisma.findUnique({ where: { id } });
-  return getAppInfo(result);
+  if (result && result.environment) {
+    result.environment = JSON.parse(result.environment)
+  }
+  return result;
 }
 
 module.exports = {

@@ -122,6 +122,8 @@ services:
           path: "./admin/public"
         - run: npm install --registry=https://registry.npmmirror.com
           path: "./admin"
+        # - run: npx prisma migrate dev --name init
+        #   path: "./admin"
         - run: npx prisma generate
           path: "./admin"
         - plugin: get-http-function-url # 获取依赖的 trigger 函数的触发器地址，会覆盖 environmentVariables 的 WEBHOOK_URL

@@ -133,7 +133,15 @@ async function transfer(orgId, transferUserId) {
   await orgModel.updateOrg(orgId, { user_id: transferUserId });
 }
 
+function desensitization(data) {
+  if (_.isArray(data)) {
+    return _.map(data, item => _.omit(item, ['secrets']))
+  }
+  return _.omit(data, ['secrets']);
+}
+
 module.exports = {
+  desensitization,
   getOwnerOrgByUserId,
   transfer,
   remove,

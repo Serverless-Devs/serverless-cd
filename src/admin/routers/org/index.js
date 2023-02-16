@@ -12,14 +12,14 @@ const authService = require('../../services/auth.service');
 router.get('/detail', async (req, res) => {
   const { orgId } = req;
   const result = await orgService.getOrgById(orgId);
-  res.json(Result.ofSuccess(result));
+  res.json(Result.ofSuccess(orgService.desensitization(result)));
 });
 
 // 显示团队成员
 router.get('/listUsers', async (req, res) => {
   const { orgId } = req;
   const result = await orgService.listByOrgId(orgId);
-  res.json(Result.ofSuccess(result));
+  res.json(Result.ofSuccess(orgService.desensitization(result)));
 });
 
 // 加入/邀请团队
@@ -33,33 +33,33 @@ router.post('/invite', auth(ADMIN_ROLE_KEYS), async (req, res) => {
 // 编辑个人在团队权限
 router.post('/userAuth', async (req, res) => {
   const { orgId } = req;
-  const result = await orgService.updateUserRole(orgId, req.body);
-  res.json(Result.ofSuccess(result));
+  await orgService.updateUserRole(orgId, req.body);
+  res.json(Result.ofSuccess());
 });
 
 // 删除成员
 router.post('/removeUser', auth(OWNER_ROLE_KEYS), async (req, res) => {
   const { orgId } = req;
   const { userId } = req.body;
-  const result = await orgService.deleteUser(orgId, userId);
-  res.json(Result.ofSuccess(result));
+  await orgService.deleteUser(orgId, userId);
+  res.json(Result.ofSuccess());
 });
 
 // 删除团队
 router.post('/remove', auth(OWNER_ROLE_KEYS), async (req, res) => {
   const { orgId } = req;
-  const result = await orgService.remove(orgId);
-  res.json(Result.ofSuccess(result));
+  await orgService.remove(orgId);
+  res.json(Result.ofSuccess());
 });
 
 // 转让【owner】
 router.post('/transfer', auth(OWNER_ROLE_KEYS), async (req, res) => {
   const { orgId, userId } = req;
   const { userId: transferUserId } = req.body;
-  const result = await orgService.transfer(orgId, transferUserId);
+  await orgService.transfer(orgId, transferUserId);
   const { id } = await orgService.getOwnerOrgByUserId(userId);
   await authService.setJwt({ userId, orgId: id }, res);
-  res.json(Result.ofSuccess(result));
+  res.json(Result.ofSuccess());
 });
 
 /**

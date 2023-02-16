@@ -52,7 +52,16 @@ async function getProviderToken(orgId, userId, provider) {
   return token;
 }
 
+function desensitization(data) {
+  if (_.isArray(data)) {
+    return _.map(data, item => _.omit(item, ['third_part', 'password', 'secrets']))
+  }
+  return _.omit(data, ['third_part', 'password', 'secrets']);
+}
+
+
 module.exports = {
+  desensitization,
   getUserById,
   updateUserById,
   getProviderToken,

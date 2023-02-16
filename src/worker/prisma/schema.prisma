@@ -16,7 +16,6 @@ model User {
   username String  @unique
   avatar String?
   password String?
-  secrets String?
   github_unionid String?
   third_part String?  @db.Text
 }
@@ -24,7 +23,8 @@ model User {
 model Org {
   id    String     @id
   user_id String
-  name String             // username
+  secrets String?
+  name String             // 
   role String             // owner / admin / member
   description String?
 }
@@ -49,7 +49,7 @@ model Task {
   env_name String
   app_id String
   status String?
-  steps String? @db.Text
+  steps String?   @db.Text
   user_id String?       // 记录谁操作的
   trigger_payload  String @db.Text
   created_time DateTime  @default(now())

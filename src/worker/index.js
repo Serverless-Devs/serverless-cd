@@ -38,6 +38,8 @@ async function handler(event, _context, callback) {
     environment = {},
     envName,
   } = inputs;
+  const targetEnvConfig = _.get(environment, envName, {});
+  const envSecrets = _.get(targetEnvConfig, 'secrets', {});
 
   const cwdPath = path.join(execDir, taskId);
   const logPrefix = `${LOG_LOCAL_PATH_PREFIX}/${taskId}`;
@@ -76,7 +78,7 @@ async function handler(event, _context, callback) {
     const steps = _.get(pipelineContext, 'steps');
     logger.debug(`parse spec success, steps: ${JSON.stringify(steps)}`);
     logger.debug(`start update app`);
-    environment[envName].latest_task = getEnvData(context);
+    targetEnvConfig.latest_task = getEnvData(context);
     logger.info(`update app in engine onInit: ${JSON.stringify(environment)}`);
     await updateAppById(appId, { environment });
     logger.debug(`start update app success`);
@@ -113,7 +115,7 @@ async function handler(event, _context, callback) {
         user_id: userId,
         id: appId,
       },
-      secrets,
+      secrets: _.merge(secrets, envSecrets),
       git: {
         // git 相关的内容
         owner,
@@ -147,7 +149,7 @@ async function handler(event, _context, callback) {
           status: context.status,
           steps: getTaskPayload(context.steps),
         });
-        environment[envName].latest_task = getEnvData(context);
+        targetEnvConfig.latest_task = getEnvData(context);
         logger.info(`onCompleted environment: ${JSON.stringify(environment)}`);
         await updateAppById(appId, { environment });
         logger.info('completed end.');
@@ -165,7 +167,7 @@ async function handler(event, _context, callback) {
     status: engine.context.status,
     trigger_payload: inputs,
   });
-  environment[envName].latest_task = getEnvData(engine.context);
+  targetEnvConfig.latest_task = getEnvData(engine.context);
   console.log('App update environment', JSON.stringify(environment));
   // 防止有其他的动作，将等待状态也要set 到表中
   await updateAppById(appId, { environment });
