@@ -107,7 +107,7 @@ async function transfer(orgId, transferUserId) {
   if (_.isEmpty(data.name)) {
     throw new ValidationError(`没有找到此团队：${orgId}`);
   }
-  const { role, name, description } = data;
+  const { role, name } = data;
   if (!_.includes(OWNER_ROLE_KEYS, role)) {
     throw new NoPermissionError('您不是最高管理员，无权此操作');
   }
@@ -115,8 +115,7 @@ async function transfer(orgId, transferUserId) {
   if (!_.isEmpty(userData)) {
     await orgModel.remove(userData.id);
   }
-  await orgModel.remove(orgId);
-  await orgModel.createOrg({ userId: transferUserId, name, role, description });
+  await orgModel.updateOrg(orgId, { user_id: transferUserId });
 }
 
 module.exports = {

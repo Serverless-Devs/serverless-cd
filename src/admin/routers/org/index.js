@@ -44,7 +44,7 @@ router.post('/removeUser', auth(OWNER_ROLE_KEYS), async (req, res) => {
   res.json(Result.ofSuccess(result));
 });
 
-// 删除组织
+// 删除团队
 router.post('/remove', auth(OWNER_ROLE_KEYS), async (req, res) => {
   const { orgId } = req;
   const result = await orgService.remove(orgId);
