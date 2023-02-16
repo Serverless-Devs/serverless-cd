@@ -54,7 +54,7 @@ const BasicInfoDetail = (props: Props) => {
               <div className="flex-r" style={{ justifyContent: 'flex-start' }}>
                 <Status status={status as any} />
                 {taskId && (
-                  <Link className="ml-8" to={`/application/${appId}/detail/${envName}/${taskId}`}>
+                  <Link className="ml-8" to={`/application/${appId}/${envName}/${taskId}`}>
                     查看
                   </Link>
                 )}

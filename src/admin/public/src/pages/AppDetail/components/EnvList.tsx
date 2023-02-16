@@ -13,7 +13,7 @@ import { get, noop } from 'lodash';
 type Props = {
   appId: string;
   data: any;
-  refresh: () => Promise<any>;
+  refresh?: () => Promise<any>;
 };
 
 const EnvList: FC<Props> = (props) => {
@@ -66,7 +66,7 @@ const EnvList: FC<Props> = (props) => {
       dataIndex: 'name',
       cell: (value, _index, record) => (
         <>
-          <Link to={`/application/${appId}/detail/${value}`}>{value}</Link>
+          <Link to={`/application/${appId}/${value}`}>{value}</Link>
         </>
       ),
     },
@@ -87,11 +87,7 @@ const EnvList: FC<Props> = (props) => {
       title: '部署版本',
       dataIndex: 'taskId',
       cell: (value, _index, record) =>
-        value ? (
-          <Link to={`/application/${appId}/detail/${record.envName}/${value}`}>{value}</Link>
-        ) : (
-          '--'
-        ),
+        value ? <Link to={`/application/${appId}/${record.envName}/${value}`}>{value}</Link> : '--',
     },
     {
       key: 'commitInfo',

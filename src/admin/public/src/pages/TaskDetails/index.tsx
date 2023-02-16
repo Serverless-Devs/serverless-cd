@@ -105,7 +105,7 @@ const Details = ({
   };
 
   const redeployCallback = (id) => {
-    history?.replace(`/application/${appId}/detail/${envName}/${id || taskId}`);
+    history?.replace(`/application/${appId}/${envName}/${id || taskId}`);
   };
 
   return (
@@ -138,11 +138,11 @@ const Details = ({
         },
         {
           name: appId,
-          path: `/application/${appId}/detail`,
+          path: `/application/${appId}`,
         },
         {
           name: envName,
-          path: `/application/${appId}/detail/${envName}`,
+          path: `/application/${appId}/${envName}`,
         },
         {
           name: taskId,

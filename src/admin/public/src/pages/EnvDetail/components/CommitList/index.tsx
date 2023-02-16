@@ -114,7 +114,7 @@ const CommitList: FC<IProps> = (props) => {
                       <div className="copy-trigger flex-r" style={{ justifyContent: 'flex-start' }}>
                         <Link
                           className="commit-description text-nowrap-1 mr-8"
-                          to={`/application/${appId}/detail/${envName}/${taskId}`}
+                          to={`/application/${appId}/${envName}/${taskId}`}
                         >
                           {taskId}
                         </Link>
