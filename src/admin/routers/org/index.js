@@ -6,6 +6,7 @@ const { Result } = require('../../util');
 const { OWNER_ROLE_KEYS, ADMIN_ROLE_KEYS } = require('@serverless-cd/config');
 const auth = require('../../middleware/auth');
 const orgService = require('../../services/org.service');
+const authService = require('../../services/auth.service');
 
 // 查看用户当前信息
 router.get('/detail', async (req, res) => {
@@ -53,9 +54,11 @@ router.post('/remove', auth(OWNER_ROLE_KEYS), async (req, res) => {
 
 // 转让【owner】
 router.post('/transfer', auth(OWNER_ROLE_KEYS), async (req, res) => {
-  const { orgId } = req;
+  const { orgId, userId } = req;
   const { userId: transferUserId } = req.body;
   const result = await orgService.transfer(orgId, transferUserId);
+  const { id } = await orgService.getOwnerOrgByUserId(userId);
+  await authService.setJwt({ userId, orgId: id }, res);
   res.json(Result.ofSuccess(result));
 });
 

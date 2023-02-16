@@ -16,18 +16,21 @@ async function listByOrgId(orgId = '') {
   return data;
 }
 
-async function create(orgId, token, body) {
-  const { repo, owner, repo_url, provider_repo_id: providerRepoId, description, provider, environment } = body;
-
+async function preview(body = {}) {
+  const { provider_repo_id: providerRepoId, provider } = body;
   const application = await appModel.getAppByProvider({
-    orgId,
     provider,
     providerRepoId,
   });
   if (!_.isEmpty(application)) {
     throw new ValidationError('代码仓库已绑定，请勿重新绑定');
   }
+}
 
+async function create(orgId, token, body) {
+  await preview(body);
+
+  const { repo, owner, repo_url, provider_repo_id: providerRepoId, description, provider, environment } = body;
   const appId = unionId();
   const webHookSecret = unionId();
   debug('start add webhook');
@@ -105,6 +108,7 @@ async function remove(orgId, userId, appId) {
 }
 
 module.exports = {
+  preview,
   listByOrgId,
   create,
   update,

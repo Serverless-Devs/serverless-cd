@@ -6,7 +6,24 @@ const { Result, ValidationError } = require('../../util');
 const auth = require('../../middleware/auth');
 const appService = require('../../services/application.service');
 const userService = require('../../services/user.service');
-const { ADMIN_ROLE_KEYS } = require('@serverless-cd/config');
+const { ADMIN_ROLE_KEYS, OWNER_ROLE_KEYS } = require('@serverless-cd/config');
+
+/**
+ * 创建应用预检测
+ */
+router.post('/preview', async function (req, res) {
+  await appService.preview(req.body);
+  return res.json(Result.ofSuccess());
+});
+
+/**
+ * 转让【owner】
+ */
+router.post('/transfer', auth(OWNER_ROLE_KEYS), async (req, res) => {
+  const { orgId: transferOrgId, appId } = req.body;
+  const result = await appService.update(appId, { org_id: transferOrgId });
+  res.json(Result.ofSuccess(result));
+});
 
 /**
  * 应用列表
