@@ -39,16 +39,6 @@ services:
         environmentVariables:
           # 用于链接数据库
           DATABASE_URL: ${env.DATABASE_URL}
-          # 阿里云密钥
-          ACCOUNT_ID: ${env.ACCOUNT_ID}
-          ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
-          ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
-          # 部署的区域
-          REGION: ${vars.region}
-          # 部署函数的服务名称
-          SERVICE_NAME: ${vars.service.name}
-          # worker 函数的名称
-          WORKER_FUNCTION_NAME: ${vars.workerFunctionName}
       triggers:
         - name: http-trigger
           type: http
@@ -87,14 +77,8 @@ services:
           PATH: /opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
           # 用于给用户显示日志链接地址
           DOMAIN: ${vars.domain}
-          # 阿里云密钥
-          ACCOUNT_ID: ${env.ACCOUNT_ID}
-          ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
-          ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
           # 上传的OSS地址
           OSS_BUCKET: ${vars.ossBucket}
-          # 部署的区域
-          REGION: ${vars.region}
           # 用于链接数据库
           DATABASE_URL: ${env.DATABASE_URL}
         asyncConfiguration:
@@ -123,18 +107,8 @@ services:
         memorySize: 640
         timeout: 600
         environmentVariables:
-          # 部署的区域
-          REGION: ${vars.region}
-          # 部署函数的服务名称
-          SERVICE_NAME: ${vars.service.name}
-          # worker 函数的名称
-          WORKER_FUNCTION_NAME: ${vars.workerFunctionName}
           # 用于链接数据库
           DATABASE_URL: ${env.DATABASE_URL}
-          # 阿里云密钥
-          ACCOUNT_ID: ${env.ACCOUNT_ID}
-          ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
-          ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
         asyncConfiguration:
           maxAsyncRetryAttempts: 0
 
@@ -181,16 +155,6 @@ services:
           DATABASE_URL: ${env.DATABASE_URL}
           # 回调地址, 本地调试时需要填写
           # WEBHOOK_URL: ${env.WEBHOOK_URL}
-          # 阿里云密钥
-          ACCOUNT_ID: ${env.ACCOUNT_ID}
-          ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
-          ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
-          # 部署的区域
-          REGION: ${vars.region}
-          # 部署函数的服务名称
-          SERVICE_NAME: ${vars.service.name}
-          # worker 函数的名称
-          WORKER_FUNCTION_NAME: ${vars.workerFunctionName}
           # 上传的OSS地址
           OSS_BUCKET: ${vars.ossBucket}
           JWT_SECRET: ${env.JWT_SECRET}
