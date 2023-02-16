@@ -27,6 +27,9 @@ router.get('/repos', auth(ADMIN_ROLE_KEYS), async function (req, res) {
   return res.json(Result.ofSuccess(rows));
 });
 
+/**
+ * 组织的仓库信息
+ */
 router.get('/orgRepos', auth(ADMIN_ROLE_KEYS), async function (req, res, _next) {
   const rows = await gitService.getProviderRepos(req.orgId, PROVIDER.GITHUB, req.query);
   return res.json(Result.ofSuccess(rows));

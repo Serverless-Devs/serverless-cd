@@ -15,6 +15,9 @@ Service:
   对象存储:
     Authorities:
       - AliyunOSSFullAccess
+  日志服务:
+    Authorities:
+      - AliyunLogFullAccess
 Parameters:
   type: object
   additionalProperties: false # 不允许增加其他属性

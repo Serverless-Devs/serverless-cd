@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "prettier": "cd ../.. && npm run prettier",
-    "start": "DEBUG=serverless-cd:* WORKER_FUNCTION_NAME=worker SERVICE_NAME=serverless-cd nodemon index.js"
+    "start": "DEBUG=serverless-cd:* nodemon index.js"
   },
   "author": "mamba",
   "license": "ISC",
