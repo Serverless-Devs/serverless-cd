@@ -65,12 +65,3 @@ Parameters:
       title: 数据库链接地址
       type: secret
       description: 用于链接数据库，示例：mysql://USER:PASSWORD@HOST:PORT/DATABASE
-    # ACCOUNT_ID:
-    #   title: 阿里云
-    #   type: secret
-    # ACCESS_KEY_ID:
-    #   title: 阿里云
-    #   type: secret
-    # ACCESS_KEY_SECRET:
-    #   title: 阿里云
-    #   type: secret

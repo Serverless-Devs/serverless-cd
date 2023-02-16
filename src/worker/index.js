@@ -6,7 +6,6 @@ const {
   DOWNLOAD_CODE_DIR: execDir,
   CD_PIPELINE_YAML,
   CREDENTIALS,
-  OSS_CONFIG,
   DEFAULT_UNSET_ENVS,
   LOG_LOCAL_PATH_PREFIX,
 } = require('@serverless-cd/config');
@@ -16,7 +15,7 @@ const Setup = require('@serverless-cd/setup-runtime').default;
 const Engine = require('@serverless-cd/engine').default;
 
 const _ = core.lodash;
-const { getPayload, getOTSTaskPayload } = require('./utils');
+const { getPayload, getTaskPayload, getOssConfig } = require('./utils');
 const { updateAppById, makeTask } = require('./model');
 
 async function handler(event, _context, callback) {
@@ -100,10 +99,7 @@ async function handler(event, _context, callback) {
     cwd: cwdPath,
     logConfig: {
       logPrefix,
-      ossConfig: OSS_CONFIG ? {
-        ...CREDENTIALS,
-        ...OSS_CONFIG,
-      } : undefined,
+      ossConfig: getOssConfig(),
       // logLevel: 'debug',
     },
     inputs: {
@@ -137,19 +133,19 @@ async function handler(event, _context, callback) {
       onPreRun: async function (_data, context) {
         await makeTask(taskId, {
           status: context.status,
-          steps: getOTSTaskPayload(context.steps),
+          steps: getTaskPayload(context.steps),
         });
       },
       onPostRun: async function (_data, context) {
         await makeTask(taskId, {
           status: context.status,
-          steps: getOTSTaskPayload(context.steps),
+          steps: getTaskPayload(context.steps),
         });
       },
       onCompleted: async function (context, logger) {
         await makeTask(taskId, {
           status: context.status,
-          steps: getOTSTaskPayload(context.steps),
+          steps: getTaskPayload(context.steps),
         });
         environment[envName].latest_task = getEnvData(context);
         logger.info(`onCompleted environment: ${JSON.stringify(environment)}`);

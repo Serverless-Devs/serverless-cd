@@ -58,7 +58,6 @@ router.get('/log', async function (req, res) {
       const log = fs.readFileSync(logPath, { encoding: 'utf8' });
       res.json(Result.ofSuccess(log));
     } catch (ex) {
-      // TODO: read files
       throw new NotFoundError('没有找到日志');
     }
   }
