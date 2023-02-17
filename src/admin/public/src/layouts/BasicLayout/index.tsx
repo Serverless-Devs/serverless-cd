@@ -6,8 +6,6 @@ import {
   Menu,
   Avatar,
   Divider,
-  Dialog,
-  Button,
 } from '@alicloud/console-components';
 import PageNav from './components/PageNav';
 import Logo from './components/Logo';
@@ -55,25 +53,6 @@ interface IBasicLayoutProps {
   location: object | any;
 }
 export function BasicLayout({ children, match, location: { pathname } }: IBasicLayoutProps) {
-  const orgName = get(match, 'params.orgName');
-  if (orgName !== get(window, 'CONFIG.ORG_NAME')) {
-    const dialog = Dialog.alert({
-      title: `组织${orgName}信息出错/删除`,
-      content: `当前组织${orgName}信息出错/删除`,
-      footer: [
-        <Button
-          type="primary"
-          onClick={() => {
-            history?.push('/');
-            dialog.hide();
-          }}
-        >
-          返回应用列表
-        </Button>,
-      ],
-    });
-    return null;
-  }
   const getDevice: IGetDevice = (width) => {
     const isPhone =
       typeof navigator !== 'undefined' && navigator && navigator.userAgent.match(/phone/gi);
@@ -104,18 +83,20 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
 
   const menu = () => {
     const onItemClick = (key) => {
-      if (key === 'username') return;
-      if (key === 'logout') {
+      if (key === '/username') return;
+      if (key === '/logout') {
         request();
         userDispatchers.removeStateInfo();
-        history?.push('/login');
-        return;
+        return history?.push(key);
+      }
+      if (key === '/organizations') {
+        return history?.push(key);
       }
       history?.push(`/${get(window, 'CONFIG.ORG_NAME')}${key}`);
     };
     return (
       <Menu className="user-menu" onItemClick={onItemClick}>
-        <Menu.Item key="username">
+        <Menu.Item key="/username">
           <span className="user-name">{username}</span>
         </Menu.Item>
         <Divider key="divider1" className="m-t-b-10" />
@@ -123,12 +104,15 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
           Dashboard
         </Menu.Item>
         <Divider key="divider2" className="m-t-b-10" />
-
         <Menu.Item key="/settings" className="m-t-b-10">
           Settings
         </Menu.Item>
-        <Divider key="divider2" className="m-t-b-10" />
-        <Menu.Item key="logout">Login Out</Menu.Item>
+        <Divider key="divider3" className="m-t-b-10" />
+        <Menu.Item key="/organizations" className="m-t-b-10">
+          Organizations
+        </Menu.Item>
+        <Divider key="divider4" className="m-t-b-10" />
+        <Menu.Item key="/logout">Login Out</Menu.Item>
       </Menu>
     );
   };

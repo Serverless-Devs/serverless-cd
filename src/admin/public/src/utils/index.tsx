@@ -14,6 +14,14 @@ export function getParams(search = '') {
   return obj;
 }
 
+export function getParam(name) {
+  const reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+  const result: any = window.location.search.substr(1).match(reg);
+  if (!_.isEmpty(result)) {
+    return decodeURI(result[2]);
+  }
+}
+
 export const sleep = (time = 1000) => new Promise((resolve) => setTimeout(resolve, time));
 
 export function replaceAll(string, search, replace) {

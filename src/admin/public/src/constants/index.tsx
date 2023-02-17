@@ -57,3 +57,9 @@ export const DEPLOY_STATUS = {
 };
 
 export const pollingStatus = ['pending', 'running'];
+
+export enum ROLE {
+  OWNER = 'owner',
+  ADMIN = 'admin',
+  MEMBER = 'member',
+}

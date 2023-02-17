@@ -61,11 +61,8 @@ module.exports = {
       orgPrisma.findMany({
         ...option,
         where,
-        orderBy: {
-          updated_time: 'desc',
-        },
       }),
     ]);
-    return { totalCount, result: _.map(result, r => getOrgInfo(r)) };
+    return { totalCount, result: _.map(result, (r) => getOrgInfo(r)) };
   },
 };

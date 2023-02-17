@@ -1,9 +1,18 @@
 import { request } from 'ice';
 
 export const listUsers = async () => {
-  return await request.get('/api/org/listUsers');
+  const { data } = await request.get('/api/org/listUsers');
+  return data;
 };
 
-export const createOrg = async () => {
-  return await request.post('/api/org/create');
+export const createOrg = async (body) => {
+  return await request.post('/api/org/create', body);
+};
+
+export const inviteUser = async (body) => {
+  return await request.post('/api/org/invite', body);
+};
+
+export const removeUser = async (body) => {
+  return await request.post('/api/org/removeUser', body);
 };
