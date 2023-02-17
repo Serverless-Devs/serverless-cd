@@ -22,7 +22,15 @@ interface IItem {
   createdTime: number;
 }
 
-const AppList = () => {
+const AppList = ({
+  match: {
+    params: { orgName },
+  },
+}) => {
+  if (isEmpty(orgName)) {
+    return history?.push(`/${get(window, 'CONFIG.ORG_NAME')}/application`);
+  }
+
   const { data, request, refresh, cancel } = useRequest(listApp, {
     pollingInterval: 5000,
   });
@@ -32,9 +40,8 @@ const AppList = () => {
 
   const fetchData = async () => {
     setLoading(true);
-    const res = await request();
+    await request();
     setLoading(false);
-    setApplist(res);
   };
 
   useEffect(() => {
@@ -43,6 +50,7 @@ const AppList = () => {
 
   useEffect(() => {
     if (isEmpty(data)) return;
+    setApplist(data);
     const completedList: boolean[] = [];
     for (const item of data) {
       const environment = get(item, 'environment', {});
@@ -74,7 +82,7 @@ const AppList = () => {
   const debounceSearch = debounce(onSearch, 250, { maxWait: 1000 });
 
   const onCreateApp = () => {
-    history?.push('/create');
+    history?.push(`/${orgName}/create`);
   };
 
   if (loading) {
@@ -102,7 +110,7 @@ const AppList = () => {
       title: '应用名称',
       dataIndex: 'repo_name',
       cell: (value, index, record) => {
-        return <Link to={`/application/${record.id}`}>{value}</Link>;
+        return <Link to={`/${orgName}/application/${record.id}`}>{value}</Link>;
       },
     },
     {
@@ -178,13 +186,13 @@ const AppList = () => {
               expandedRowRender={(record) => {
                 return (
                   <div className="pt-8 pb-8">
-                    <EnvList appId={record.id} data={record} refresh={refresh} />
+                    <EnvList appId={record.id} orgName={orgName} data={record} refresh={refresh} />
                   </div>
                 );
               }}
             />
           ) : (
-            <NotAppliaction queryKey={queryKey} />
+            <NotAppliaction orgName={orgName} queryKey={queryKey} />
           )}
         </>
       )}

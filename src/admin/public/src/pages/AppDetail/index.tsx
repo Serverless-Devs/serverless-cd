@@ -12,7 +12,7 @@ import { get, isEmpty, isBoolean } from 'lodash';
 
 const Details = ({
   match: {
-    params: { appId },
+    params: { appId, orgName },
   },
 }) => {
   const {
@@ -120,7 +120,12 @@ const Details = ({
       <Loading visible={loading} inline={false}>
         <BasicInfoDetail data={get(detailInfo, 'data', {})} refreshCallback={handleRefresh} />
         <hr className="mb-20 mt-20" />
-        <EnvList appId={appId} data={get(detailInfo, 'data', {})} refresh={refresh} />
+        <EnvList
+          appId={appId}
+          orgName={orgName}
+          data={get(detailInfo, 'data', {})}
+          refresh={refresh}
+        />
       </Loading>
     </PageLayout>
   );

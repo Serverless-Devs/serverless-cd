@@ -74,7 +74,7 @@ const routerConfig: IRouterConfig[] = [
     ],
   },
   {
-    path: '/application/:appId',
+    path: '/:orgName/application/:appId',
     component: BasicLayout,
     children: [
       {
@@ -92,15 +92,10 @@ const routerConfig: IRouterConfig[] = [
         exact: true,
         component: TaskDetails,
       },
-      {
-        path: '/application/:appId',
-        // 重定向
-        redirect: '/application',
-      },
     ],
   },
   {
-    path: '/',
+    path: '/:orgName',
     component: BasicLayout,
     children: [
       {
@@ -116,9 +111,14 @@ const routerConfig: IRouterConfig[] = [
       {
         path: '/',
         // 重定向
-        redirect: '/application',
+        redirect: '/:orgName/application',
       },
     ],
+  },
+  {
+    path: '/',
+    exact: true,
+    component: AppList,
   },
 ];
 export default routerConfig;

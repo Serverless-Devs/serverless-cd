@@ -44,7 +44,7 @@ const PanelTitle = ({ step, isRequest }) => {
 
 const Details = ({
   match: {
-    params: { appId, envName, taskId },
+    params: { appId, envName, taskId, orgName },
   },
 }) => {
   const [taskSteps, setTaskSteps] = useState<any[]>([]);
@@ -138,11 +138,11 @@ const Details = ({
         },
         {
           name: appId,
-          path: `/application/${appId}`,
+          path: `/${orgName}/application/${appId}`,
         },
         {
           name: envName,
-          path: `/application/${appId}/${envName}`,
+          path: `/${orgName}/application/${appId}/${envName}`,
         },
         {
           name: taskId,

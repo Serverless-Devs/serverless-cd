@@ -6,6 +6,8 @@ import {
   Menu,
   Avatar,
   Divider,
+  Dialog,
+  Button,
 } from '@alicloud/console-components';
 import PageNav from './components/PageNav';
 import Logo from './components/Logo';
@@ -53,6 +55,25 @@ interface IBasicLayoutProps {
   location: object | any;
 }
 export function BasicLayout({ children, match, location: { pathname } }: IBasicLayoutProps) {
+  const orgName = get(match, 'params.orgName');
+  if (orgName !== get(window, 'CONFIG.ORG_NAME')) {
+    const dialog = Dialog.alert({
+      title: `组织${orgName}信息出错/删除`,
+      content: `当前组织${orgName}信息出错/删除`,
+      footer: [
+        <Button
+          type="primary"
+          onClick={() => {
+            history?.push('/');
+            dialog.hide();
+          }}
+        >
+          返回应用列表
+        </Button>,
+      ],
+    });
+    return null;
+  }
   const getDevice: IGetDevice = (width) => {
     const isPhone =
       typeof navigator !== 'undefined' && navigator && navigator.userAgent.match(/phone/gi);
@@ -89,7 +110,7 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
         history?.push('/login');
         return;
       }
-      history?.push(key);
+      history?.push(`/${get(window, 'CONFIG.ORG_NAME')}/${key}`);
     };
     return (
       <Menu className="user-menu" onItemClick={onItemClick}>
@@ -97,17 +118,15 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
           <span className="user-name">{username}</span>
         </Menu.Item>
         <Divider key="divider1" className="m-t-b-10" />
-        <Menu.Item key="/" className="m-t-b-10">
+        <Menu.Item key="/application" className="m-t-b-10">
           Dashboard
         </Menu.Item>
-        <Divider key="divider1" className="m-t-b-10" />
-        <Menu.Item key="/" className="m-t-b-10">
-          Dashboard
-        </Menu.Item>
+        <Divider key="divider2" className="m-t-b-10" />
+
         <Menu.Item key="/settings/tokens" className="m-t-b-10">
           Settings
         </Menu.Item>
-        <Divider key="divider3" className="m-t-b-10" />
+        <Divider key="divider2" className="m-t-b-10" />
         <Menu.Item key="logout">Login Out</Menu.Item>
       </Menu>
     );
