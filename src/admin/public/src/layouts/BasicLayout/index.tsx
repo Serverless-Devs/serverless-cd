@@ -93,7 +93,8 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
   const [userState, userDispatchers] = store.useModel('user');
   const avatar = get(userState, 'userInfo.avatar');
   const username = get(userState, 'userInfo.username', '');
-  const showMenu = menuConfig.includes(pathname);
+  // const showMenu = menuConfig.includes(pathname);
+  const showMenu = false;
 
   useEffect(() => {
     setTimeout(() => {
@@ -110,7 +111,7 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
         history?.push('/login');
         return;
       }
-      history?.push(`/${get(window, 'CONFIG.ORG_NAME')}/${key}`);
+      history?.push(`/${get(window, 'CONFIG.ORG_NAME')}${key}`);
     };
     return (
       <Menu className="user-menu" onItemClick={onItemClick}>
@@ -123,7 +124,7 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
         </Menu.Item>
         <Divider key="divider2" className="m-t-b-10" />
 
-        <Menu.Item key="/settings/tokens" className="m-t-b-10">
+        <Menu.Item key="/settings" className="m-t-b-10">
           Settings
         </Menu.Item>
         <Divider key="divider2" className="m-t-b-10" />

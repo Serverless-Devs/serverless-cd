@@ -20,8 +20,7 @@ const AppDetail = lazy(() => import(/* webpackChunkName: 'AppDetail' */ '@/pages
 const EnvDetail = lazy(() => import(/* webpackChunkName: 'AppDetail' */ '@/pages/EnvDetail'));
 const TaskDetails = lazy(() => import(/* webpackChunkName: 'TaskDetails' */ '@/pages/TaskDetails'));
 const Auth = lazy(() => import(/* webpackChunkName: 'Auth' */ '@/pages/Auth'));
-const Tokens = lazy(() => import(/* webpackChunkName: 'Tokens' */ '@/pages/Tokens'));
-const Secrets = lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Secrets'));
+const Settings = lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Settings'));
 
 const routerConfig: IRouterConfig[] = [
   {
@@ -54,22 +53,6 @@ const routerConfig: IRouterConfig[] = [
         path: '/:provider/callback',
         exact: true,
         component: Auth,
-      },
-    ],
-  },
-  {
-    path: '/settings',
-    component: BasicLayout,
-    children: [
-      {
-        path: '/tokens',
-        exact: true,
-        component: Tokens,
-      },
-      {
-        path: '/secrets',
-        exact: true,
-        component: Secrets,
       },
     ],
   },
@@ -107,6 +90,11 @@ const routerConfig: IRouterConfig[] = [
         path: '/create',
         exact: true,
         component: Create,
+      },
+      {
+        path: '/settings',
+        exact: true,
+        component: Settings,
       },
       {
         path: '/',
