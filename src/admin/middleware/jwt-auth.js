@@ -1,7 +1,7 @@
 const { JWT_SECRET, EXCLUDE_AUTH_URL } = require('@serverless-cd/config');
 const { lodash: _ } = require('@serverless-cd/core');
 const jwt = require('jsonwebtoken');
-const { NeedLogin } = require('../util');
+const { NeedLogin, generateOrgIdByUserIdAndOrgName } = require('../util');
 const debug = require('debug')('serverless-cd:middleware');
 
 
@@ -24,7 +24,10 @@ module.exports = async function (req, _res, next) {
           next(new NeedLogin('没有用户或者团队信息'));
         }
         debug('verify user:: ', user);
+        const orgName = _.get(req, 'query.orgName', _.get(req, 'body.orgName'));
         req.userId = user.userId;
+        req.orgName = orgName;
+        req.orgId = generateOrgIdByUserIdAndOrgName(user.userId, orgName);
         next();
       } catch (error) {
         next(new NeedLogin(error.message));

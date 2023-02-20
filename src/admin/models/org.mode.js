@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const { ROLE, TABLE } = require('@serverless-cd/config');
-const { unionId, prisma } = require('../util');
+const { generateOrgIdByUserIdAndOrgName, prisma } = require('../util');
 
 const orgPrisma = prisma[TABLE.ORG];
 
@@ -27,7 +27,7 @@ module.exports = {
     return getOrgInfo(result);
   },
   async createOrg({ userId, name, role, description, secrets }) {
-    const orgId = `${userId}:${name}`;
+    const orgId = generateOrgIdByUserIdAndOrgName(userId, name);
     const result = await orgPrisma.create({
       data: {
         id: orgId,
