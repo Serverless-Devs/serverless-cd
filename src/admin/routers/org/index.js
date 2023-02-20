@@ -31,13 +31,18 @@ router.post('/invite', auth(ADMIN_ROLE_KEYS), async (req, res) => {
 });
 
 // 编辑个人在团队权限
-router.post('/userAuth', auth(ADMIN_ROLE_KEYS), async (req, res) => {
+router.post('/updateAuth', auth(ADMIN_ROLE_KEYS), async (req, res) => {
   const { orgName, body: { inviteUserName, role } } = req;
   await orgService.updateUserRole(orgName, inviteUserName, role);
   res.json(Result.ofSuccess());
 });
 
-// TODO: 编辑密钥信息【是不是需要修改 owner 的密钥】
+// // 编辑密钥信息【是不是需要修改 owner 的密钥】
+// router.post('/updateSecrets', auth(ADMIN_ROLE_KEYS), async (req, res) => {
+//   const { orgName, body: { inviteUserName, role } } = req;
+//   await orgService.updateUserRole(orgName, inviteUserName, role);
+//   res.json(Result.ofSuccess());
+// });
 
 // 删除成员
 router.post('/removeUser', auth(OWNER_ROLE_KEYS), async (req, res) => {
