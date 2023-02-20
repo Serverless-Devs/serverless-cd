@@ -49,7 +49,9 @@ const AppList = ({
   }, []);
 
   useEffect(() => {
-    if (isEmpty(data)) return;
+    if (isEmpty(data)) {
+      return cancel();
+    }
     setApplist(data);
     const completedList: boolean[] = [];
     for (const item of data) {

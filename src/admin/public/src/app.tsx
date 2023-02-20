@@ -11,10 +11,12 @@ const appConfig: IAppConfig = {
       response: {
         onConfig: (response) => {
           if (response.data.code === 302) {
-            return history?.push('/');
+            history?.push('/');
+            return response;
           }
           if (response.data.code === 401) {
-            return history?.push('/login');
+            history?.push('/login');
+            return response;
           }
           if (!response.data.success && response.data.message) {
             Toast.error(response.data.message);
