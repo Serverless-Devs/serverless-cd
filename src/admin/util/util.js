@@ -88,6 +88,7 @@ const githubRequest = (accessToken) => {
 };
 
 module.exports = {
+  checkName: (name) => /^[a-zA-Z0-9-_]{1,50}$/.test(name),
   unless,
   retryOnce,
   formatBranch,

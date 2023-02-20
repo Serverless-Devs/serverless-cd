@@ -57,8 +57,7 @@ router.post('/transfer', auth(OWNER_ROLE_KEYS), async (req, res) => {
   const { orgId, userId } = req;
   const { userId: transferUserId } = req.body;
   await orgService.transfer(orgId, transferUserId);
-  const { id } = await orgService.getOwnerOrgByUserId(userId);
-  await authService.setJwt({ userId, orgId: id }, res);
+  await orgService.getOwnerOrgByUserId(userId);
   res.json(Result.ofSuccess());
 });
 

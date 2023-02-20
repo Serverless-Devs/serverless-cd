@@ -17,10 +17,12 @@ router.get('/info', async function (req, res) {
   }
 
   const third_part = _.get(result, 'third_part', {});
+  const listOrgs = await orgService.listByUserId(userId)
   const userInfo = {
     ...userService.desensitization(result),
     isAuth: !!_.get(third_part, 'github.access_token', false),
     github_name: _.get(third_part, 'github.owner', ''),
+    listOrgs: orgService.desensitization(listOrgs),
   };
 
   return res.json(Result.ofSuccess(userInfo));

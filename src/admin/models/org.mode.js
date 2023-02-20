@@ -27,7 +27,7 @@ module.exports = {
     return getOrgInfo(result);
   },
   async createOrg({ userId, name, role, description, secrets }) {
-    const orgId = unionId();
+    const orgId = `${userId}:${name}`;
     const result = await orgPrisma.create({
       data: {
         id: orgId,
