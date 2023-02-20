@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const { ROLE, OWNER_ROLE_KEYS } = require('@serverless-cd/config');
+const { ROLE, ROLE_KEYS, OWNER_ROLE_KEYS } = require('@serverless-cd/config');
 const orgModel = require('../models/org.mode');
 const applicationModel = require('../models/application.mode');
 const userModel = require('../models/user.mode');
@@ -46,6 +46,9 @@ async function createOrg(userId, name, description) {
 }
 
 async function invite(orgName, inviteUserName, role = ROLE.MEMBER) {
+  if (_.includes(ROLE_KEYS, role)) {
+    throw new NoPermissionError(`权限字段需要是: ${ROLE_KEYS.join('、')}`);
+  }
   if (_.includes(OWNER_ROLE_KEYS, role)) {
     throw new NoPermissionError('不能邀请人为最高管理');
   }
