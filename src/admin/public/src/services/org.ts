@@ -13,6 +13,10 @@ export const inviteUser = async (body) => {
   return await request.post('/api/org/invite', body);
 };
 
+export const updateAuth = async (body) => {
+  return await request.post('/api/org/updateAuth', body);
+};
+
 export const removeUser = async (body) => {
   return await request.post('/api/org/removeUser', body);
 };

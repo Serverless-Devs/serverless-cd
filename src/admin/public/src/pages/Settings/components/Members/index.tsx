@@ -2,10 +2,10 @@ import React, { useEffect } from 'react';
 import { listUsers, removeUser } from '@/services/org';
 import { useRequest } from 'ice';
 import { Table, Button, Icon, Dialog } from '@alicloud/console-components';
+import Actions, { LinkButton } from '@alicloud/console-components-actions';
 import AddMember from './components/AddMember';
 import { Toast } from '@/components/ToastContainer';
 import { ROLE } from '@/constants';
-import { get } from 'lodash';
 
 function Members() {
   const { data, request, refresh, loading } = useRequest(listUsers);
@@ -16,11 +16,10 @@ function Members() {
 
   const handleDelete = (record) => {
     const dialog = Dialog.alert({
-      // TODO:name?
-      title: `删除成员：${record.name}`,
+      title: `删除成员：${record.username}`,
       content: '您确定删除当前成员吗?',
       onOk: async () => {
-        const { success } = await removeUser({ userId: record.user_id });
+        const { success } = await removeUser({ inviteUserId: record.user_id });
         if (success) {
           Toast.success('成员删除成功');
           refresh();
@@ -32,9 +31,8 @@ function Members() {
   const columns = [
     {
       title: '成员',
-      key: 'name',
-      // TODO: username, 目前name是组织名称
-      dataIndex: 'name',
+      key: 'username',
+      dataIndex: 'username',
     },
     {
       title: '角色',
@@ -49,14 +47,22 @@ function Members() {
     {
       title: '操作',
       cell: (value, _index, record) => (
-        <Button
-          type="primary"
-          disabled={record.role === ROLE.OWNER}
-          text
-          onClick={() => handleDelete(record)}
-        >
-          删除
-        </Button>
+        <Actions>
+          <AddMember
+            callback={refresh}
+            type="edit"
+            dataSource={{ inviteUserName: record.username, role: record.role }}
+          >
+            <LinkButton disabled={record.role === ROLE.OWNER}>编辑</LinkButton>
+          </AddMember>
+          <LinkButton
+            type="primary"
+            disabled={record.role === ROLE.OWNER}
+            onClick={() => handleDelete(record)}
+          >
+            删除
+          </LinkButton>
+        </Actions>
       ),
     },
   ];
@@ -71,12 +77,7 @@ function Members() {
           <Icon type="refresh" />
         </Button>
       </div>
-      <Table
-        loading={loading}
-        hasBorder={false}
-        dataSource={get(data, 'result')}
-        columns={columns}
-      />
+      <Table loading={loading} hasBorder={false} dataSource={data} columns={columns} />
     </div>
   );
 }
