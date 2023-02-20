@@ -46,7 +46,7 @@ async function createOrg(userId, name, description) {
 }
 
 async function invite(orgName, inviteUserName, role = ROLE.MEMBER) {
-  if (_.includes(ROLE_KEYS, role)) {
+  if (!_.includes(ROLE_KEYS, role)) {
     throw new NoPermissionError(`权限字段需要是: ${ROLE_KEYS.join('、')}`);
   }
   if (_.includes(OWNER_ROLE_KEYS, role)) {
