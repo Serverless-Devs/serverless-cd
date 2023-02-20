@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Shell,
   ConfigProvider,
@@ -15,6 +15,7 @@ import { history, useRequest } from 'ice';
 import store from '@/store';
 import { get } from 'lodash';
 import ToastContainer from '@/components/ToastContainer';
+import { getOrgName } from '@/utils';
 import './index.css';
 
 const menuConfig = ['/settings/tokens', '/settings/secrets'];
@@ -75,24 +76,18 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
   // const showMenu = menuConfig.includes(pathname);
   const showMenu = false;
 
-  useEffect(() => {
-    setTimeout(() => {
-      userDispatchers.getUserInfo();
-    }, 500);
-  }, []);
-
   const menu = () => {
     const onItemClick = (key) => {
       if (key === '/username') return;
       if (key === '/logout') {
         request();
         userDispatchers.removeStateInfo();
-        return history?.push(key);
+        return history?.push('/login');
       }
       if (key === '/organizations') {
         return history?.push(key);
       }
-      history?.push(`/${get(window, 'CONFIG.ORG_NAME')}${key}`);
+      history?.push(`/${getOrgName()}${key}`);
     };
     return (
       <Menu className="user-menu" onItemClick={onItemClick}>
