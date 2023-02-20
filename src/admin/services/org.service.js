@@ -21,9 +21,10 @@ async function listByUserId(userId = '') {
 }
 
 async function listByOrgName(name = '') {
-  const result = await orgModel.list({ name });
-  const names = await prisma.$transaction(
-    result.map(async ({ user_id: userId }) => {
+  const { result } = await orgModel.list({ name });
+
+  const names = await Promise.all(
+    _.map(result, async ({ user_id: userId }) => {
       const data = await userModel.getUserById(userId);
       return { username: _.get(data, 'username') };
     }),
@@ -88,10 +89,8 @@ async function deleteUser(orgName, inviteUserId) {
 }
 
 async function remove(orgId, orgName) {
-  await prisma.$transaction(
-    await applicationModel.deleteAppByOrgId(orgId),
-    await orgModel.deleteMany({ name: orgName }),
-  )
+  await orgModel.deleteMany({ name: orgName });
+  await applicationModel.deleteAppByOrgId(orgId);
 }
 
 async function transfer(orgId, orgName, transferUserName) {
@@ -119,18 +118,14 @@ async function transfer(orgId, orgName, transferUserName) {
 
   if (_.isEmpty(transferOrgData)) {
     _.set(payload, 'userId', transferUserId);
-    await prisma.$transaction([
-      orgModel.remove(orgId),
-      orgModel.createOrg(payload),
-      applicationModel.updateManyOrgIdOfApp(orgId, transferOrgId),
-    ]);
+    await applicationModel.updateManyOrgIdOfApp(orgId, transferOrgId);
+    await orgModel.createOrg(payload);
+    await orgModel.remove(orgId);
   } else {
     _.set(payload, 'user_id', transferUserId);
-    await prisma.$transaction([
-      orgModel.remove(orgId),
-      orgModel.updateOrg(transferOrgId, payload),
-      applicationModel.updateManyOrgIdOfApp(orgId, transferOrgId),
-    ]);
+    await orgModel.updateOrg(transferOrgId, payload);
+    await applicationModel.updateManyOrgIdOfApp(orgId, transferOrgId);
+    await orgModel.remove(orgId);
   }
 }
 
