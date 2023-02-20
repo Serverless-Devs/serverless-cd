@@ -1,13 +1,38 @@
 import { runApp, IAppConfig, history } from 'ice';
 import React from 'react';
 import { Toast } from './components/ToastContainer';
+import { userInfo } from '@/services/user';
+import { getOrgName } from '@/utils';
+import { startsWith } from 'lodash';
 
 const appConfig: IAppConfig = {
   app: {
     rootId: 'ice-container',
+    getInitialData: async () => {
+      const user = await userInfo();
+      return {
+        initialStates: {
+          user: {
+            userInfo: user,
+          },
+        },
+      };
+    },
   },
   request: {
     interceptors: {
+      request: {
+        onConfig: (config) => {
+          // 发送请求前：可以对 RequestConfig 做一些统一处理
+          if (config.url === '/api/user/info') return config;
+          if (startsWith(config.url, '/api/auth')) return config;
+          const orgName = getOrgName();
+          if (orgName) {
+            config.params = { ...config.params, orgName };
+          }
+          return config;
+        },
+      },
       response: {
         onConfig: (response) => {
           if (response.data.code === 302) {

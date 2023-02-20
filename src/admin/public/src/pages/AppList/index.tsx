@@ -12,6 +12,7 @@ import { C_REPOSITORY } from '@/constants/repository';
 import ExternalLink from '@/components/ExternalLink';
 import { Toast } from '@/components/ToastContainer';
 import { sleep } from '@/utils';
+import store from '@/store';
 
 interface IItem {
   providerUid: number;
@@ -27,8 +28,10 @@ const AppList = ({
     params: { orgName },
   },
 }) => {
+  const [userState] = store.useModel('user');
+  const username = get(userState, 'userInfo.username');
   if (isEmpty(orgName)) {
-    return history?.push(`/${get(window, 'CONFIG.ORG_NAME')}/application`);
+    return history?.push(`/${username}/application`);
   }
 
   const { data, request, refresh, cancel } = useRequest(listApp, {
