@@ -6,7 +6,7 @@ const { Result, ValidationError } = require('../../util');
 const auth = require('../../middleware/auth');
 const appService = require('../../services/application.service');
 const userService = require('../../services/user.service');
-const { ADMIN_ROLE_KEYS, OWNER_ROLE_KEYS, ROLE } = require('@serverless-cd/config');
+const { ADMIN_ROLE_KEYS, OWNER_ROLE_KEYS, ROLE_KEYS } = require('@serverless-cd/config');
 
 /**
  * 创建应用预检测
@@ -28,7 +28,7 @@ router.post('/transfer', auth(OWNER_ROLE_KEYS), async (req, res) => {
 /**
  * 应用列表
  */
-router.get('/list', auth(Object.values(ROLE)), async function (req, res) {
+router.get('/list', auth(ROLE_KEYS), async function (req, res) {
   const { orgId } = req;
   const appList = await appService.listByOrgId(orgId);
   return res.json(Result.ofSuccess(appList));
@@ -37,7 +37,7 @@ router.get('/list', auth(Object.values(ROLE)), async function (req, res) {
 /**
  * 应用查询
  */
-router.get('/detail', auth(Object.values(ROLE)), async function (req, res) {
+router.get('/detail', auth(ROLE_KEYS), async function (req, res) {
   const appDetail = await appService.getAppById(req.query.id);
   if (_.isEmpty(appDetail)) {
     throw new ValidationError('暂无应用信息');

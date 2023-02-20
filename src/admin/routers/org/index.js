@@ -8,7 +8,7 @@ const auth = require('../../middleware/auth');
 const orgService = require('../../services/org.service');
 
 // 查看团队信息
-router.get('/detail', auth(Object.values(ROLE)), async (req, res) => {
+router.get('/detail', auth(ROLE_KEYS), async (req, res) => {
   const { userId, query: { orgName } } = req;
   const orgId = generateOrgIdByUserIdAndOrgName(userId, orgName);
   const result = await orgService.getOrgById(orgId);
@@ -16,7 +16,7 @@ router.get('/detail', auth(Object.values(ROLE)), async (req, res) => {
 });
 
 // 显示团队成员: TODO 用户名称
-router.get('/listUsers', auth(Object.values(ROLE)), async (req, res) => {
+router.get('/listUsers', auth(ROLE_KEYS), async (req, res) => {
   const { query: { orgName } } = req;
   const result = await orgService.listByOrgName(orgName);
   res.json(Result.ofSuccess(orgService.desensitization(result)));
