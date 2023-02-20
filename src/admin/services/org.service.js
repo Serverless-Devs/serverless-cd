@@ -88,8 +88,10 @@ async function deleteUser(orgName, inviteUserId) {
 }
 
 async function remove(orgId, orgName) {
-  await applicationModel.deleteAppByOrgId(orgId);
-  await orgModel.deleteMany({ name: orgName });
+  await prisma.$transaction(
+    await applicationModel.deleteAppByOrgId(orgId),
+    await orgModel.deleteMany({ name: orgName }),
+  )
 }
 
 async function transfer(orgId, orgName, transferUserName) {
