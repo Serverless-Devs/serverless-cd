@@ -7,7 +7,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -17,7 +17,7 @@ model User {
   avatar String?
   password String?
   github_unionid String?
-  third_part String?  @db.Text
+  third_part String?
 }
 
 model Org {
@@ -35,7 +35,7 @@ model Application {
   description String?
   owner String
   provider String
-  environment String @db.Text
+  environment String
   provider_repo_id String
   repo_name String
   repo_url String
@@ -49,9 +49,9 @@ model Task {
   env_name String
   app_id String
   status String?
-  steps String?   @db.Text
+  steps String?
   user_id String?       // 记录谁操作的
-  trigger_payload  String @db.Text
+  trigger_payload  String
   created_time DateTime  @default(now())
   updated_time DateTime  @updatedAt
 }

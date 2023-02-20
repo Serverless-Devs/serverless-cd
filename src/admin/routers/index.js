@@ -46,6 +46,10 @@ const defaultRoutes = [
     path: '/github',
     route: require('./code-provider/github'),
   },
+  {
+    path: '/common',
+    route: require('./common'),
+  },
 ];
 
 defaultRoutes.forEach((route) => {
