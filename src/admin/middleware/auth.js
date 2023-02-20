@@ -4,6 +4,9 @@ const debug = require('debug')('serverless-cd:middleware-auth');
 
 const auth = (orgRoleKeys) => async (req, _res, next) => {
   const { orgId } = req;
+  if (!orgId) {
+    return next(new NoPermissionError('没有获取到团队信息，无法判断操作权限'));
+  }
   debug(`orgId: ${orgId}`);
   debug(`orgRoleKeys: ${orgRoleKeys}`);
   const hasPermissions = await authService.checkOrganizationRole(orgId, orgRoleKeys);

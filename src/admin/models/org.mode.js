@@ -22,7 +22,7 @@ module.exports = {
     const result = await orgPrisma.findFirst({ where });
     return getOrgInfo(result);
   },
-  async getOrgById(id) {
+  async getOrgById(id = '') {
     const result = await orgPrisma.findUnique({ where: { id } });
     return getOrgInfo(result);
   },
