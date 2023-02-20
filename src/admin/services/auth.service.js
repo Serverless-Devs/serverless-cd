@@ -67,8 +67,8 @@ async function setJwt({ userId }, res) {
  * 检测用户是否拥有调用的权限
  */
 async function checkOrganizationRole(orgId, orgRoleKeys = ADMIN_ROLE_KEYS) {
-  const { role } = await orgModel.getOrgById(orgId);
-  return orgRoleKeys.includes(role);
+  const orgConfig = await orgModel.getOrgById(orgId);
+  return orgRoleKeys.includes(_.get(orgConfig, 'role'));
 }
 
 module.exports = {

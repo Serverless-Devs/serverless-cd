@@ -6,7 +6,7 @@ const orgPrisma = prisma[TABLE.ORG];
 
 const getOrgInfo = (result) => {
   if (!result) {
-    return null;
+    return {};
   }
   if (_.isArray(result)) {
     result = _.first(result);
