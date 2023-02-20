@@ -3,7 +3,7 @@ const _ = require('lodash');
 const debug = require('debug')('serverless-cd:org');
 
 const { Result, generateOrgIdByUserIdAndOrgName } = require('../../util');
-const { OWNER_ROLE_KEYS, ADMIN_ROLE_KEYS, ROLE } = require('@serverless-cd/config');
+const { OWNER_ROLE_KEYS, ADMIN_ROLE_KEYS, ROLE_KEYS } = require('@serverless-cd/config');
 const auth = require('../../middleware/auth');
 const orgService = require('../../services/org.service');
 
