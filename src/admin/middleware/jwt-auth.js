@@ -24,10 +24,12 @@ module.exports = async function (req, _res, next) {
           next(new NeedLogin('没有用户或者团队信息'));
         }
         debug('verify user:: ', user);
-        const orgName = _.get(req, 'query.orgName', _.get(req, 'body.orgName'));
         req.userId = user.userId;
-        req.orgName = orgName;
-        req.orgId = generateOrgIdByUserIdAndOrgName(user.userId, orgName);
+        const orgName = _.get(req, 'query.orgName', _.get(req, 'body.orgName'));
+        if (orgName) {
+          req.orgName = orgName;
+          req.orgId = generateOrgIdByUserIdAndOrgName(user.userId, orgName);
+        }
         next();
       } catch (error) {
         next(new NeedLogin(error.message));

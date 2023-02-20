@@ -35,8 +35,7 @@ async function invokeFunction(trigger_payload) {
   );;
 }
 
-async function redeploy(userId, body = {}) {
-  const { taskId, appId } = body;
+async function redeploy(userId, { taskId, appId } = {}) {
   if (_.isEmpty(taskId)) {
     throw new ValidationError('taskId 必填');
   }
@@ -73,8 +72,7 @@ async function redeploy(userId, body = {}) {
   }
 }
 
-async function cancelTask(body = {}) {
-  const { taskId } = body;
+async function cancelTask({ taskId } = {}) {
   if (_.isEmpty(taskId)) {
     throw new ValidationError('taskId 必填');
   }

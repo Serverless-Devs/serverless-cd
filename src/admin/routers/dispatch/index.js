@@ -8,6 +8,7 @@ const auth = require('../../middleware/auth');
 const dispatchService = require('../../services/dispatch.service');
 
 //  重新 / 回滚
+//  body: { taskId, appId }
 router.post('/redeploy', auth(ADMIN_ROLE_KEYS), async function (req, res) {
   const { userId, body } = req;
   const result = await dispatchService.redeploy(userId, body);

@@ -8,7 +8,7 @@ const auth = require('../../middleware/auth');
 const orgService = require('../../services/org.service');
 
 // 查看团队信息
-router.get('/detail', async (req, res) => {
+router.get('/detail', auth(Object.values(ROLE)), async (req, res) => {
   const { userId, query: { orgName } } = req;
   const orgId = generateOrgIdByUserIdAndOrgName(userId, orgName);
   const result = await orgService.getOrgById(orgId);
