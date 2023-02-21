@@ -22,8 +22,20 @@ const TaskDetails = lazy(() => import(/* webpackChunkName: 'TaskDetails' */ '@/p
 const Auth = lazy(() => import(/* webpackChunkName: 'Auth' */ '@/pages/Auth'));
 const Settings = lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Settings'));
 const Orgs = lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Orgs'));
+const NotAuth = lazy(() => import(/* webpackChunkName: 'NotAuth' */ '@/pages/NotAuth'));
 
 const routerConfig: IRouterConfig[] = [
+  {
+    path: '/notAuth',
+    component: LoginLayout,
+    children: [
+      {
+        path: '/',
+        exact: true,
+        component: NotAuth,
+      },
+    ],
+  },
   {
     path: '/login',
     component: LoginLayout,

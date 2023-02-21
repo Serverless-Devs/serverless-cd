@@ -43,6 +43,10 @@ const appConfig: IAppConfig = {
             history?.push('/login');
             return response;
           }
+          if (response.data.code === 403) {
+            history?.push('/notAuth');
+            return response;
+          }
           if (!response.data.success && response.data.message) {
             Toast.error(response.data.message);
           }

@@ -20,3 +20,7 @@ export const updateAuth = async (body) => {
 export const removeUser = async (body) => {
   return await request.post('/api/org/removeUser', body);
 };
+
+export const removeOrg = async (body) => {
+  return await request.post('/api/org/remove', body);
+};

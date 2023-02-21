@@ -69,7 +69,7 @@ router.post('/transfer', auth(OWNER_ROLE_KEYS), async (req, res) => {
  * 创建团队
  */
 router.post('/create', async (req, res) => {
-  const { userId, payload: { name, description } } = req;
+  const { userId, body: { name, description } } = req;
   await orgService.createOrg(userId, name, description);
   res.json(Result.ofSuccess());
 });
