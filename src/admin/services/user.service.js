@@ -28,7 +28,7 @@ async function getOrganizationOwnerIdByOrgId(orgId) {
   if (role === ROLE.OWNER) {
     ownerUserId = orgData.user_id;
   } else {
-    const ownerOrgData = await orgModel.getOrgFirst({ name, role: ROLE.OWNER });
+    const ownerOrgData = await orgModel.getOwnerOrgByName(name);
     ownerUserId = ownerOrgData.user_id;
   }
 

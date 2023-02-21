@@ -15,7 +15,7 @@ async function getOrgById(orgId = '') {
   if (_.includes(OWNER_ROLE_KEYS, role)) {
     return data;
   }
-  const ownerData = await orgModel.getOrgFirst({ name, role: ROLE.OWNER });
+  const ownerData = await orgModel.getOwnerOrgByName(name);
   const secrets = _.get(ownerData, 'secrets', {});
   if (_.includes(ADMIN_ROLE_KEYS, role)) {
     _.set(data, 'secrets', secrets);
@@ -126,7 +126,7 @@ async function remove(orgId, orgName) {
 }
 
 async function updateOwnerByName(orgName, data) {
-  const { id: orgId } = await orgModel.getOrgFirst({ name: orgName, role: ROLE.OWNER });
+  const { id: orgId } = await orgModel.getOwnerOrgByName(orgName);
   await orgModel.updateOrg(orgId, data);
 }
 

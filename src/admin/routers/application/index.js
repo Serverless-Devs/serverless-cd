@@ -29,8 +29,8 @@ router.post('/transfer', auth(OWNER_ROLE_KEYS), async (req, res) => {
  * 应用列表
  */
 router.get('/list', auth(ROLE_KEYS), async function (req, res) {
-  const { orgId } = req;
-  const appList = await appService.listByOrgId(orgId);
+  const { orgName } = req;
+  const appList = await appService.listByOrgName(orgName);
   return res.json(Result.ofSuccess(appList));
 });
 

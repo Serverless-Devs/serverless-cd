@@ -17,7 +17,7 @@ async function initUser({ username, password }) {
   if (_.get(data, 'username', '')) {
     throw new ValidationError('用户名已存在');
   }
-  const orgData = await orgModel.getOrgFirst({ name: username });
+  const orgData = await orgModel.getOwnerOrgByName(username);
   if (_.get(orgData, 'name', '')) {
     throw new ValidationError('团队名称已存在');
   }
@@ -38,9 +38,8 @@ async function loginWithPassword({ username, password }) {
     throw new ValidationError('用户名或密码不正确');
   }
 
-  const userId = data.id;
-  const { id: orgId } = await orgModel.getOrgFirst({ user_id: userId, role: ROLE.OWNER });
-  return { userId, orgId };
+  const { id: userId } = data;
+  return { userId };
 }
 
 /**

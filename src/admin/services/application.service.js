@@ -10,7 +10,8 @@ const orgModel = require('../models/org.mode');
 const webhookService = require('./webhook.service');
 const userService = require('./user.service');
 
-async function listByOrgId(orgId = '') {
+async function listByOrgName(orgName = '') {
+  const { id: orgId } = await orgModel.getOwnerOrgByName(orgName);
   const data = await appModel.listAppByOrgId(orgId);
   if (_.isNil(data)) {
     return {};
@@ -38,7 +39,7 @@ async function create(orgId, orgName, providerToken, body) {
   debug('start add webhook');
   await webhookService.add({ owner, repo, token: providerToken, webHookSecret, appId, provider });
   debug('start create app');
-  const ownerOrg = await orgModel.getOrgFirst({ name: orgName, role: ROLE.OWNER });
+  const ownerOrg = await orgModel.getOwnerOrgByName(orgName);
   await appModel.createApp({
     id: appId,
     org_id: orgId,
@@ -112,7 +113,7 @@ async function remove(orgId, userId, appId) {
 }
 
 async function transfer(appId, transferOrgName) {
-  const transferOwnerOrg = await orgModel.getOrgFirst({ name: transferOrgName, role: ROLE.OWNER });
+  const transferOwnerOrg = await orgModel.getOwnerOrgByName(transferOrgName);
   const transferOrgId = _.get(transferOwnerOrg, 'id');
   if (_.isEmpty(transferOrgId)) {
     throw new ValidationError(`没有找到 ${transferOrgName} 团队`);
@@ -122,7 +123,7 @@ async function transfer(appId, transferOrgName) {
 
 module.exports = {
   preview,
-  listByOrgId,
+  listByOrgName,
   create,
   update,
   transfer,

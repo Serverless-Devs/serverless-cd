@@ -18,8 +18,11 @@ const getOrgInfo = (result) => {
 };
 
 module.exports = {
-  async getOrgFirst(where) {
-    const result = await orgPrisma.findFirst({ where });
+  async getOwnerOrgByName(name = '') {
+    if (!name) {
+      return {};
+    }
+    const result = await orgPrisma.findFirst({ where: { name, role: ROLE.OWNER } });
     return getOrgInfo(result);
   },
   async getOrgById(id = '') {
