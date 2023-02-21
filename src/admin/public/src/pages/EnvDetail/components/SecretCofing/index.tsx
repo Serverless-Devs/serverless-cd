@@ -54,6 +54,7 @@ const SecretConfig: FC<IProps> = ({
     const { success } = await request({ environment, appId, provider });
     if (success) {
       Toast.success('配置成功');
+      secretsDrawerRef?.current?.setVisible(false);
       refreshCallback && refreshCallback();
     }
   };
