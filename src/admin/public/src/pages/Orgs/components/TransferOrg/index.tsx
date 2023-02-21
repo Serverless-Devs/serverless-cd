@@ -27,9 +27,9 @@ const TransferOrg: FC<IProps> = (props) => {
     validate(async (errors, values) => {
       if (errors) return;
       try {
-        const { success } = await request({ ...values, orgName: dataSource.name});
+        const { success } = await request({ ...values, orgName: dataSource.name });
         if (success) {
-          Toast.success('转让组织');
+          Toast.success('转让组织成功');
           setVisible(false);
           resetToDefault();
           await callback();
