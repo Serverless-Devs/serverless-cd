@@ -37,12 +37,12 @@ router.post('/updateAuth', auth(ADMIN_ROLE_KEYS), async (req, res) => {
   res.json(Result.ofSuccess());
 });
 
-// // 编辑密钥信息【是不是需要修改 owner 的密钥】
-// router.post('/updateSecrets', auth(ADMIN_ROLE_KEYS), async (req, res) => {
-//   const { orgName, body: { inviteUserName, role } } = req;
-//   await orgService.updateUserRole(orgName, inviteUserName, role);
-//   res.json(Result.ofSuccess());
-// });
+// 编辑密钥信息
+router.post('/update', auth(ADMIN_ROLE_KEYS), async (req, res) => {
+  const { orgId, body: { secrets } } = req;
+  await orgService.update(orgId, { secrets });
+  res.json(Result.ofSuccess());
+});
 
 // 删除成员
 router.post('/removeUser', auth(OWNER_ROLE_KEYS), async (req, res) => {

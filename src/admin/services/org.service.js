@@ -108,6 +108,10 @@ async function remove(orgId, orgName) {
   await applicationModel.deleteAppByOrgId(orgId);
 }
 
+async function update(orgId, data) {
+  await orgModel.updateOrg(orgId, data);
+}
+
 async function transfer(orgId, orgName, transferUserName) {
   if (transferUserName === orgName) {
     throw new ValidationError('注册的团队不能转让');
@@ -145,13 +149,15 @@ async function transfer(orgId, orgName, transferUserName) {
 }
 
 function desensitization(data) {
-  if (_.isArray(data)) {
-    return _.map(data, item => _.omit(item, ['secrets']))
-  }
-  return _.omit(data, ['secrets']);
+  return data;
+  // if (_.isArray(data)) {
+  //   return _.map(data, item => _.omit(item, ['secrets']))
+  // }
+  // return _.omit(data, ['secrets']);
 }
 
 module.exports = {
+  update,
   desensitization,
   transfer,
   remove,
