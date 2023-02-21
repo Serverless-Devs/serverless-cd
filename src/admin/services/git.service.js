@@ -35,7 +35,7 @@ async function getProviderRepos(orgId, provider, { org } = {}) {
   const token = await getProviderToken(orgId, provider);
   const providerClient = git(provider, { access_token: token });
 
-  const applicationResult = await appService.listByOrgId(orgId);
+  const applicationResult = await appService.listByOrgName(orgId);
 
   try {
     let rows;
@@ -81,7 +81,7 @@ async function getBranches(orgId, provider, query) {
 
 async function checkProviderFile(orgId, provider, body = {}) {
   const token = await getProviderToken(orgId, provider);
-  return await checkFile({ ...body, token, file: CD_PIPELINE_YAML })
+  return await checkFile({ ...body, token, file: CD_PIPELINE_YAML });
 }
 
 async function putFile(orgId, provider, body) {
