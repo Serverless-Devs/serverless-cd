@@ -5,7 +5,7 @@ import { Table, Button, Icon, Dialog } from '@alicloud/console-components';
 import Actions, { LinkButton } from '@alicloud/console-components-actions';
 import AddMember from './components/AddMember';
 import { Toast } from '@/components/ToastContainer';
-import { ROLE } from '@/constants';
+import { ROLE, ROLE_LABEL } from '@/constants';
 
 function Members() {
   const { data, request, refresh, loading } = useRequest(listUsers);
@@ -38,6 +38,7 @@ function Members() {
       title: '角色',
       key: 'role',
       dataIndex: 'role',
+      cell: (value, _index, record) => ROLE_LABEL[value],
     },
     {
       title: '描述',

@@ -63,3 +63,9 @@ export enum ROLE {
   ADMIN = 'admin',
   MEMBER = 'member',
 }
+
+export const ROLE_LABEL = {
+  [ROLE.OWNER]: 'Owner',
+  [ROLE.ADMIN]: '管理者',
+  [ROLE.MEMBER]: '开发者',
+};
