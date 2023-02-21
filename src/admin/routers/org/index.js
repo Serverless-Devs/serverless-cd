@@ -39,8 +39,8 @@ router.post('/updateAuth', auth(ADMIN_ROLE_KEYS), async (req, res) => {
 
 // 编辑信息
 router.post('/update', auth(ADMIN_ROLE_KEYS), async (req, res) => {
-  const { orgId, body: { secrets } } = req;
-  await orgService.update(orgId, { secrets });
+  const { orgName, body: { secrets } } = req;
+  await orgService.update(orgName, { secrets });
   res.json(Result.ofSuccess());
 });
 

@@ -125,7 +125,8 @@ async function remove(orgId, orgName) {
   await applicationModel.deleteAppByOrgId(orgId);
 }
 
-async function update(orgId, data) {
+async function updateOwnerByName(orgName, data) {
+  const { id: orgId } = await orgModel.getOrgFirst({ name: orgName, role: ROLE.OWNER });
   await orgModel.updateOrg(orgId, data);
 }
 
@@ -174,7 +175,7 @@ function desensitization(data) {
 }
 
 module.exports = {
-  update,
+  updateOwnerByName,
   desensitization,
   transfer,
   remove,
