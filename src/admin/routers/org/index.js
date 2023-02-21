@@ -37,7 +37,7 @@ router.post('/updateAuth', auth(ADMIN_ROLE_KEYS), async (req, res) => {
   res.json(Result.ofSuccess());
 });
 
-// 编辑密钥信息
+// 编辑信息
 router.post('/update', auth(ADMIN_ROLE_KEYS), async (req, res) => {
   const { orgId, body: { secrets } } = req;
   await orgService.update(orgId, { secrets });
