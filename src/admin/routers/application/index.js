@@ -20,8 +20,8 @@ router.post('/preview', async function (req, res) {
  * 转让【owner】
  */
 router.post('/transfer', auth(OWNER_ROLE_KEYS), async (req, res) => {
-  const { transferOrgId, appId } = req.body;
-  const result = await appService.update(appId, { org_id: transferOrgId });
+  const { transferOrgName, appId } = req.body;
+  const result = await appService.transfer(appId, transferOrgName);
   res.json(Result.ofSuccess(result));
 });
 
@@ -50,11 +50,11 @@ router.get('/detail', auth(ROLE_KEYS), async function (req, res) {
  * 创建应用
  */
 router.post('/create', auth(ADMIN_ROLE_KEYS), async function (req, res) {
-  const { userId, orgId } = req;
+  const { userId, orgId, orgName } = req;
   const { provider } = req.body;
-  const token = await userService.getProviderToken(orgId, userId, provider);
+  const providerToken = await userService.getProviderToken(orgId, userId, provider);
 
-  const appInfo = await appService.create(orgId, token, req.body);
+  const appInfo = await appService.create(orgId, orgName, providerToken, req.body);
   return res.json(Result.ofSuccess(appInfo));
 });
 

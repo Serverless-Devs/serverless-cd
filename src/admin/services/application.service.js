@@ -1,9 +1,11 @@
 const _ = require('lodash');
 const debug = require('debug')('serverless-cd:application');
+const { ROLE } = require('@serverless-cd/config');
 
 const { ValidationError, unionId } = require('../util');
 const appModel = require('../models/application.mode');
 const taskModel = require('../models/task.mode');
+const orgModel = require('../models/org.mode');
 
 const webhookService = require('./webhook.service');
 const userService = require('./user.service');
@@ -27,18 +29,20 @@ async function preview(body = {}) {
   }
 }
 
-async function create(orgId, token, body) {
+async function create(orgId, orgName, providerToken, body) {
   await preview(body);
 
   const { repo, owner, repo_url, provider_repo_id: providerRepoId, description, provider, environment } = body;
   const appId = unionId();
   const webHookSecret = unionId();
   debug('start add webhook');
-  await webhookService.add({ owner, repo, token, webHookSecret, appId, provider });
+  await webhookService.add({ owner, repo, token: providerToken, webHookSecret, appId, provider });
   debug('start create app');
+  const ownerOrg = await orgModel.getOrgFirst({ name: orgName, role: ROLE.OWNER });
   await appModel.createApp({
     id: appId,
     org_id: orgId,
+    owner_org_id: _.get(ownerOrg, 'id'),
     description,
     owner,
     provider,
@@ -107,11 +111,21 @@ async function remove(orgId, userId, appId) {
   debug(`Removed webhook successfully`);
 }
 
+async function transfer(appId, transferOrgName) {
+  const transferOwnerOrg = await orgModel.getOrgFirst({ name: transferOrgName, role: ROLE.OWNER });
+  const transferOrgId = _.get(transferOwnerOrg, 'id');
+  if (_.isEmpty(transferOrgId)) {
+    throw new ValidationError(`没有找到 ${transferOrgName} 团队`);
+  }
+  await update(appId, { org_id: transferOrgId, owner_org_id: transferOrgId })
+}
+
 module.exports = {
   preview,
   listByOrgId,
   create,
   update,
+  transfer,
   remove,
   removeEnv,
   getAppById,
