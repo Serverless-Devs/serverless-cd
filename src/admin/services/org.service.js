@@ -1,9 +1,10 @@
 const _ = require('lodash');
+const debug = require('debug')('serverless-cd:org-service');
 const { ROLE, ROLE_KEYS, OWNER_ROLE_KEYS } = require('@serverless-cd/config');
 const orgModel = require('../models/org.mode');
 const applicationModel = require('../models/application.mode');
 const userModel = require('../models/user.mode');
-const { ValidationError, NoPermissionError, generateOrgIdByUserIdAndOrgName, prisma } = require('../util');
+const { ValidationError, NoPermissionError, generateOrgIdByUserIdAndOrgName } = require('../util');
 
 async function getOrgById(orgId = '') {
   const data = await orgModel.getOrgById(orgId);
@@ -60,11 +61,21 @@ async function invite(orgName, inviteUserName, role = ROLE.MEMBER) {
   if (_.isEmpty(userConfig)) {
     throw new ValidationError(`没有找到此用户: ${inviteUserName}`);
   }
+  const inviteOrgId = generateOrgIdByUserIdAndOrgName(userConfig.id, orgName);
+  const inviteOrgConfig = await orgModel.getOrgById(inviteOrgId);
+  if (_.isEmpty(inviteOrgConfig)) {
+    throw new ValidationError(`用户${inviteUserName}已经在组织${orgName}已经中存在`);
+  }
 
   await orgModel.createOrg({ userId: userConfig.id, name: orgName, role });
 }
 
-async function updateUserRole(orgName, inviteUserId, role = ROLE.MEMBER) {
+async function updateUserRole(orgName, inviteUserName, role = ROLE.MEMBER) {
+  const userConfig = await userModel.getUserByName(inviteUserName);
+  if (_.isEmpty(userConfig)) {
+    throw new ValidationError(`没有找到此用户: ${inviteUserName}`);
+  }
+  const inviteUserId = userConfig.id;
   if (_.isEmpty(inviteUserId)) {
     throw new ValidationError('需要填写被操作的用户ID');
   }
@@ -73,9 +84,10 @@ async function updateUserRole(orgName, inviteUserId, role = ROLE.MEMBER) {
   }
 
   const inviteUserOrgId = generateOrgIdByUserIdAndOrgName(inviteUserId, orgName);
+  debug(`update user role inviteUserOrgId: ${inviteUserOrgId}`);
   const userData = await orgModel.getOrgById(inviteUserOrgId);
   if (_.isEmpty(userData)) {
-    throw new ValidationError(`${orgName}团队中没有找到此用户：${userId}`);
+    throw new ValidationError(`${orgName}团队中没有找到此用户：${inviteUserId}`);
   }
   if (_.includes(OWNER_ROLE_KEYS, userData.role)) {
     throw new NoPermissionError(`此用户拥有${orgName}团队最高管理权限，您无法操作`);
