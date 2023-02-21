@@ -2,8 +2,21 @@ const { fs } = require('@serverless-cd/core');
 const { spawnSync } = require('child_process');
 const { prisma } = require('../util');
 
+async function testConnection() {
+  // 判断数据表是否已经存在
+  try {
+    await prisma.user.findUnique({ where: { id: '2' } });
+    console.log('find unique successfully');
+    return true;
+  } catch (ex) {
+    console.log('find unique error: ' + ex.code);
+    return ex.code !== 'P2021';
+  }
+}
+
 const DB_TYPE = {
   sqlite: async () => {
+    const databaseUrl = process.env.DATABASE_URL;
     const filePath = databaseUrl.replace('file:', '');
     console.log('databaseUrl: ', databaseUrl);
     console.log('filePath: ', filePath);
@@ -43,15 +56,20 @@ module.exports = async function (dbType) {
   if (!databaseUrl) {
     throw new Error('DATABASE_URL 未配置');
   }
-  // 判断数据表是否已经存在
-  try {
-    await prisma.user.findUnique({ where: { id: '2' } });
-    return;
-  } catch (ex) {
-    if (ex.code !== 'P2021') {
+
+  for (let i = 1; i < 4; i++) {
+    const connection = await testConnection();
+    console.log(`第 ${i} 次，connection: ${connection}, dbType: ${dbType}`);
+    if (connection) {
       return;
     }
+    await DB_TYPE[dbType]();
+    await prisma.$disconnect();
+    await prisma.$connect();
   }
 
-  await DB_TYPE[dbType]();
+  const connection = await testConnection();
+  if (!connection) {
+    throw new Error('没有链接上数据表');
+  }
 }
