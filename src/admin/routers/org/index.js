@@ -17,8 +17,8 @@ router.get('/detail', auth(ROLE_KEYS), async (req, res) => {
 
 // 显示团队成员
 router.get('/listUsers', auth(ROLE_KEYS), async (req, res) => {
-  const { query: { orgName } } = req;
-  const result = await orgService.listByOrgName(orgName);
+  const { orgId, query: { orgName } } = req;
+  const result = await orgService.listByOrgName(orgId, orgName);
   res.json(Result.ofSuccess(orgService.desensitization(result)));
 });
 
@@ -26,8 +26,8 @@ router.get('/listUsers', auth(ROLE_KEYS), async (req, res) => {
 // TODO: 受邀人员需要同意才能加入，可以通过生成的链接直接加入
 router.post('/invite', auth(ADMIN_ROLE_KEYS), async (req, res) => {
   const { orgName, body: { inviteUserName, role } } = req;
-  const result = await orgService.invite(orgName, inviteUserName, role);
-  res.json(Result.ofSuccess(result));
+  await orgService.invite(orgName, inviteUserName, role);
+  res.json(Result.ofSuccess());
 });
 
 // 编辑个人在团队权限

@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const debug = require('debug')('serverless-cd:org-service');
-const { ROLE, ROLE_KEYS, OWNER_ROLE_KEYS } = require('@serverless-cd/config');
+const { ROLE, ROLE_KEYS, OWNER_ROLE_KEYS, ADMIN_ROLE_KEYS } = require('@serverless-cd/config');
 const orgModel = require('../models/org.mode');
 const applicationModel = require('../models/application.mode');
 const userModel = require('../models/user.mode');
@@ -11,6 +11,18 @@ async function getOrgById(orgId = '') {
   if (_.isEmpty(data)) {
     return {};
   }
+  const { role, name } = data;
+  if (_.includes(OWNER_ROLE_KEYS, role)) {
+    return data;
+  }
+  const ownerData = await orgModel.getOrgFirst({ name, role: ROLE.OWNER });
+  const secrets = _.get(ownerData, 'secrets', {});
+  if (_.includes(ADMIN_ROLE_KEYS, role)) {
+    _.set(data, 'secrets', secrets);
+  } else {
+    _.set(data, 'secrets', _.mapValues(secrets, () => ''));
+  }
+
   return data;
 }
 
@@ -21,13 +33,18 @@ async function listByUserId(userId = '') {
   return await orgModel.list({ user_id: userId });
 }
 
-async function listByOrgName(name = '') {
+async function listByOrgName(orgId, name = '') {
   const { result } = await orgModel.list({ name });
+
+  const ownerData = _.find(result, ({ role }) => role === ROLE.OWNER);
+  const { role } = _.find(result, ({ id }) => id === orgId);
+  const ownerSecrets = _.get(ownerData, 'secrets', {});
+  const secrets = _.includes(ADMIN_ROLE_KEYS, role) ? ownerSecrets : _.mapValues(ownerSecrets, () => '');
 
   const names = await Promise.all(
     _.map(result, async ({ user_id: userId }) => {
       const data = await userModel.getUserById(userId);
-      return { username: _.get(data, 'username') };
+      return { username: _.get(data, 'username'), secrets };
     }),
   );
   return _.merge(result, names);

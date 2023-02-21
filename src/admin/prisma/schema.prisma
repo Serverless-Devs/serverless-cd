@@ -32,6 +32,7 @@ model Org {
 model Application {
   id String @id
   org_id String
+  owner_org_id String
   description String?
   owner String
   provider String
