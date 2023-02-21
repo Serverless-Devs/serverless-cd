@@ -45,7 +45,7 @@ module.exports = {
   },
   async updateOrg(id, data) {
     if (data.secrets) {
-      data.secrets = JSON.stringify(secrets);
+      data.secrets = JSON.stringify(data.secrets);
     }
     const result = await orgPrisma.update({ where: { id }, data });
     return result;
