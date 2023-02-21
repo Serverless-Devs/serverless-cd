@@ -19,7 +19,7 @@ async function initUser({ username, password }) {
   }
   const orgData = await orgModel.getOrgFirst({ name: username });
   if (_.get(orgData, 'name', '')) {
-    throw new ValidationError('组织名称已存在');
+    throw new ValidationError('团队名称已存在');
   }
 
   const { id: userId } = await userModel.createUser({ username, password });

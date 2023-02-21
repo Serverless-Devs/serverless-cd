@@ -26,7 +26,7 @@ router.post('/cancel', auth(ADMIN_ROLE_KEYS), async function (req, res) {
 router.post('/manual', auth(ADMIN_ROLE_KEYS), async function (req, res) {
   const { userId, orgId } = req;
   debug(`dispatch manual req.body ${JSON.stringify(req.body)}`);
-  const result = await dispatchService.manualTask(userId, orgId, req.body);
+  const result = await dispatchService.manualTask(userId, req.body);
   res.json(Result.ofSuccess(result));
 });
 

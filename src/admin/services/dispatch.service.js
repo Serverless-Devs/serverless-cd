@@ -4,6 +4,7 @@ const gitProvider = require('@serverless-cd/git-provider');
 
 const taskService = require('./task.service');
 const taskModel = require('../models/task.mode');
+const orgModel = require('../models/org.mode');
 const applicationService = require('./application.service');
 const userService = require('./user.service');
 
@@ -117,7 +118,7 @@ async function cancelTask({ taskId } = {}) {
   await applicationService.update(app_id, { environment });
 }
 
-async function manualTask(userId, orgId, body = {}) {
+async function manualTask(userId, body = {}) {
   const { appId, commitId, ref, message, inputs, envName } = body;
   if (_.isEmpty(appId)) {
     throw new ValidationError('appId 必填');
@@ -131,10 +132,7 @@ async function manualTask(userId, orgId, body = {}) {
     throw new ValidationError('没有查到应用信息');
   }
 
-  const { owner, provider, repo_name, repo_url, environment, org_id } = applicationResult;
-  if (org_id !== orgId) {
-    throw new ValidationError('无权操作此应用');
-  }
+  const { owner, provider, repo_name, repo_url, environment, owner_org_id } = applicationResult;
 
   debug('find provider access token');
   const userResult = await userService.getUserById(userId);
@@ -163,6 +161,10 @@ async function manualTask(userId, orgId, body = {}) {
     }
   }
   debug('get commit config end');
+  debug('get org owner secrets');
+  const ownerOrgData = await orgModel.getOrgById(owner_org_id);
+  const ownerSecrets = _.get(ownerOrgData, 'secrets', {});
+  debug('get org owner successfully');
 
   const targetEnvName = envName ? envName : _.first(_.keys(environment));
   const payload = {
@@ -174,7 +176,7 @@ async function manualTask(userId, orgId, body = {}) {
       appId,
       owner,
       accessToken: providerToken,
-      secrets: _.get(environment, `${targetEnvName}.secrets`, {}),
+      secrets: _.merge(ownerSecrets, _.get(environment, `${targetEnvName}.secrets`, {})),
     },
     ref,
     message: msg,

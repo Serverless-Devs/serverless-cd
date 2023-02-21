@@ -58,7 +58,7 @@ async function createOrg(userId, name, description) {
   const orgId = generateOrgIdByUserIdAndOrgName(userId, name);
   const userData = await orgModel.getOrgById(orgId);
   if (!_.isEmpty(userData)) {
-    throw new ValidationError('组织已存在');
+    throw new ValidationError('团队已存在');
   }
   await orgModel.createOrg({ userId, name, description, role: ROLE.OWNER });
 }

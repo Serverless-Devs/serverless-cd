@@ -7,10 +7,10 @@ module.exports = async function (provider, appId) {
   if (_.isEmpty(applicationResult)) {
     throw new Error(`Not found application by id ${appId}`);
   }
-  const orgId = _.get(applicationResult, 'org_id', '');
+  const ownerOrgId = _.get(applicationResult, 'owner_org_id', '');
 
-  console.log(`Get organization owner config by orgId ${orgId}`);
-  const userConfig = await getOrganizationOwnerIdByOrgId(orgId);
+  console.log(`Get organization owner config by orgId ${ownerOrgId}`);
+  const userConfig = await getOrganizationOwnerIdByOrgId(ownerOrgId);
 
   console.log('get config');
   const accessToken = _.get(userConfig, `third_part.${provider}.access_token`, '');

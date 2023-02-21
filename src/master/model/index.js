@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const { TABLE, ROLE } = require('@serverless-cd/config');
+const { TABLE } = require('@serverless-cd/config');
 const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
@@ -24,9 +24,14 @@ async function getUserById(id) {
  * 根据团队Id拿到拥有者用户数据
  */
 async function getOrganizationOwnerIdByOrgId(orgId) {
-  const [, name] = _.split(orgId, ':');
-  const ownerOrgData = await orgPrisma.findFirst({ where: { name, role: ROLE.OWNER } });
+  const ownerOrgData = await orgPrisma.findUnique({ where: { id: orgId } });
+  if (_.isEmpty(ownerOrgData)) {
+    throw new Error('没有找到团队信息');
+  }
   const userConfig = await getUserById(ownerOrgData.user_id);
+  if (_.isEmpty(userConfig)) {
+    throw new Error('没有找到用户信息');
+  }
   return {
     ...userConfig,
     secrets: ownerOrgData.secrets,
