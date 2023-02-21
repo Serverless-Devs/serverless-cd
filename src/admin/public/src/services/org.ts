@@ -29,3 +29,11 @@ export const transferOrg = async (body) => {
   return await request.post('/api/org/transfer', body);
 };
 
+export const orgDetail = async () => {
+  return await request.get('/api/org/detail');
+};
+
+export const orgUpdate = async (body) => {
+  return await request.post('/api/org/update', { ...body });
+};
+

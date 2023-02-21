@@ -16,11 +16,3 @@ export const updateUserProviderToken = async (params) => {
   });
   return res.data;
 };
-
-export const addOrCompileSecrets = async (data) => {
-  return await request.post('/api/auth/user/addOrCompileSecrets', { data });
-};
-
-export const gitGlobalSecrets = async () => {
-  return await request.get('/api/auth/user/globalSecrets');
-};

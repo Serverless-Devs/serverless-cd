@@ -1,16 +1,15 @@
-import React, { FC } from 'react';
+import React, { FC, useRef } from 'react';
 import { useRequest } from 'ice';
 import SlidePanel from '@alicloud/console-components-slide-panel';
 import { Form, Field } from '@alicloud/console-components';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import Trigger from '@serverless-cd/trigger-ui';
 import { updateApp } from '@/services/applist';
-import { validateTrigger } from '@/pages/EnvDetail/components/TriggerConfig';
 import Env, { validteEnv } from '@/pages/Create/components/github/Env';
 import ConfigEdit from '@/components/ConfigEdit';
 import { TYPE as ENV_TYPE } from '@/components/EnvType';
 import { Toast } from '@/components/ToastContainer';
-import { get, each, keys } from 'lodash';
+import { get, keys } from 'lodash';
 
 const FormItem = Form.Item;
 
@@ -26,26 +25,28 @@ const CreateEnv: FC<IProps> = (props) => {
   const [visible, setVisible] = React.useState(false);
   const field = Field.useField();
   const { init, resetToDefault, validate } = field;
+  const triggerRef: any = useRef(null);
+  const secretsRef: any = useRef(null);
+
   const handleClose = () => {
     resetToDefault();
     setVisible(false);
   };
   const handleOK = async () => {
     validate(async (errors, values) => {
-      if (errors) return;
+      const res = await triggerRef?.current?.validate();
+      const secretsRes = await secretsRef?.current?.validate();
+      if (errors || !res || !secretsRes) return;
+
       const provider = get(data, 'provider');
       const envInfo: any = get(values, 'environment', {});
       const secrets = get(values, 'secrets', []);
-      const newSecrets = {};
-      each(secrets, ({ key, value }) => {
-        newSecrets[key] = value;
-      });
       const environment = {
         ...get(data, 'environment'),
         [envInfo.name]: {
           created_time: Date.now(),
           type: envInfo.type,
-          secrets: newSecrets,
+          secrets: secrets,
           trigger_spec: {
             [provider]: values['trigger'],
           },
@@ -96,17 +97,12 @@ const CreateEnv: FC<IProps> = (props) => {
           </FormItem>
           <FormItem label="触发方式" required>
             <Trigger
-              {...(init('trigger', {
-                rules: [
-                  {
-                    validator: validateTrigger,
-                  },
-                ],
-              }) as any)}
+              {...(init('trigger') as any)}
+              ref={triggerRef}
             />
           </FormItem>
           <FormItem label="Secrets">
-            <ConfigEdit field={field} />
+            <ConfigEdit {...(init('secrets'))} ref={secretsRef} />
           </FormItem>
         </Form>
       </SlidePanel>
