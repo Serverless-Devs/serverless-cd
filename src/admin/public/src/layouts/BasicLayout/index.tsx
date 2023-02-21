@@ -15,7 +15,6 @@ import { history, useRequest } from 'ice';
 import store from '@/store';
 import { get } from 'lodash';
 import ToastContainer from '@/components/ToastContainer';
-import { getOrgName } from '@/utils';
 import './index.css';
 
 const menuConfig = ['/settings/tokens', '/settings/secrets'];
@@ -79,15 +78,15 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
   const menu = () => {
     const onItemClick = (key) => {
       if (key === '/username') return;
-      if (key === '/logout') {
+      if (key === '/login') {
         request();
         userDispatchers.removeStateInfo();
-        return history?.push('/login');
+        return history?.push(key);
       }
       if (key === '/organizations') {
         return history?.push(key);
       }
-      history?.push(`/${getOrgName()}${key}`);
+      history?.push(`/${username}${key}`);
     };
     return (
       <Menu className="user-menu" onItemClick={onItemClick}>
@@ -95,19 +94,14 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
           <span className="user-name">{username}</span>
         </Menu.Item>
         <Divider key="divider1" className="m-t-b-10" />
-        <Menu.Item key="/application" className="m-t-b-10">
-          Dashboard
-        </Menu.Item>
+        <Menu.Item key="/application">Your repositories</Menu.Item>
+        <Menu.Item key="/organizations">Your organizations</Menu.Item>
         <Divider key="divider2" className="m-t-b-10" />
         <Menu.Item key="/settings" className="m-t-b-10">
           Settings
         </Menu.Item>
-        <Divider key="divider3" className="m-t-b-10" />
-        <Menu.Item key="/organizations" className="m-t-b-10">
-          Organizations
-        </Menu.Item>
         <Divider key="divider4" className="m-t-b-10" />
-        <Menu.Item key="/logout">Login Out</Menu.Item>
+        <Menu.Item key="/login">Sign out</Menu.Item>
       </Menu>
     );
   };

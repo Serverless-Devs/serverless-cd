@@ -69,7 +69,7 @@ module.exports = {
     return result;
   },
   async updateManyOrgIdOfApp(sourceOrgId, targetOrgId) {
-    return await prisma.post.updateMany({
+    return await applicationPrisma.updateMany({
       where: {
         org_id: sourceOrgId,
       },

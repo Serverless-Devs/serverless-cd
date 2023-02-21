@@ -24,3 +24,8 @@ export const removeUser = async (body) => {
 export const removeOrg = async (body) => {
   return await request.post('/api/org/remove', body);
 };
+
+export const transferOrg = async (body) => {
+  return await request.post('/api/org/transfer', body);
+};
+
