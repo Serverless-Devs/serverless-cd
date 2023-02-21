@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useRequest } from 'ice';
+import { useRequest, Link } from 'ice';
 import { Button, Icon, Table, Dialog } from '@alicloud/console-components';
 import Actions, { LinkButton } from '@alicloud/console-components-actions';
 import CreateOrg from './components/CreateOrg';
@@ -40,6 +40,7 @@ function Orgs() {
       title: '组织名称',
       key: 'name',
       dataIndex: 'name',
+      cell: (value, _index, record) => <Link to={`/${value}`}>{value}</Link>,
     },
     {
       title: '角色',
