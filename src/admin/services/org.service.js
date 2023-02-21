@@ -80,8 +80,8 @@ async function invite(orgName, inviteUserName, role = ROLE.MEMBER) {
   }
   const inviteOrgId = generateOrgIdByUserIdAndOrgName(userConfig.id, orgName);
   const inviteOrgConfig = await orgModel.getOrgById(inviteOrgId);
-  if (_.isEmpty(inviteOrgConfig)) {
-    throw new ValidationError(`用户${inviteUserName}已经在组织${orgName}已经中存在`);
+  if (!_.isEmpty(inviteOrgConfig)) {
+    throw new ValidationError(`用户${inviteUserName}已经在${orgName}团队中存在`);
   }
 
   await orgModel.createOrg({ userId: userConfig.id, name: orgName, role });

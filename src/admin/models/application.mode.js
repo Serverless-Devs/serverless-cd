@@ -69,13 +69,23 @@ module.exports = {
     return result;
   },
   async updateManyOrgIdOfApp(sourceOrgId, targetOrgId) {
-    return await applicationPrisma.updateMany({
-      where: {
-        org_id: sourceOrgId,
-      },
-      data: {
-        org_id: targetOrgId,
-      },
-    })
+    await prisma.$transaction([
+      applicationPrisma.updateMany({
+        where: {
+          org_id: sourceOrgId,
+        },
+        data: {
+          org_id: targetOrgId,
+        },
+      }),
+      applicationPrisma.updateMany({
+        where: {
+          owner_org_id: sourceOrgId,
+        },
+        data: {
+          owner_org_id: targetOrgId,
+        },
+      })
+    ]);
   },
 };
