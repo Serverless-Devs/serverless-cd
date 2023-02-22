@@ -53,6 +53,7 @@ interface IBasicLayoutProps {
   location: object | any;
 }
 export function BasicLayout({ children, match, location: { pathname } }: IBasicLayoutProps) {
+  const { orgName } = match.params;
   const getDevice: IGetDevice = (width) => {
     const isPhone =
       typeof navigator !== 'undefined' && navigator && navigator.userAgent.match(/phone/gi);
@@ -123,7 +124,7 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
         fixedHeader={false}
       >
         <Shell.Branding>
-          <Logo image={LOGO_URL} />
+          <Logo image={LOGO_URL} url={`/${orgName}/application`} />
         </Shell.Branding>
         {match?.path !== '/login' && (
           <Shell.Action>
