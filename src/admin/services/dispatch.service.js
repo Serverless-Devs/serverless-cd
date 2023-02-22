@@ -5,7 +5,6 @@ const gitProvider = require('@serverless-cd/git-provider');
 const taskModel = require('../models/task.mode');
 const orgModel = require('../models/org.mode');
 const applicationService = require('./application.service');
-const userService = require('./user.service');
 const taskService = require('./task.service');
 const orgService = require('./org.service');
 
@@ -56,17 +55,20 @@ async function redeploy(dispatchOrgId, { taskId, appId } = {}) {
   }
 
   const trigger_payload = _.get(taskResult, 'trigger_payload');
-  const environment = _.get(applicationResult, 'environment', {});
+  // 重新设置新的 task id
   const newTaskId = unionToken();
-
   _.set(trigger_payload, 'redelivery', taskId);
   _.set(trigger_payload, 'taskId', newTaskId);
-  _.set(trigger_payload, 'dispatchOrgId', dispatchOrgId);
-  _.set(trigger_payload, 'environment', {
-    ...environment,
-    ...trigger_payload.environment || {},
-  });
-
+  // 设置新的环境信息
+  const environment = _.merge(_.get(applicationResult, 'environment', {}), trigger_payload.environment || {});
+  _.set(trigger_payload, 'environment', environment);
+  _.set(trigger_payload, 'authorization.dispatchOrgId', dispatchOrgId);
+  // 设置新的Secrets信息
+  const ownerOrgData = await orgModel.getOrgById(applicationResult.owner_org_id);
+  const ownerSecrets = _.get(ownerOrgData, 'secrets', {});
+  const secrets = _.merge(ownerSecrets, _.get(environment, `${trigger_payload.envName}.secrets`, {}))
+  _.set(trigger_payload, 'authorization.secrets', secrets);
+  // 调用函数
   const asyncInvokeRes = await invokeFunction(trigger_payload);
   return {
     'x-fc-request-id': _.get(asyncInvokeRes, 'headers[x-fc-request-id]'),

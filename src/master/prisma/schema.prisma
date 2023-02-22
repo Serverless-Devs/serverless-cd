@@ -32,6 +32,7 @@ model Org {
 model Application {
   id String @id
   org_id String
+  owner_org_id String
   description String?
   owner String
   provider String
@@ -50,7 +51,7 @@ model Task {
   app_id String
   status String?
   steps String?   @db.Text
-  user_id String?       // 记录谁操作的
+  dispatch_org_id String?       // 记录谁操作的
   trigger_payload  String @db.Text
   created_time DateTime  @default(now())
   updated_time DateTime  @updatedAt

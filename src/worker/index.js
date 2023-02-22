@@ -27,7 +27,7 @@ async function handler(event, _context, callback) {
     provider,
     cloneUrl,
     pusher,
-    authorization: { userId, owner, appId, accessToken: token, secrets } = {},
+    authorization: { dispatchOrgId, owner, appId, accessToken: token, secrets } = {},
     ref,
     commit,
     message,
@@ -45,6 +45,15 @@ async function handler(event, _context, callback) {
   const logPrefix = `${LOG_LOCAL_PATH_PREFIX}/${taskId}`;
   core.fs.emptyDirSync(logPrefix);
   console.log('start task, uuid: ', taskId);
+
+  let url = '';
+  if (DOMAIN && dispatchOrgId) {
+    const [, orgName] = _.split(dispatchOrgId, ':');
+    if (orgName) {
+      url = `${DOMAIN}/${orgName}/application/${appId}/detail/${envName}/${taskId}`;
+    }
+    console.log(`get task url: ${url}, target org name: ${orgName}`);
+  }
 
   const appTaskConfig = { taskId, commit, message, ref };
 
@@ -108,11 +117,11 @@ async function handler(event, _context, callback) {
       ...customInputs,
       task: {
         id: taskId,
-        url: DOMAIN ? `${DOMAIN}/application/${userId}/detail/${envName}/${taskId}` : '',
+        url,
       },
       app: {
         // 应用的关联配置
-        user_id: userId,
+        dispatch_org_id: dispatchOrgId,
         id: appId,
       },
       secrets: _.merge(secrets, envSecrets),
@@ -162,7 +171,7 @@ async function handler(event, _context, callback) {
   console.log('init task');
   await makeTask(taskId, {
     env_name: envName,
-    user_id: userId,
+    dispatch_org_id: dispatchOrgId,
     app_id: appId,
     status: engine.context.status,
     trigger_payload: inputs,
