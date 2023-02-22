@@ -22,10 +22,9 @@ module.exports = {
     const result = await applicationPrisma.findUnique({ where: { id } });
     return getAppInfo(result);
   },
-  async getAppByProvider({ orgId, provider, providerRepoId }) {
+  async getAppByProvider({ provider, providerRepoId }) {
     const application = await applicationPrisma.findFirst({
       where: {
-        org_id: orgId,
         provider,
         provider_repo_id: providerRepoId,
       },
@@ -40,10 +39,10 @@ module.exports = {
       },
     });
   },
-  async listAppByOrgId(orgId) {
+  async listAppByOwnerOrgId(orgId) {
     const applicationResult = await applicationPrisma.findMany({
       where: {
-        org_id: orgId,
+        owner_org_id: orgId,
       },
       orderBy: {
         updated_time: 'desc',
@@ -57,8 +56,8 @@ module.exports = {
     });
     return result;
   },
-  async deleteAppByOrgId(orgId = '') {
-    const result = await applicationPrisma.deleteMany({ where: { org_id: orgId } });
+  async deleteAppByOwnerOrgId(orgId = '') {
+    const result = await applicationPrisma.deleteMany({ where: { owner_org_id: orgId } });
     return result;
   },
   async updateAppById(id, data) {

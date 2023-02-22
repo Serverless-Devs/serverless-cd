@@ -10,8 +10,8 @@ const dispatchService = require('../../services/dispatch.service');
 //  重新 / 回滚
 //  body: { taskId, appId }
 router.post('/redeploy', auth(ADMIN_ROLE_KEYS), async function (req, res) {
-  const { userId, body } = req;
-  const result = await dispatchService.redeploy(userId, body);
+  const { orgId, body } = req;
+  const result = await dispatchService.redeploy(orgId, body);
   res.json(Result.ofSuccess(result));
 });
 
@@ -24,9 +24,9 @@ router.post('/cancel', auth(ADMIN_ROLE_KEYS), async function (req, res) {
 
 // 手动部署
 router.post('/manual', auth(ADMIN_ROLE_KEYS), async function (req, res) {
-  const { userId, orgId } = req;
+  const { orgId, orgName } = req;
   debug(`dispatch manual req.body ${JSON.stringify(req.body)}`);
-  const result = await dispatchService.manualTask(userId, req.body);
+  const result = await dispatchService.manualTask(orgId, orgName, req.body);
   res.json(Result.ofSuccess(result));
 });
 

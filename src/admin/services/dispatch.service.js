@@ -2,11 +2,12 @@ const _ = require('lodash');
 const debug = require('debug')('serverless-cd:dispatch');
 const gitProvider = require('@serverless-cd/git-provider');
 
-const taskService = require('./task.service');
 const taskModel = require('../models/task.mode');
 const orgModel = require('../models/org.mode');
 const applicationService = require('./application.service');
 const userService = require('./user.service');
+const taskService = require('./task.service');
+const orgService = require('./org.service');
 
 const { ValidationError, Client, unionToken } = require('../util');
 const {
@@ -36,7 +37,7 @@ async function invokeFunction(trigger_payload) {
   );;
 }
 
-async function redeploy(userId, { taskId, appId } = {}) {
+async function redeploy(dispatchOrgId, { taskId, appId } = {}) {
   if (_.isEmpty(taskId)) {
     throw new ValidationError('taskId 必填');
   }
@@ -60,7 +61,7 @@ async function redeploy(userId, { taskId, appId } = {}) {
 
   _.set(trigger_payload, 'redelivery', taskId);
   _.set(trigger_payload, 'taskId', newTaskId);
-  _.set(trigger_payload, 'userId', userId);
+  _.set(trigger_payload, 'dispatchOrgId', dispatchOrgId);
   _.set(trigger_payload, 'environment', {
     ...environment,
     ...trigger_payload.environment || {},
@@ -118,7 +119,7 @@ async function cancelTask({ taskId } = {}) {
   await applicationService.update(app_id, { environment });
 }
 
-async function manualTask(userId, body = {}) {
+async function manualTask(dispatchOrgId, orgName, body = {}) {
   const { appId, commitId, ref, message, inputs, envName } = body;
   if (_.isEmpty(appId)) {
     throw new ValidationError('appId 必填');
@@ -135,7 +136,7 @@ async function manualTask(userId, body = {}) {
   const { owner, provider, repo_name, repo_url, environment, owner_org_id } = applicationResult;
 
   debug('find provider access token');
-  const userResult = await userService.getUserById(userId);
+  const userResult = await orgService.getOwnerUserByName(orgName);
   const providerToken = _.get(userResult, `third_part.${provider}.access_token`, '');
   if (_.isEmpty(providerToken)) {
     throw new ValidationError(`${provider} 密钥查询异常`);
@@ -172,7 +173,7 @@ async function manualTask(userId, body = {}) {
     provider,
     cloneUrl: repo_url,
     authorization: {
-      userId,
+      dispatchOrgId,
       appId,
       owner,
       accessToken: providerToken,

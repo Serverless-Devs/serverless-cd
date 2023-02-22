@@ -12,7 +12,7 @@ const userService = require('./user.service');
 
 async function listByOrgName(orgName = '') {
   const { id: orgId } = await orgModel.getOwnerOrgByName(orgName);
-  const data = await appModel.listAppByOrgId(orgId);
+  const data = await appModel.listAppByOwnerOrgId(orgId);
   if (_.isNil(data)) {
     return {};
   }

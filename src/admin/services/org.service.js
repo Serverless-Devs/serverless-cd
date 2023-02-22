@@ -122,7 +122,7 @@ async function deleteUser(orgName, inviteUserId) {
 
 async function remove(orgId, orgName) {
   await orgModel.deleteMany({ name: orgName });
-  await applicationModel.deleteAppByOrgId(orgId);
+  await applicationModel.deleteAppByOwnerOrgId(orgId);
 }
 
 async function updateOwnerByName(orgName, data) {
