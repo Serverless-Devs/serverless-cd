@@ -5,14 +5,14 @@
   "main": "index.js",
   "scripts": {
     "prettier": "cd ../.. && npm run prettier",
-    "start": "DEBUG=serverless-cd:* WORKER_FUNCTION_NAME=worker SERVICE_NAME=serverless-cd nodemon index.js"
+    "start": "node local-run.js"
   },
   "author": "mamba",
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^4.8.1",
-    "@serverless-cd/config": "^0.0.11",
-    "@serverless-cd/core": "^0.0.2",
+    "@serverless-cd/config": "^0.0.13",
+    "@serverless-cd/core": "^0.0.15",
     "@serverless-cd/git": "^0.0.2",
     "@serverless-cd/git-provider": "^0.0.7",
     "@serverless-cd/srm-aliyun-fc2": "^0.0.5",
@@ -32,6 +32,7 @@
     "simple-git": "^3.13.0"
   },
   "devDependencies": {
+    "@serverless-devs/core": "^0.1.53",
     "nodemon": "^2.0.19",
     "prisma": "^4.8.1"
   }

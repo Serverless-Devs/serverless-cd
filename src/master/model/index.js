@@ -1,37 +1,11 @@
 const _ = require('lodash');
-const { TABLE, ROLE } = require('@serverless-cd/config');
+const { TABLE } = require('@serverless-cd/config');
 const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 const applicationPrisma = prisma[TABLE.APPLICATION];
 const orgPrisma = prisma[TABLE.ORG];
 const userPrisma = prisma[TABLE.USER];
-
-const getUserInfo = (result) => {
-  if (!result) {
-    return null;
-  }
-  if (_.isArray(result)) {
-    result = _.first(result);
-  }
-  result.third_part = _.isString(result.third_part)
-    ? JSON.parse(result.third_part)
-    : result.third_part;
-  return result;
-};
-
-const getAppInfo = (result) => {
-  if (!result) {
-    return null;
-  }
-  if (_.isArray(result)) {
-    result = _.first(result);
-  }
-  result.environment = _.isString(result.environment)
-    ? JSON.parse(result.environment)
-    : result.environment;
-  return result;
-};
 
 /**
  * 根据 userId 获取用户信息
@@ -40,26 +14,9 @@ const getAppInfo = (result) => {
  */
 async function getUserById(id) {
   const result = await userPrisma.findUnique({ where: { id } });
-  return getUserInfo(result);
-}
-
-/**
- * 根据 orgId 获取团队信息
- * @param {*} id 
- * @returns 
- */
-async function getOrgById(id) {
-  const result = await orgPrisma.findUnique({ where: { id } });
-  return result;
-}
-
-/**
- * 根据条件获取团队的第一条信息
- * @param {*} where 
- * @returns 
- */
-async function getOrgFirst(where) {
-  const result = await orgPrisma.findFirst({ where });
+  if (result && result.third_part) {
+    result.third_part = JSON.parse(result.third_part);
+  }
   return result;
 }
 
@@ -67,19 +24,18 @@ async function getOrgFirst(where) {
  * 根据团队Id拿到拥有者用户数据
  */
 async function getOrganizationOwnerIdByOrgId(orgId) {
-  let ownerUserId = '';
-  // 当前用户在此团队的数据
-  const orgData = await getOrgById(orgId);
-  const { role, name = '' } = orgData || {};
-  if (role === ROLE.OWNER) {
-    ownerUserId = orgData.user_id;
-  } else {
-    const ownerOrgData = await getOrgFirst({ name, role: ROLE.OWNER });
-    ownerUserId = ownerOrgData.user_id;
+  const ownerOrgData = await orgPrisma.findUnique({ where: { id: orgId } });
+  if (_.isEmpty(ownerOrgData)) {
+    throw new Error('没有找到团队信息');
   }
-
-  // 此团队拥有者的数据：一个团队只能拥有一个 owner
-  return await getUserById(ownerUserId);
+  const userConfig = await getUserById(ownerOrgData.user_id);
+  if (_.isEmpty(userConfig)) {
+    throw new Error('没有找到用户信息');
+  }
+  return {
+    ...userConfig,
+    secrets: ownerOrgData.secrets,
+  };
 }
 
 /**
@@ -89,7 +45,10 @@ async function getOrganizationOwnerIdByOrgId(orgId) {
  */
 async function getAppById(id) {
   const result = await applicationPrisma.findUnique({ where: { id } });
-  return getAppInfo(result);
+  if (result && result.environment) {
+    result.environment = JSON.parse(result.environment)
+  }
+  return result;
 }
 
 module.exports = {

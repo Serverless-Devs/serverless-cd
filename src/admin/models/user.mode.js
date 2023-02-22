@@ -26,20 +26,19 @@ module.exports = {
     const userInfo = await userPrisma.findUnique({ where: { username } });
     return getUserInfo(userInfo);
   },
-  async getUserByGithubUid(githubUid) {
-    const userInfo = await userPrisma.findFirst({ where: { github_unionid: githubUid } });
-    return getUserInfo(userInfo);
-  },
-  async updateUserById(id, params) {
+  async updateUserById(id, data) {
+    if (data.third_part) {
+      data.third_part = JSON.stringify(data.third_part);
+    }
     await userPrisma.update({
       where: { id },
-      data: {
-        ...params,
-        third_part: JSON.stringify(params.third_part),
-      },
+      data,
     });
   },
   async createUser(data) {
+    if (data.third_part) {
+      data.third_part = JSON.stringify(data.third_part);
+    }
     const userId = unionId();
     const result = await userPrisma.create({
       data: {

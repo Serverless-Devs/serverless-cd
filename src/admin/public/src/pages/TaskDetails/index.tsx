@@ -44,7 +44,7 @@ const PanelTitle = ({ step, isRequest }) => {
 
 const Details = ({
   match: {
-    params: { appId, envName, taskId },
+    params: { appId, envName, taskId, orgName },
   },
 }) => {
   const [taskSteps, setTaskSteps] = useState<any[]>([]);
@@ -105,7 +105,7 @@ const Details = ({
   };
 
   const redeployCallback = (id) => {
-    history?.replace(`/application/${appId}/detail/${envName}/${id || taskId}`);
+    history?.replace(`/application/${appId}/${envName}/${id || taskId}`);
   };
 
   return (
@@ -134,15 +134,15 @@ const Details = ({
       breadcrumbs={[
         {
           name: '应用列表',
-          path: '/',
+          path: `/${orgName}/application`,
         },
         {
           name: appId,
-          path: `/application/${appId}/detail`,
+          path: `/${orgName}/application/${appId}`,
         },
         {
           name: envName,
-          path: `/application/${appId}/detail/${envName}`,
+          path: `/${orgName}/application/${appId}/${envName}`,
         },
         {
           name: taskId,

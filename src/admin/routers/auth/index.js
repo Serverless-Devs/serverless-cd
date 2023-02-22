@@ -7,9 +7,9 @@ const authServices = require('../../services/auth.service');
  */
 router.post('/signUp', async function (req, res) {
   const { username, password } = req.body;
-  const { userId, orgId } = await authServices.initUser({ username, password });
-  await authServices.setJwt({ userId, orgId }, res);
-  return res.json(Result.ofSuccess());
+  const { userId } = await authServices.initUser({ username, password });
+  await authServices.setJwt({ userId }, res);
+  return res.json(Result.ofSuccess({ username, userId }));
 });
 
 /**
@@ -17,9 +17,9 @@ router.post('/signUp', async function (req, res) {
  */
 router.post('/login', async function (req, res) {
   const { username, password } = req.body;
-  const { userId, orgId } = await authServices.loginWithPassword({ username, password });
-  await authServices.setJwt({ userId, orgId }, res);
-  return res.json(Result.ofSuccess());
+  const { userId } = await authServices.loginWithPassword({ username, password });
+  await authServices.setJwt({ userId }, res);
+  return res.json(Result.ofSuccess({ username, userId }));
 });
 
 /**

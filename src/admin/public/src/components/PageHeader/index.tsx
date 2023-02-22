@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { history } from 'ice';
 import { Breadcrumb, Box, Typography } from '@alicloud/console-components';
 import styles from './index.module.css';
 
@@ -9,7 +10,11 @@ const PageHeader = (props) => {
       {breadcrumbs && breadcrumbs.length > 0 ? (
         <Breadcrumb className={styles.breadcrumbs} separator=" / ">
           {breadcrumbs.map((item, idx) => (
-            <Breadcrumb.Item key={idx} link={item.path}>
+            <Breadcrumb.Item
+              className="cursor-pointer "
+              key={idx}
+              onClick={() => history?.push(item.path)}
+            >
               {item.name}
             </Breadcrumb.Item>
           ))}

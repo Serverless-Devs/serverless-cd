@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Form, Radio, Field, Input } from '@alicloud/console-components';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import AuthDialog from './AuthDialog';
@@ -18,6 +18,14 @@ interface IProps {
 const Github = (props: IProps) => {
   const { field } = props;
   const { init, getValue, resetToDefault } = field;
+  const secretsRef: any = useRef(null);
+
+  const secretsValidator = async (_, value, callback) => {
+    let res = await secretsRef.current.validate();
+    if (!res) return callback('error');
+    callback();
+  }
+
   return (
     <>
       <Form field={field} {...FORM_ITEM_LAYOUT}>
@@ -86,8 +94,13 @@ const Github = (props: IProps) => {
         <FormItem label="描述">
           <Input {...init('description')} placeholder="请输入描述" />
         </FormItem>
-        <FormItem label="Secrets">
-          <ConfigEdit field={field} />
+        <FormItem label="Secrets" help="">
+          <ConfigEdit
+            {...init('secrets', {
+              rules: [{ validator: secretsValidator }]
+            })}
+            ref={secretsRef}
+          />
         </FormItem>
       </Form>
     </>

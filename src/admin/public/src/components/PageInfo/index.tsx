@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Box } from '@alicloud/console-components';
 
 interface Props {
-  title: string;
+  title?: string;
   extra?: React.ReactNode | string;
   endExtra?: React.ReactNode | string;
   children?: React.ReactNode;
@@ -11,10 +11,10 @@ interface Props {
 const PageInfo = (props: Props) => {
   const { title, extra, children, endExtra } = props;
   return (
-    <Box spacing={8}>
+    <Box spacing={32}>
       <div className="box-hd flex-r" style={{ justifyContent: 'space-between' }}>
         <div className="flex-r">
-          <h3 className="mr-10">{title}</h3>
+          {title && <h3 className="mr-10">{title}</h3>}
           {extra}
         </div>
         <div>{endExtra}</div>

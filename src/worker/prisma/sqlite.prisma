@@ -7,7 +7,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -16,15 +16,15 @@ model User {
   username String  @unique
   avatar String?
   password String?
-  secrets String?
   github_unionid String?
-  third_part String?  @db.Text
+  third_part String?
 }
 
 model Org {
-  id    String     @id
+  id    String     @id    // 生成格式变更为：user_id:name
   user_id String
-  name String             // username
+  secrets String?
+  name String             // 
   role String             // owner / admin / member
   description String?
 }
@@ -32,10 +32,11 @@ model Org {
 model Application {
   id String @id
   org_id String
+  owner_org_id String
   description String?
   owner String
   provider String
-  environment String @db.Text
+  environment String
   provider_repo_id String
   repo_name String
   repo_url String
@@ -49,9 +50,9 @@ model Task {
   env_name String
   app_id String
   status String?
-  steps String? @db.Text
-  user_id String?       // 记录谁操作的
-  trigger_payload  String @db.Text
+  steps String?
+  dispatch_org_id String?       // 记录谁操作的
+  trigger_payload  String
   created_time DateTime  @default(now())
   updated_time DateTime  @updatedAt
 }

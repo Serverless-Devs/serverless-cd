@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const _ = require('lodash');
-const { Result, NoPermissionError } = require('../../util');
+const { Result, NeedLogin } = require('../../util');
 const { OWNER_ROLE_KEYS } = require('@serverless-cd/config');
 const auth = require('../../middleware/auth');
 const userService = require('../../services/user.service');
@@ -13,14 +13,13 @@ router.get('/info', async function (req, res) {
   const { userId } = req;
   const result = await userService.getUserById(userId);
   if (!result.id) {
-    throw new NoPermissionError('用户信息异常');
+    throw new NeedLogin('用户信息异常');
   }
 
-  const third_part = _.get(result, 'third_part', {});
+  const listOrgs = await orgService.listByUserId(userId)
   const userInfo = {
-    ..._.omit(result, ['third_part', 'password', 'secrets']),
-    isAuth: !!_.get(third_part, 'github.access_token', false),
-    github_name: _.get(third_part, 'github.owner', ''),
+    ...userService.desensitization(result),
+    listOrgs: orgService.desensitization(listOrgs),
   };
 
   return res.json(Result.ofSuccess(userInfo));
@@ -46,7 +45,7 @@ router.put('/token', auth(OWNER_ROLE_KEYS), async function (req, res) {
 router.get('/listOrgs', async (req, res) => {
   const { userId } = req;
   const result = await orgService.listByUserId(userId);
-  res.json(Result.ofSuccess(result));
+  res.json(Result.ofSuccess(orgService.desensitization(result)));
 });
 
 module.exports = router;

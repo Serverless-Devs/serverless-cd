@@ -3,6 +3,7 @@ import { Link, history } from 'ice';
 import { Button, Box, Field } from '@alicloud/console-components';
 import AccountForm from '../AccountForm';
 import { getConsoleConfig } from '@/utils';
+import store from '@/store';
 
 const PAGE_CONFIG = {
   login: {
@@ -40,15 +41,24 @@ const AccountLoginOrSignUp = (props: Props) => {
   const { title, btnText, linkTo, linkText } = PAGE_CONFIG[pageType];
   const field = Field.useField();
   const { init, getValue, validate, getError } = field;
+  const [, userDispatchers] = store.useModel('user');
 
-  useEffect(() => {
+  const goAppList = async () => {
     if (!data) return;
-    const { success } = data;
+    const {
+      success,
+      data: { username },
+    } = data;
     if (success) {
-      history?.push('/');
+      await userDispatchers.getUserInfo();
+      history?.push(`/${username}/application`);
       return;
     }
-  }, [data]);
+  };
+
+  useEffect(() => {
+    goAppList();
+  }, [JSON.stringify(data)]);
 
   const btnClick = () => {
     validate((errors, values) => {

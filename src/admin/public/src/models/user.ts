@@ -6,7 +6,6 @@ export default {
   // 定义 model 的初始 state
   state: {
     name: 'user',
-    isAuth: false, // 是否授权
     userInfo: {}, // 用户信息
     userRepos: [], // 用户仓库
   },
@@ -26,7 +25,6 @@ export default {
       const result = await userInfo();
       dispatch.user.update({
         userInfo: result,
-        isAuth: result?.isAuth,
       });
     },
     async getUserRepos() {
@@ -40,7 +38,6 @@ export default {
       dispatch.user.update({
         userRepos: [],
         userInfo: {},
-        isAuth: false,
       });
     },
   }),

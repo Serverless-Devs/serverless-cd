@@ -7,10 +7,10 @@ module.exports = async function (provider, appId) {
   if (_.isEmpty(applicationResult)) {
     throw new Error(`Not found application by id ${appId}`);
   }
-  const orgId = _.get(applicationResult, 'org_id', '');
+  const ownerOrgId = _.get(applicationResult, 'owner_org_id', '');
 
-  console.log(`Get organization owner config by orgId ${orgId}`);
-  const userConfig = await getOrganizationOwnerIdByOrgId(orgId);
+  console.log(`Get organization owner config by orgId ${ownerOrgId}`);
+  const userConfig = await getOrganizationOwnerIdByOrgId(ownerOrgId);
 
   console.log('get config');
   const accessToken = _.get(userConfig, `third_part.${provider}.access_token`, '');
@@ -22,7 +22,7 @@ module.exports = async function (provider, appId) {
   return {
     appId,
     accessToken,
-    userId: '', // _.get(userConfig, 'id', ''), // 如果是 webhook 触发则不传递 user_id，做 api 审计
+    dispatchOrgId: ownerOrgId, // 如果是 webhook 触发则传递ownerOrgId
     secrets: _.get(userConfig, 'secrets', {}),
     repoId: _.get(applicationResult, 'provider_repo_id', ''),
     environment: _.get(applicationResult, 'environment', {}),

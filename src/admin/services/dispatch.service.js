@@ -2,10 +2,11 @@ const _ = require('lodash');
 const debug = require('debug')('serverless-cd:dispatch');
 const gitProvider = require('@serverless-cd/git-provider');
 
-const taskService = require('./task.service');
 const taskModel = require('../models/task.mode');
+const orgModel = require('../models/org.mode');
 const applicationService = require('./application.service');
-const userService = require('./user.service');
+const taskService = require('./task.service');
+const orgService = require('./org.service');
 
 const { ValidationError, Client, unionToken } = require('../util');
 const {
@@ -35,8 +36,7 @@ async function invokeFunction(trigger_payload) {
   );;
 }
 
-async function redeploy(userId, body = {}) {
-  const { taskId, appId } = body;
+async function redeploy(dispatchOrgId, { taskId, appId } = {}) {
   if (_.isEmpty(taskId)) {
     throw new ValidationError('taskId 必填');
   }
@@ -55,17 +55,20 @@ async function redeploy(userId, body = {}) {
   }
 
   const trigger_payload = _.get(taskResult, 'trigger_payload');
-  const environment = _.get(applicationResult, 'environment', {});
+  // 重新设置新的 task id
   const newTaskId = unionToken();
-
   _.set(trigger_payload, 'redelivery', taskId);
   _.set(trigger_payload, 'taskId', newTaskId);
-  _.set(trigger_payload, 'userId', userId);
-  _.set(trigger_payload, 'environment', {
-    ...environment,
-    ...trigger_payload.environment || {},
-  });
-
+  // 设置新的环境信息
+  const environment = _.merge(_.get(applicationResult, 'environment', {}), trigger_payload.environment || {});
+  _.set(trigger_payload, 'environment', environment);
+  _.set(trigger_payload, 'authorization.dispatchOrgId', dispatchOrgId);
+  // 设置新的Secrets信息
+  const ownerOrgData = await orgModel.getOrgById(applicationResult.owner_org_id);
+  const ownerSecrets = _.get(ownerOrgData, 'secrets', {});
+  const secrets = _.merge(ownerSecrets, _.get(environment, `${trigger_payload.envName}.secrets`, {}))
+  _.set(trigger_payload, 'authorization.secrets', secrets);
+  // 调用函数
   const asyncInvokeRes = await invokeFunction(trigger_payload);
   return {
     'x-fc-request-id': _.get(asyncInvokeRes, 'headers[x-fc-request-id]'),
@@ -73,8 +76,7 @@ async function redeploy(userId, body = {}) {
   }
 }
 
-async function cancelTask(body = {}) {
-  const { taskId } = body;
+async function cancelTask({ taskId } = {}) {
   if (_.isEmpty(taskId)) {
     throw new ValidationError('taskId 必填');
   }
@@ -119,7 +121,7 @@ async function cancelTask(body = {}) {
   await applicationService.update(app_id, { environment });
 }
 
-async function manualTask(userId, orgId, body = {}) {
+async function manualTask(dispatchOrgId, orgName, body = {}) {
   const { appId, commitId, ref, message, inputs, envName } = body;
   if (_.isEmpty(appId)) {
     throw new ValidationError('appId 必填');
@@ -133,13 +135,10 @@ async function manualTask(userId, orgId, body = {}) {
     throw new ValidationError('没有查到应用信息');
   }
 
-  const { owner, provider, repo_name, repo_url, environment, org_id } = applicationResult;
-  if (org_id !== orgId) {
-    throw new ValidationError('无权操作此应用');
-  }
+  const { owner, provider, repo_name, repo_url, environment, owner_org_id } = applicationResult;
 
   debug('find provider access token');
-  const userResult = await userService.getUserById(userId);
+  const userResult = await orgService.getOwnerUserByName(orgName);
   const providerToken = _.get(userResult, `third_part.${provider}.access_token`, '');
   if (_.isEmpty(providerToken)) {
     throw new ValidationError(`${provider} 密钥查询异常`);
@@ -165,6 +164,10 @@ async function manualTask(userId, orgId, body = {}) {
     }
   }
   debug('get commit config end');
+  debug('get org owner secrets');
+  const ownerOrgData = await orgModel.getOrgById(owner_org_id);
+  const ownerSecrets = _.get(ownerOrgData, 'secrets', {});
+  debug('get org owner successfully');
 
   const targetEnvName = envName ? envName : _.first(_.keys(environment));
   const payload = {
@@ -172,11 +175,11 @@ async function manualTask(userId, orgId, body = {}) {
     provider,
     cloneUrl: repo_url,
     authorization: {
-      userId,
+      dispatchOrgId,
       appId,
       owner,
       accessToken: providerToken,
-      secrets: _.get(environment, `${targetEnvName}.secrets`, {}),
+      secrets: _.merge(ownerSecrets, _.get(environment, `${targetEnvName}.secrets`, {})),
     },
     ref,
     message: msg,
