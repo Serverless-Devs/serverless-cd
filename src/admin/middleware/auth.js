@@ -7,7 +7,7 @@ const auth = (orgRoleKeys) => async (req, _res, next) => {
   if (!orgId) {
     return next(new NoAuthError('没有获取到团队信息，无法判断操作权限'));
   }
-  // TODO: 没有获取到 org
+
   debug(`orgId: ${orgId}`);
   debug(`orgRoleKeys: ${orgRoleKeys}`);
   const hasPermissions = await authService.checkOrganizationRole(orgId, orgRoleKeys);

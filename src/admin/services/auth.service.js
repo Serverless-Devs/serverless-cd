@@ -1,10 +1,10 @@
 const jwt = require('jsonwebtoken');
 const debug = require('debug')('serverless-cd:auth');
 const _ = require('lodash');
-const { JWT_SECRET, ROLE, ADMIN_ROLE_KEYS, SESSION_EXPIRATION } = require('@serverless-cd/config');
+const { JWT_SECRET, ADMIN_ROLE_KEYS, SESSION_EXPIRATION } = require('@serverless-cd/config');
 const userModel = require('../models/user.mode');
 const orgModel = require('../models/org.mode');
-const { md5Encrypt, ValidationError, checkNameAvailable } = require('../util');
+const { md5Encrypt, ValidationError, checkNameAvailable, NoAuthError } = require('../util');
 
 /**
  * 注册用户
@@ -67,6 +67,9 @@ async function setJwt({ userId }, res) {
  */
 async function checkOrganizationRole(orgId, orgRoleKeys = ADMIN_ROLE_KEYS) {
   const orgConfig = await orgModel.getOrgById(orgId);
+  if (_.isEmpty(orgConfig)) {
+    throw new NoAuthError('在此团队没有找到您，没有权限');
+  }
   return orgRoleKeys.includes(_.get(orgConfig, 'role'));
 }
 
