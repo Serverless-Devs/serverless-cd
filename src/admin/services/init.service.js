@@ -1,4 +1,5 @@
 const { fs } = require('@serverless-cd/core');
+const path = require('path');
 const { spawnSync } = require('child_process');
 const { prisma } = require('../util');
 
@@ -10,7 +11,7 @@ async function testConnection() {
     return true;
   } catch (ex) {
     console.log('find unique error: ' + ex.code);
-    return ex.code !== 'P2021';
+    return ex.code && ex.code !== 'P2021';
   }
 }
 
@@ -20,11 +21,12 @@ const DB_TYPE = {
     const filePath = databaseUrl.replace('file:', '');
     console.log('databaseUrl: ', databaseUrl);
     console.log('filePath: ', filePath);
-    try {
-      await fs.remove(filePath);
-    } catch (e) { }
+    // try {
+    //   await fs.remove(filePath);
+    // } catch (e) { }
+    fs.ensureDirSync(path.dirname(filePath));
     await fs.outputFile(filePath, '');
-    console.log('invoke end: ', await fs.pathExists(filePath));
+    console.log('invoke end: ', fs.pathExistsSync(filePath));
     spawnSync('npm i @prisma/engines@4.9.0 --registry=https://registry.npmmirror.com --force', {
       encoding: 'utf8',
       stdio: 'inherit',
@@ -66,6 +68,7 @@ module.exports = async function (dbType) {
     await DB_TYPE[dbType]();
     await prisma.$disconnect();
     await prisma.$connect();
+    // 修改函数 强制访问新的容器
   }
 
   const connection = await testConnection();
