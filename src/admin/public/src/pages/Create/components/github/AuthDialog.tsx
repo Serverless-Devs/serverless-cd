@@ -3,6 +3,7 @@ import { Form, Select, Button, Dialog, Input, Field, Message } from '@alicloud/c
 import store from '@/store';
 import { get, noop, find } from 'lodash';
 import { updateUserProviderToken } from '@/services/user';
+import { ownerUserInfo } from '@/services/org';
 import { useRequest } from 'ice';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import { Toast } from '@/components/ToastContainer';
@@ -31,28 +32,33 @@ const AuthDialog = (props: IProps) => {
   const [visible, setVisible] = useState(false);
   const [refreshLoading, setRefreshLoading] = useState(false);
   const { loading, request } = useRequest(updateUserProviderToken);
-  const [userState, userDispatchers] = store.useModel('user');
-  const effectsState = store.useModelEffectsState('user');
-
+  const ownerUserInfoRequest = useRequest(ownerUserInfo);
+  const [userState] = store.useModel('user');
   const field = Field.useField();
   const { init, validate, setValue, getValue } = field;
+  const isAuth = get(ownerUserInfoRequest.data, 'data.isAuth', false);
+  const isOwner = get(ownerUserInfoRequest.data, 'data.id') === get(userState, 'userInfo.id');
 
   useEffect(() => {
-    if (!userState.isAuth) {
+    ownerUserInfoRequest.request();
+  }, []);
+
+  useEffect(() => {
+    if (!isAuth) {
       // 重置上层数据
       reset();
       // 重置当前组件的数据
       field.reset();
     }
     fetchUserList();
-  }, [userState.isAuth]);
+  }, [isAuth]);
 
   const fetchUserList = async () => {
-    if (!userState.isAuth) {
+    if (!isAuth) {
       setValue('user_list', []);
       return;
     }
-    const userInfo = userState.userInfo as IUserInfo;
+    const userInfo = get(ownerUserInfoRequest.data, 'data', {}) as IUserInfo;
     const data: IUserInfo[] = [];
     data.push({
       ...userInfo,
@@ -72,7 +78,7 @@ const AuthDialog = (props: IProps) => {
             )}
             <span>{userInfo.github_name || userInfo.username}</span>
           </div>
-          <Button className="unbind" type="primary" text onClick={onUnbind}>
+          <Button className="unbind" type="primary" text onClick={onUnbind} disabled={!isOwner}>
             解绑
           </Button>
         </div>
@@ -114,7 +120,7 @@ const AuthDialog = (props: IProps) => {
           reset();
           // 重置当前组件的数据
           field.reset();
-          userDispatchers.getUserInfo();
+          ownerUserInfoRequest.refresh();
         } catch (error) {
           Toast.error(error.message);
         }
@@ -131,7 +137,7 @@ const AuthDialog = (props: IProps) => {
       } catch (error) {
         Toast.error(error.message);
       }
-      userDispatchers.getUserInfo();
+      refresh();
       setVisible(false);
     });
   };
@@ -143,7 +149,7 @@ const AuthDialog = (props: IProps) => {
 
   const refresh = async () => {
     setRefreshLoading(true);
-    await userDispatchers.getUserInfo();
+    await ownerUserInfoRequest.refresh();
     setRefreshLoading(false);
   };
 
@@ -154,8 +160,8 @@ const AuthDialog = (props: IProps) => {
           className="full-width"
           placeholder="请选择"
           dataSource={getValue('user_list')}
-          state={effectsState.getUserInfo.isLoading ? 'loading' : undefined}
-          disabled={effectsState.getUserInfo.isLoading}
+          state={ownerUserInfoRequest.loading ? 'loading' : undefined}
+          disabled={ownerUserInfoRequest.loading}
           value={value?.github_name || value?.username}
           onChange={handleChange}
           valueRender={valueRender}
@@ -167,7 +173,7 @@ const AuthDialog = (props: IProps) => {
           loading={refreshLoading}
         />
       </div>
-      {!userState.isAuth && (
+      {!isAuth && (
         <div className="align-center mt-4 fz-12">
           <span>您还未授权Serverless cd读取您的代码仓库.</span>
           <Button
@@ -176,6 +182,7 @@ const AuthDialog = (props: IProps) => {
             size="small"
             text
             onClick={() => setVisible(true)}
+            disabled={!isOwner}
           >
             授权账户
           </Button>

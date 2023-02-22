@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRequest, history, Link } from 'ice';
 import { listApp, deleteApp } from '@/services/applist';
 import { Button, Search, Loading, Table, Dialog, Icon } from '@alicloud/console-components';
-import { filter, includes, debounce, isEmpty, get, isBoolean } from 'lodash';
+import { filter, includes, debounce, isEmpty, get, isBoolean, isUndefined } from 'lodash';
 import PageLayout from '@/layouts/PageLayout';
 import NotAppliaction from './components/NotAppliaction';
 import { CreateAppLication } from '../Create';
@@ -154,6 +154,7 @@ const AppList = ({
     },
   ];
 
+  if (isUndefined(data)) return null;
   return (
     <PageLayout
       breadcrumbs={[
@@ -163,7 +164,7 @@ const AppList = ({
       ]}
       hideBackground
     >
-      {isEmpty(data) ? (
+      {data.length === 0 ? (
         <CreateAppLication />
       ) : (
         <>

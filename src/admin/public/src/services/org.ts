@@ -37,3 +37,6 @@ export const orgUpdate = async (body) => {
   return await request.post('/api/org/update', { ...body });
 };
 
+export const ownerUserInfo = async () => {
+  return await request.get('/api/org/ownerUserInfo');
+};
