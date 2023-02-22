@@ -5,13 +5,14 @@ import { manualDeployApp } from '@/services/task';
 import { checkFile, githubPutFile } from '@/services/git';
 import { useRequest, history } from 'ice';
 import { CREATE_TYPE, SERVERLESS_PIPELINE_CONTENT } from './constant';
-import { get, each, map, every, find, uniqWith, isEqual, isEmpty } from 'lodash';
+import { get, map, every, find, uniqWith, isEqual, isEmpty } from 'lodash';
 import { getConsoleConfig, sleep } from '@/utils';
 import { Toast } from '@/components/ToastContainer';
 import CodeMirror from '@/components/CodeMirror';
 import yaml from 'js-yaml';
 interface IProps {
   field: Field;
+  orgName: string;
 }
 
 interface IStepItem {
@@ -23,6 +24,7 @@ interface IStepItem {
 }
 
 const Submit = (props: IProps) => {
+  const { orgName } = props;
   const CD_PIPELINE_YAML = getConsoleConfig('CD_PIPELINE_YAML', 'serverless-pipeline.yaml');
   const { loading, request } = useRequest(createApp);
   const manualDeploy = useRequest(manualDeployApp);
@@ -83,7 +85,9 @@ const Submit = (props: IProps) => {
         }
         await sleep(1500);
         Toast.success('应用创建成功');
-        history?.push('/');
+
+        // /${orgName} = > /${orgName}/application 重新加载应用列表
+        history?.push(`/${orgName}`);
       }
     } catch (error) {
       Toast.error(error.message);
@@ -249,16 +253,16 @@ const Submit = (props: IProps) => {
         footer={
           (getValue('errorBranch') as [])?.length > 0
             ? [
-              <Button
-                type="primary"
-                onClick={handleCreate}
-                style={{ marginRight: 8 }}
-                loading={getValue('submitLoading')}
-              >
-                确定
-              </Button>,
-              <Button onClick={() => setValue('showDialog', false)}>取消</Button>,
-            ]
+                <Button
+                  type="primary"
+                  onClick={handleCreate}
+                  style={{ marginRight: 8 }}
+                  loading={getValue('submitLoading')}
+                >
+                  确定
+                </Button>,
+                <Button onClick={() => setValue('showDialog', false)}>取消</Button>,
+              ]
             : []
         }
       >

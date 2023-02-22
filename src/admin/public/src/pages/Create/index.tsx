@@ -6,25 +6,29 @@ import Github from './components/github/index';
 import Submit from './components/Submit';
 import './index.less';
 
-const Create = () => {
+const Create = ({
+  match: {
+    params: { orgName },
+  },
+}) => {
   return (
     <PageLayout
       breadcrumbs={[
         {
           name: '应用列表',
-          path: '/',
+          path: `/${orgName}/application`,
         },
         {
           name: '创建应用',
         },
       ]}
     >
-      <CreateAppLication />
+      <CreateAppLication orgName={orgName} />
     </PageLayout>
   );
 };
 
-export const CreateAppLication = () => {
+export const CreateAppLication = ({ orgName }) => {
   const field = Field.useField();
   const { init, getValue } = field;
 
@@ -33,7 +37,9 @@ export const CreateAppLication = () => {
       <CreateType {...init('createType', { initValue: CREATE_TYPE.Repository })} />
       {getValue('createType') === CREATE_TYPE.Repository && <Github field={field} />}
       {getValue('createType') === CREATE_TYPE.Template && <h1>敬请期待...</h1>}
-      {getValue('createType') === CREATE_TYPE.Repository && <Submit field={field} />}
+      {getValue('createType') === CREATE_TYPE.Repository && (
+        <Submit field={field} orgName={orgName} />
+      )}
     </div>
   );
 };

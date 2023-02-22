@@ -62,7 +62,7 @@ const Details = ({
           <Button
             type="primary"
             onClick={() => {
-              history?.push('/');
+              history?.push(`/${orgName}/application`);
               dialog.hide();
             }}
           >
@@ -96,7 +96,7 @@ const Details = ({
       breadcrumbs={[
         {
           name: '应用列表',
-          path: '/',
+          path: `/${orgName}/application`,
         },
         {
           name: appId,

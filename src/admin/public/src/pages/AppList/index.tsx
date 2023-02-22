@@ -29,8 +29,9 @@ const AppList = ({
   },
 }) => {
   const [userState] = store.useModel('user');
-  const username = get(userState, 'userInfo.username');
+
   if (isEmpty(orgName)) {
+    const username = get(userState, 'userInfo.username');
     return history?.push(`/${username}/application`);
   }
 
@@ -103,7 +104,7 @@ const AppList = ({
         if (success) {
           Toast.success('应用删除成功');
           await sleep(800);
-          history?.push('/');
+          history?.push(`/${orgName}/application`);
         }
         dialog.hide();
       },
@@ -165,7 +166,7 @@ const AppList = ({
       hideBackground
     >
       {data.length === 0 ? (
-        <CreateAppLication />
+        <CreateAppLication orgName={orgName} />
       ) : (
         <>
           <div className="flex-r mb-16">

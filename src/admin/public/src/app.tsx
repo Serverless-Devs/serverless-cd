@@ -14,7 +14,6 @@ const appConfig: IAppConfig = {
       return {
         initialStates: {
           user: {
-            isAuth: get(user, 'isAuth', false),
             userInfo: user,
           },
         },
