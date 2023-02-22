@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.0.x"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    String     @id
+  username String  @unique
+  avatar String?
+  password String?
+  github_unionid String?
+  third_part String?
+}
+
+model Org {
+  id    String     @id    // 生成格式变更为：user_id:name
+  user_id String
+  secrets String?
+  name String             // 
+  role String             // owner / admin / member
+  description String?
+}
+
+model Application {
+  id String @id
+  org_id String
+  owner_org_id String
+  description String?
+  owner String
+  provider String
+  environment String
+  provider_repo_id String
+  repo_name String
+  repo_url String
+  webhook_secret String?
+  created_time DateTime  @default(now())
+  updated_time DateTime  @updatedAt
+}
+
+model Task {
+  id String @id
+  env_name String
+  app_id String
+  status String?
+  steps String?
+  dispatch_org_id String?       // 记录谁操作的
+  trigger_payload  String
+  created_time DateTime  @default(now())
+  updated_time DateTime  @updatedAt
+}

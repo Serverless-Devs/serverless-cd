@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "prettier": "cd ../.. && npm run prettier",
-    "start": "DEBUG=serverless-cd:* nodemon index.js"
+    "start": "node local-run.js"
   },
   "author": "mamba",
   "license": "ISC",
@@ -32,6 +32,7 @@
     "simple-git": "^3.13.0"
   },
   "devDependencies": {
+    "@serverless-devs/core": "^0.1.53",
     "nodemon": "^2.0.19",
     "prisma": "^4.8.1"
   }
