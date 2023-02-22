@@ -11,13 +11,14 @@ import { formatTime } from '@/utils';
 import { get, noop } from 'lodash';
 
 type Props = {
+  orgName: string;
   appId: string;
   data: any;
   refresh?: () => Promise<any>;
 };
 
 const EnvList: FC<Props> = (props) => {
-  const { data, appId, refresh = noop } = props;
+  const { data, appId, refresh = noop, orgName } = props;
   const { loading, request } = useRequest(removeEnv);
   const getEnvData = () => {
     const list: any = [];
@@ -66,7 +67,7 @@ const EnvList: FC<Props> = (props) => {
       dataIndex: 'name',
       cell: (value, _index, record) => (
         <>
-          <Link to={`/application/${appId}/${value}`}>{value}</Link>
+          <Link to={`/${orgName}/application/${appId}/${value}`}>{value}</Link>
         </>
       ),
     },
@@ -87,7 +88,11 @@ const EnvList: FC<Props> = (props) => {
       title: '部署版本',
       dataIndex: 'taskId',
       cell: (value, _index, record) =>
-        value ? <Link to={`/application/${appId}/${record.envName}/${value}`}>{value}</Link> : '--',
+        value ? (
+          <Link to={`/${orgName}/application/${appId}/${record.envName}/${value}`}>{value}</Link>
+        ) : (
+          '--'
+        ),
     },
     {
       key: 'commitInfo',

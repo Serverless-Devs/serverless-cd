@@ -7,7 +7,7 @@ import SecretDrawer from '@/components/SecretDrawer';
 import { Toast } from '@/components/ToastContainer';
 import { updateApp } from '@/services/applist';
 import Copy from '@/components/CopyIcon';
-import { map, keys, forEach, get } from 'lodash';
+import { map, keys, get } from 'lodash';
 
 type IProps = {
   secrets: object;
@@ -45,21 +45,16 @@ const SecretConfig: FC<IProps> = ({
   };
 
   const showDrawer = () => {
-    secretsDrawerRef?.current?.setValue('secrets', secretList);
     secretsDrawerRef?.current?.setVisible(true);
   };
 
   const onCompileSecret = async (values) => {
-    let secretsParams = {};
-    forEach(values || [], ({ key, value }) => {
-      secretsParams[key] = value;
-    });
     const environment = get(data, 'environment');
-    environment[envName].secrets = secretsParams;
+    environment[envName].secrets = values;
     const { success } = await request({ environment, appId, provider });
     if (success) {
       Toast.success('配置成功');
-      secretsDrawerRef?.current?.closeDrawer();
+      secretsDrawerRef?.current?.setVisible(false);
       refreshCallback && refreshCallback();
     }
   };

@@ -12,7 +12,7 @@ const errorHandler = (err, req, res, next) => {
     errorRes = Result.ofError(err.message, NeedLogin);
   } else {
     console.log('非预期错误，统一 500');
-    errorRes = Result.ofError(err.message, 500);
+    errorRes = Result.ofError(err.message, 'SystemError');
   }
   console.log(err);
   res.json(errorRes);

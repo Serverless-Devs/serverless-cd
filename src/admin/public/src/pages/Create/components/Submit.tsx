@@ -54,13 +54,6 @@ const Submit = (props: IProps) => {
     const trigger_spec: any = {
       [values['gitType']]: { push: { branches: { precise: uniqWith(precise, isEqual) } } },
     };
-    const secrets = {};
-    each(values['secrets'], (item) => {
-      if (item.key && item.value) {
-        secrets[item.key] = item.value;
-      }
-    });
-
     const environment = get(values, 'environment', {});
     const dataMap = {
       [CREATE_TYPE.Repository]: {
@@ -74,7 +67,7 @@ const Submit = (props: IProps) => {
           [environment.name]: {
             type: environment.type,
             trigger_spec,
-            secrets,
+            secrets: get(values, 'secrets', {}),
           },
         },
       },
@@ -256,16 +249,16 @@ const Submit = (props: IProps) => {
         footer={
           (getValue('errorBranch') as [])?.length > 0
             ? [
-                <Button
-                  type="primary"
-                  onClick={handleCreate}
-                  style={{ marginRight: 8 }}
-                  loading={getValue('submitLoading')}
-                >
-                  确定
-                </Button>,
-                <Button onClick={() => setValue('showDialog', false)}>取消</Button>,
-              ]
+              <Button
+                type="primary"
+                onClick={handleCreate}
+                style={{ marginRight: 8 }}
+                loading={getValue('submitLoading')}
+              >
+                确定
+              </Button>,
+              <Button onClick={() => setValue('showDialog', false)}>取消</Button>,
+            ]
             : []
         }
       >

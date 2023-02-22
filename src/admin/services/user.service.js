@@ -28,7 +28,7 @@ async function getOrganizationOwnerIdByOrgId(orgId) {
   if (role === ROLE.OWNER) {
     ownerUserId = orgData.user_id;
   } else {
-    const ownerOrgData = await orgModel.getOrgFirst({ name, role: ROLE.OWNER });
+    const ownerOrgData = await orgModel.getOwnerOrgByName(name);
     ownerUserId = ownerOrgData.user_id;
   }
 
@@ -54,8 +54,20 @@ async function getProviderToken(orgId, userId, provider) {
 
 function desensitization(data) {
   if (_.isArray(data)) {
-    return _.map(data, item => _.omit(item, ['third_part', 'password', 'secrets']))
+    return _.map(data, item => {
+      const third_part = _.get(data, 'third_part', {});
+      _.merge(item, {
+        isAuth: !!_.get(third_part, 'github.access_token', false),
+        github_name: _.get(third_part, 'github.owner', ''),
+      });
+      return _.omit(item, ['third_part', 'password', 'secrets'])
+    })
   }
+  const third_part = _.get(data, 'third_part', {});
+  _.merge(data, {
+    isAuth: !!_.get(third_part, 'github.access_token', false),
+    github_name: _.get(third_part, 'github.owner', ''),
+  });
   return _.omit(data, ['third_part', 'password', 'secrets']);
 }
 

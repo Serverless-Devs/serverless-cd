@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRequest, history, Link } from 'ice';
 import { listApp, deleteApp } from '@/services/applist';
 import { Button, Search, Loading, Table, Dialog, Icon } from '@alicloud/console-components';
-import { filter, includes, debounce, isEmpty, get, isBoolean } from 'lodash';
+import { filter, includes, debounce, isEmpty, get, isBoolean, isUndefined } from 'lodash';
 import PageLayout from '@/layouts/PageLayout';
 import NotAppliaction from './components/NotAppliaction';
 import { CreateAppLication } from '../Create';
@@ -12,6 +12,7 @@ import { C_REPOSITORY } from '@/constants/repository';
 import ExternalLink from '@/components/ExternalLink';
 import { Toast } from '@/components/ToastContainer';
 import { sleep } from '@/utils';
+import store from '@/store';
 
 interface IItem {
   providerUid: number;
@@ -22,7 +23,17 @@ interface IItem {
   createdTime: number;
 }
 
-const AppList = () => {
+const AppList = ({
+  match: {
+    params: { orgName },
+  },
+}) => {
+  const [userState] = store.useModel('user');
+  const username = get(userState, 'userInfo.username');
+  if (isEmpty(orgName)) {
+    return history?.push(`/${username}/application`);
+  }
+
   const { data, request, refresh, cancel } = useRequest(listApp, {
     pollingInterval: 5000,
   });
@@ -32,9 +43,8 @@ const AppList = () => {
 
   const fetchData = async () => {
     setLoading(true);
-    const res = await request();
+    await request();
     setLoading(false);
-    setApplist(res);
   };
 
   useEffect(() => {
@@ -42,7 +52,10 @@ const AppList = () => {
   }, []);
 
   useEffect(() => {
-    if (isEmpty(data)) return;
+    if (isEmpty(data)) {
+      return cancel();
+    }
+    setApplist(data);
     const completedList: boolean[] = [];
     for (const item of data) {
       const environment = get(item, 'environment', {});
@@ -74,7 +87,7 @@ const AppList = () => {
   const debounceSearch = debounce(onSearch, 250, { maxWait: 1000 });
 
   const onCreateApp = () => {
-    history?.push('/create');
+    history?.push(`/${orgName}/create`);
   };
 
   if (loading) {
@@ -102,7 +115,7 @@ const AppList = () => {
       title: '应用名称',
       dataIndex: 'repo_name',
       cell: (value, index, record) => {
-        return <Link to={`/application/${record.id}`}>{value}</Link>;
+        return <Link to={`/${orgName}/application/${record.id}`}>{value}</Link>;
       },
     },
     {
@@ -141,6 +154,7 @@ const AppList = () => {
     },
   ];
 
+  if (isUndefined(data)) return null;
   return (
     <PageLayout
       breadcrumbs={[
@@ -150,7 +164,7 @@ const AppList = () => {
       ]}
       hideBackground
     >
-      {isEmpty(data) ? (
+      {data.length === 0 ? (
         <CreateAppLication />
       ) : (
         <>
@@ -178,13 +192,13 @@ const AppList = () => {
               expandedRowRender={(record) => {
                 return (
                   <div className="pt-8 pb-8">
-                    <EnvList appId={record.id} data={record} refresh={refresh} />
+                    <EnvList appId={record.id} orgName={orgName} data={record} refresh={refresh} />
                   </div>
                 );
               }}
             />
           ) : (
-            <NotAppliaction queryKey={queryKey} />
+            <NotAppliaction orgName={orgName} queryKey={queryKey} />
           )}
         </>
       )}

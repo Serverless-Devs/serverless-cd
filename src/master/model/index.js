@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const { TABLE, ROLE } = require('@serverless-cd/config');
+const { TABLE } = require('@serverless-cd/config');
 const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
@@ -21,39 +21,20 @@ async function getUserById(id) {
 }
 
 /**
- * 根据 orgId 获取团队信息
- * @param {*} id 
- * @returns 
- */
-async function getOrgById(id) {
-  const result = await orgPrisma.findUnique({ where: { id } });
-  if (result && result.secrets) {
-    result.secrets = JSON.parse(result.secrets);
-  }
-  return result;
-}
-
-/**
  * 根据团队Id拿到拥有者用户数据
  */
 async function getOrganizationOwnerIdByOrgId(orgId) {
-  let ownerUserId = '';
-  // 当前用户在此团队的数据
-  const orgData = await getOrgById(orgId);
-  const { role, name = '' } = orgData || {};
-  if (role === ROLE.OWNER) {
-    ownerUserId = orgData.user_id;
-  } else {
-    const ownerOrgData = await orgPrisma.findFirst({ where: { name, role: ROLE.OWNER } });
-    ownerUserId = ownerOrgData.user_id;
+  const ownerOrgData = await orgPrisma.findUnique({ where: { id: orgId } });
+  if (_.isEmpty(ownerOrgData)) {
+    throw new Error('没有找到团队信息');
   }
-
-  // TODO
-  // 此团队拥有者的数据：一个团队只能拥有一个 owner
-  const userConfig = await getUserById(ownerUserId);
+  const userConfig = await getUserById(ownerOrgData.user_id);
+  if (_.isEmpty(userConfig)) {
+    throw new Error('没有找到用户信息');
+  }
   return {
     ...userConfig,
-    secrets: orgData.secrets,
+    secrets: ownerOrgData.secrets,
   };
 }
 

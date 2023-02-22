@@ -10,6 +10,7 @@ const taskService = require('../../services/task.service');
 
 /**
  * task 列表
+ * query: { appId, envName?, taskId?, pageSize, currentPage }
  */
 router.get('/list', async function (req, res) {
   const { totalCount, result } = await taskService.list(req.query);

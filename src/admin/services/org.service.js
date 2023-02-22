@@ -1,26 +1,28 @@
 const _ = require('lodash');
-const { ROLE, ADMIN_ROLE_KEYS, OWNER_ROLE_KEYS } = require('@serverless-cd/config');
+const debug = require('debug')('serverless-cd:org-service');
+const { ROLE, ROLE_KEYS, OWNER_ROLE_KEYS, ADMIN_ROLE_KEYS } = require('@serverless-cd/config');
 const orgModel = require('../models/org.mode');
+const applicationModel = require('../models/application.mode');
 const userModel = require('../models/user.mode');
-const { ValidationError, NoPermissionError } = require('../util');
-
-async function getOwnerOrgByUserId(userId, orgName) {
-  let name = orgName;
-  if (_.isEmpty(name)) {
-    const userConfig = await userModel.getUserById(userId);
-    name = _.get(userConfig, 'username', '');
-  }
-  return await orgModel.getOrgFirst({ user_id: userId, name });
-}
+const { ValidationError, NoPermissionError, generateOrgIdByUserIdAndOrgName } = require('../util');
 
 async function getOrgById(orgId = '') {
-  if (_.isEmpty(orgId)) {
-    return {};
-  }
   const data = await orgModel.getOrgById(orgId);
   if (_.isEmpty(data)) {
     return {};
   }
+  const { role, name } = data;
+  if (_.includes(OWNER_ROLE_KEYS, role)) {
+    return data;
+  }
+  const ownerData = await orgModel.getOwnerOrgByName(name);
+  const secrets = _.get(ownerData, 'secrets', {});
+  if (_.includes(ADMIN_ROLE_KEYS, role)) {
+    _.set(data, 'secrets', secrets);
+  } else {
+    _.set(data, 'secrets', _.mapValues(secrets, () => ''));
+  }
+
   return data;
 }
 
@@ -31,118 +33,156 @@ async function listByUserId(userId = '') {
   return await orgModel.list({ user_id: userId });
 }
 
-async function listByOrgId(orgId = '') {
-  if (_.isEmpty(orgId)) {
-    return {};
-  }
-  const data = await orgModel.getOrgById(orgId);
-  if (_.isEmpty(data)) {
-    throw new ValidationError(`没有找到此团队：${orgId}`);
-  }
-  return await orgModel.list({ name: data.name });
+async function listByOrgName(orgId, name = '') {
+  const { result } = await orgModel.list({ name });
+
+  const ownerData = _.find(result, ({ role }) => role === ROLE.OWNER);
+  const { role } = _.find(result, ({ id }) => id === orgId);
+  const ownerSecrets = _.get(ownerData, 'secrets', {});
+  const secrets = _.includes(ADMIN_ROLE_KEYS, role) ? ownerSecrets : _.mapValues(ownerSecrets, () => '');
+
+  const names = await Promise.all(
+    _.map(result, async ({ user_id: userId }) => {
+      const data = await userModel.getUserById(userId);
+      return { username: _.get(data, 'username'), secrets };
+    }),
+  );
+  return _.merge(result, names);
 }
 
-async function createOrg(userId, payload = {}) {
-  const { name, description } = payload;
+async function createOrg(userId, name, description) {
   if (_.isEmpty(name)) {
     throw new ValidationError('创建团队 name 是必填项');
   }
-  await orgModel.createOrg({ userId, name: payload.name, description, role: ROLE.OWNER });
+
+  const orgId = generateOrgIdByUserIdAndOrgName(userId, name);
+  const userData = await orgModel.getOrgById(orgId);
+  if (!_.isEmpty(userData)) {
+    throw new ValidationError('团队已存在');
+  }
+  await orgModel.createOrg({ userId, name, description, role: ROLE.OWNER });
 }
 
-async function invite(orgId, payload = {}) {
-  const { userId } = payload;
-  if (_.isEmpty(userId)) {
-    throw new ValidationError('需要填写被邀请用户的ID');
+async function invite(orgName, inviteUserName, role = ROLE.MEMBER) {
+  if (!_.includes(ROLE_KEYS, role)) {
+    throw new NoPermissionError(`权限字段需要是: ${ROLE_KEYS.join('、')}`);
+  }
+  if (_.includes(OWNER_ROLE_KEYS, role)) {
+    throw new NoPermissionError('不能邀请人为最高管理');
+  }
+  if (_.isEmpty(inviteUserName)) {
+    throw new ValidationError('需要填写被邀请用户名');
   }
 
-  const data = await orgModel.getOrgById(orgId);
-  if (_.isEmpty(data)) {
-    throw new ValidationError(`没有找到此团队：${orgId}`);
+  const userConfig = await userModel.getUserByName(inviteUserName);
+  if (_.isEmpty(userConfig)) {
+    throw new ValidationError(`没有找到此用户: ${inviteUserName}`);
   }
-  await orgModel.createOrg({ userId, name: data.name, role: ROLE.MEMBER });
+  const inviteOrgId = generateOrgIdByUserIdAndOrgName(userConfig.id, orgName);
+  const inviteOrgConfig = await orgModel.getOrgById(inviteOrgId);
+  if (!_.isEmpty(inviteOrgConfig)) {
+    throw new ValidationError(`用户${inviteUserName}已经在${orgName}团队中存在`);
+  }
+
+  await orgModel.createOrg({ userId: userConfig.id, name: orgName, role });
 }
 
-async function updateUserRole(orgId, payload = {}) {
-  const { userId, role = ROLE.MEMBER } = payload;
-  if (_.isEmpty(userId)) {
-    throw new ValidationError('需要填写被邀请用户的ID');
+async function updateUserRole(orgName, inviteUserName, role = ROLE.MEMBER) {
+  const userConfig = await userModel.getUserByName(inviteUserName);
+  if (_.isEmpty(userConfig)) {
+    throw new ValidationError(`没有找到此用户: ${inviteUserName}`);
+  }
+  const inviteUserId = userConfig.id;
+  if (_.isEmpty(inviteUserId)) {
+    throw new ValidationError('需要填写被操作的用户ID');
   }
   if (_.includes(OWNER_ROLE_KEYS, role)) {
     throw new NoPermissionError('您没有权限设置最高管理权限');
   }
 
-  const data = await orgModel.getOrgById(orgId);
-  if (_.isEmpty(data)) {
-    throw new ValidationError(`没有找到此团队：${orgId}`);
-  }
-  const { name, role: editRole } = data;
-  // 不是管理员不能操作
-  if (!_.includes(ADMIN_ROLE_KEYS, editRole)) {
-    throw new NoPermissionError('权限不足，无法操作此团队');
-  }
-
-  const userData = await orgModel.getOrgFirst({ user_id: userId, name });
+  const inviteUserOrgId = generateOrgIdByUserIdAndOrgName(inviteUserId, orgName);
+  debug(`update user role inviteUserOrgId: ${inviteUserOrgId}`);
+  const userData = await orgModel.getOrgById(inviteUserOrgId);
   if (_.isEmpty(userData)) {
-    throw new ValidationError(`${name}团队中没有找到用户${userId}`);
+    throw new ValidationError(`${orgName}团队中没有找到此用户：${inviteUserId}`);
   }
   if (_.includes(OWNER_ROLE_KEYS, userData.role)) {
-    throw new NoPermissionError(`此用户拥有${name}团队最高管理权限，您无法操作`);
+    throw new NoPermissionError(`此用户拥有${orgName}团队最高管理权限，您无法操作`);
   }
   await orgModel.updateOrg(userData.id, { role });
 }
 
-async function deleteUser(orgId, userId) {
-  if (_.isEmpty(userId)) {
+async function deleteUser(orgName, inviteUserId) {
+  if (_.isEmpty(inviteUserId)) {
     throw new ValidationError('需要被删除用户的ID');
   }
-  const data = await orgModel.getOrgById(orgId);
-  if (_.isEmpty(data.name)) {
-    throw new ValidationError(`没有找到此团队：${orgId}`);
-  }
-  return await orgModel.deleteMany({ user_id: userId, name: data.name });
+  const inviteUserOrgId = generateOrgIdByUserIdAndOrgName(inviteUserId, orgName);
+  return await orgModel.remove(inviteUserOrgId);
 }
 
-async function remove(orgId = '') {
-  const data = await orgModel.getOrgById(orgId);
-  if (_.isEmpty(data.name)) {
-    throw new ValidationError(`没有找到此团队：${orgId}`);
-  }
-
-  return await orgModel.deleteMany({ name: data.name });
+async function remove(orgId, orgName) {
+  await orgModel.deleteMany({ name: orgName });
+  await applicationModel.deleteAppByOwnerOrgId(orgId);
 }
 
-async function transfer(orgId, transferUserId) {
-  const data = await orgModel.getOrgById(orgId);
-  if (_.isEmpty(data.name)) {
-    throw new ValidationError(`没有找到此团队：${orgId}`);
-  }
-  const { role, name } = data;
-  if (!_.includes(OWNER_ROLE_KEYS, role)) {
-    throw new NoPermissionError('您不是最高管理员，无权此操作');
-  }
-  const userConfig = await userModel.getUserById(userId);
-  if (_.get(userConfig, 'username') === name) {
+async function updateOwnerByName(orgName, data) {
+  const { id: orgId } = await orgModel.getOwnerOrgByName(orgName);
+  await orgModel.updateOrg(orgId, data);
+}
+
+async function transfer(orgId, orgName, transferUserName) {
+  if (transferUserName === orgName) {
     throw new ValidationError('注册的团队不能转让');
   }
 
-  const userData = await orgModel.getOrgFirst({ user_id: transferUserId, name });
-  if (!_.isEmpty(userData)) {
-    await orgModel.remove(userData.id);
+  const transferUserConfig = await userModel.getUserByName(transferUserName);
+  if (_.isEmpty(transferUserConfig)) {
+    throw new ValidationError('没有找到此用户');
   }
-  await orgModel.updateOrg(orgId, { user_id: transferUserId });
+  // 获取目前团队的数据
+  const orgData = await orgModel.getOrgById(orgId);
+  // 获取目标用户的数据
+  const transferUserId = transferUserConfig.id;
+  const transferOrgId = generateOrgIdByUserIdAndOrgName(`${transferUserId}:${orgName}`)
+  const transferOrgData = await orgModel.getOrgById(transferOrgId);
+  // 组合目标团队的数据
+  const payload = {
+    name: orgName,
+    role: ROLE.OWNER,
+    description: _.get(orgData, 'description'),
+    secrets: _.get(orgData, 'secrets'),
+  }
+
+  if (_.isEmpty(transferOrgData)) {
+    _.set(payload, 'userId', transferUserId);
+    await applicationModel.updateManyOrgIdOfApp(orgId, transferOrgId);
+    await orgModel.createOrg(payload);
+    await orgModel.remove(orgId);
+  } else {
+    _.set(payload, 'user_id', transferUserId);
+    await orgModel.updateOrg(transferOrgId, payload);
+    await applicationModel.updateManyOrgIdOfApp(orgId, transferOrgId);
+    await orgModel.remove(orgId);
+  }
 }
 
 function desensitization(data) {
-  if (_.isArray(data)) {
-    return _.map(data, item => _.omit(item, ['secrets']))
-  }
-  return _.omit(data, ['secrets']);
+  return data;
+  // if (_.isArray(data)) {
+  //   return _.map(data, item => _.omit(item, ['secrets']))
+  // }
+  // return _.omit(data, ['secrets']);
+}
+
+async function getOwnerUserByName(orgName) {
+  const { user_id } = await orgModel.getOwnerOrgByName(orgName);
+  return await userModel.getUserById(user_id);
 }
 
 module.exports = {
+  getOwnerUserByName,
+  updateOwnerByName,
   desensitization,
-  getOwnerOrgByUserId,
   transfer,
   remove,
   deleteUser,
@@ -151,5 +191,5 @@ module.exports = {
   invite,
   getOrgById,
   listByUserId,
-  listByOrgId,
+  listByOrgName,
 };

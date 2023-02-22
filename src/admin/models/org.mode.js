@@ -1,12 +1,12 @@
 const _ = require('lodash');
 const { ROLE, TABLE } = require('@serverless-cd/config');
-const { unionId, prisma } = require('../util');
+const { generateOrgIdByUserIdAndOrgName, prisma } = require('../util');
 
 const orgPrisma = prisma[TABLE.ORG];
 
 const getOrgInfo = (result) => {
   if (!result) {
-    return null;
+    return {};
   }
   if (_.isArray(result)) {
     result = _.first(result);
@@ -18,16 +18,19 @@ const getOrgInfo = (result) => {
 };
 
 module.exports = {
-  async getOrgFirst(where) {
-    const result = await orgPrisma.findFirst({ where });
+  async getOwnerOrgByName(name = '') {
+    if (!name) {
+      return {};
+    }
+    const result = await orgPrisma.findFirst({ where: { name, role: ROLE.OWNER } });
     return getOrgInfo(result);
   },
-  async getOrgById(id) {
+  async getOrgById(id = '') {
     const result = await orgPrisma.findUnique({ where: { id } });
     return getOrgInfo(result);
   },
   async createOrg({ userId, name, role, description, secrets }) {
-    const orgId = unionId();
+    const orgId = generateOrgIdByUserIdAndOrgName(userId, name);
     const result = await orgPrisma.create({
       data: {
         id: orgId,
@@ -42,7 +45,7 @@ module.exports = {
   },
   async updateOrg(id, data) {
     if (data.secrets) {
-      data.secrets = JSON.stringify(secrets);
+      data.secrets = JSON.stringify(data.secrets);
     }
     const result = await orgPrisma.update({ where: { id }, data });
     return result;
@@ -61,11 +64,8 @@ module.exports = {
       orgPrisma.findMany({
         ...option,
         where,
-        orderBy: {
-          updated_time: 'desc',
-        },
       }),
     ]);
-    return { totalCount, result: _.map(result, r => getOrgInfo(r)) };
+    return { totalCount, result: _.map(result, (r) => getOrgInfo(r)) };
   },
 };

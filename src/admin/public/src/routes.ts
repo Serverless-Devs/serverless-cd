@@ -20,10 +20,22 @@ const AppDetail = lazy(() => import(/* webpackChunkName: 'AppDetail' */ '@/pages
 const EnvDetail = lazy(() => import(/* webpackChunkName: 'AppDetail' */ '@/pages/EnvDetail'));
 const TaskDetails = lazy(() => import(/* webpackChunkName: 'TaskDetails' */ '@/pages/TaskDetails'));
 const Auth = lazy(() => import(/* webpackChunkName: 'Auth' */ '@/pages/Auth'));
-const Tokens = lazy(() => import(/* webpackChunkName: 'Tokens' */ '@/pages/Tokens'));
-const Secrets = lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Secrets'));
+const Settings = lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Settings'));
+const Orgs = lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Orgs'));
+const NoAuth = lazy(() => import(/* webpackChunkName: 'NotAuth' */ '@/pages/NoAuth'));
 
 const routerConfig: IRouterConfig[] = [
+  {
+    path: '/noAuth',
+    component: LoginLayout,
+    children: [
+      {
+        path: '/',
+        exact: true,
+        component: NoAuth,
+      },
+    ],
+  },
   {
     path: '/login',
     component: LoginLayout,
@@ -58,23 +70,7 @@ const routerConfig: IRouterConfig[] = [
     ],
   },
   {
-    path: '/settings',
-    component: BasicLayout,
-    children: [
-      {
-        path: '/tokens',
-        exact: true,
-        component: Tokens,
-      },
-      {
-        path: '/secrets',
-        exact: true,
-        component: Secrets,
-      },
-    ],
-  },
-  {
-    path: '/application/:appId',
+    path: '/:orgName/application/:appId',
     component: BasicLayout,
     children: [
       {
@@ -92,15 +88,21 @@ const routerConfig: IRouterConfig[] = [
         exact: true,
         component: TaskDetails,
       },
+    ],
+  },
+  {
+    path: '/organizations',
+    component: BasicLayout,
+    children: [
       {
-        path: '/application/:appId',
-        // 重定向
-        redirect: '/application',
+        path: '/',
+        exact: true,
+        component: Orgs,
       },
     ],
   },
   {
-    path: '/',
+    path: '/:orgName',
     component: BasicLayout,
     children: [
       {
@@ -114,11 +116,21 @@ const routerConfig: IRouterConfig[] = [
         component: Create,
       },
       {
+        path: '/settings',
+        exact: true,
+        component: Settings,
+      },
+      {
         path: '/',
         // 重定向
-        redirect: '/application',
+        redirect: '/:orgName/application',
       },
     ],
+  },
+  {
+    path: '/',
+    exact: true,
+    component: AppList,
   },
 ];
 export default routerConfig;

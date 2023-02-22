@@ -6,7 +6,7 @@ const { Result, ValidationError } = require('../../util');
 const auth = require('../../middleware/auth');
 const appService = require('../../services/application.service');
 const userService = require('../../services/user.service');
-const { ADMIN_ROLE_KEYS, OWNER_ROLE_KEYS } = require('@serverless-cd/config');
+const { ADMIN_ROLE_KEYS, OWNER_ROLE_KEYS, ROLE_KEYS } = require('@serverless-cd/config');
 
 /**
  * 创建应用预检测
@@ -20,24 +20,24 @@ router.post('/preview', async function (req, res) {
  * 转让【owner】
  */
 router.post('/transfer', auth(OWNER_ROLE_KEYS), async (req, res) => {
-  const { orgId: transferOrgId, appId } = req.body;
-  const result = await appService.update(appId, { org_id: transferOrgId });
+  const { transferOrgName, appId } = req.body;
+  const result = await appService.transfer(appId, transferOrgName);
   res.json(Result.ofSuccess(result));
 });
 
 /**
  * 应用列表
  */
-router.get('/list', async function (req, res) {
-  const { orgId } = req;
-  const appList = await appService.listByOrgId(orgId);
+router.get('/list', auth(ROLE_KEYS), async function (req, res) {
+  const { orgName } = req;
+  const appList = await appService.listByOrgName(orgName);
   return res.json(Result.ofSuccess(appList));
 });
 
 /**
  * 应用查询
  */
-router.get('/detail', async function (req, res) {
+router.get('/detail', auth(ROLE_KEYS), async function (req, res) {
   const appDetail = await appService.getAppById(req.query.id);
   if (_.isEmpty(appDetail)) {
     throw new ValidationError('暂无应用信息');
@@ -50,11 +50,11 @@ router.get('/detail', async function (req, res) {
  * 创建应用
  */
 router.post('/create', auth(ADMIN_ROLE_KEYS), async function (req, res) {
-  const { userId, orgId } = req;
+  const { userId, orgId, orgName } = req;
   const { provider } = req.body;
-  const token = await userService.getProviderToken(orgId, userId, provider);
+  const providerToken = await userService.getProviderToken(orgId, userId, provider);
 
-  const appInfo = await appService.create(orgId, token, req.body);
+  const appInfo = await appService.create(orgId, orgName, providerToken, req.body);
   return res.json(Result.ofSuccess(appInfo));
 });
 

@@ -1,24 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useRequest } from 'ice';
 import { Button, Drawer, Field, Form } from '@alicloud/console-components';
 import PageInfo from '@/components/PageInfo';
 import { Toast } from '@/components/ToastContainer';
 import { updateApp } from '@/services/applist';
-import { get, noop, isEmpty, uniqueId } from 'lodash';
+import { get, uniqueId } from 'lodash';
 import Trigger from '@serverless-cd/trigger-ui';
-
-export const validateTrigger = (rule, value, callback) => {
-  if (isEmpty(get(value, 'push')) && isEmpty(get(value, 'pr'))) {
-    return callback('请选择触发方式');
-  } else if (
-    isEmpty(get(value, 'push.branches')) &&
-    isEmpty(get(value, 'push.tags')) &&
-    isEmpty(get(value, 'pr.branches'))
-  ) {
-    return callback('触发方式数据填写不完整');
-  }
-  callback();
-};
 
 const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, envName }) => {
   const { request, loading } = useRequest(updateApp);
@@ -26,6 +13,7 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, en
   const [triggerKey, setTriggerKey] = useState(uniqueId());
   const field = Field.useField();
   const { init, resetToDefault, validate } = field;
+  const triggerRef: any = useRef(null);
 
   const onSubmit = () => {
     validate(async (errors, values) => {
@@ -52,6 +40,12 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, en
     resetToDefault();
   };
 
+  const validateTrigger = async (_, value, callback) => {
+    const res = await triggerRef?.current?.validate();
+    if (res) return callback();
+    callback('error');
+  };
+
   useEffect(() => {
     setTriggerKey(uniqueId());
   }, [triggerSpec]);
@@ -65,9 +59,9 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, en
         </Button>
       }
     >
-      <div className="mt-16 pl-16 pr-32" key={triggerKey}>
+      <div className="mt-16" key={triggerKey}>
         {triggerSpec[provider] && (
-          <Trigger value={triggerSpec[provider]} onChange={noop} disabled />
+          <Trigger.Preview dataSource={triggerSpec[provider]} />
         )}
       </div>
       <Drawer
@@ -81,7 +75,7 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, en
       >
         <div className="dialog-body">
           <Form field={field}>
-            <Form.Item>
+            <Form.Item help="">
               <Trigger
                 {...(init('trigger', {
                   initValue: triggerSpec[provider],
@@ -91,11 +85,11 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, en
                     },
                   ],
                 }) as any)}
+                ref={triggerRef}
               />
             </Form.Item>
           </Form>
         </div>
-
         <div className="dialog-footer">
           <Button className="mr-10" type="primary" loading={loading} onClick={onSubmit}>
             确定

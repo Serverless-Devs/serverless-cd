@@ -14,7 +14,7 @@ import { Toast } from '@/components/ToastContainer';
 
 const Details = ({
   match: {
-    params: { appId, envName },
+    params: { appId, envName, orgName },
   },
 }) => {
   const {
@@ -82,7 +82,7 @@ const Details = ({
         const { success } = await removeEnv({ envName, appId });
         if (success) {
           Toast.success('环境删除成功');
-          history?.push(`/application/${appId}`);
+          history?.push(`/${orgName}/application/${appId}`);
         }
         dialog.hide();
       },
@@ -100,7 +100,7 @@ const Details = ({
         },
         {
           name: appId,
-          path: `/application/${appId}`,
+          path: `/${orgName}/application/${appId}`,
         },
         {
           name: envName,
@@ -111,7 +111,7 @@ const Details = ({
           <CreateEnv
             data={get(detailInfo, 'data', {})}
             appId={appId}
-            callback={async () => history?.push(`/application/${appId}`)}
+            callback={async () => history?.push(`/${orgName}/application/${appId}`)}
           >
             <Button type="primary">创建环境</Button>
           </CreateEnv>
@@ -126,6 +126,7 @@ const Details = ({
           data={get(detailInfo, 'data', {})}
           refreshCallback={handleRefresh}
           envName={envName}
+          orgName={orgName}
         />
         <hr className="mb-20" />
         <TriggerConfig
@@ -154,6 +155,7 @@ const Details = ({
           latestTaskId={taskId}
           refreshCallback={handleRefresh}
           envName={envName}
+          orgName={orgName}
         />
       </PageInfo>
     </PageLayout>
