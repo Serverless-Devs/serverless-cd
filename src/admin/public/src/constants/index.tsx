@@ -69,3 +69,12 @@ export const ROLE_LABEL = {
   [ROLE.ADMIN]: '管理者',
   [ROLE.MEMBER]: '开发者',
 };
+
+export enum CODE {
+  Invalid = 'Invalid',
+  NotFound = 'NotFound',
+  NoPermission = 'NoPermission',
+  Forbidden = 'Forbidden',
+  NeedLogin = 'NeedLogin',
+  SystemError = 'SystemError',
+}

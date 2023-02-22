@@ -1,6 +1,6 @@
 class ValidationError extends Error {
-  code = 'Validation';
-  static code = 'Validation';
+  code = 'Invalid';
+  static code = 'Invalid';
   constructor(message) {
     super(message);
   }
@@ -14,7 +14,7 @@ class NotFoundError extends Error {
   }
 }
 
-
+// 权限不足
 class NoPermissionError extends Error {
   code = 'NoPermission';
   static code = 'NoPermission';
@@ -23,9 +23,10 @@ class NoPermissionError extends Error {
   }
 }
 
+// 无权限
 class NoAuthError extends Error {
-  code = 'NoAuth';
-  static code = 'NoAuth';
+  code = 'Forbidden';
+  static code = 'Forbidden';
   constructor(message) {
     super(message);
   }

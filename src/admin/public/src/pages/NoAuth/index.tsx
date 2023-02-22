@@ -1,7 +1,7 @@
 import React from 'react';
 import { Icon } from '@alicloud/console-components';
 
-const NotAuth = () => {
+const NoAuth = () => {
   return (
     <div
       style={{
@@ -29,4 +29,4 @@ const NotAuth = () => {
   );
 };
 
-export default NotAuth;
+export default NoAuth;

@@ -4,6 +4,7 @@ import { Toast } from './components/ToastContainer';
 import { userInfo } from '@/services/user';
 import { getOrgName } from '@/utils';
 import { startsWith, get } from 'lodash';
+import { CODE } from '@/constants';
 
 const appConfig: IAppConfig = {
   app: {
@@ -40,12 +41,12 @@ const appConfig: IAppConfig = {
             history?.push('/');
             return response;
           }
-          if (response.data.code === 401) {
+          if (response.data.code === CODE.NeedLogin) {
             history?.push('/login');
             return response;
           }
-          if (response.data.code === 403) {
-            history?.push('/notAuth');
+          if (response.data.code === CODE.Forbidden) {
+            history?.push('/noAuth');
             return response;
           }
           if (!response.data.success && response.data.message) {
@@ -54,7 +55,7 @@ const appConfig: IAppConfig = {
           return response;
         },
         onError: (error: any) => {
-          if (error.response.status === 401) {
+          if (error.response.status === CODE.NeedLogin) {
             history?.push('/login');
           } else {
             error.response.data.message && Toast.error(error.response.data.message);

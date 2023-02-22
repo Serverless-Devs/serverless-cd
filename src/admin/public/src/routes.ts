@@ -22,17 +22,17 @@ const TaskDetails = lazy(() => import(/* webpackChunkName: 'TaskDetails' */ '@/p
 const Auth = lazy(() => import(/* webpackChunkName: 'Auth' */ '@/pages/Auth'));
 const Settings = lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Settings'));
 const Orgs = lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Orgs'));
-const NotAuth = lazy(() => import(/* webpackChunkName: 'NotAuth' */ '@/pages/NotAuth'));
+const NoAuth = lazy(() => import(/* webpackChunkName: 'NotAuth' */ '@/pages/NoAuth'));
 
 const routerConfig: IRouterConfig[] = [
   {
-    path: '/notAuth',
+    path: '/noAuth',
     component: LoginLayout,
     children: [
       {
         path: '/',
         exact: true,
-        component: NotAuth,
+        component: NoAuth,
       },
     ],
   },
