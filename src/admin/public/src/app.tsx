@@ -3,7 +3,7 @@ import React from 'react';
 import { Toast } from './components/ToastContainer';
 import { userInfo } from '@/services/user';
 import { getOrgName } from '@/utils';
-import { startsWith } from 'lodash';
+import { startsWith, get } from 'lodash';
 
 const appConfig: IAppConfig = {
   app: {
@@ -13,6 +13,7 @@ const appConfig: IAppConfig = {
       return {
         initialStates: {
           user: {
+            isAuth: get(user, 'isAuth', false),
             userInfo: user,
           },
         },
