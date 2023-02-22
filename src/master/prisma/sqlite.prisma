@@ -21,7 +21,7 @@ model User {
 }
 
 model Org {
-  id    String     @id
+  id    String     @id    // 生成格式变更为：user_id:name
   user_id String
   secrets String?
   name String             // 
@@ -32,6 +32,7 @@ model Org {
 model Application {
   id String @id
   org_id String
+  owner_org_id String
   description String?
   owner String
   provider String
@@ -50,7 +51,7 @@ model Task {
   app_id String
   status String?
   steps String?
-  user_id String?       // 记录谁操作的
+  dispatch_org_id String?       // 记录谁操作的
   trigger_payload  String
   created_time DateTime  @default(now())
   updated_time DateTime  @updatedAt
