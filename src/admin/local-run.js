@@ -32,6 +32,10 @@ const parseYaml = async (sPath) => {
   parsedObj = await parse.init(parsedObj.realVariables);
   const env = _.get(parsedObj, 'realVariables.services.admin.props.function.environmentVariables', {});
   _.merge(process.env, env);
+  const region = _.get(parsedObj, 'realVariables.services.admin.props.region', '');
+  const serviceName = _.get(parsedObj, 'realVariables.services.admin.props.service.name', '');
+  _.set(process.env, 'REGION', region);
+  _.set(process.env, 'SERVICE_NAME', serviceName);
 
   // webhook 提醒
   if (_.get(process.env, 'WEBHOOK_URL')) {
@@ -86,3 +90,5 @@ const parseYaml = async (sPath) => {
     stdio: 'inherit',
   });
 })()
+
+// region 、 service 和 function
