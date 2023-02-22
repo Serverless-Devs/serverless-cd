@@ -31,11 +31,11 @@ async function getProviderOrgs(orgId, provider) {
   }
 }
 
-async function getProviderRepos(orgId, provider, { org } = {}) {
+async function getProviderRepos(orgId, orgName, provider, { org } = {}) {
   const token = await getProviderToken(orgId, provider);
   const providerClient = git(provider, { access_token: token });
 
-  const applicationResult = await appService.listByOrgName(orgId);
+  const applicationResult = await appService.listByOrgName(orgName);
 
   try {
     let rows;

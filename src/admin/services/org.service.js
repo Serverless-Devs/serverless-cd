@@ -174,7 +174,13 @@ function desensitization(data) {
   // return _.omit(data, ['secrets']);
 }
 
+async function getOwnerUserByName(orgName) {
+  const { user_id } = await orgModel.getOwnerOrgByName(orgName);
+  return await userModel.getUserById(user_id);
+}
+
 module.exports = {
+  getOwnerUserByName,
   updateOwnerByName,
   desensitization,
   transfer,

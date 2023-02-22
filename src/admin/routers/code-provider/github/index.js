@@ -19,7 +19,7 @@ router.get('/orgs', auth(ADMIN_ROLE_KEYS), async function (req, res) {
  * 用户仓库信息
  */
 router.get('/repos', auth(ADMIN_ROLE_KEYS), async function (req, res) {
-  const rows = await gitService.getProviderRepos(req.orgId, PROVIDER.GITHUB);
+  const rows = await gitService.getProviderRepos(req.orgId, req.orgName, PROVIDER.GITHUB);
   return res.json(Result.ofSuccess(rows));
 });
 
@@ -27,7 +27,7 @@ router.get('/repos', auth(ADMIN_ROLE_KEYS), async function (req, res) {
  * 组织的仓库信息
  */
 router.get('/orgRepos', auth(ADMIN_ROLE_KEYS), async function (req, res, _next) {
-  const rows = await gitService.getProviderRepos(req.orgId, PROVIDER.GITHUB, req.query);
+  const rows = await gitService.getProviderRepos(req.orgId, req.orgName, PROVIDER.GITHUB, req.query);
   return res.json(Result.ofSuccess(rows));
 });
 
