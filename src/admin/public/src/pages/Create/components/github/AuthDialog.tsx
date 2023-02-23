@@ -6,7 +6,6 @@ import { updateUserProviderToken } from '@/services/user';
 import { ownerUserInfo } from '@/services/org';
 import { useRequest } from 'ice';
 import { FORM_ITEM_LAYOUT } from '@/constants';
-import { Toast } from '@/components/ToastContainer';
 import RefreshIcon from '@/components/RefreshIcon';
 
 const FormItem = Form.Item;
@@ -14,11 +13,16 @@ const FormItem = Form.Item;
 interface IUserInfo {
   avatar: string;
   id: string;
-  isAuth: boolean;
   username: string;
   label: string | ReactNode;
   value: string;
-  github_name: string;
+  third_part: {
+    github: {
+      owner: string;
+      avatar: string;
+      id: number;
+    };
+  };
 }
 
 interface IProps {
@@ -36,9 +40,8 @@ const AuthDialog = (props: IProps) => {
   const [userState] = store.useModel('user');
   const field = Field.useField();
   const { init, validate, setValue, getValue } = field;
-  const isAuth = get(ownerUserInfoRequest.data, 'data.isAuth', false);
+  const isAuth = Boolean(get(ownerUserInfoRequest.data, 'data.third_part.github.owner'));
   const isOwner = get(ownerUserInfoRequest.data, 'data.id') === get(userState, 'userInfo.id');
-
   useEffect(() => {
     ownerUserInfoRequest.request();
   }, []);
@@ -59,51 +62,44 @@ const AuthDialog = (props: IProps) => {
       return;
     }
     const userInfo = get(ownerUserInfoRequest.data, 'data', {}) as IUserInfo;
-    const data: IUserInfo[] = [];
-    data.push({
-      ...userInfo,
-      label: (
-        <div className="flex-r">
-          <div className="align-center">
-            {userInfo.avatar ? (
-              <img
-                src={userInfo.avatar}
-                className="ml-4 mr-4"
-                style={{ borderRadius: '50%', height: 20 }}
-              />
-            ) : (
-              <span className="avatar-default-img">
-                {get(userInfo, 'username', '').slice(0, 1)}
-              </span>
-            )}
-            <span>{userInfo.github_name || userInfo.username}</span>
-          </div>
-          <Button className="unbind" type="primary" text onClick={onUnbind} disabled={!isOwner}>
-            解绑
-          </Button>
+    const avatar = get(userInfo, 'third_part.github.avatar', '');
+    const value = get(userInfo, 'third_part.github.owner', '');
+    userInfo.value = value;
+    userInfo.label = (
+      <div className="flex-r">
+        <div className="align-center">
+          {avatar ? (
+            <img src={avatar} className="ml-4 mr-4" style={{ borderRadius: '50%', height: 20 }} />
+          ) : (
+            <span className="avatar-default-img">{value.slice(0, 1)}</span>
+          )}
+          <span>{value}</span>
         </div>
-      ),
-      value: userInfo.github_name || userInfo.username,
-    });
-    setValue('user_list', data);
+        <Button className="unbind" type="primary" text onClick={onUnbind} disabled={!isOwner}>
+          解绑
+        </Button>
+      </div>
+    );
+    setValue('user_list', [userInfo]);
     onChange(userInfo);
   };
 
   const valueRender = ({ value }) => {
     const item = find(getValue('user_list'), (item: IUserInfo) => item.value === value);
     if (!item) return null;
+    const avatar = get(item, 'third_part.github.avatar', '');
     return (
       <div className="align-center">
-        {item.avatar ? (
+        {avatar ? (
           <img
             className="mr-4"
-            src={item.avatar}
+            src={avatar}
             style={{ width: 20, height: 20, borderRadius: '50%' }}
           />
         ) : (
-          <span className="avatar-default-img">{get(item, 'username', '').slice(0, 1)}</span>
+          <span className="avatar-default-img">{item.value.slice(0, 1)}</span>
         )}
-        <span>{item.github_name || item.username}</span>
+        <span>{item.value}</span>
       </div>
     );
   };
@@ -155,7 +151,7 @@ const AuthDialog = (props: IProps) => {
           dataSource={getValue('user_list')}
           state={ownerUserInfoRequest.loading ? 'loading' : undefined}
           disabled={ownerUserInfoRequest.loading}
-          value={value?.github_name || value?.username}
+          value={value?.value}
           onChange={handleChange}
           valueRender={valueRender}
           popupClassName="icon-right"
