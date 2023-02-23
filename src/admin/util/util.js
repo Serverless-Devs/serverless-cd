@@ -1,4 +1,3 @@
-const axios = require('axios');
 const crypto = require('crypto');
 const { lodash: _ } = require('@serverless-cd/core');
 const { customAlphabet } = require('nanoid');
@@ -64,30 +63,6 @@ const md5Encrypt = (data) => {
   return crypted;
 };
 
-// axios替换成 httpx
-const githubRequest = (accessToken) => {
-  const instance = axios.create({
-    baseURL: 'https://api.github.com',
-    timeout: 3000,
-    headers: {
-      accept: 'application/json',
-      Authorization: `token ${accessToken}`,
-    },
-  });
-
-  return async (url, data = {}) => {
-    const [method, path] = url.split(/\s+/);
-
-    if (method === 'GET') {
-      return await instance.get(path, {
-        params: data,
-      });
-    } else {
-      return await instance.post(path, data);
-    }
-  };
-};
-
 const checkNameAvailable = (name) => /^[a-zA-Z0-9-_]{1,50}$/.test(name);
 
 const generateOrgIdByUserIdAndOrgName = (id, name) => {
@@ -104,7 +79,6 @@ module.exports = {
   retryOnce,
   formatBranch,
   md5Encrypt,
-  githubRequest,
   unionId: customAlphabet(UID_TOKEN, 16),
-  unionToken: customAlphabet(UID_TOKEN_UPPERCASE, 40),
+  unionToken: customAlphabet(UID_TOKEN_UPPERCASE, 16),
 };

@@ -53,22 +53,20 @@ async function getProviderToken(orgId, userId, provider) {
 }
 
 function desensitization(data) {
+  const filterData = (item) => {
+    item.third_part = _.mapValues(_.get(data, 'third_part', {}), (item = {}) => ({
+      owner: item.owner,
+      id: item.id,
+      avatar: item.avatar,
+    }));
+    return _.omit(item, ['password', 'secrets'])
+  };
+
   if (_.isArray(data)) {
-    return _.map(data, item => {
-      const third_part = _.get(data, 'third_part', {});
-      _.merge(item, {
-        isAuth: !!_.get(third_part, 'github.access_token', false),
-        github_name: _.get(third_part, 'github.owner', ''),
-      });
-      return _.omit(item, ['third_part', 'password', 'secrets'])
-    })
+    return _.map(data, item => filterData(item));
   }
-  const third_part = _.get(data, 'third_part', {});
-  _.merge(data, {
-    isAuth: !!_.get(third_part, 'github.access_token', false),
-    github_name: _.get(third_part, 'github.owner', ''),
-  });
-  return _.omit(data, ['third_part', 'password', 'secrets']);
+
+  return filterData(data);
 }
 
 

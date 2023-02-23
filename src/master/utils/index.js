@@ -12,5 +12,5 @@ module.exports = {
   ...require('./invoke'),
   getAppConfig: require('./get-app-config'),
   ignoreRunFunctionError,
-  nanoid: customAlphabet(UID_TOKEN_UPPERCASE, 40),
+  nanoid: customAlphabet(UID_TOKEN_UPPERCASE, 16),
 }
