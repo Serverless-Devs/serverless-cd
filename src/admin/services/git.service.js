@@ -25,7 +25,7 @@ async function getProviderOrgs(orgId, provider) {
     return await providerClient.listOrgs();
   } catch (err) {
     if (err.code === 401 && err.message === 'Bad credentials') {
-      throw new ValidationError('Github token 无效，请重新配置');
+      throw new ValidationError(`${provider} token 无效，请重新配置`);
     }
     throw err;
   }
@@ -59,7 +59,7 @@ async function getProviderRepos(orgId, orgName, provider, { org } = {}) {
     return rows;
   } catch (err) {
     if (err.code === 401 && err.message === 'Bad credentials') {
-      throw new ValidationError('Github token 无效，请重新配置');
+      throw new ValidationError(`${provider} token 无效，请重新配置`);
     }
     throw err;
   }
@@ -73,7 +73,7 @@ async function getBranches(orgId, provider, query) {
     return await providerClient.listBranches(query);
   } catch (err) {
     if (err.code === 401 && err.message === 'Bad credentials') {
-      throw new ValidationError('Github token 无效，请重新配置');
+      throw new ValidationError(`${provider} token 无效，请重新配置`);
     }
     throw err;
   }
@@ -90,7 +90,21 @@ async function putFile(orgId, provider, body) {
   return await providerClient.putFile(body);
 }
 
+async function getUser(provider, access_token) {
+  const providerClient = git(provider, { access_token });
+
+  try {
+    return await providerClient.user();
+  } catch (err) {
+    if (err.code === 401 && err.message === 'Bad credentials') {
+      throw new ValidationError(`${provider} token 无效，请重新配置`);
+    }
+    throw err;
+  }
+}
+
 module.exports = {
+  getUser,
   putFile,
   checkProviderFile,
   getBranches,
