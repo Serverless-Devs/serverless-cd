@@ -92,12 +92,12 @@ services:
 
   worker-deliver:
     component: fc
-    actions:
-      pre-deploy:
-        - run: npm install --registry=https://registry.npmmirror.com
-          path: "./worker"
-        - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
-          path: "./worker"
+    # actions:
+    #   pre-deploy:
+    #     - run: npm install --registry=https://registry.npmmirror.com
+    #       path: "./worker"
+    #     - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
+    #       path: "./worker"
     props:
       region: ${vars.region}
       service: ${vars.service}
