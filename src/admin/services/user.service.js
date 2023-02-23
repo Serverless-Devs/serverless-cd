@@ -17,6 +17,10 @@ async function updateUserById(userId, data) {
   return await userModel.updateUserById(userId, data);
 }
 
+async function fuzzyQueriesByName(containsName) {
+  return await userModel.fuzzyQueriesByName(containsName);
+}
+
 /**
  * 根据团队Id拿到拥有者用户数据
  */
@@ -71,6 +75,7 @@ function desensitization(data) {
 
 
 module.exports = {
+  fuzzyQueriesByName,
   desensitization,
   getUserById,
   updateUserById,
