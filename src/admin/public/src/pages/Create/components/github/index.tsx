@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Form, Radio, Field, Input } from '@alicloud/console-components';
+import { Form, Radio, Field, Input, Divider } from '@alicloud/console-components';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import AuthDialog from './AuthDialog';
 import Repo from './Repo';
@@ -24,7 +24,7 @@ const Github = (props: IProps) => {
     let res = await secretsRef.current.validate();
     if (!res) return callback('error');
     callback();
-  }
+  };
 
   return (
     <>
@@ -76,6 +76,11 @@ const Github = (props: IProps) => {
             }) as any)}
           />
         </FormItem>
+        <FormItem label="描述">
+          <Input {...init('description')} placeholder="请输入描述" />
+        </FormItem>
+        <Divider className="mt-32" />
+        <div className="text-bold mt-16 mb-16">环境配置</div>
         <FormItem label="环境" required>
           <Env
             {...(init('environment', {
@@ -91,13 +96,10 @@ const Github = (props: IProps) => {
         <FormItem label="触发方式" required>
           <Trigger repo={getValue('repo')} {...(init('trigger') as any)} />
         </FormItem>
-        <FormItem label="描述">
-          <Input {...init('description')} placeholder="请输入描述" />
-        </FormItem>
         <FormItem label="Secrets" help="">
           <ConfigEdit
             {...init('secrets', {
-              rules: [{ validator: secretsValidator }]
+              rules: [{ validator: secretsValidator }],
             })}
             ref={secretsRef}
           />
