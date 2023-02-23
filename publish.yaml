@@ -50,6 +50,6 @@ Parameters:
     serviceName:
       title: 服务名
       type: string
-      default: wss
+      default: serverless-cd
       pattern: "^[a-zA-Z_][a-zA-Z0-9-_]{0,127}$"
       description: 应用所属的函数计算服务, 只能包含字母、数字、下划线和中划线。不能以数字、中划线开头。长度在 1-128 之间
