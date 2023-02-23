@@ -30,16 +30,12 @@ const AddMember: FC<IProps> = (props) => {
   const handleOK = async () => {
     validate(async (errors, values) => {
       if (errors) return;
-      try {
-        const { success } = await request(values);
-        if (success) {
-          Toast.success(type === 'create' ? '添加成员成功' : '编辑成员成功');
-          setVisible(false);
-          resetToDefault();
-          await callback();
-        }
-      } catch (error) {
-        Toast.error(error.message);
+      const { success } = await request(values);
+      if (success) {
+        Toast.success(type === 'create' ? '添加成员成功' : '编辑成员成功');
+        setVisible(false);
+        resetToDefault();
+        await callback();
       }
     });
   };

@@ -114,16 +114,12 @@ const AuthDialog = (props: IProps) => {
       title: '您确定解除Github的账户授权吗',
       content: '若您解除绑定，当前账户下的所有应用将无法触发部署流程。',
       onOk: async () => {
-        try {
-          await request({ token: '', provider: 'github' });
-          // 重置上层数据
-          reset();
-          // 重置当前组件的数据
-          field.reset();
-          ownerUserInfoRequest.refresh();
-        } catch (error) {
-          Toast.error(error.message);
-        }
+        await request({ token: '', provider: 'github' });
+        // 重置上层数据
+        reset();
+        // 重置当前组件的数据
+        field.reset();
+        ownerUserInfoRequest.refresh();
       },
     });
   };
@@ -132,11 +128,8 @@ const AuthDialog = (props: IProps) => {
     validate(async (errors, values) => {
       if (errors) return;
       const token = get(values, 'token', '');
-      try {
-        await request({ token, provider: 'github' });
-      } catch (error) {
-        Toast.error(error.message);
-      }
+      const { success } = await request({ token, provider: 'github' });
+      if (!success) return;
       refresh();
       setVisible(false);
     });

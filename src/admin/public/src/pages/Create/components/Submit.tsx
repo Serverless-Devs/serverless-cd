@@ -74,23 +74,19 @@ const Submit = (props: IProps) => {
         },
       },
     };
-    try {
-      const { success, data } = await request(dataMap[get(values, 'createType')]);
-      if (success) {
-        if (get(isDeploy, 'current') && data.id && !isEmpty(values['trigger'])) {
-          await manualDeploy.request({
-            appId: data.id,
-            ref: `refs/heads/${get(values, 'trigger[0].branch')}`,
-          });
-        }
-        await sleep(1500);
-        Toast.success('应用创建成功');
-
-        // /${orgName} = > /${orgName}/application 重新加载应用列表
-        history?.push(`/${orgName}`);
+    const { success, data } = await request(dataMap[get(values, 'createType')]);
+    if (success) {
+      if (get(isDeploy, 'current') && data.id && !isEmpty(values['trigger'])) {
+        await manualDeploy.request({
+          appId: data.id,
+          ref: `refs/heads/${get(values, 'trigger[0].branch')}`,
+        });
       }
-    } catch (error) {
-      Toast.error(error.message);
+      await sleep(1500);
+      Toast.success('应用创建成功');
+
+      // /${orgName} = > /${orgName}/application 重新加载应用列表
+      history?.push(`/${orgName}`);
     }
     setValue('submitLoading', false);
   };

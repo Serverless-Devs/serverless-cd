@@ -22,15 +22,11 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, en
       environment[envName].trigger_spec = {
         [provider]: values['trigger'],
       };
-      try {
-        const { success } = await request({ environment, appId, provider });
-        if (success) {
-          Toast.success('配置成功');
-          refreshCallback && refreshCallback();
-          setVisible(false);
-        }
-      } catch (error) {
-        Toast.error(error.message);
+      const { success } = await request({ environment, appId, provider });
+      if (success) {
+        Toast.success('配置成功');
+        refreshCallback && refreshCallback();
+        setVisible(false);
       }
     });
   };
@@ -60,9 +56,7 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, en
       }
     >
       <div className="mt-16" key={triggerKey}>
-        {triggerSpec[provider] && (
-          <Trigger.Preview dataSource={triggerSpec[provider]} />
-        )}
+        {triggerSpec[provider] && <Trigger.Preview dataSource={triggerSpec[provider]} />}
       </div>
       <Drawer
         title="编辑触发配置"

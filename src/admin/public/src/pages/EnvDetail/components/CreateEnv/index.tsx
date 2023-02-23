@@ -52,16 +52,12 @@ const CreateEnv: FC<IProps> = (props) => {
           },
         },
       };
-      try {
-        const { success } = await request({ environment, appId, provider });
-        if (success) {
-          Toast.success('创建环境成功');
-          setVisible(false);
-          resetToDefault();
-          await callback();
-        }
-      } catch (error) {
-        Toast.error(error.message);
+      const { success } = await request({ environment, appId, provider });
+      if (success) {
+        Toast.success('创建环境成功');
+        setVisible(false);
+        resetToDefault();
+        await callback();
       }
     });
   };
@@ -96,13 +92,10 @@ const CreateEnv: FC<IProps> = (props) => {
             />
           </FormItem>
           <FormItem label="触发方式" required>
-            <Trigger
-              {...(init('trigger') as any)}
-              ref={triggerRef}
-            />
+            <Trigger {...(init('trigger') as any)} ref={triggerRef} />
           </FormItem>
           <FormItem label="Secrets">
-            <ConfigEdit {...(init('secrets'))} ref={secretsRef} />
+            <ConfigEdit {...init('secrets')} ref={secretsRef} />
           </FormItem>
         </Form>
       </SlidePanel>
