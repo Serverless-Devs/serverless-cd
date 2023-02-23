@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "prettier": "cd ../.. && npm run prettier",
-    "start": "node local-run.js"
+    "start": "DEBUG=serverless-cd:* nodemon index.js",
+    "local-start": "node local-run.js"
   },
   "author": "mamba",
   "license": "ISC",
