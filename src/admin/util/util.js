@@ -106,5 +106,5 @@ module.exports = {
   md5Encrypt,
   githubRequest,
   unionId: customAlphabet(UID_TOKEN, 16),
-  unionToken: customAlphabet(UID_TOKEN_UPPERCASE, 40),
+  unionToken: customAlphabet(UID_TOKEN_UPPERCASE, 16),
 };
