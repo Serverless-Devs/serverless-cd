@@ -1,4 +1,4 @@
-const { ValidationError, Result, NotFoundError, NoPermissionError, NeedLogin } = require('../util');
+const { ValidationError, Result, NotFoundError, NoPermissionError, NeedLogin, NoAuthError } = require('../util');
 
 const errorHandler = (err, req, res, next) => {
   let errorRes = {};
@@ -10,6 +10,8 @@ const errorHandler = (err, req, res, next) => {
     errorRes = Result.ofError(err.message, NoPermissionError);
   } else if (err instanceof NeedLogin) {
     errorRes = Result.ofError(err.message, NeedLogin);
+  } else if (err instanceof NoAuthError) {
+    errorRes = Result.ofError(err.message, NoAuthError);
   } else {
     console.log('非预期错误，统一 500');
     errorRes = Result.ofError(err.message, 'SystemError');
