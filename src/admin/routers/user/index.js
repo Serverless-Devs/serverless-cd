@@ -27,6 +27,16 @@ router.get('/info', async function (req, res) {
 });
 
 /**
+ * 通过名称模糊查询
+ */
+router.get('/containsName', async function (req, res) {
+  const { containsName } = req.query;
+  const result = await userService.fuzzyQueriesByName(containsName);
+  return res.json(Result.ofSuccess(result));
+});
+
+
+/**
  * 绑定 github token
  */
 router.put('/token', auth(OWNER_ROLE_KEYS), async function (req, res) {
