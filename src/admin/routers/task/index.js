@@ -1,14 +1,16 @@
 const router = require('express').Router();
 const _ = require('lodash');
+const fs = require('fs');
 const debug = require('debug')('serverless-cd:task');
 
-const { Result, Client, ValidationError } = require('../../util');
+const { Result, Client, ValidationError, NotFoundError } = require('../../util');
 const auth = require('../../middleware/auth');
-const { ADMIN_ROLE_KEYS } = require('@serverless-cd/config');
+const { ADMIN_ROLE_KEYS, LOG_LOCAL_PATH_PREFIX } = require('@serverless-cd/config');
 const taskService = require('../../services/task.service');
 
 /**
  * task 列表
+ * query: { appId, envName?, taskId?, pageSize, currentPage }
  */
 router.get('/list', async function (req, res) {
   const { totalCount, result } = await taskService.list(req.query);
@@ -38,16 +40,27 @@ router.get('/log', async function (req, res) {
   if (_.isEmpty(stepCount)) {
     throw new ValidationError('StepCount is empty');
   }
+
+  const logPath = `${LOG_LOCAL_PATH_PREFIX}/${taskId}/step_${stepCount}.log`;
   const ossClient = Client.oss();
-  try {
-    const { content } = await ossClient.get(`logs/${taskId}/step_${stepCount}.log`);
-    res.json(Result.ofSuccess(content.toString('utf8')));
-  } catch (ex) {
-    if (ex.status === 404) {
-      throw new NotFoundError('The logs for this run have expired and are no longer available.');
+  if (ossClient) {
+    try {
+      const { content } = await ossClient.get(logPath);
+      res.json(Result.ofSuccess(content.toString('utf8')));
+    } catch (ex) {
+      if (ex.status === 404) {
+        throw new NotFoundError('此运行的日志已过期，不再可用。');
+      }
+      console.error(ex.status, ex.code, ex.message);
+      throw ex
     }
-    console.error(ex.status, ex.code, ex.message);
-    throw ex;
+  } else {
+    try {
+      const log = fs.readFileSync(logPath, { encoding: 'utf8' });
+      res.json(Result.ofSuccess(log));
+    } catch (ex) {
+      throw new NotFoundError('没有找到日志');
+    }
   }
 });
 

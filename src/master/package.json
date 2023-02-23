@@ -16,7 +16,7 @@
   ],
   "dependencies": {
     "@prisma/client": "^4.8.1",
-    "@serverless-cd/config": "^0.0.10",
+    "@serverless-cd/config": "^0.0.12",
     "@serverless-cd/engine": "^0.0.21",
     "@serverless-cd/git": "^0.0.2",
     "@serverless-cd/srm-aliyun-fc2": "^0.0.5",

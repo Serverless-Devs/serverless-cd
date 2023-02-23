@@ -2,7 +2,7 @@ import React, { useEffect, ReactNode, useState } from 'react';
 import { useRequest } from 'ice';
 import { Select, Icon, Field, Form } from '@alicloud/console-components';
 import store from '@/store';
-import { noop, map, find, isEmpty, cloneDeep } from 'lodash';
+import { noop, map, find, isEmpty, cloneDeep, get } from 'lodash';
 import RefreshIcon from '@/components/RefreshIcon';
 import { githubOrgs, githubOrgRepos } from '@/services/git';
 
@@ -45,11 +45,13 @@ const Repos = (props: IProps) => {
   const { value, onChange = noop, field } = props;
   const { data, loading, request } = useRequest(githubOrgs);
   const orgRepos = useRequest(githubOrgRepos);
-  const [userState, userDispatchers] = store.useModel('user');
+  const [, userDispatchers] = store.useModel('user');
   const effectsState = store.useModelEffectsState('user');
   const [refreshLoading, setRefreshLoading] = useState(false);
   const [currentRepoType, setCurrentRepoType] = useState('personal');
   const { getValue, setValue, init, getError } = field;
+  // owner是否授权
+  const isAuth = get(getValue('gitUser'), 'isAuth', false);
 
   useEffect(() => {
     if (!isEmpty(data)) {
@@ -68,10 +70,10 @@ const Repos = (props: IProps) => {
   }, [getValue('repoTypeList')]);
 
   useEffect(() => {
-    if (!userState.isAuth) return;
+    if (!isAuth) return;
     onRepoTypeChange('personal');
     request();
-  }, [userState.isAuth]);
+  }, [isAuth]);
 
   const valueRender = ({ value }) => {
     const userRepos = (getValue('userRepos') as IRepoItem[]) || ([] as IRepoItem[]);
@@ -97,7 +99,7 @@ const Repos = (props: IProps) => {
   };
 
   const fetchUserRepos = async () => {
-    if (!userState.isAuth) return;
+    if (!isAuth) return;
     const res = await userDispatchers.getUserRepos();
     const data = map(res, (item: IRepoItem) => {
       return {
@@ -137,7 +139,7 @@ const Repos = (props: IProps) => {
   };
 
   const fetchOrgRepos = async (org) => {
-    if (!userState.isAuth) return;
+    if (!isAuth) return;
     const { data: res } = await orgRepos.request({ org });
     const data = map(res, (item: IRepoItem) => {
       return {

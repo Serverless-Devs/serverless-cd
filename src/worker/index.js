@@ -6,8 +6,8 @@ const {
   DOWNLOAD_CODE_DIR: execDir,
   CD_PIPELINE_YAML,
   CREDENTIALS,
-  OSS_CONFIG,
   DEFAULT_UNSET_ENVS,
+  LOG_LOCAL_PATH_PREFIX,
 } = require('@serverless-cd/config');
 
 const checkout = require('@serverless-cd/git').default;
@@ -15,7 +15,7 @@ const Setup = require('@serverless-cd/setup-runtime').default;
 const Engine = require('@serverless-cd/engine').default;
 
 const _ = core.lodash;
-const { getPayload, getOTSTaskPayload } = require('./utils');
+const { getPayload, getTaskPayload, getOssConfig } = require('./utils');
 const { updateAppById, makeTask } = require('./model');
 
 async function handler(event, _context, callback) {
@@ -27,7 +27,7 @@ async function handler(event, _context, callback) {
     provider,
     cloneUrl,
     pusher,
-    authorization: { userId, owner, appId, accessToken: token, secrets } = {},
+    authorization: { dispatchOrgId, owner, appId, accessToken: token, secrets } = {},
     ref,
     commit,
     message,
@@ -38,11 +38,22 @@ async function handler(event, _context, callback) {
     environment = {},
     envName,
   } = inputs;
+  const targetEnvConfig = _.get(environment, envName, {});
+  const envSecrets = _.get(targetEnvConfig, 'secrets', {});
 
   const cwdPath = path.join(execDir, taskId);
-  const logPrefix = `/logs/${taskId}`;
+  const logPrefix = `${LOG_LOCAL_PATH_PREFIX}/${taskId}`;
   core.fs.emptyDirSync(logPrefix);
   console.log('start task, uuid: ', taskId);
+
+  let url = '';
+  if (DOMAIN && dispatchOrgId) {
+    const [, orgName] = _.split(dispatchOrgId, ':');
+    if (orgName) {
+      url = `${DOMAIN}/${orgName}/application/${appId}/detail/${envName}/${taskId}`;
+    }
+    console.log(`get task url: ${url}, target org name: ${orgName}`);
+  }
 
   const appTaskConfig = { taskId, commit, message, ref };
 
@@ -76,7 +87,7 @@ async function handler(event, _context, callback) {
     const steps = _.get(pipelineContext, 'steps');
     logger.debug(`parse spec success, steps: ${JSON.stringify(steps)}`);
     logger.debug(`start update app`);
-    environment[envName].latest_task = getEnvData(context);
+    targetEnvConfig.latest_task = getEnvData(context);
     logger.info(`update app in engine onInit: ${JSON.stringify(environment)}`);
     await updateAppById(appId, { environment });
     logger.debug(`start update app success`);
@@ -99,24 +110,21 @@ async function handler(event, _context, callback) {
     cwd: cwdPath,
     logConfig: {
       logPrefix,
-      ossConfig: {
-        ...CREDENTIALS,
-        ...OSS_CONFIG,
-      },
+      ossConfig: getOssConfig(),
       // logLevel: 'debug',
     },
     inputs: {
       ...customInputs,
       task: {
         id: taskId,
-        url: DOMAIN ? `${DOMAIN}/application/${userId}/detail/${envName}/${taskId}` : '',
+        url,
       },
       app: {
         // 应用的关联配置
-        user_id: userId,
+        dispatch_org_id: dispatchOrgId,
         id: appId,
       },
-      secrets,
+      secrets: _.merge(secrets, envSecrets),
       git: {
         // git 相关的内容
         owner,
@@ -136,21 +144,21 @@ async function handler(event, _context, callback) {
       onPreRun: async function (_data, context) {
         await makeTask(taskId, {
           status: context.status,
-          steps: getOTSTaskPayload(context.steps),
+          steps: getTaskPayload(context.steps),
         });
       },
       onPostRun: async function (_data, context) {
         await makeTask(taskId, {
           status: context.status,
-          steps: getOTSTaskPayload(context.steps),
+          steps: getTaskPayload(context.steps),
         });
       },
       onCompleted: async function (context, logger) {
         await makeTask(taskId, {
           status: context.status,
-          steps: getOTSTaskPayload(context.steps),
+          steps: getTaskPayload(context.steps),
         });
-        environment[envName].latest_task = getEnvData(context);
+        targetEnvConfig.latest_task = getEnvData(context);
         logger.info(`onCompleted environment: ${JSON.stringify(environment)}`);
         await updateAppById(appId, { environment });
         logger.info('completed end.');
@@ -163,12 +171,12 @@ async function handler(event, _context, callback) {
   console.log('init task');
   await makeTask(taskId, {
     env_name: envName,
-    user_id: userId,
+    dispatch_org_id: dispatchOrgId,
     app_id: appId,
     status: engine.context.status,
     trigger_payload: inputs,
   });
-  environment[envName].latest_task = getEnvData(engine.context);
+  targetEnvConfig.latest_task = getEnvData(engine.context);
   console.log('App update environment', JSON.stringify(environment));
   // 防止有其他的动作，将等待状态也要set 到表中
   await updateAppById(appId, { environment });

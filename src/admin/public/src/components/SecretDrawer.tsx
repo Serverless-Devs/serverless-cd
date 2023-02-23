@@ -1,5 +1,6 @@
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import { Drawer, Field, Button } from '@alicloud/console-components';
+import React, { forwardRef, useImperativeHandle, useState, useRef } from 'react';
+import { Field } from '@alicloud/console-components';
+import SlidePanel from '@alicloud/console-components-slide-panel';
 import ConfigEdit from '@/components/ConfigEdit';
 import '@/styles/secrets.less';
 
@@ -13,8 +14,8 @@ interface Props {
 const SecretDrawer = ({ title, loading = false, onSubmit, secretsData }: Props, ref) => {
   const [visible, setVisible] = useState(false);
   const field = Field.useField();
-  const { getValue, setValue } = field;
-
+  const { getValue, setValue, init, validate } = field;
+  const secretsRef: any = useRef(null);
   useImperativeHandle(ref, () => ({
     setValue,
     getValue,
@@ -24,34 +25,35 @@ const SecretDrawer = ({ title, loading = false, onSubmit, secretsData }: Props, 
 
   const closeDrawer = () => {
     setVisible(false);
-    setValue('secrets', []);
   };
 
   const onEdit = () => {
-    onSubmit(getValue('secrets'));
+    validate(async (error, value) => {
+      const res = await secretsRef.current.validate();
+      if (error || !res) return;
+      onSubmit(value['secrets']);
+    })
   };
 
   return (
-    <Drawer
+    <SlidePanel
       title={title}
-      placement="right"
-      width={'60%'}
-      visible={visible}
+      width="large"
+      isShowing={visible}
+      onOk={onEdit}
       onClose={closeDrawer}
-      className="dialog-drawer"
+      onCancel={closeDrawer}
+      isProcessing={loading}
     >
-      <div className="dialog-body secrets-content" style={{ paddingRight: 40 }}>
-        <ConfigEdit field={field} secretsData={secretsData} />
-      </div>
-      <div className="dialog-footer">
-        <Button className="mr-10" type="primary" onClick={onEdit} loading={loading}>
-          确定
-        </Button>
-        <Button type="normal" onClick={closeDrawer}>
-          取消
-        </Button>
-      </div>
-    </Drawer>
+      {
+        visible && (
+          <ConfigEdit
+            {...(init('secrets', { initValue: secretsData }))}
+            ref={secretsRef}
+          />
+        )
+      }
+    </SlidePanel>
   );
 };
 

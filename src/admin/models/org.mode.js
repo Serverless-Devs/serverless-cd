@@ -1,20 +1,36 @@
 const _ = require('lodash');
 const { ROLE, TABLE } = require('@serverless-cd/config');
-const { unionId, prisma } = require('../util');
+const { generateOrgIdByUserIdAndOrgName, prisma } = require('../util');
 
 const orgPrisma = prisma[TABLE.ORG];
 
+const getOrgInfo = (result) => {
+  if (!result) {
+    return {};
+  }
+  if (_.isArray(result)) {
+    result = _.first(result);
+  }
+  if (result.secrets) {
+    result.secrets = JSON.parse(result.secrets);
+  }
+  return result;
+};
+
 module.exports = {
-  async getOrgFirst(where) {
-    const result = await orgPrisma.findFirst({ where });
-    return result;
+  async getOwnerOrgByName(name = '') {
+    if (!name) {
+      return {};
+    }
+    const result = await orgPrisma.findFirst({ where: { name, role: ROLE.OWNER } });
+    return getOrgInfo(result);
   },
-  async getOrgById(id) {
+  async getOrgById(id = '') {
     const result = await orgPrisma.findUnique({ where: { id } });
-    return result;
+    return getOrgInfo(result);
   },
-  async createOrg({ userId, name, role, description }) {
-    const orgId = unionId();
+  async createOrg({ userId, name, role, description, secrets }) {
+    const orgId = generateOrgIdByUserIdAndOrgName(userId, name);
     const result = await orgPrisma.create({
       data: {
         id: orgId,
@@ -22,11 +38,15 @@ module.exports = {
         name,
         role: role || ROLE.OWNER,
         description,
+        secrets: secrets ? JSON.stringify(secrets) : '',
       },
     });
     return result;
   },
   async updateOrg(id, data) {
+    if (data.secrets) {
+      data.secrets = JSON.stringify(data.secrets);
+    }
     const result = await orgPrisma.update({ where: { id }, data });
     return result;
   },
@@ -44,11 +64,8 @@ module.exports = {
       orgPrisma.findMany({
         ...option,
         where,
-        orderBy: {
-          updated_time: 'desc',
-        },
       }),
     ]);
-    return { totalCount, result };
+    return { totalCount, result: _.map(result, (r) => getOrgInfo(r)) };
   },
 };

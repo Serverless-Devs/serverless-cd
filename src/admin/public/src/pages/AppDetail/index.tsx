@@ -12,7 +12,7 @@ import { get, isEmpty, isBoolean } from 'lodash';
 
 const Details = ({
   match: {
-    params: { appId },
+    params: { appId, orgName },
   },
 }) => {
   const {
@@ -65,7 +65,7 @@ const Details = ({
           <Button
             type="primary"
             onClick={() => {
-              history?.push('/');
+              history?.push(`/${orgName}/application`);
               dialog.hide();
             }}
           >
@@ -75,7 +75,7 @@ const Details = ({
         ],
       });
     }
-  }, [detailInfo]);
+  }, [JSON.stringify(detailInfo)]);
 
   const deleteApplication = () => {
     const dialog = Dialog.alert({
@@ -86,7 +86,7 @@ const Details = ({
         if (success) {
           Toast.success('应用删除成功');
           await sleep(800);
-          history?.push('/');
+          history?.push(`/${orgName}/application`);
         }
         dialog.hide();
       },
@@ -100,7 +100,7 @@ const Details = ({
       breadcrumbs={[
         {
           name: '应用列表',
-          path: '/',
+          path: `/${orgName}/application`,
         },
         {
           name: appId,
@@ -120,7 +120,12 @@ const Details = ({
       <Loading visible={loading} inline={false}>
         <BasicInfoDetail data={get(detailInfo, 'data', {})} refreshCallback={handleRefresh} />
         <hr className="mb-20 mt-20" />
-        <EnvList appId={appId} data={get(detailInfo, 'data', {})} refresh={refresh} />
+        <EnvList
+          appId={appId}
+          orgName={orgName}
+          data={get(detailInfo, 'data', {})}
+          refresh={refresh}
+        />
       </Loading>
     </PageLayout>
   );

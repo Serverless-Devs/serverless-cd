@@ -19,13 +19,14 @@ const { Row, Col } = Grid;
 interface IProps {
   appId: string;
   envName: string;
+  orgName: string;
   refreshCallback: () => Promise<any>;
   latestTaskId?: string;
   application: object;
 }
 
 const CommitList: FC<IProps> = (props) => {
-  const { appId, latestTaskId, application, refreshCallback, envName } = props;
+  const { appId, latestTaskId, application, refreshCallback, envName, orgName } = props;
   const { data, request, refresh, cancel } = useRequest(getTaskList, {
     pollingInterval: 5000,
   });
@@ -114,7 +115,7 @@ const CommitList: FC<IProps> = (props) => {
                       <div className="copy-trigger flex-r" style={{ justifyContent: 'flex-start' }}>
                         <Link
                           className="commit-description text-nowrap-1 mr-8"
-                          to={`/application/${appId}/detail/${envName}/${taskId}`}
+                          to={`/${orgName}/application/${appId}/${envName}/${taskId}`}
                         >
                           {taskId}
                         </Link>
@@ -165,7 +166,12 @@ const CommitList: FC<IProps> = (props) => {
             visible={visible}
             onClose={() => setVisible(false)}
           >
-            <CommitTable appId={appId} latestTaskId={latestTaskId} envName={envName} />
+            <CommitTable
+              appId={appId}
+              latestTaskId={latestTaskId}
+              envName={envName}
+              orgName={orgName}
+            />
           </Drawer>
         </>
       ) : (

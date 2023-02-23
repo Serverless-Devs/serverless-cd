@@ -44,8 +44,9 @@ views:       // 前端 html 模版文件
 ## 项目启动
 
 > PS: 如果需要使用`prisma`，则需要在目录下创建`.env`文件，内容需要有`DATABASE_URL`字段用于链接数据库.  
->  npx prisma migrate dev --name init 创建数据库  
->  npx prisma studio 管理数据库
+>  npx prisma generate --schema=./prisma/[xxxx].prisma【必须】
+>  npx prisma migrate dev --name init --schema=./prisma/[xxxx].prisma  创建数据库,执行终端能够获取到 `DATABASE_URL` 环境变量才可以使用 【除了首次，必须要再执行了】 
+>  npx prisma studio --schema=./prisma/[xxxx].prisma 需要在执行终端能够获取到 `DATABASE_URL` 环境变量才可以使用。此命令和项目启动没有任何关系，仅仅是可视化管理数据库
 
 ```shell
 # 启动一个终端，执行

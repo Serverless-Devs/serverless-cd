@@ -18,3 +18,7 @@
 .user-email {
   color: #6e7c88;
 }
+
+.next-shell-main .next-shell-content-inner {
+  min-height: calc(100vh - 92px);
+}

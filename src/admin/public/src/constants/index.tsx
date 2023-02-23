@@ -57,3 +57,24 @@ export const DEPLOY_STATUS = {
 };
 
 export const pollingStatus = ['pending', 'running'];
+
+export enum ROLE {
+  OWNER = 'owner',
+  ADMIN = 'admin',
+  MEMBER = 'member',
+}
+
+export const ROLE_LABEL = {
+  [ROLE.OWNER]: 'Owner',
+  [ROLE.ADMIN]: '管理者',
+  [ROLE.MEMBER]: '开发者',
+};
+
+export enum CODE {
+  Invalid = 'Invalid',
+  NotFound = 'NotFound',
+  NoPermission = 'NoPermission',
+  Forbidden = 'Forbidden',
+  NeedLogin = 'NeedLogin',
+  SystemError = 'SystemError',
+}

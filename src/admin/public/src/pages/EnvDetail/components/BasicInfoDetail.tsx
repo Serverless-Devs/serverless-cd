@@ -13,10 +13,11 @@ interface Props {
   data: object;
   refreshCallback: Function;
   envName: string;
+  orgName: string;
 }
 
 const BasicInfoDetail = (props: Props) => {
-  const { data, refreshCallback, envName } = props;
+  const { data, refreshCallback, envName, orgName } = props;
   const provider = get(data, 'provider');
   const envInfo = get(data, `environment.${envName}`);
   const repo_name = get(data, 'repo_name');
@@ -54,7 +55,10 @@ const BasicInfoDetail = (props: Props) => {
               <div className="flex-r" style={{ justifyContent: 'flex-start' }}>
                 <Status status={status as any} />
                 {taskId && (
-                  <Link className="ml-8" to={`/application/${appId}/detail/${envName}/${taskId}`}>
+                  <Link
+                    className="ml-8"
+                    to={`/${orgName}/application/${appId}/${envName}/${taskId}`}
+                  >
                     查看
                   </Link>
                 )}

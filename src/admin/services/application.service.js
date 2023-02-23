@@ -1,41 +1,49 @@
 const _ = require('lodash');
 const debug = require('debug')('serverless-cd:application');
+const { ROLE } = require('@serverless-cd/config');
 
 const { ValidationError, unionId } = require('../util');
 const appModel = require('../models/application.mode');
 const taskModel = require('../models/task.mode');
+const orgModel = require('../models/org.mode');
 
 const webhookService = require('./webhook.service');
 const userService = require('./user.service');
 
-async function listByOrgId(orgId = '') {
-  const data = await appModel.listAppByOrgId(orgId);
+async function listByOrgName(orgName = '') {
+  const { id: orgId } = await orgModel.getOwnerOrgByName(orgName);
+  const data = await appModel.listAppByOwnerOrgId(orgId);
   if (_.isNil(data)) {
     return {};
   }
   return data;
 }
 
-async function create(orgId, token, body) {
-  const { repo, owner, repo_url, provider_repo_id: providerRepoId, description, provider, environment } = body;
-
+async function preview(body = {}) {
+  const { provider_repo_id: providerRepoId, provider } = body;
   const application = await appModel.getAppByProvider({
-    orgId,
     provider,
     providerRepoId,
   });
   if (!_.isEmpty(application)) {
     throw new ValidationError('代码仓库已绑定，请勿重新绑定');
   }
+}
 
+async function create(orgId, orgName, providerToken, body) {
+  await preview(body);
+
+  const { repo, owner, repo_url, provider_repo_id: providerRepoId, description, provider, environment } = body;
   const appId = unionId();
   const webHookSecret = unionId();
   debug('start add webhook');
-  await webhookService.add(owner, repo, token, webHookSecret, appId);
+  await webhookService.add({ owner, repo, token: providerToken, webHookSecret, appId, provider });
   debug('start create app');
+  const ownerOrg = await orgModel.getOwnerOrgByName(orgName);
   await appModel.createApp({
     id: appId,
     org_id: orgId,
+    owner_org_id: _.get(ownerOrg, 'id'),
     description,
     owner,
     provider,
@@ -100,14 +108,25 @@ async function remove(orgId, userId, appId) {
   debug('Removed app successfully');
 
   debug(`Removed webhook:\nowner: ${owner}, repo_name: ${repo_name}, appId: ${appId}`);
-  await webhookService.remove(owner, repo_name, token, appId);
+  await webhookService.remove({ owner, repo_name, token, appId, provider });
   debug(`Removed webhook successfully`);
 }
 
+async function transfer(appId, transferOrgName) {
+  const transferOwnerOrg = await orgModel.getOwnerOrgByName(transferOrgName);
+  const transferOrgId = _.get(transferOwnerOrg, 'id');
+  if (_.isEmpty(transferOrgId)) {
+    throw new ValidationError(`没有找到 ${transferOrgName} 团队`);
+  }
+  await update(appId, { org_id: transferOrgId, owner_org_id: transferOrgId })
+}
+
 module.exports = {
-  listByOrgId,
+  preview,
+  listByOrgName,
   create,
   update,
+  transfer,
   remove,
   removeEnv,
   getAppById,
