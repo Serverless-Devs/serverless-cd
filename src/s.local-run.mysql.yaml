@@ -15,8 +15,8 @@ vars:
   workerDeliverFunctionName: workerDeliver
   domain: "0.0.0.0"
   logLocalPathPrefix: ../logs
-  databaseUrl: "file:./dev.db"
-  prisma: "sqlite"
+  databaseUrl: "${env.DATABASE_URL}"
+  prisma: "mysql"
   JWT_SECRET: 0df85e4e140f6
 
 services:
@@ -95,12 +95,12 @@ services:
 
   worker-deliver:
     component: fc
-    actions:
-      pre-deploy:
-        - run: npm install --registry=https://registry.npmmirror.com
-          path: "./worker"
-        - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
-          path: "./worker"
+    # actions:
+    #   pre-deploy:
+    #     - run: npm install --registry=https://registry.npmmirror.com
+    #       path: "./worker"
+    #     - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
+    #       path: "./worker"
     props:
       region: ${vars.region}
       service: ${vars.service}
@@ -139,7 +139,7 @@ services:
             functionName: ${vars.masterFunctionName}
             envKey: WEBHOOK_URL
       post-deploy:
-        - component: fc invoke --event '{"path":"/api/common/init?prisma=sqlite"}'
+        - component: fc invoke --event '{"path":"/api/common/init?prisma=mysql"}'
     props:
       region: ${vars.region}
       service: ${vars.service}

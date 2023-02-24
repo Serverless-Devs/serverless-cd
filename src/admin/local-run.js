@@ -74,18 +74,20 @@ const parseYaml = async (sPath) => {
   }
 
   const { DATABASE_URL: databaseUrl } = process.env;
-  if (databaseUrl && databaseUrl.startsWith('file:')) {
-    let filePath = databaseUrl.replace('file:', '');
-    if (!path.isAbsolute(filePath)) {
-      filePath = path.resolve(process.cwd(), filePath);
-      process.env.DATABASE_URL = `file:${filePath}`;
+  if (databaseUrl) {
+    if (databaseUrl.startsWith('${env.')) {
+      throw new Error('请先设置环境变量 DATABASE_URL 用于链接 mysql 数据库');
     }
+    if (databaseUrl.startsWith('file:')) {
+      let filePath = databaseUrl.replace('file:', '');
+      if (!path.isAbsolute(filePath)) {
+        filePath = path.resolve(process.cwd(), filePath);
+        process.env.DATABASE_URL = `file:${filePath}`;
+      }
+    }
+  } else {
+    throw new Error('请先设置环境变量 DATABASE_URL 用于链接 mysql 数据库');
   }
-
-  // const databaseUrl = process.env.DATABASE_URL;
-  const filePath = databaseUrl.replace('file:', '');
-  console.log('databaseUrl: ', databaseUrl);
-  console.log('filePath: ', filePath);
 
   return parsedObj;
 }
