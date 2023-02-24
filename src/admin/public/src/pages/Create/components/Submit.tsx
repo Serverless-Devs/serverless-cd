@@ -10,6 +10,8 @@ import { getConsoleConfig, sleep } from '@/utils';
 import { Toast } from '@/components/ToastContainer';
 import CodeMirror from '@/components/CodeMirror';
 import yaml from 'js-yaml';
+import { TYPE as ENV_TYPE } from '@/components/EnvType';
+
 interface IProps {
   field: Field;
   orgName: string;
@@ -56,7 +58,6 @@ const Submit = (props: IProps) => {
     const trigger_spec: any = {
       [values['gitType']]: { push: { branches: { precise: uniqWith(precise, isEqual) } } },
     };
-    const environment = get(values, 'environment', {});
     const dataMap = {
       [CREATE_TYPE.Repository]: {
         provider: get(values, 'gitType'),
@@ -66,10 +67,11 @@ const Submit = (props: IProps) => {
         owner: get(values, 'repo.owner'),
         provider_repo_id: String(get(values, 'repo.id')),
         environment: {
-          [environment.name]: {
-            type: environment.type,
+          default: {
+            type: ENV_TYPE.TESTING,
             trigger_spec,
             secrets: get(values, 'secrets', {}),
+            cd_pipeline_yaml: CD_PIPELINE_YAML,
           },
         },
       },
@@ -123,6 +125,7 @@ const Submit = (props: IProps) => {
             ref: `refs/heads/${ele.branch}`,
             provider: get(values, 'gitType'),
             owner: get(values, 'repo.owner'),
+            file: CD_PIPELINE_YAML,
           });
           setValue('current', index + 1);
           if (res) {

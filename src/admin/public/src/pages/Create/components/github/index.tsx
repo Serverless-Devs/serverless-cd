@@ -4,9 +4,7 @@ import { FORM_ITEM_LAYOUT } from '@/constants';
 import AuthDialog from './AuthDialog';
 import Repo from './Repo';
 import Trigger from './Trigger';
-import Env, { validteEnv } from './Env';
 import ConfigEdit from '@/components/ConfigEdit';
-import { TYPE as ENV_TYPE } from '@/components/EnvType';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -81,18 +79,6 @@ const Github = (props: IProps) => {
         </FormItem>
         <Divider className="mt-32" />
         <div className="text-bold mt-16 mb-16">环境配置</div>
-        <FormItem label="环境" required>
-          <Env
-            {...(init('environment', {
-              initValue: { name: 'default', type: ENV_TYPE.TESTING },
-              rules: [
-                {
-                  validator: validteEnv,
-                },
-              ],
-            }) as any)}
-          />
-        </FormItem>
         <FormItem label="触发方式" required>
           <Trigger repo={getValue('repo')} {...(init('trigger') as any)} />
         </FormItem>
