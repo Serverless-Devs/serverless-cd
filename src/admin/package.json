@@ -6,7 +6,7 @@
   "scripts": {
     "prettier": "cd ../.. && npm run prettier",
     "start": "DEBUG=serverless-cd:* nodemon index.js",
-    "local-start": "node local-run.js"
+    "sqlite-start": "node local-run --filename=s.local-run.sqlite"
   },
   "author": "mamba",
   "license": "ISC",
