@@ -6,7 +6,7 @@
     "@alicloud/console-components": "^1.5.10",
     "@alicloud/console-components-actions": "^1.0.19",
     "@alicloud/console-components-slide-panel": "^2.2.14",
-    "@serverless-cd/trigger-ui": "^0.0.20",
+    "@serverless-cd/trigger-ui": "^0.0.21",
     "@serverless-cd/ui": "^0.0.1-beta.9",
     "@serverless-cd/variable-ui": "^0.0.3",
     "ansi-to-html": "^0.7.2",

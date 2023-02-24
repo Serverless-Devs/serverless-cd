@@ -4,11 +4,13 @@ import { Button, Drawer, Field, Form } from '@alicloud/console-components';
 import PageInfo from '@/components/PageInfo';
 import { Toast } from '@/components/ToastContainer';
 import { updateApp } from '@/services/applist';
-import { get, uniqueId } from 'lodash';
-import Trigger from '@serverless-cd/trigger-ui';
+import { githubBranches } from '@/services/git';
+import { get, isEmpty, uniqueId, map } from 'lodash';
+import Trigger, { valuesFormat } from '@serverless-cd/trigger-ui';
 
 const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, envName }) => {
   const { request, loading } = useRequest(updateApp);
+  const branchReq = useRequest(githubBranches);
   const [visible, setVisible] = useState(false);
   const [triggerKey, setTriggerKey] = useState(uniqueId());
   const field = Field.useField();
@@ -20,7 +22,7 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, en
       if (errors) return;
       const environment = get(data, 'environment');
       environment[envName].trigger_spec = {
-        [provider]: values['trigger'],
+        [provider]: valuesFormat(values['trigger']),
       };
       const { success } = await request({ environment, appId, provider });
       if (success) {
@@ -45,6 +47,20 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, en
   useEffect(() => {
     setTriggerKey(uniqueId());
   }, [triggerSpec]);
+
+  useEffect(() => {
+    if (visible) {
+      const { owner, repo_name } = data
+      if (owner && repo_name) branchReq.request({ owner: owner, repo: repo_name });
+    }
+  }, [visible])
+  const getBranchList = () => {
+    if (isEmpty(branchReq.data)) return []
+    const newData = map(branchReq.data, item => (
+      { ...item, label: item.name, value: item.name }
+    ))
+    return newData
+  }
 
   return (
     <PageInfo
@@ -79,6 +95,9 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, en
                     },
                   ],
                 }) as any)}
+                mode='strict'
+                loading={branchReq.loading}
+                branchList={getBranchList()}
                 ref={triggerRef}
               />
             </Form.Item>
