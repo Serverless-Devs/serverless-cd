@@ -6,12 +6,14 @@
   "scripts": {
     "prettier": "cd ../.. && npm run prettier",
     "start": "DEBUG=serverless-cd:* nodemon index.js",
-    "local-start": "node local-run.js"
+    "local-start": "node local-run",
+    "sqlite-start": "node local-run --filename=s.local-run.sqlite",
+    "mysql-start": "node local-run --filename=s.local-run.mysql"
   },
   "author": "mamba",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^4.8.1",
+    "@prisma/client": "^4.10.1",
     "@serverless-cd/config": "^0.0.13",
     "@serverless-cd/core": "^0.0.15",
     "@serverless-cd/git": "^0.0.2",
@@ -35,6 +37,6 @@
   "devDependencies": {
     "@serverless-devs/core": "^0.1.53",
     "nodemon": "^2.0.19",
-    "prisma": "^4.8.1"
+    "prisma": "^4.10.1"
   }
 }

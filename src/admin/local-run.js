@@ -4,24 +4,34 @@ const { spawnSync } = require('child_process');
 const _ = core.lodash;
 const fs = core.fse;
 
-const getSPath = () => {
-  let sPath = path.join(process.cwd(), 's.yaml');
+const getYamlName = () => {
+  for (const arg of process.argv) {
+    if (arg.trim().startsWith('--filename=')) {
+      return arg.trim().split('=')[1];
+    }
+  }
+  return 's';
+}
+
+const getYamlPath = () => {
+  const yamlName = getYamlName();
+  let sPath = path.join(process.cwd(), `${yamlName}.yaml`);
   if (fs.existsSync(sPath)) {
     return sPath;
   }
-  sPath = path.join(process.cwd(), 's.yml');
+  sPath = path.join(process.cwd(), `${yamlName}.yml`);
   if (fs.existsSync(sPath)) {
     return sPath;
   }
-  sPath = path.join(process.cwd(), '..', 's.yaml');
+  sPath = path.join(process.cwd(), '..', `${yamlName}.yaml`);
   if (fs.existsSync(sPath)) {
     return sPath;
   }
-  sPath = path.join(process.cwd(), '..', 's.yml');
+  sPath = path.join(process.cwd(), '..', `${yamlName}.yml`);
   if (fs.existsSync(sPath)) {
     return sPath;
   }
-  console.warn('没有找到 s yaml 文件');
+  console.warn('没有找到 yaml 文件');
 }
 
 const parseYaml = async (sPath) => {
@@ -63,11 +73,27 @@ const parseYaml = async (sPath) => {
     _.merge(process.env, cred);
   }
 
+  const { DATABASE_URL: databaseUrl } = process.env;
+  if (databaseUrl) {
+    if (databaseUrl.startsWith('${env.')) {
+      throw new Error('请先设置环境变量 DATABASE_URL 用于链接 mysql 数据库');
+    }
+    if (databaseUrl.startsWith('file:')) {
+      let filePath = databaseUrl.replace('file:', '');
+      if (!path.isAbsolute(filePath)) {
+        filePath = path.resolve(process.cwd(), filePath);
+        process.env.DATABASE_URL = `file:${filePath}`;
+      }
+    }
+  } else {
+    throw new Error('请先设置环境变量 DATABASE_URL 用于链接 mysql 数据库');
+  }
+
   return parsedObj;
 }
 
 (async function () {
-  const sPath = getSPath();
+  const sPath = getYamlPath();
   console.debug(`获取到 s yaml 路径: ${sPath}`);
   if (sPath) {
     const parsedObj = await parseYaml(sPath);
@@ -90,5 +116,3 @@ const parseYaml = async (sPath) => {
     stdio: 'inherit',
   });
 })()
-
-// region 、 service 和 function
