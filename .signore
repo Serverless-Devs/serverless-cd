@@ -6,6 +6,8 @@ src/example
 .s
 /s.yaml
 /src/s.dev.yaml
+/src/s.local-run.sqlite.yaml
+/src/s.local-run.mysql.yaml
 /src/serverless-cd.yaml
 /Makefile
 /package.json
@@ -18,3 +20,6 @@ _mock
 .prettierignore
 prettier.config.js
 serverless-pipeline.yaml
+
+dev.db
+dev.db-journal

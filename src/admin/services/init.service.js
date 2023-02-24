@@ -27,7 +27,7 @@ const DB_TYPE = {
     fs.ensureDirSync(path.dirname(filePath));
     await fs.outputFile(filePath, '');
     console.log('invoke end: ', fs.pathExistsSync(filePath));
-    spawnSync('npm i @prisma/engines@4.9.0 --registry=https://registry.npmmirror.com --force', {
+    spawnSync('npm i @prisma/engines@4.9.0 --no-save --registry=https://registry.npmmirror.com --force', {
       encoding: 'utf8',
       stdio: 'inherit',
       shell: true,
@@ -39,7 +39,7 @@ const DB_TYPE = {
     });
   },
   mysql: async () => {
-    spawnSync('npm i @prisma/engines@4.9.0 --registry=https://registry.npmmirror.com --force', {
+    spawnSync('npm i @prisma/engines@4.9.0 --no-save --registry=https://registry.npmmirror.com --force', {
       encoding: 'utf8',
       stdio: 'inherit',
       shell: true,
