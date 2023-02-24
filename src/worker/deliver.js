@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const { default: Client } = require('@alicloud/fc-open20210406');
 const { CREDENTIALS, FC: { workerFunction }, TASK_STATUS } = require('@serverless-cd/config');
-const { updateAppById, getTask, makeTask } = require('./model');
+const { updateAppEnvById, getTask, makeTask } = require('./model');
 
 const { RUNNING, FAILURE: FAILED_STATUS } = TASK_STATUS;
 
@@ -90,10 +90,10 @@ async function handler(event, context, callback) {
   if (statefulAsyncInvocationStatus === 'Failed') {
     const appTaskConfig = { taskId, commit, message, ref };
 
-    _.set(environment, `[${envName}].latest_task`, {
+    const latestTask = {
       ...appTaskConfig, completed: true, status: FAILED_STATUS
-    });
-    await updateAppById(appId, { environment });
+    };
+    await updateAppEnvById(appId, envName, latestTask);
 
     let makeTaskPayload = {};
     const dbConfig = await getTask(taskId);

@@ -36,7 +36,7 @@ async function invokeFunction(trigger_payload) {
   );;
 }
 
-async function redeploy(dispatchOrgId, { taskId, appId } = {}) {
+async function redeploy(dispatchOrgId, orgName, { taskId, appId } = {}) {
   if (_.isEmpty(taskId)) {
     throw new ValidationError('taskId 必填');
   }
@@ -49,25 +49,45 @@ async function redeploy(dispatchOrgId, { taskId, appId } = {}) {
     throw new ValidationError('没有查到部署信息');
   }
 
+  const trigger_payload = _.get(taskResult, 'trigger_payload');
+  const envName = _.get(trigger_payload, 'envName', '');
+  if (_.isEmpty(envName)) {
+    throw new ValidationError('没有找到被触发的环境名称');
+  }
+
   const applicationResult = await applicationService.getAppById(appId);
   if (_.isEmpty(applicationResult)) {
     throw new ValidationError('没有查到应用信息');
   }
+  const { owner, provider, environment, owner_org_id } = applicationResult;
+  // 设置新的环境信息
+  if (_.isEmpty(environment[envName])) {
+    throw new ValidationError(`当前不存在${envName}环境`);
+  }
+  _.unset(environment, 'latest_task');
+  _.set(trigger_payload, 'environment', environment);
 
-  const trigger_payload = _.get(taskResult, 'trigger_payload');
   // 重新设置新的 task id
   const newTaskId = unionToken();
   _.set(trigger_payload, 'redelivery', taskId);
   _.set(trigger_payload, 'taskId', newTaskId);
-  // 设置新的环境信息
-  const environment = _.merge(_.get(applicationResult, 'environment', {}), trigger_payload.environment || {});
-  _.set(trigger_payload, 'environment', environment);
-  _.set(trigger_payload, 'authorization.dispatchOrgId', dispatchOrgId);
-  // 设置新的Secrets信息
-  const ownerOrgData = await orgModel.getOrgById(applicationResult.owner_org_id);
-  const ownerSecrets = _.get(ownerOrgData, 'secrets', {});
-  const secrets = _.merge(ownerSecrets, _.get(environment, `${trigger_payload.envName}.secrets`, {}))
-  _.set(trigger_payload, 'authorization.secrets', secrets);
+
+  // 设置新的auth信息
+  const ownerOrgData = await orgModel.getOrgById(owner_org_id);
+
+  const ownerSecrets = _.get(ownerOrgData, 'secrets') || {};
+  const appSecrets = _.get(environment, `${envName}.secrets`) || {};
+
+
+  const userResult = await orgService.getOwnerUserByName(orgName);
+  const providerToken = _.get(userResult, `third_part.${provider}.access_token`, '');
+  _.merge(trigger_payload.authorization, {
+    secrets: _.merge(ownerSecrets, appSecrets),
+    dispatchOrgId,
+    owner,
+    accessToken: providerToken,
+  });
+
   // 调用函数
   const asyncInvokeRes = await invokeFunction(trigger_payload);
   return {

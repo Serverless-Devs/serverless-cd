@@ -10,8 +10,8 @@ const dispatchService = require('../../services/dispatch.service');
 //  重新 / 回滚
 //  body: { taskId, appId }
 router.post('/redeploy', auth(ADMIN_ROLE_KEYS), async function (req, res) {
-  const { orgId, body } = req;
-  const result = await dispatchService.redeploy(orgId, body);
+  const { orgId, orgName, body } = req;
+  const result = await dispatchService.redeploy(orgId, orgName, body);
   res.json(Result.ofSuccess(result));
 });
 

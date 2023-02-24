@@ -44,16 +44,16 @@ const getTaskInfo = (result) => {
  * @param {*} id 
  * @returns 
  */
-async function updateAppById(id, data) {
+async function updateAppEnvById(id, envName, latestTask) {
   const result = await applicationPrisma.findUnique({ where: { id } });
   if (_.isEmpty(result)) {
     throw new Error(`Not found app with id ${id}`);
   }
-
-  if (_.isPlainObject(data.environment)) {
-    data.environment = JSON.stringify(data.environment);
-  }
-  return applicationPrisma.update({ where: { id }, data });
+  result.environment = _.isString(result.environment) ? JSON.parse(result.environment) : result.environment;
+  _.set(result, `environment.[${envName}].latest_task`, latestTask);
+  result.environment = JSON.stringify(result.environment);
+  console.log('result: ', result);
+  return applicationPrisma.update({ where: { id }, data: result });
 }
 
 
@@ -89,7 +89,7 @@ async function makeTask(id, data = {}) {
 }
 
 module.exports = {
-  updateAppById,
+  updateAppEnvById,
   makeTask,
   getTask,
 }

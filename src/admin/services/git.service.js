@@ -81,7 +81,7 @@ async function getBranches(orgId, provider, query) {
 
 async function checkProviderFile(orgId, provider, body = {}) {
   const token = await getProviderToken(orgId, provider);
-  return await checkFile({ ...body, token, file: CD_PIPELINE_YAML });
+  return await checkFile({ file: CD_PIPELINE_YAML, ...body, token });
 }
 
 async function putFile(orgId, provider, body) {
