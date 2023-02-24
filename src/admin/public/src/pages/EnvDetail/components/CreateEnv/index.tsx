@@ -1,7 +1,7 @@
 import React, { FC, useRef, useEffect } from 'react';
 import { useRequest } from 'ice';
 import SlidePanel from '@alicloud/console-components-slide-panel';
-import { Form, Field } from '@alicloud/console-components';
+import { Form, Field, Input } from '@alicloud/console-components';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import Trigger, { valuesFormat } from '@serverless-cd/trigger-ui';
 import { updateApp } from '@/services/applist';
@@ -11,6 +11,7 @@ import ConfigEdit from '@/components/ConfigEdit';
 import { TYPE as ENV_TYPE } from '@/components/EnvType';
 import { Toast } from '@/components/ToastContainer';
 import { get, keys, isEmpty, map } from 'lodash';
+import { getConsoleConfig } from '@/utils';
 
 const FormItem = Form.Item;
 
@@ -29,13 +30,14 @@ const CreateEnv: FC<IProps> = (props) => {
   const { init, resetToDefault, validate } = field;
   const triggerRef: any = useRef(null);
   const secretsRef: any = useRef(null);
+  const CD_PIPELINE_YAML = getConsoleConfig('CD_PIPELINE_YAML', 'serverless-pipeline.yaml');
 
   useEffect(() => {
     if (visible) {
-      const { owner, repo_name } = data
+      const { owner, repo_name } = data;
       if (owner && repo_name) branchReq.request({ owner: owner, repo: repo_name });
     }
-  }, [visible])
+  }, [visible]);
 
   const handleClose = () => {
     resetToDefault();
@@ -59,6 +61,7 @@ const CreateEnv: FC<IProps> = (props) => {
           trigger_spec: {
             [provider]: valuesFormat(values['trigger']),
           },
+          cd_pipeline_yaml: values['cd_pipeline_yaml'],
         },
       };
       const { success } = await request({ environment, appId, provider });
@@ -72,12 +75,14 @@ const CreateEnv: FC<IProps> = (props) => {
   };
 
   const getBranchList = () => {
-    if (isEmpty(branchReq.data)) return []
-    const newData = map(branchReq.data, item => (
-      { ...item, label: item.name, value: item.name }
-    ))
-    return newData
-  }
+    if (isEmpty(branchReq.data)) return [];
+    const newData = map(branchReq.data, (item) => ({
+      ...item,
+      label: item.name,
+      value: item.name,
+    }));
+    return newData;
+  };
 
   return (
     <>
@@ -109,7 +114,21 @@ const CreateEnv: FC<IProps> = (props) => {
             />
           </FormItem>
           <FormItem label="触发方式" required>
-            <Trigger {...(init('trigger') as any)} mode='strict' loading={branchReq.loading} branchList={getBranchList()} ref={triggerRef} />
+            <Trigger
+              {...(init('trigger') as any)}
+              mode="strict"
+              loading={branchReq.loading}
+              branchList={getBranchList()}
+              ref={triggerRef}
+            />
+          </FormItem>
+          <FormItem label="指定yaml">
+            <Input
+              {...init('cd_pipeline_yaml', {
+                initValue: CD_PIPELINE_YAML,
+                rules: [{ required: true, message: '请输入yaml文件名称' }],
+              })}
+            />
           </FormItem>
           <FormItem label="Secrets">
             <ConfigEdit {...init('secrets')} ref={secretsRef} />
