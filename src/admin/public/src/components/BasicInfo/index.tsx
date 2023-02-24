@@ -10,7 +10,7 @@ type Item = {
 
 type Props = {
   items: Item[];
-  title: any;
+  title?: any;
   sizePerRow?: number;
   padding?: string;
   editButton?: any;

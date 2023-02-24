@@ -11,6 +11,7 @@ import SecretConfig from './components/SecretCofing';
 import TriggerConfig from './components/TriggerConfig';
 import CreateEnv from './components/CreateEnv';
 import { Toast } from '@/components/ToastContainer';
+import BasicInfo from '@/components/BasicInfo';
 
 const Details = ({
   match: {
@@ -136,6 +137,15 @@ const Details = ({
           appId={appId}
           refreshCallback={handleRefresh}
           envName={envName}
+        />
+        <BasicInfo
+          items={[
+            {
+              text: '指定yaml',
+              value: get(detailInfo, `data.environment.${envName}.cd_pipeline_yaml`),
+            },
+          ]}
+          sizePerRow={2}
         />
         <hr className="mb-20" />
         <SecretConfig

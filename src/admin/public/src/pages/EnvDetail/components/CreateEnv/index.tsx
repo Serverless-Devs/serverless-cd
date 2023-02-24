@@ -122,7 +122,7 @@ const CreateEnv: FC<IProps> = (props) => {
               ref={triggerRef}
             />
           </FormItem>
-          <FormItem label="指定yaml">
+          <FormItem label="指定yaml" required>
             <Input
               {...init('cd_pipeline_yaml', {
                 initValue: CD_PIPELINE_YAML,
