@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Select, Input } from '@alicloud/console-components';
+import { Select, Input, Form, Radio } from '@alicloud/console-components';
 import { map, noop, isEmpty, find } from 'lodash';
 import { githubBranches } from '@/services/git';
 import { useRequest } from 'ice';
 import { IRepoItem } from './Repo';
 import { PUSH, DEFAULT_NEW_BRANCH } from '../constant';
+import { FORM_ITEM_LAYOUT } from '@/constants';
 
-const { Row, Col } = Grid;
+const RadioGroup = Radio.Group;
 
 interface IProps {
   value?: IInfo;
@@ -66,19 +67,18 @@ const Trigger = (props: IProps) => {
   };
 
   return (
-    <Row gutter={16} className="mb-8">
-      <Col span="12">
-        <Select
-          className="full-width"
+    <Form {...FORM_ITEM_LAYOUT}>
+      <Form.Item label="触发条件" required>
+        <RadioGroup
+          size="medium"
           value={info.push}
-          onChange={(value) => handleChangeValue('push', value)}
-          dataSource={[
-            { label: 'Push代码到新分支', value: PUSH.NEW },
-            { label: 'Push代码到指定分支', value: PUSH.SPECIFY },
-          ]}
-        />
-      </Col>
-      <Col span="12">
+          onChange={(value: string) => handleChangeValue('push', value)}
+        >
+          <Radio value={PUSH.NEW}>Push代码到新分支</Radio>
+          <Radio value={PUSH.SPECIFY}>Push代码到指定分支</Radio>
+        </RadioGroup>
+      </Form.Item>
+      <Form.Item label="触发分支" required>
         {info.push === PUSH.SPECIFY ? (
           <Select
             className="full-width"
@@ -96,8 +96,8 @@ const Trigger = (props: IProps) => {
         ) : (
           <Input value={info.branch} disabled className="full-width" />
         )}
-      </Col>
-    </Row>
+      </Form.Item>
+    </Form>
   );
 };
 

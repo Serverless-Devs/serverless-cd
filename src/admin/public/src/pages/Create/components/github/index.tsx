@@ -82,9 +82,7 @@ const Github = (props: IProps) => {
         </FormItem>
         <Divider className="mt-32" />
         <div className="text-bold mt-16 mb-16">环境配置</div>
-        <FormItem label="触发方式" required>
-          <Trigger repo={getValue('repo')} {...(init('trigger') as any)} />
-        </FormItem>
+        <Trigger repo={getValue('repo')} {...(init('trigger') as any)} />
         {get(getValue('trigger'), 'push') === PUSH.SPECIFY && (
           <>
             <FormItem label="立即部署">
