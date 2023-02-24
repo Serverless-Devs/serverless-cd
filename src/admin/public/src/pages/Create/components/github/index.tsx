@@ -1,10 +1,12 @@
 import React, { useRef } from 'react';
-import { Form, Radio, Field, Input, Divider } from '@alicloud/console-components';
+import { Form, Radio, Field, Input, Divider, Switch } from '@alicloud/console-components';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import AuthDialog from './AuthDialog';
 import Repo from './Repo';
 import Trigger from './Trigger';
 import ConfigEdit from '@/components/ConfigEdit';
+import { PUSH } from '../constant';
+import { get } from 'lodash';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -19,6 +21,7 @@ const Github = (props: IProps) => {
   const secretsRef: any = useRef(null);
 
   const secretsValidator = async (_, value, callback) => {
+    if (get(getValue('trigger'), 'push') === PUSH.NEW) return callback();
     let res = await secretsRef.current.validate();
     if (!res) return callback('error');
     callback();
@@ -82,14 +85,21 @@ const Github = (props: IProps) => {
         <FormItem label="触发方式" required>
           <Trigger repo={getValue('repo')} {...(init('trigger') as any)} />
         </FormItem>
-        <FormItem label="Secrets" help="">
-          <ConfigEdit
-            {...init('secrets', {
-              rules: [{ validator: secretsValidator }],
-            })}
-            ref={secretsRef}
-          />
-        </FormItem>
+        {get(getValue('trigger'), 'push') === PUSH.SPECIFY && (
+          <>
+            <FormItem label="立即部署">
+              <Switch {...init('deployEnable', { valueName: 'checked', initValue: true })} />
+            </FormItem>
+            <FormItem label="Secrets" help="">
+              <ConfigEdit
+                {...init('secrets', {
+                  rules: [{ validator: secretsValidator }],
+                })}
+                ref={secretsRef}
+              />
+            </FormItem>
+          </>
+        )}
       </Form>
     </>
   );

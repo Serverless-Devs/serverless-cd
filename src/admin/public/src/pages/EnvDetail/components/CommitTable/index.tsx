@@ -17,7 +17,7 @@ interface IProps {
   latestTaskId?: string;
 }
 
-const PAGE_SIZE = 2;
+const PAGE_SIZE = 10;
 
 const CommitTable: FC<IProps> = (props) => {
   const { appId, latestTaskId, envName, orgName } = props;
