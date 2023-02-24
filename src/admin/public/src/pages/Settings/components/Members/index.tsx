@@ -6,6 +6,7 @@ import Actions, { LinkButton } from '@alicloud/console-components-actions';
 import AddMember from './components/AddMember';
 import { Toast } from '@/components/ToastContainer';
 import { ROLE, ROLE_LABEL } from '@/constants';
+import { map } from 'lodash';
 
 function Members() {
   const { data, request, refresh, loading } = useRequest(listUsers);
@@ -71,7 +72,7 @@ function Members() {
   return (
     <div className="mt-16">
       <div className="flex-r mb-16">
-        <AddMember callback={refresh}>
+        <AddMember callback={refresh} existUsers={map(data, (item) => item.username)}>
           <Button type="primary">添加成员</Button>
         </AddMember>
         <Button onClick={refresh}>

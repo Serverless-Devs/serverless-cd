@@ -15,3 +15,8 @@ export const updateUserProviderToken = async (params) => {
     data: params,
   });
 };
+
+export const getContainsName = async (params) => {
+  const res = await request.get('/api/user/containsName', { params });
+  return res.data;
+};
