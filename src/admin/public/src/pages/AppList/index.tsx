@@ -104,7 +104,7 @@ const AppList = ({
         if (success) {
           Toast.success('应用删除成功');
           await sleep(800);
-          history?.push(`/${orgName}/application`);
+          history?.push(`/${orgName}`);
         }
         dialog.hide();
       },

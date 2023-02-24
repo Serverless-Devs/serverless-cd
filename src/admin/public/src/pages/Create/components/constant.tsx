@@ -3,6 +3,13 @@ export enum CREATE_TYPE {
   Repository = 'repository',
 }
 
+export enum PUSH {
+  SPECIFY = 'specify',
+  NEW = 'new',
+}
+
+export const DEFAULT_NEW_BRANCH = 'serverless-cd-project-setup';
+
 export enum TRIGGER_TYPE {
   PUSH = 'push',
   RELEASE = 'release',
