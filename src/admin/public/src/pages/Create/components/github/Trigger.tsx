@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Select, Input } from '@alicloud/console-components';
-import { map, noop, isEmpty } from 'lodash';
+import { map, noop, isEmpty, find } from 'lodash';
 import { githubBranches } from '@/services/git';
 import { useRequest } from 'ice';
 import { IRepoItem } from './Repo';
@@ -17,6 +17,7 @@ interface IProps {
 export interface IInfo {
   push: `${PUSH}`;
   branch: string;
+  commit_sha?: string;
 }
 
 const Trigger = (props: IProps) => {
@@ -36,9 +37,17 @@ const Trigger = (props: IProps) => {
     : value;
   const [info, setInfo] = useState<IInfo>(newVal);
 
-  useEffect(() => {
+  const doRepoChange = async () => {
     setInfo(defaultValue);
-    !isEmpty(repo) && request({ owner: repo.owner, repo: repo.name });
+    if (!isEmpty(repo)) {
+      const res = await request({ owner: repo.owner, repo: repo.name });
+      const commitObj = find(res, (obj) => obj.name === repo.default_branch);
+      onChange({ ...info, commit_sha: commitObj?.commit_sha });
+    }
+  };
+
+  useEffect(() => {
+    doRepoChange();
   }, [JSON.stringify(repo)]);
 
   useEffect(() => {
