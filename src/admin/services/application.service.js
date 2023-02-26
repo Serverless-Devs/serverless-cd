@@ -1,7 +1,8 @@
 const _ = require('lodash');
+const core = require('@serverless-devs/core');
 const debug = require('debug')('serverless-cd:application');
-const { ROLE } = require('@serverless-cd/config');
-
+const path = require('path');
+const fs = require('fs-extra');
 const { ValidationError, unionId } = require('../util');
 const appModel = require('../models/application.mode');
 const taskModel = require('../models/task.mode');
@@ -33,7 +34,15 @@ async function preview(body = {}) {
 async function create(orgId, orgName, providerToken, body) {
   await preview(body);
 
-  const { repo, owner, repo_url, provider_repo_id: providerRepoId, description, provider, environment } = body;
+  const {
+    repo,
+    owner,
+    repo_url,
+    provider_repo_id: providerRepoId,
+    description,
+    provider,
+    environment,
+  } = body;
   const appId = unionId();
   const webHookSecret = unionId();
   debug('start add webhook');
@@ -55,6 +64,79 @@ async function create(orgId, orgName, providerToken, body) {
   });
   debug('create app success');
   return { id: appId };
+}
+async function createByTemplate({ type, userId, orgId, orgName }, body) {
+  const { provider, appId: oldAppId, owner, repo } = body;
+  const appId = oldAppId || unionId();
+  const execDir = `/tmp/${appId}`;
+  // 1. 初始化模版
+  if (type === 'initTemplate') {
+    const { template, parameters = {} } = req.body;
+    if (_.isEmpty(template)) {
+      throw new ParamsValidationError('参数校验失败，template必填 ');
+    }
+    await appService.initTemplate({
+      template,
+      parameters,
+      execDir,
+      appName: appId,
+      access: 'default',
+    });
+    debug('init template');
+    return { appId };
+  }
+  // 2. 初始化Repo
+  if (type === 'initRepo') {
+    const token = await userService.getProviderToken(orgId, userId, provider);
+    await gitService.createRepoWithWebhook({
+      owner,
+      repo,
+      token,
+      secret: unionId(),
+      appId,
+      provider,
+    });
+    return { appId, webhookSecret };
+  }
+  // 3. 初始化commit信息
+  if (type === 'initCommit') {
+    await gitService.initAndCommit({
+      provider,
+      execDir,
+      repoUrl: `https://${provider}.com/${owner}/${repo}.git`,
+      branch: 'master',
+    });
+    return {};
+  }
+  // 4. 提交代码
+  if (type === 'push') {
+    await push({
+      execDir,
+      branch: 'master',
+    });
+    return {};
+  }
+
+  // 5. 创建应用
+  if (type === 'createApp') {
+    const { repo_url, provider_repo_id: providerRepoId, description, environment } = body;
+    const ownerOrg = await orgModel.getOwnerOrgByName(orgName);
+    await appModel.createApp({
+      id: appId,
+      org_id: orgId,
+      owner_org_id: _.get(ownerOrg, 'id'),
+      description,
+      owner,
+      provider,
+      environment,
+      provider_repo_id: providerRepoId,
+      repo_name: repo,
+      repo_url,
+      webhook_secret: webHookSecret,
+    });
+  }
+
+  throw new ValidationError('请求路径不正确');
 }
 
 async function getAppById(appId = '') {
@@ -118,10 +200,27 @@ async function transfer(appId, transferOrgName) {
   if (_.isEmpty(transferOrgId)) {
     throw new ValidationError(`没有找到 ${transferOrgName} 团队`);
   }
-  await update(appId, { org_id: transferOrgId, owner_org_id: transferOrgId })
+  await update(appId, { org_id: transferOrgId, owner_org_id: transferOrgId });
+}
+
+/**
+ * 初始化模版
+ */
+async function initTemplate({ template, parameters, execDir, appName }) {
+  await fs.remove(execDir);
+  debug(`Init template: ${(template, parameters, execDir, appName)}`);
+  await core.loadApplication({
+    source: template,
+    target: path.dirname(execDir),
+    name: path.basename(execDir),
+    parameters,
+    appName,
+    access: 'default',
+  });
 }
 
 module.exports = {
+  initTemplate,
   preview,
   listByOrgName,
   create,
@@ -130,4 +229,5 @@ module.exports = {
   remove,
   removeEnv,
   getAppById,
+  createByTemplate,
 };

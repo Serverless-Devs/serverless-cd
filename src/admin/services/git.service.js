@@ -1,12 +1,14 @@
 const debug = require('debug')('serverless-cd:git');
 const git = require('@serverless-cd/git-provider');
-const { checkFile } = require('@serverless-cd/git');
+const { checkFile, initConfig, addCommit, setRemote } = require('@serverless-cd/git');
 const { CD_PIPELINE_YAML } = require('@serverless-cd/config');
-const _ = require('lodash');
-
 const userService = require('./user.service');
+const path = require('path');
 const appService = require('./application.service');
+const webhookService = require('./webhook.service');
 const { ValidationError } = require('../util');
+const _ = require('lodash');
+const { fs } = require('@serverless-cd/core');
 
 async function getProviderToken(orgId, provider) {
   // 获取 owner 代码仓库的 token
@@ -18,65 +20,44 @@ async function getProviderToken(orgId, provider) {
   return token;
 }
 
-async function getProviderOrgs(orgId, provider) {
+async function getProviderClient(orgId, provider) {
   const token = await getProviderToken(orgId, provider);
-  const providerClient = git(provider, { access_token: token });
-  try {
-    return await providerClient.listOrgs();
-  } catch (err) {
-    if (err.code === 401 && err.message === 'Bad credentials') {
-      throw new ValidationError(`${provider} token 无效，请重新配置`);
-    }
-    throw err;
-  }
+  return git(provider, { access_token: token });
+}
+
+async function getProviderOrgs(orgId, provider) {
+  const providerClient = await getProviderClient(orgId, provider);
+  return await providerClient.listOrgs();
 }
 
 async function getProviderRepos(orgId, orgName, provider, { org } = {}) {
-  const token = await getProviderToken(orgId, provider);
-  const providerClient = git(provider, { access_token: token });
-
+  const providerClient = await getProviderClient(orgId, provider);
   const applicationResult = await appService.listByOrgName(orgName);
 
-  try {
-    let rows;
-    if (org) {
-      rows = await providerClient.listOrgRepos(org);
-    } else {
-      rows = await providerClient.listRepos();
-    }
-
-    if (!_.isEmpty(applicationResult)) {
-      return _.map(rows, (item) => {
-        for (const applicationItem of applicationResult) {
-          if (item.id === Number(applicationItem.provider_repo_id)) {
-            item.disabled = true;
-            return item;
-          }
-        }
-        return item;
-      });
-    }
-    return rows;
-  } catch (err) {
-    if (err.code === 401 && err.message === 'Bad credentials') {
-      throw new ValidationError(`${provider} token 无效，请重新配置`);
-    }
-    throw err;
+  let rows;
+  if (org) {
+    rows = await providerClient.listOrgRepos(org);
+  } else {
+    rows = await providerClient.listRepos();
   }
+
+  if (!_.isEmpty(applicationResult)) {
+    return _.map(rows, (item) => {
+      for (const applicationItem of applicationResult) {
+        if (item.id === Number(applicationItem.provider_repo_id)) {
+          item.disabled = true;
+          return item;
+        }
+      }
+      return item;
+    });
+  }
+  return rows;
 }
 
 async function getBranches(orgId, provider, query) {
-  const token = await getProviderToken(orgId, provider);
-  const providerClient = git(provider, { access_token: token });
-
-  try {
-    return await providerClient.listBranches(query);
-  } catch (err) {
-    if (err.code === 401 && err.message === 'Bad credentials') {
-      throw new ValidationError(`${provider} token 无效，请重新配置`);
-    }
-    throw err;
-  }
+  const providerClient = await getProviderClient(orgId, provider);
+  return await providerClient.listBranches(query);
 }
 
 async function checkProviderFile(orgId, provider, body = {}) {
@@ -86,8 +67,7 @@ async function checkProviderFile(orgId, provider, body = {}) {
 
 async function putFile(orgId, provider, body) {
   const { owner, repo, ref, sha } = body;
-  const token = await getProviderToken(orgId, provider);
-  const providerClient = git(provider, { access_token: token });
+  const providerClient = await getProviderClient(orgId, provider);
   // TODO: 直接创建分支，后续守帅会优化
   try {
     // TODO: 如果分支存在，创建会报错
@@ -101,16 +81,68 @@ async function putFile(orgId, provider, body) {
 
 async function getUser(provider, access_token) {
   const providerClient = git(provider, { access_token });
-
-  try {
-    return await providerClient.user();
-  } catch (err) {
-    if (err.code === 401 && err.message === 'Bad credentials') {
-      throw new ValidationError(`${provider} token 无效，请重新配置`);
-    }
-    throw err;
-  }
+  return await providerClient.user();
 }
+
+/**
+ * 创建新的Repo并加上Webhook
+ * 1. create Repo
+ * 2. create Webhook
+ */
+async function createRepoWithWebhook({ owner, repo, token, secret, appId, provider }) {
+  const providerClient = git(provider, { access_token: token });
+  
+  const hasRepoResult = await providerClient.hasRepo({ owner, repo });
+  if(!_.get(hasRepoResult, 'isExist')) {
+    debug(`Repo not exist, create repo ${(owner, repo)}`);
+    await providerClient.createRepo({ 
+      name: repo,
+      private: false,
+      description: "Create by serverles-cd"
+    });
+  }
+  debug(`Repo is exist`);
+  debug(`Add webhook ${(owner, repo, token, secret, appId, provider)}`);
+  webhookService.add({ owner, repo, token, webHookSecret: secret, appId, provider });
+}
+
+/**
+ * git init
+ * git config
+ * git remote add origin 
+ * 
+ * git add .
+ * git commit
+ * @param {*} param0 
+ */
+async function initAndCommit({ provider, repoUrl, execDir, branch }) {
+  const gitClient = null;
+  if(!fs.existsSync(path.join(execDir, '.git'))) {
+    debug("git init config");
+    gitClient = await initConfig({
+      userName: 'serverless-cd',
+      userEmail: 'dankun@alibaba-inc.com',
+      execDir,
+    });
+  }
+  debug(`git set remote: ${repoUrl}`);
+  try {
+    await setRemote({
+      provider_platform: provider,
+      repoUrl,
+      execDir,
+    }, gitClient);
+  } catch (error) {
+    // ignore error
+  }
+  
+  debug(`git add and commit`);
+  await addCommit({
+    execDir,
+    branch: branch || 'master',
+  }, gitClient);
+}
+
 
 module.exports = {
   getUser,
@@ -119,4 +151,6 @@ module.exports = {
   getBranches,
   getProviderOrgs,
   getProviderRepos,
+  createRepoWithWebhook,
+  initAndCommit,
 };

@@ -6,6 +6,14 @@ class ValidationError extends Error {
   }
 }
 
+class ParamsValidationError extends Error {
+  code = 'ParamsInvalid';
+  static code = 'ParamsInvalid';
+  constructor(message) {
+    super(message);
+  }
+}
+
 class NotFoundError extends Error {
   code = 'NotFound';
   static code = 'NotFound';
@@ -44,6 +52,7 @@ module.exports = {
   NoAuthError,
   NeedLogin,
   ValidationError,
+  ParamsValidationError,
   NotFoundError,
   NoPermissionError,
 };
