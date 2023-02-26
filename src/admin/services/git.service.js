@@ -85,9 +85,18 @@ async function checkProviderFile(orgId, provider, body = {}) {
 }
 
 async function putFile(orgId, provider, body) {
+  const { owner, repo, ref, sha } = body;
   const token = await getProviderToken(orgId, provider);
   const providerClient = git(provider, { access_token: token });
-  return await providerClient.putFile(body);
+  // TODO: 直接创建分支，后续守帅会优化
+  try {
+    // TODO: 如果分支存在，创建会报错
+    await providerClient.octokit.request('POST /repos/{owner}/{repo}/git/refs', body);
+  } catch (error) {}
+  try {
+    // TODO: 如果文件存在，putFile会报错
+    return await providerClient.putFile(body);
+  } catch (error) {}
 }
 
 async function getUser(provider, access_token) {

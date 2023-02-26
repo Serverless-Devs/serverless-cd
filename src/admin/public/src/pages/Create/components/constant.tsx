@@ -3,6 +3,13 @@ export enum CREATE_TYPE {
   Repository = 'repository',
 }
 
+export enum PUSH {
+  SPECIFY = 'specify',
+  NEW = 'new',
+}
+
+export const DEFAULT_NEW_BRANCH = 'serverless-cd-project-setup';
+
 export enum TRIGGER_TYPE {
   PUSH = 'push',
   RELEASE = 'release',
@@ -29,7 +36,7 @@ export const SERVERLESS_PIPELINE_CONTENT = {
       },
     },
     {
-      run: "echo 'Hi {{ task_id }}'",
+      run: "echo 'Hi {{ task.id }}'",
     },
     {
       run: "echo 'Hi {{ git.event_name }}'",
