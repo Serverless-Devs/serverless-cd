@@ -33,9 +33,9 @@ const SecretTable = ({ secretList, loading = false, setSecretList }: Props) => {
           width: '35%',
           cell: (value) => {
             return (
-              <span className="mr-16 copy-trigger">
-                {value} <Copy content={value} size="xs" />
-              </span>
+              <Copy content={value} size="xs">
+                <span className="mr-16">{value}</span>
+              </Copy>
             );
           },
         },
@@ -47,9 +47,9 @@ const SecretTable = ({ secretList, loading = false, setSecretList }: Props) => {
             return (
               <div className="flex-r" style={{ justifyContent: 'flex-start' }}>
                 {item.showPassword ? (
-                  <span className="mr-16 copy-trigger">
-                    {value} <Copy content={value} size="xs" />
-                  </span>
+                  <Copy content={value} size="xs">
+                    <span className="mr-16">{value}</span>
+                  </Copy>
                 ) : (
                   <span className="mr-16">***************</span>
                 )}
