@@ -8,8 +8,9 @@ interface Props {
   size?: any;
   type?: string;
   text?: string;
+  children?: any
 }
-const CopyIcon = ({ content, size = 'medium', type = 'icon', text }: Props) => {
+const CopyIcon = ({ content, size = 'medium', type = 'icon', text, children }: Props) => {
   return (
     <CopyToClipboard
       text={content}
@@ -19,13 +20,16 @@ const CopyIcon = ({ content, size = 'medium', type = 'icon', text }: Props) => {
         }
       }}
     >
-      {type === 'icon' ? (
-        <Icon type="copy" className="cursor-pointer copy-icon" size={size} />
-      ) : (
-        <Button className="mr-8" type="primary" text>
-          {text}
-        </Button>
-      )}
+      <span className={children ? 'copy-trigger' : ''}>
+        {children}
+        {type === 'icon' ? (
+          <Icon type="copy" className="cursor-pointer copy-icon" size={size} />
+        ) : (
+          <Button className="mr-8" type="primary" text>
+            {text}
+          </Button>
+        )}
+      </span>
     </CopyToClipboard>
   );
 };
