@@ -51,7 +51,7 @@ const Repos = (props: IProps) => {
   const [currentRepoType, setCurrentRepoType] = useState('personal');
   const { getValue, setValue, init, getError } = field;
   // owner是否授权
-  const isAuth = get(getValue('gitUser'), 'isAuth', false);
+  const isAuth = Boolean(get(getValue('gitUser'), 'third_part.github.owner'));
 
   useEffect(() => {
     if (!isEmpty(data)) {

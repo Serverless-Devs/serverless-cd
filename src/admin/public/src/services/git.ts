@@ -18,11 +18,9 @@ export const githubBranches = async (params) => {
 };
 
 export const githubPutFile = async (body) => {
-  const { data } = await request.post('/api/github/putFile', body);
-  return data;
+  return await request.post('/api/github/putFile', body);
 };
 
 export const checkFile = async (body) => {
-  const { data } = await request.post('/api/github/checkFile', body);
-  return data;
+  return await request.post('/api/github/checkFile', body);
 };

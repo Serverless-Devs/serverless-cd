@@ -26,16 +26,12 @@ const TransferOrg: FC<IProps> = (props) => {
   const handleOK = async () => {
     validate(async (errors, values) => {
       if (errors) return;
-      try {
-        const { success } = await request({ ...values, orgName: dataSource.name });
-        if (success) {
-          Toast.success('转让组织成功');
-          setVisible(false);
-          resetToDefault();
-          await callback();
-        }
-      } catch (error) {
-        Toast.error(error.message);
+      const { success } = await request({ ...values, orgName: dataSource.name });
+      if (success) {
+        Toast.success('转让组织成功');
+        setVisible(false);
+        resetToDefault();
+        await callback();
       }
     });
   };
