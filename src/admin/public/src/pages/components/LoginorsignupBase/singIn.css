@@ -16,3 +16,9 @@
   border-radius: 5px;
   box-shadow: -2px 4px 26px 0 rgb(0 0 0 / 10%);
 }
+
+.singup-or-rememberme {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

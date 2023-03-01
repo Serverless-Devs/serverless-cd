@@ -13,7 +13,8 @@ datasource db {
 
 model User {
   id    String     @id
-  username String  @unique
+  username String
+  email String?  @unique
   avatar String?
   password String?
   github_unionid String?
