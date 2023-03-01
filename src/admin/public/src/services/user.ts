@@ -11,8 +11,12 @@ export const listOrgs = async () => {
 };
 
 export const updateUserProviderToken = async (params) => {
-  const res = await request.put('/api/user/token', {
+  return await request.put('/api/user/token', {
     data: params,
   });
+};
+
+export const getContainsName = async (params) => {
+  const res = await request.get('/api/user/containsName', { params });
   return res.data;
 };

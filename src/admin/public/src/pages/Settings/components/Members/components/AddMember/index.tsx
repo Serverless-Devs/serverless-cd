@@ -1,10 +1,12 @@
 import React, { FC } from 'react';
 import { useRequest } from 'ice';
 import SlidePanel from '@alicloud/console-components-slide-panel';
-import { Form, Field, Input, Select } from '@alicloud/console-components';
+import { Form, Field, Select } from '@alicloud/console-components';
 import { FORM_ITEM_LAYOUT, ROLE } from '@/constants';
 import { Toast } from '@/components/ToastContainer';
 import { inviteUser, updateAuth } from '@/services/org';
+import { debounce, map, filter, includes } from 'lodash';
+import { getContainsName } from '@/services/user';
 
 const FormItem = Form.Item;
 
@@ -13,16 +15,17 @@ type IProps = {
   type?: 'create' | 'edit';
   callback: () => Promise<any>;
   dataSource?: { inviteUserName: string; role: `${ROLE}` };
+  existUsers?: string[];
 };
 
 const AddMember: FC<IProps> = (props) => {
-  const { children, callback, type = 'create', dataSource } = props;
+  const { children, callback, type = 'create', dataSource, existUsers } = props;
   const { request, loading } = useRequest(type === 'create' ? inviteUser : updateAuth);
   const [visible, setVisible] = React.useState(false);
   const field = Field.useField({
     values: dataSource,
   });
-  const { init, resetToDefault, validate } = field;
+  const { init, resetToDefault, validate, getValue, setValue } = field;
   const handleClose = () => {
     resetToDefault();
     setVisible(false);
@@ -30,18 +33,23 @@ const AddMember: FC<IProps> = (props) => {
   const handleOK = async () => {
     validate(async (errors, values) => {
       if (errors) return;
-      try {
-        const { success } = await request(values);
-        if (success) {
-          Toast.success(type === 'create' ? '添加成员成功' : '编辑成员成功');
-          setVisible(false);
-          resetToDefault();
-          await callback();
-        }
-      } catch (error) {
-        Toast.error(error.message);
+      const { success } = await request(values);
+      if (success) {
+        Toast.success(type === 'create' ? '添加成员成功' : '编辑成员成功');
+        setVisible(false);
+        resetToDefault();
+        await callback();
       }
     });
+  };
+
+  const onChangeUserName = async (value) => {
+    const data = await getContainsName({ containsName: value });
+    const filterUsers = filter(data, (item) => !includes(existUsers, item.username));
+    setValue(
+      'users',
+      map(filterUsers, (item) => ({ label: item.username, value: item.username })),
+    );
   };
 
   return (
@@ -58,16 +66,25 @@ const AddMember: FC<IProps> = (props) => {
       >
         <Form field={field} {...FORM_ITEM_LAYOUT}>
           <FormItem label="用户名称" required>
-            <Input
+            <Select
               disabled={type === 'edit'}
+              showSearch
+              hasClear
+              placeholder="请输入用户名称（模糊搜索）"
+              filterLocal={false}
+              className="full-width"
               {...init('inviteUserName', {
                 rules: [
                   {
                     required: true,
-                    message: '请输入用户名称',
+                    message: '用户名称不能为空',
                   },
                 ],
+                props: {
+                  onSearch: debounce(onChangeUserName, 250, { maxWait: 1000 }),
+                },
               })}
+              dataSource={getValue('users')}
             />
           </FormItem>
           <FormItem label="角色" required>
