@@ -17,10 +17,9 @@ router.post('/signUp', async function (req, res) {
  * 登录
  */
 router.post('/login', async function (req, res) {
-  const { username, password, email } = req.body;
-  const data = await authServices.loginWithPassword({ username, password, email });
+  const { loginname, password } = req.body;
+  const data = await authServices.loginWithPassword({ loginname, password });
   await authServices.setJwt({ userId: data.id }, res);
-  console.log('123123123', data);
   return res.json(Result.ofSuccess(data));
 });
 

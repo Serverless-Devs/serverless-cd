@@ -36,7 +36,7 @@ const SingInupBase = (props) => {
     <React.Fragment>
       <Auth
         title={title}
-        type="LOGINEMAIL"
+        type="LOGIN"
         onSingIn={btnClick}
       >
         <div className="singup-or-rememberme">
