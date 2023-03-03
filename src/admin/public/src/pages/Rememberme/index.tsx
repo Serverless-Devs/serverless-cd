@@ -3,11 +3,11 @@ import { Avatar } from '@alicloud/console-components';
 import { useRequest } from 'ice';
 import { LOGIN_LOGO_URL } from '@/constants/public';
 import { accountSignUp } from '@/services/auth';
-import AccountLoginOrSignUp from '@/pages/components/AccountLoginOrSignUp';
 import AccountSingUp from '@/pages/components/AccountLoginOrSignUp/singUp';
+import AccountLoginRememberMe from '@/pages/components/AccountLoginRememberMe';
 import '@/pages/components/LoginorsignupBase/index.css';
 
-const Login = () => {
+const RememberMe = () => {
   const signUp = useRequest(accountSignUp);
 
   const title = (
@@ -23,19 +23,11 @@ const Login = () => {
   );
   return (
     <div className="session-container">
-      {/* <Avatar
-        style={{ width: 128, height: 'auto' }}
-        icon="account"
-        src={LOGIN_LOGO_URL}
-        shape="square"
-      />
-      <AccountLoginOrSignUp pageType="signUp" request={signUp} /> */}
-      <AccountSingUp
+      <AccountLoginRememberMe
         title={title}
-        request={signUp}
       />
     </div>
   );
 };
 
-export default Login;
+export default RememberMe;

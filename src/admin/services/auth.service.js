@@ -9,7 +9,7 @@ const { md5Encrypt, ValidationError, checkNameAvailable, NoAuthError } = require
 /**
  * 注册用户
  */
-async function initUser({ username, password }) {
+async function initUser({ username, password, email }) {
   if (!checkNameAvailable(username)) {
     throw new ValidationError('用户名称不合法，预期格式：/^[a-zA-Z0-9-_]{1,50}$/');
   }
@@ -17,12 +17,17 @@ async function initUser({ username, password }) {
   if (_.get(data, 'username', '')) {
     throw new ValidationError('用户名已存在');
   }
+  const dataEmail = await userModel.getUserByEmail(email);
+  
+  if (_.get(dataEmail, 'email', '')) {
+    throw new ValidationError('邮箱已存在');
+  }
   const orgData = await orgModel.getOwnerOrgByName(username);
   if (_.get(orgData, 'name', '')) {
     throw new ValidationError('团队名称已存在');
   }
 
-  const { id: userId } = await userModel.createUser({ username, password });
+  const { id: userId } = await userModel.createUser({ username, password, email });
   const { id: orgId } = await orgModel.createOrg({ userId, name: username });
 
   return { userId, orgId };
@@ -31,15 +36,21 @@ async function initUser({ username, password }) {
 /**
  * 通过密码登陆账户
  */
-async function loginWithPassword({ username, password }) {
-  const data = await userModel.getUserByName(username);
+async function loginWithPassword({ loginname, password }) {
+  // 通过账户 / 邮箱 登录
+  // 通过密码登录
+  let data;
+  if (loginname.indexOf('@') > -1) {
+    data = await userModel.getUserByEmail(loginname);
+  } else {
+    data = await userModel.getUserByName(loginname);
+  }
   const isTrue = _.get(data, 'password', '') === md5Encrypt(password);
   if (!isTrue) {
     throw new ValidationError('用户名或密码不正确');
   }
 
-  const { id: userId } = data;
-  return { userId };
+  return data;
 }
 
 /**
