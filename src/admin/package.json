@@ -22,7 +22,7 @@
     "@prisma/client": "^4.10.1",
     "@serverless-cd/config": "^0.0.13",
     "@serverless-cd/core": "^0.0.15",
-    "@serverless-cd/git": "^0.0.3",
+    "@serverless-cd/git": "^0.0.4",
     "@serverless-cd/git-provider": "^0.1.2",
     "@serverless-cd/srm-aliyun-fc2": "^0.0.5",
     "@serverless-devs/core": "^0.1.45",

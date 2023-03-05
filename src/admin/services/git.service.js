@@ -121,7 +121,7 @@ async function initAndCommit({ provider, repoUrl, execDir, branch }) {
     debug("git init config");
     gitClient = await initConfig({
       userName: 'serverless-cd',
-      userEmail: 'dankun@alibaba-inc.com',
+      userEmail: 'serverless@serverless-cd',
       execDir,
     });
   }

@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const core = require('@serverless-devs/core');
+const { push } = require('@serverless-devs/git');
 const debug = require('debug')('serverless-cd:application');
 const path = require('path');
 const fs = require('fs-extra');
@@ -65,6 +66,12 @@ async function create(orgId, orgName, providerToken, body) {
   debug('create app success');
   return { id: appId };
 }
+/**
+ * 幂等
+ * @param {*} param0 
+ * @param {*} body 
+ * @returns 
+ */
 async function createByTemplate({ type, userId, orgId, orgName }, body) {
   const { provider, appId: oldAppId, owner, repo } = body;
   const appId = oldAppId || unionId();
@@ -75,7 +82,7 @@ async function createByTemplate({ type, userId, orgId, orgName }, body) {
     if (_.isEmpty(template)) {
       throw new ParamsValidationError('参数校验失败，template必填 ');
     }
-    await appService.initTemplate({
+    await initTemplate({
       template,
       parameters,
       execDir,
