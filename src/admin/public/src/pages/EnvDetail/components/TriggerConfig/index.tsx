@@ -1,48 +1,36 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useRequest } from 'ice';
-import { Button, Drawer, Field, Form } from '@alicloud/console-components';
+import { Button, Drawer, Field, Form, Input } from '@alicloud/console-components';
 import PageInfo from '@/components/PageInfo';
 import { Toast } from '@/components/ToastContainer';
 import { updateApp } from '@/services/applist';
-import { get, noop, isEmpty, uniqueId } from 'lodash';
-import Trigger from '@serverless-cd/trigger-ui';
-
-export const validateTrigger = (rule, value, callback) => {
-  if (isEmpty(get(value, 'push')) && isEmpty(get(value, 'pr'))) {
-    return callback('请选择触发方式');
-  } else if (
-    isEmpty(get(value, 'push.branches')) &&
-    isEmpty(get(value, 'push.tags')) &&
-    isEmpty(get(value, 'pr.branches'))
-  ) {
-    return callback('触发方式数据填写不完整');
-  }
-  callback();
-};
+import { githubBranches } from '@/services/git';
+import { get, isEmpty, uniqueId, map } from 'lodash';
+import Trigger, { valuesFormat } from '@serverless-cd/trigger-ui';
+import { FORM_ITEM_LAYOUT } from '@/constants';
 
 const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, envName }) => {
   const { request, loading } = useRequest(updateApp);
+  const branchReq = useRequest(githubBranches);
   const [visible, setVisible] = useState(false);
   const [triggerKey, setTriggerKey] = useState(uniqueId());
   const field = Field.useField();
   const { init, resetToDefault, validate } = field;
+  const triggerRef: any = useRef(null);
 
   const onSubmit = () => {
     validate(async (errors, values) => {
       if (errors) return;
       const environment = get(data, 'environment');
       environment[envName].trigger_spec = {
-        [provider]: values['trigger'],
+        [provider]: valuesFormat(values['trigger']),
       };
-      try {
-        const { success } = await request({ environment, appId, provider });
-        if (success) {
-          Toast.success('配置成功');
-          refreshCallback && refreshCallback();
-          setVisible(false);
-        }
-      } catch (error) {
-        Toast.error(error.message);
+      environment[envName].cd_pipeline_yaml = values['cd_pipeline_yaml'];
+      const { success } = await request({ environment, appId, provider });
+      if (success) {
+        Toast.success('配置成功');
+        refreshCallback && refreshCallback();
+        setVisible(false);
       }
     });
   };
@@ -52,9 +40,31 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, en
     resetToDefault();
   };
 
+  const validateTrigger = async (_, value, callback) => {
+    const res = await triggerRef?.current?.validate();
+    if (res) return callback();
+    callback('error');
+  };
+
   useEffect(() => {
     setTriggerKey(uniqueId());
   }, [triggerSpec]);
+
+  useEffect(() => {
+    if (visible) {
+      const { owner, repo_name } = data;
+      if (owner && repo_name) branchReq.request({ owner: owner, repo: repo_name });
+    }
+  }, [visible]);
+  const getBranchList = () => {
+    if (isEmpty(branchReq.data)) return [];
+    const newData = map(branchReq.data, (item) => ({
+      ...item,
+      label: item.name,
+      value: item.name,
+    }));
+    return newData;
+  };
 
   return (
     <PageInfo
@@ -65,10 +75,8 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, en
         </Button>
       }
     >
-      <div className="mt-16 pl-16 pr-32" key={triggerKey}>
-        {triggerSpec[provider] && (
-          <Trigger value={triggerSpec[provider]} onChange={noop} disabled />
-        )}
+      <div className="mt-16" key={triggerKey}>
+        {triggerSpec[provider] && <Trigger.Preview dataSource={triggerSpec[provider]} />}
       </div>
       <Drawer
         title="编辑触发配置"
@@ -80,8 +88,8 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, en
         className="dialog-drawer"
       >
         <div className="dialog-body">
-          <Form field={field}>
-            <Form.Item>
+          <Form field={field} {...FORM_ITEM_LAYOUT}>
+            <Form.Item label="触发条件">
               <Trigger
                 {...(init('trigger', {
                   initValue: triggerSpec[provider],
@@ -91,11 +99,22 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, en
                     },
                   ],
                 }) as any)}
+                mode="strict"
+                loading={branchReq.loading}
+                branchList={getBranchList()}
+                ref={triggerRef}
+              />
+            </Form.Item>
+            <Form.Item label="指定yaml" required>
+              <Input
+                {...init('cd_pipeline_yaml', {
+                  initValue: get(data, `environment.${envName}.cd_pipeline_yaml`),
+                  rules: [{ required: true, message: '请输入yaml文件名称' }],
+                })}
               />
             </Form.Item>
           </Form>
         </div>
-
         <div className="dialog-footer">
           <Button className="mr-10" type="primary" loading={loading} onClick={onSubmit}>
             确定

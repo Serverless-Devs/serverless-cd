@@ -28,7 +28,7 @@ const ProjectCard = ({ item }) => {
   const description = get(item, 'description', '');
   const updated_time = get(item, 'updated_time', '');
   const goDetails = () => {
-    history.push(`/application/${id}/detail`);
+    history.push(`/application/${id}`);
   };
 
   return (

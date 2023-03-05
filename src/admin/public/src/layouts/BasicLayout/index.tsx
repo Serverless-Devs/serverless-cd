@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Shell,
   ConfigProvider,
@@ -53,6 +53,7 @@ interface IBasicLayoutProps {
   location: object | any;
 }
 export function BasicLayout({ children, match, location: { pathname } }: IBasicLayoutProps) {
+  const { orgName } = match.params;
   const getDevice: IGetDevice = (width) => {
     const isPhone =
       typeof navigator !== 'undefined' && navigator && navigator.userAgent.match(/phone/gi);
@@ -72,43 +73,36 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
   const [userState, userDispatchers] = store.useModel('user');
   const avatar = get(userState, 'userInfo.avatar');
   const username = get(userState, 'userInfo.username', '');
-  const showMenu = menuConfig.includes(pathname);
-
-  useEffect(() => {
-    setTimeout(() => {
-      userDispatchers.getUserInfo();
-    }, 500);
-  }, []);
+  // const showMenu = menuConfig.includes(pathname);
+  const showMenu = false;
 
   const menu = () => {
     const onItemClick = (key) => {
-      if (key === 'username') return;
-      if (key === 'logout') {
+      if (key === '/username') return;
+      if (key === '/login') {
         request();
         userDispatchers.removeStateInfo();
-        history?.push('/login');
-        return;
+        return history?.push(key);
       }
-      history?.push(key);
+      if (key === '/organizations') {
+        return history?.push(key);
+      }
+      history?.push(`/${username}${key}`);
     };
     return (
       <Menu className="user-menu" onItemClick={onItemClick}>
-        <Menu.Item key="username">
+        <Menu.Item key="/username">
           <span className="user-name">{username}</span>
         </Menu.Item>
         <Divider key="divider1" className="m-t-b-10" />
-        <Menu.Item key="/" className="m-t-b-10">
-          Dashboard
-        </Menu.Item>
-        <Divider key="divider1" className="m-t-b-10" />
-        <Menu.Item key="/" className="m-t-b-10">
-          Dashboard
-        </Menu.Item>
-        <Menu.Item key="/settings/tokens" className="m-t-b-10">
+        <Menu.Item key="/application">Your repositories</Menu.Item>
+        <Menu.Item key="/organizations">Your organizations</Menu.Item>
+        <Divider key="divider2" className="m-t-b-10" />
+        <Menu.Item key="/settings" className="m-t-b-10">
           Settings
         </Menu.Item>
-        <Divider key="divider3" className="m-t-b-10" />
-        <Menu.Item key="logout">Login Out</Menu.Item>
+        <Divider key="divider4" className="m-t-b-10" />
+        <Menu.Item key="/login">Sign out</Menu.Item>
       </Menu>
     );
   };
@@ -130,7 +124,7 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
         fixedHeader={false}
       >
         <Shell.Branding>
-          <Logo image={LOGO_URL} />
+          <Logo image={LOGO_URL} url={`/${orgName}/application`} />
         </Shell.Branding>
         {match?.path !== '/login' && (
           <Shell.Action>

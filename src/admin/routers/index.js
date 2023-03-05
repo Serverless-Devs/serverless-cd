@@ -2,7 +2,6 @@ const router = require('express').Router();
 const jwtAuth = require('../middleware/jwt-auth');
 const { CD_PIPELINE_YAML, SUPPORT_LOGIN, GITHUB_REDIRECT_URI } = require('@serverless-cd/config');
 const debug = require('debug')('serverless-cd:root');
-const orgService = require('../services/org.service');
 
 router.get('/', jwtAuth, async function (req, res, _next) {
   const config = {
@@ -42,6 +41,10 @@ const defaultRoutes = [
   {
     path: '/github',
     route: require('./code-provider/github'),
+  },
+  {
+    path: '/common',
+    route: require('./common'),
   },
 ];
 

@@ -15,17 +15,24 @@ Service:
   对象存储:
     Authorities:
       - AliyunOSSFullAccess
+  日志服务:
+    Authorities:
+      - AliyunLogFullAccess
 Parameters:
   type: object
   additionalProperties: false # 不允许增加其他属性
   required: # 必填项
     - region
     - serviceName
-    - ossBucket
-    - domain
-    - JWT_SECRET
-    - DATABASE_URL
   properties:
+    prisma:
+      title: 数据库链接类型
+      description: 选择mysql需要配置环境变量DATABASE_URL用于链接数据库
+      type: string
+      default: sqlite
+      enum:
+        - sqlite
+        - mysql
     region:
       title: 地域
       type: string
@@ -46,31 +53,3 @@ Parameters:
       default: serverless-cd
       pattern: "^[a-zA-Z_][a-zA-Z0-9-_]{0,127}$"
       description: 应用所属的函数计算服务, 只能包含字母、数字、下划线和中划线。不能以数字、中划线开头。长度在 1-128 之间
-    ossBucket:
-      title: 对象存储 bucket 名称
-      type: string
-      description: 用于存放执行日志
-    domain:
-      title: 自定义域名
-      type: string
-      default: auto
-      description: 填写auto 系统会生成一个测试域名
-
-    JWT_SECRET:
-      title: 登陆签名密钥
-      type: secret
-      default: auto
-      description: 填写auto系统会生成一个密钥串
-    DATABASE_URL:
-      title: 数据库链接地址
-      type: secret
-      description: 用于链接数据库，示例：mysql://USER:PASSWORD@HOST:PORT/DATABASE
-    # ACCOUNT_ID:
-    #   title: 阿里云
-    #   type: secret
-    # ACCESS_KEY_ID:
-    #   title: 阿里云
-    #   type: secret
-    # ACCESS_KEY_SECRET:
-    #   title: 阿里云
-    #   type: secret

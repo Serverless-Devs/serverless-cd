@@ -8,6 +8,7 @@ import AccountLoginOrSignUp from '@/pages/components/AccountLoginOrSignUp';
 import { accountLogin } from '@/services/auth';
 import { getConsoleConfig, getParams } from '@/utils';
 import '@/pages/components/LoginorsignupBase/index.css';
+import SingInupBase from '@/pages/components/LoginorsignupBase/singIn';
 
 const { github } = getConsoleConfig('SUPPORT_LOGIN', {});
 
@@ -20,16 +21,21 @@ const Login = ({ location: { search } }) => {
   if (isLogin || !github || showLogin) {
     node = <AccountLoginOrSignUp pageType="login" request={login} setIsLogin={setIsLogin} />;
   }
-
-  return (
-    <div className="session-container">
+  const title = (
+    <div style={{ width: '100%', textAlign: 'center', marginBottom: -12 }}>
       <Avatar
         style={{ width: 128, height: 'auto' }}
         icon="account"
         src={LOGIN_LOGO_URL}
         shape="square"
       />
-      {node}
+      <h1>登录 Serverless CD</h1>
+    </div>
+  );
+  return (
+    <div className="session-container">
+      <SingInupBase title={title} request={login} />
+      {/* {node} */}
     </div>
   );
 };

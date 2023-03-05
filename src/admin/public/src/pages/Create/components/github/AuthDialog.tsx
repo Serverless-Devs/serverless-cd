@@ -3,9 +3,9 @@ import { Form, Select, Button, Dialog, Input, Field, Message } from '@alicloud/c
 import store from '@/store';
 import { get, noop, find } from 'lodash';
 import { updateUserProviderToken } from '@/services/user';
+import { ownerUserInfo } from '@/services/org';
 import { useRequest } from 'ice';
 import { FORM_ITEM_LAYOUT } from '@/constants';
-import { Toast } from '@/components/ToastContainer';
 import RefreshIcon from '@/components/RefreshIcon';
 
 const FormItem = Form.Item;
@@ -13,11 +13,16 @@ const FormItem = Form.Item;
 interface IUserInfo {
   avatar: string;
   id: string;
-  isAuth: boolean;
   username: string;
   label: string | ReactNode;
   value: string;
-  github_name: string;
+  third_part: {
+    github: {
+      owner: string;
+      avatar: string;
+      id: number;
+    };
+  };
 }
 
 interface IProps {
@@ -31,73 +36,70 @@ const AuthDialog = (props: IProps) => {
   const [visible, setVisible] = useState(false);
   const [refreshLoading, setRefreshLoading] = useState(false);
   const { loading, request } = useRequest(updateUserProviderToken);
-  const [userState, userDispatchers] = store.useModel('user');
-  const effectsState = store.useModelEffectsState('user');
-
+  const ownerUserInfoRequest = useRequest(ownerUserInfo);
+  const [userState] = store.useModel('user');
   const field = Field.useField();
   const { init, validate, setValue, getValue } = field;
+  const isAuth = Boolean(get(ownerUserInfoRequest.data, 'data.third_part.github.owner'));
+  const isOwner = get(ownerUserInfoRequest.data, 'data.id') === get(userState, 'userInfo.id');
+  useEffect(() => {
+    ownerUserInfoRequest.request();
+  }, []);
 
   useEffect(() => {
-    if (!userState.isAuth) {
+    if (!isAuth) {
       // 重置上层数据
       reset();
       // 重置当前组件的数据
       field.reset();
     }
     fetchUserList();
-  }, [userState.isAuth]);
+  }, [isAuth]);
 
   const fetchUserList = async () => {
-    if (!userState.isAuth) {
+    if (!isAuth) {
       setValue('user_list', []);
       return;
     }
-    const userInfo = userState.userInfo as IUserInfo;
-    const data: IUserInfo[] = [];
-    data.push({
-      ...userInfo,
-      label: (
-        <div className="flex-r">
-          <div className="align-center">
-            {userInfo.avatar ? (
-              <img
-                src={userInfo.avatar}
-                className="ml-4 mr-4"
-                style={{ borderRadius: '50%', height: 20 }}
-              />
-            ) : (
-              <span className="avatar-default-img">
-                {get(userInfo, 'username', '').slice(0, 1)}
-              </span>
-            )}
-            <span>{userInfo.github_name || userInfo.username}</span>
-          </div>
-          <Button className="unbind" type="primary" text onClick={onUnbind}>
-            解绑
-          </Button>
+    const userInfo = get(ownerUserInfoRequest.data, 'data', {}) as IUserInfo;
+    const avatar = get(userInfo, 'third_part.github.avatar', '');
+    const value = get(userInfo, 'third_part.github.owner', '');
+    userInfo.value = value;
+    userInfo.label = (
+      <div className="flex-r">
+        <div className="align-center">
+          {avatar ? (
+            <img src={avatar} className="ml-4 mr-4" style={{ borderRadius: '50%', height: 20 }} />
+          ) : (
+            <span className="avatar-default-img">{value.slice(0, 1)}</span>
+          )}
+          <span>{value}</span>
         </div>
-      ),
-      value: userInfo.github_name || userInfo.username,
-    });
-    setValue('user_list', data);
+        <Button className="unbind" type="primary" text onClick={onUnbind} disabled={!isOwner}>
+          解绑
+        </Button>
+      </div>
+    );
+    setValue('user_list', [userInfo]);
     onChange(userInfo);
   };
 
   const valueRender = ({ value }) => {
     const item = find(getValue('user_list'), (item: IUserInfo) => item.value === value);
     if (!item) return null;
+    const avatar = get(item, 'third_part.github.avatar', '');
     return (
       <div className="align-center">
-        {item.avatar ? (
+        {avatar ? (
           <img
             className="mr-4"
-            src={item.avatar}
+            src={avatar}
             style={{ width: 20, height: 20, borderRadius: '50%' }}
           />
         ) : (
-          <span className="avatar-default-img">{get(item, 'username', '').slice(0, 1)}</span>
+          <span className="avatar-default-img">{item.value.slice(0, 1)}</span>
         )}
-        <span>{item.github_name || item.username}</span>
+        <span>{item.value}</span>
       </div>
     );
   };
@@ -108,16 +110,12 @@ const AuthDialog = (props: IProps) => {
       title: '您确定解除Github的账户授权吗',
       content: '若您解除绑定，当前账户下的所有应用将无法触发部署流程。',
       onOk: async () => {
-        try {
-          await request({ token: '', provider: 'github' });
-          // 重置上层数据
-          reset();
-          // 重置当前组件的数据
-          field.reset();
-          userDispatchers.getUserInfo();
-        } catch (error) {
-          Toast.error(error.message);
-        }
+        await request({ token: '', provider: 'github' });
+        // 重置上层数据
+        reset();
+        // 重置当前组件的数据
+        field.reset();
+        ownerUserInfoRequest.refresh();
       },
     });
   };
@@ -126,12 +124,9 @@ const AuthDialog = (props: IProps) => {
     validate(async (errors, values) => {
       if (errors) return;
       const token = get(values, 'token', '');
-      try {
-        await request({ token, provider: 'github' });
-      } catch (error) {
-        Toast.error(error.message);
-      }
-      userDispatchers.getUserInfo();
+      const { success } = await request({ token, provider: 'github' });
+      if (!success) return;
+      refresh();
       setVisible(false);
     });
   };
@@ -143,7 +138,7 @@ const AuthDialog = (props: IProps) => {
 
   const refresh = async () => {
     setRefreshLoading(true);
-    await userDispatchers.getUserInfo();
+    await ownerUserInfoRequest.refresh();
     setRefreshLoading(false);
   };
 
@@ -154,9 +149,9 @@ const AuthDialog = (props: IProps) => {
           className="full-width"
           placeholder="请选择"
           dataSource={getValue('user_list')}
-          state={effectsState.getUserInfo.isLoading ? 'loading' : undefined}
-          disabled={effectsState.getUserInfo.isLoading}
-          value={value?.github_name || value?.username}
+          state={ownerUserInfoRequest.loading ? 'loading' : undefined}
+          disabled={ownerUserInfoRequest.loading}
+          value={value?.value}
           onChange={handleChange}
           valueRender={valueRender}
           popupClassName="icon-right"
@@ -167,7 +162,7 @@ const AuthDialog = (props: IProps) => {
           loading={refreshLoading}
         />
       </div>
-      {!userState.isAuth && (
+      {!isAuth && (
         <div className="align-center mt-4 fz-12">
           <span>您还未授权Serverless cd读取您的代码仓库.</span>
           <Button
@@ -176,6 +171,7 @@ const AuthDialog = (props: IProps) => {
             size="small"
             text
             onClick={() => setVisible(true)}
+            disabled={!isOwner}
           >
             授权账户
           </Button>

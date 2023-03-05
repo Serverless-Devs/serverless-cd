@@ -6,7 +6,6 @@ const {
   DOWNLOAD_CODE_DIR: execDir,
   CD_PIPELINE_YAML,
   CREDENTIALS,
-  OSS_CONFIG,
   DEFAULT_UNSET_ENVS,
   LOG_LOCAL_PATH_PREFIX,
 } = require('@serverless-cd/config');
@@ -16,8 +15,8 @@ const Setup = require('@serverless-cd/setup-runtime').default;
 const Engine = require('@serverless-cd/engine').default;
 
 const _ = core.lodash;
-const { getPayload, getOTSTaskPayload } = require('./utils');
-const { updateAppById, makeTask } = require('./model');
+const { getPayload, getTaskPayload, getOssConfig } = require('./utils');
+const { updateAppEnvById, makeTask } = require('./model');
 
 async function handler(event, _context, callback) {
   // 解析入参
@@ -28,7 +27,7 @@ async function handler(event, _context, callback) {
     provider,
     cloneUrl,
     pusher,
-    authorization: { userId, owner, appId, accessToken: token, secrets } = {},
+    authorization: { dispatchOrgId, owner, appId, accessToken: token, secrets } = {},
     ref,
     commit,
     message,
@@ -39,11 +38,21 @@ async function handler(event, _context, callback) {
     environment = {},
     envName,
   } = inputs;
+  const envSecrets = _.get(environment, `${envName}.secrets`) || {};
 
   const cwdPath = path.join(execDir, taskId);
   const logPrefix = `${LOG_LOCAL_PATH_PREFIX}/${taskId}`;
   core.fs.emptyDirSync(logPrefix);
   console.log('start task, uuid: ', taskId);
+
+  let url = '';
+  if (DOMAIN && dispatchOrgId) {
+    const [, orgName] = _.split(dispatchOrgId, ':');
+    if (orgName) {
+      url = `${DOMAIN}/${orgName}/application/${appId}/detail/${envName}/${taskId}`;
+    }
+    console.log(`get task url: ${url}, target org name: ${orgName}`);
+  }
 
   const appTaskConfig = { taskId, commit, message, ref };
 
@@ -70,16 +79,15 @@ async function handler(event, _context, callback) {
     logger.info('checkout success');
 
     // 解析 pipeline
-    const pipLineYaml = path.join(cwdPath, CD_PIPELINE_YAML);
+    const pipLineYaml = path.join(cwdPath, _.get(environment, `${envName}.cd_pipeline_yaml`) || CD_PIPELINE_YAML);
     logger.info(`parse spec: ${pipLineYaml}`);
     const pipelineContext = core.parseSpec(pipLineYaml);
     logger.debug(`pipelineContext:: ${JSON.stringify(pipelineContext)}`);
     const steps = _.get(pipelineContext, 'steps');
     logger.debug(`parse spec success, steps: ${JSON.stringify(steps)}`);
     logger.debug(`start update app`);
-    environment[envName].latest_task = getEnvData(context);
     logger.info(`update app in engine onInit: ${JSON.stringify(environment)}`);
-    await updateAppById(appId, { environment });
+    await updateAppEnvById(appId, envName, getEnvData(context));
     logger.debug(`start update app success`);
 
     const runtimes = _.get(pipelineContext, 'runtimes', []);
@@ -100,24 +108,21 @@ async function handler(event, _context, callback) {
     cwd: cwdPath,
     logConfig: {
       logPrefix,
-      ossConfig: OSS_CONFIG ? {
-        ...CREDENTIALS,
-        ...OSS_CONFIG,
-      } : undefined,
+      ossConfig: getOssConfig(),
       // logLevel: 'debug',
     },
     inputs: {
       ...customInputs,
       task: {
         id: taskId,
-        url: DOMAIN ? `${DOMAIN}/application/${userId}/detail/${envName}/${taskId}` : '',
+        url,
       },
       app: {
         // 应用的关联配置
-        user_id: userId,
+        dispatch_org_id: dispatchOrgId,
         id: appId,
       },
-      secrets,
+      secrets: _.merge(secrets, envSecrets),
       git: {
         // git 相关的内容
         owner,
@@ -137,23 +142,22 @@ async function handler(event, _context, callback) {
       onPreRun: async function (_data, context) {
         await makeTask(taskId, {
           status: context.status,
-          steps: getOTSTaskPayload(context.steps),
+          steps: getTaskPayload(context.steps),
         });
       },
       onPostRun: async function (_data, context) {
         await makeTask(taskId, {
           status: context.status,
-          steps: getOTSTaskPayload(context.steps),
+          steps: getTaskPayload(context.steps),
         });
       },
       onCompleted: async function (context, logger) {
         await makeTask(taskId, {
           status: context.status,
-          steps: getOTSTaskPayload(context.steps),
+          steps: getTaskPayload(context.steps),
         });
-        environment[envName].latest_task = getEnvData(context);
         logger.info(`onCompleted environment: ${JSON.stringify(environment)}`);
-        await updateAppById(appId, { environment });
+        await updateAppEnvById(appId, envName, getEnvData(context));
         logger.info('completed end.');
         callback(null, '');
       },
@@ -164,15 +168,14 @@ async function handler(event, _context, callback) {
   console.log('init task');
   await makeTask(taskId, {
     env_name: envName,
-    user_id: userId,
+    dispatch_org_id: dispatchOrgId,
     app_id: appId,
     status: engine.context.status,
     trigger_payload: inputs,
   });
-  environment[envName].latest_task = getEnvData(engine.context);
   console.log('App update environment', JSON.stringify(environment));
   // 防止有其他的动作，将等待状态也要set 到表中
-  await updateAppById(appId, { environment });
+  await updateAppEnvById(appId, envName, getEnvData(engine.context));
   console.log('engine run start');
   await engine.start();
 }

@@ -2,9 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useRequest } from 'ice';
 import { Button } from '@alicloud/console-components';
 import PageInfo from '@/components/PageInfo';
-import PageLayout from '@/layouts/PageLayout';
-import { map, get, forEach, keys, isEmpty } from 'lodash';
-import { addOrCompileSecrets, gitGlobalSecrets } from '@/services/user';
+import { map, get, keys, isEmpty } from 'lodash';
+import { orgDetail, orgUpdate } from '@/services/org';
 import { Toast } from '@/components/ToastContainer';
 import SecretTable from '@/components/SecretTable';
 import SecretDrawer from '@/components/SecretDrawer';
@@ -13,8 +12,8 @@ import Copy from '@/components/CopyIcon';
 const Secrets = () => {
   const [secretList, setSecretList] = useState<any[]>([]);
   const [isAddSecret, setIsAddSecret] = useState(false);
-  const { loading, request } = useRequest(addOrCompileSecrets);
-  const globalSecrets = useRequest(gitGlobalSecrets);
+  const { loading, request } = useRequest(orgUpdate);
+  const globalSecrets = useRequest(orgDetail);
   const secrets = get(globalSecrets.data, 'data.secrets', {});
   const secretsDrawerRef: any = useRef();
   useEffect(() => {
@@ -28,11 +27,7 @@ const Secrets = () => {
   }, [secrets]);
 
   const onAddOrCompileSecret = async (values) => {
-    let secretsParams = {};
-    forEach(values || [], ({ key, value }) => {
-      secretsParams[key] = value;
-    });
-    const { success } = await request({ secrets: secretsParams, isAdd: isAddSecret });
+    const { success } = await request({ secrets: values });
     if (success) {
       Toast.success('配置成功');
       secretsDrawerRef?.current?.closeDrawer();
@@ -42,11 +37,11 @@ const Secrets = () => {
 
   const showDrawer = (triggerType) => {
     setIsAddSecret(triggerType);
-    if (!triggerType) secretsDrawerRef?.current?.setValue('secrets', secretList);
     secretsDrawerRef?.current?.setVisible(true);
   };
 
   const formaSecrets = (secrets) => {
+
     return map(keys(secrets), (key) => {
       return {
         key,
@@ -57,26 +52,10 @@ const Secrets = () => {
   };
 
   return (
-    <PageLayout
-      title="Secrets"
-      breadcrumbExtra={
-        <Button type="primary" onClick={() => showDrawer(true)}>
-          新增Secret
-        </Button>
-      }
-      breadcrumbs={[
-        {
-          name: '设置',
-        },
-        {
-          name: 'Secrets',
-        },
-      ]}
-    >
+    <div className='mt-16'>
       <PageInfo
-        title="密钥配置"
         extra={
-          <Button type="primary" text onClick={() => showDrawer(false)}>
+          <Button type="primary" onClick={() => showDrawer(false)}>
             编辑
           </Button>
         }
@@ -95,7 +74,7 @@ const Secrets = () => {
         onSubmit={onAddOrCompileSecret}
         secretsData={isAddSecret ? {} : secrets}
       />
-    </PageLayout>
+    </div>
   );
 };
 

@@ -1,15 +1,11 @@
 const router = require('express').Router();
 const _ = require('lodash');
-const { checkFile } = require('@serverless-cd/git');
-const git = require('@serverless-cd/git-provider');
 const debug = require('debug')('serverless-cd:provider-github');
 
-const { Result, ValidationError } = require('../../../util');
-const { PROVIDER, ADMIN_ROLE_KEYS, CD_PIPELINE_YAML } = require('@serverless-cd/config');
+const { Result } = require('../../../util');
+const { PROVIDER, ADMIN_ROLE_KEYS } = require('@serverless-cd/config');
 const auth = require('../../../middleware/auth');
 const gitService = require('../../../services/git.service');
-const userService = require('../../../services/user.service');
-const appService = require('../../../services/application.service');
 
 /**
  * 组织信息
@@ -23,12 +19,15 @@ router.get('/orgs', auth(ADMIN_ROLE_KEYS), async function (req, res) {
  * 用户仓库信息
  */
 router.get('/repos', auth(ADMIN_ROLE_KEYS), async function (req, res) {
-  const rows = await gitService.getProviderRepos(req.orgId, PROVIDER.GITHUB);
+  const rows = await gitService.getProviderRepos(req.orgId, req.orgName, PROVIDER.GITHUB);
   return res.json(Result.ofSuccess(rows));
 });
 
+/**
+ * 组织的仓库信息
+ */
 router.get('/orgRepos', auth(ADMIN_ROLE_KEYS), async function (req, res, _next) {
-  const rows = await gitService.getProviderRepos(req.orgId, PROVIDER.GITHUB, req.query);
+  const rows = await gitService.getProviderRepos(req.orgId, req.orgName, PROVIDER.GITHUB, req.query);
   return res.json(Result.ofSuccess(rows));
 });
 

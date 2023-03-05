@@ -1,26 +1,44 @@
 const router = require('express').Router();
 const _ = require('lodash');
 const debug = require('debug')('serverless-cd:application');
-
-const { Result, ValidationError } = require('../../util');
+const { push } = require('@serverless-cd/git');
+const { Result, ValidationError, ParamsValidationError, unionId } = require('../../util');
 const auth = require('../../middleware/auth');
+const gitService = require('../../services/git.service');
 const appService = require('../../services/application.service');
 const userService = require('../../services/user.service');
-const { ADMIN_ROLE_KEYS } = require('@serverless-cd/config');
+const { ADMIN_ROLE_KEYS, OWNER_ROLE_KEYS, ROLE_KEYS } = require('@serverless-cd/config');
+
+/**
+ * 创建应用预检测
+ */
+router.post('/preview', async function (req, res) {
+  await appService.preview(req.body);
+  return res.json(Result.ofSuccess());
+});
+
+/**
+ * 转让【owner】
+ */
+router.post('/transfer', auth(OWNER_ROLE_KEYS), async (req, res) => {
+  const { transferOrgName, appId } = req.body;
+  const result = await appService.transfer(appId, transferOrgName);
+  res.json(Result.ofSuccess(result));
+});
 
 /**
  * 应用列表
  */
-router.get('/list', async function (req, res) {
-  const { orgId } = req;
-  const appList = await appService.listByOrgId(orgId);
+router.get('/list', auth(ROLE_KEYS), async function (req, res) {
+  const { orgName } = req;
+  const appList = await appService.listByOrgName(orgName);
   return res.json(Result.ofSuccess(appList));
 });
 
 /**
  * 应用查询
  */
-router.get('/detail', async function (req, res) {
+router.get('/detail', auth(ROLE_KEYS), async function (req, res) {
   const appDetail = await appService.getAppById(req.query.id);
   if (_.isEmpty(appDetail)) {
     throw new ValidationError('暂无应用信息');
@@ -28,17 +46,42 @@ router.get('/detail', async function (req, res) {
   return res.json(Result.ofSuccess(appDetail));
 });
 
-
 /**
  * 创建应用
  */
 router.post('/create', auth(ADMIN_ROLE_KEYS), async function (req, res) {
-  const { userId, orgId } = req;
+  const { userId, orgId, orgName } = req;
   const { provider } = req.body;
-  const token = await userService.getProviderToken(orgId, userId, provider);
+  const providerToken = await userService.getProviderToken(orgId, userId, provider);
 
-  const appInfo = await appService.create(orgId, token, req.body);
+  const appInfo = await appService.create(orgId, orgName, providerToken, req.body);
   return res.json(Result.ofSuccess(appInfo));
+});
+
+/**
+ * 创建通过模版创建应用
+ * /createByTemplate?type=initTemplate # 初始化模版
+ *  - template: devsapp/start-express
+ *  - parameters: {}
+ *  - appName: start-express
+ * /createByTemplate?type=initRepo # 初始化仓库
+ *  - appId
+ *  - webHookSecret
+ *  - provider
+ *  - owner
+ *  - repo
+ * /createByTemplate?type=initCommit # 初始化commit 信息
+ *  - appId
+ *  - provider
+ *  - owner
+ *  - repo
+ * /createByTemplate?type=push # 提交代码
+ *  - appId
+ */
+router.post('/createByTemplate', auth(ADMIN_ROLE_KEYS), async function (req, res) {
+  const { type, userId, orgId, orgName } = req.query;
+  const result = appService.createByTemplate({ type, userId, orgId, orgName }, req.body);
+  return res.json(Result.ofSuccess(result));
 });
 
 /**

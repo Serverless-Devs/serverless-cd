@@ -8,16 +8,30 @@ const getUserInfo = (result) => {
   if (!result) {
     return null;
   }
-  if (_.isArray(result)) {
-    result = _.first(result);
+  const handlerUserInfo = (user) => {
+    user.third_part = _.isString(user.third_part)
+      ? JSON.parse(user.third_part)
+      : user.third_part;
+    return user;
   }
-  result.third_part = _.isString(result.third_part)
-    ? JSON.parse(result.third_part)
-    : result.third_part;
-  return result;
+  if (_.isArray(result)) {
+    return _.map(result, handlerUserInfo);
+  }
+  return handlerUserInfo(result);
 };
 
 module.exports = {
+  async fuzzyQueriesByName(containsName = '') {
+    if (_.isEmpty(containsName)) {
+      return [];
+    }
+    const result = await userPrisma.findMany({
+      where: {
+        username: { contains: containsName }
+      }
+    });
+    return getUserInfo(result);
+  },
   async getUserById(id) {
     const result = await userPrisma.findUnique({ where: { id } });
     return getUserInfo(result);
@@ -26,20 +40,23 @@ module.exports = {
     const userInfo = await userPrisma.findUnique({ where: { username } });
     return getUserInfo(userInfo);
   },
-  async getUserByGithubUid(githubUid) {
-    const userInfo = await userPrisma.findFirst({ where: { github_unionid: githubUid } });
+  async getUserByEmail(email) {
+    const userInfo = await userPrisma.findUnique({ where: { email } });
     return getUserInfo(userInfo);
   },
-  async updateUserById(id, params) {
+  async updateUserById(id, data) {
+    if (data.third_part) {
+      data.third_part = JSON.stringify(data.third_part);
+    }
     await userPrisma.update({
       where: { id },
-      data: {
-        ...params,
-        third_part: JSON.stringify(params.third_part),
-      },
+      data,
     });
   },
   async createUser(data) {
+    if (data.third_part) {
+      data.third_part = JSON.stringify(data.third_part);
+    }
     const userId = unionId();
     const result = await userPrisma.create({
       data: {

@@ -1,12 +1,12 @@
-import React from 'react';
-import { Form, Radio, Field, Input } from '@alicloud/console-components';
+import React, { useRef } from 'react';
+import { Form, Radio, Field, Input, Divider, Switch } from '@alicloud/console-components';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import AuthDialog from './AuthDialog';
 import Repo from './Repo';
 import Trigger from './Trigger';
-import Env, { validteEnv } from './Env';
 import ConfigEdit from '@/components/ConfigEdit';
-import { TYPE as ENV_TYPE } from '@/components/EnvType';
+import { PUSH } from '../constant';
+import { get } from 'lodash';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -18,6 +18,15 @@ interface IProps {
 const Github = (props: IProps) => {
   const { field } = props;
   const { init, getValue, resetToDefault } = field;
+  const secretsRef: any = useRef(null);
+
+  const secretsValidator = async (_, value, callback) => {
+    if (get(getValue('trigger'), 'push') === PUSH.NEW) return callback();
+    let res = await secretsRef.current.validate();
+    if (!res) return callback('error');
+    callback();
+  };
+
   return (
     <>
       <Form field={field} {...FORM_ITEM_LAYOUT}>
@@ -68,27 +77,27 @@ const Github = (props: IProps) => {
             }) as any)}
           />
         </FormItem>
-        <FormItem label="环境" required>
-          <Env
-            {...(init('environment', {
-              initValue: { name: 'default', type: ENV_TYPE.TESTING },
-              rules: [
-                {
-                  validator: validteEnv,
-                },
-              ],
-            }) as any)}
-          />
-        </FormItem>
-        <FormItem label="触发方式" required>
-          <Trigger repo={getValue('repo')} {...(init('trigger') as any)} />
-        </FormItem>
         <FormItem label="描述">
           <Input {...init('description')} placeholder="请输入描述" />
         </FormItem>
-        <FormItem label="Secrets">
-          <ConfigEdit field={field} />
-        </FormItem>
+        <Divider className="mt-32" />
+        <div className="text-bold mt-16 mb-16">环境配置</div>
+        <Trigger repo={getValue('repo')} {...(init('trigger') as any)} />
+        {get(getValue('trigger'), 'push') === PUSH.SPECIFY && (
+          <>
+            <FormItem label="立即部署">
+              <Switch {...init('deployEnable', { valueName: 'checked', initValue: true })} />
+            </FormItem>
+            <FormItem label="Secrets" help="">
+              <ConfigEdit
+                {...init('secrets', {
+                  rules: [{ validator: secretsValidator }],
+                })}
+                ref={secretsRef}
+              />
+            </FormItem>
+          </>
+        )}
       </Form>
     </>
   );

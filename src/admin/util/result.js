@@ -11,7 +11,7 @@ const getCode = (arg) => {
 class Result {
   static ofError(message, code) {
     return {
-      code: code ? getCode(code) || 500 : 500,
+      code: code ? getCode(code) || 'SystemError' : 'SystemError',
       success: false,
       message,
     };

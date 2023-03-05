@@ -10,6 +10,7 @@ const taskService = require('../../services/task.service');
 
 /**
  * task 列表
+ * query: { appId, envName?, taskId?, pageSize, currentPage }
  */
 router.get('/list', async function (req, res) {
   const { totalCount, result } = await taskService.list(req.query);
@@ -58,7 +59,6 @@ router.get('/log', async function (req, res) {
       const log = fs.readFileSync(logPath, { encoding: 'utf8' });
       res.json(Result.ofSuccess(log));
     } catch (ex) {
-      // TODO: read files
       throw new NotFoundError('没有找到日志');
     }
   }

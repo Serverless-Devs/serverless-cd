@@ -17,6 +17,10 @@ async function updateUserById(userId, data) {
   return await userModel.updateUserById(userId, data);
 }
 
+async function fuzzyQueriesByName(containsName) {
+  return await userModel.fuzzyQueriesByName(containsName);
+}
+
 /**
  * 根据团队Id拿到拥有者用户数据
  */
@@ -28,7 +32,7 @@ async function getOrganizationOwnerIdByOrgId(orgId) {
   if (role === ROLE.OWNER) {
     ownerUserId = orgData.user_id;
   } else {
-    const ownerOrgData = await orgModel.getOrgFirst({ name, role: ROLE.OWNER });
+    const ownerOrgData = await orgModel.getOwnerOrgByName(name);
     ownerUserId = ownerOrgData.user_id;
   }
 
@@ -52,7 +56,27 @@ async function getProviderToken(orgId, userId, provider) {
   return token;
 }
 
+function desensitization(data) {
+  const filterData = (item) => {
+    item.third_part = _.mapValues(_.get(data, 'third_part', {}), (item = {}) => ({
+      owner: item.owner,
+      id: item.id,
+      avatar: item.avatar,
+    }));
+    return _.omit(item, ['password', 'secrets'])
+  };
+
+  if (_.isArray(data)) {
+    return _.map(data, item => filterData(item));
+  }
+
+  return filterData(data);
+}
+
+
 module.exports = {
+  fuzzyQueriesByName,
+  desensitization,
   getUserById,
   updateUserById,
   getProviderToken,

@@ -13,13 +13,14 @@ import { pollingStatus } from '@/constants';
 interface IProps {
   appId: string;
   envName: string;
+  orgName: string;
   latestTaskId?: string;
 }
 
-const PAGE_SIZE = 2;
+const PAGE_SIZE = 10;
 
 const CommitTable: FC<IProps> = (props) => {
-  const { appId, latestTaskId, envName } = props;
+  const { appId, latestTaskId, envName, orgName } = props;
   const { loading, data, request, refresh } = useRequest(getTaskList);
   const [taskList, setTaskList] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -42,7 +43,7 @@ const CommitTable: FC<IProps> = (props) => {
           <>
             <Link
               className="commit-description"
-              to={`/application/${appId}/detail/${envName}/${value}`}
+              to={`/${orgName}/application/${appId}/${envName}/${value}`}
             >
               {value}
             </Link>

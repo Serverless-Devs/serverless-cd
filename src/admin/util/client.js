@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const OssClient = require('ali-oss');
 const Fc = require('@serverless-cd/srm-aliyun-fc2');
 const { CREDENTIALS, OSS_CONFIG } = require('@serverless-cd/config');
@@ -6,7 +7,7 @@ const { accessKeyId, accessKeySecret, accountId, securityToken } = CREDENTIALS;
 
 module.exports = class Client {
   static oss() {
-    if (OSS_CONFIG) {
+    if (_.get(OSS_CONFIG, 'bucket')) {
       return new OssClient({
         accessKeyId,
         accessKeySecret,

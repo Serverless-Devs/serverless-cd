@@ -8,12 +8,15 @@ vars:
     name: "{{serviceName}}"
     description: Serverless-cd 应用
     logConfig: auto
+    nasConfig: auto
   masterFunctionName: master
   workerFunctionName: worker
   adminFunctionName: admin
   workerDeliverFunctionName: workerDeliver
-  ossBucket: "{{ossBucket}}"
-  domain: "{{ domain }}"
+  domain: "{{domain}}"
+  logLocalPathPrefix: /mnt/auto/logs
+  databaseUrl: "{{databaseUrl}}"
+  prisma: "{{prisma}}"
 
 services:
   master:
@@ -22,7 +25,7 @@ services:
       pre-deploy:
         - run: npm install --registry=https://registry.npmmirror.com
           path: "./master"
-        - run: npx prisma generate
+        - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
           path: "./master"
     props:
       region: ${vars.region}
@@ -36,19 +39,11 @@ services:
         memorySize: 640
         timeout: 12
         instanceConcurrency: 20
+        layers:
+          - acs:fc:${vars.region}:1940309364339785:layers/sqlite3/versions/1
         environmentVariables:
-          # 用于链接数据库
-          DATABASE_URL: ${env.DATABASE_URL}
-          # 阿里云密钥
-          ACCOUNT_ID: ${env.ACCOUNT_ID}
-          ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
-          ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
-          # 部署的区域
-          REGION: ${vars.region}
-          # 部署函数的服务名称
-          SERVICE_NAME: ${vars.service.name}
-          # worker 函数的名称
-          WORKER_FUNCTION_NAME: ${vars.workerFunctionName}
+          PATH: /opt:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
+          DATABASE_URL: ${vars.databaseUrl} # 用于链接数据库
       triggers:
         - name: http-trigger
           type: http
@@ -63,7 +58,7 @@ services:
       pre-deploy:
         - run: npm install --registry=https://registry.npmmirror.com
           path: "./worker"
-        - run: npx prisma generate
+        - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
           path: "./worker"
       post-deploy:
         - component: fc api UpdateFunction --region ${vars.region} --header '{"x-fc-disable-container-reuse":"True"}' --path '{"serviceName":"${vars.service.name}","functionName":"${vars.workerFunctionName}"}'
@@ -83,20 +78,12 @@ services:
         timeout: 3600
         layers:
           - acs:fc:${vars.region}:official:layers/Nodejs16/versions/1
+          - acs:fc:${vars.region}:1940309364339785:layers/sqlite3/versions/1
         environmentVariables:
-          PATH: /opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
-          # 用于给用户显示日志链接地址
-          DOMAIN: ${vars.domain}
-          # 阿里云密钥
-          ACCOUNT_ID: ${env.ACCOUNT_ID}
-          ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
-          ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
-          # 上传的OSS地址
-          OSS_BUCKET: ${vars.ossBucket}
-          # 部署的区域
-          REGION: ${vars.region}
-          # 用于链接数据库
-          DATABASE_URL: ${env.DATABASE_URL}
+          PATH: /opt:/opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
+          DOMAIN: ${vars.domain} # 用于给用户显示日志链接地址
+          LOG_LOCAL_PATH_PREFIX: ${vars.logLocalPathPrefix}
+          DATABASE_URL: ${vars.databaseUrl} # 用于链接数据库
         asyncConfiguration:
           maxAsyncRetryAttempts: 0
           statefulInvocation: true
@@ -105,12 +92,12 @@ services:
 
   worker-deliver:
     component: fc
-    actions:
-      pre-deploy:
-        - run: npm install --registry=https://registry.npmmirror.com
-          path: "./worker"
-        - run: npx prisma generate
-          path: "./worker"
+    # actions:
+    #   pre-deploy:
+    #     - run: npm install --registry=https://registry.npmmirror.com
+    #       path: "./worker"
+    #     - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
+    #       path: "./worker"
     props:
       region: ${vars.region}
       service: ${vars.service}
@@ -122,19 +109,11 @@ services:
         handler: deliver.handler
         memorySize: 640
         timeout: 600
+        layers:
+          - acs:fc:${vars.region}:1940309364339785:layers/sqlite3/versions/1
         environmentVariables:
-          # 部署的区域
-          REGION: ${vars.region}
-          # 部署函数的服务名称
-          SERVICE_NAME: ${vars.service.name}
-          # worker 函数的名称
-          WORKER_FUNCTION_NAME: ${vars.workerFunctionName}
-          # 用于链接数据库
-          DATABASE_URL: ${env.DATABASE_URL}
-          # 阿里云密钥
-          ACCOUNT_ID: ${env.ACCOUNT_ID}
-          ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
-          ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
+          PATH: /opt:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
+          DATABASE_URL: ${vars.databaseUrl} # 用于链接数据库
         asyncConfiguration:
           maxAsyncRetryAttempts: 0
 
@@ -148,7 +127,7 @@ services:
           path: "./admin/public"
         - run: npm install --registry=https://registry.npmmirror.com
           path: "./admin"
-        - run: npx prisma generate
+        - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
           path: "./admin"
         - plugin: get-http-function-url # 获取依赖的 trigger 函数的触发器地址，会覆盖 environmentVariables 的 WEBHOOK_URL
           args:
@@ -156,6 +135,8 @@ services:
             serviceName: ${vars.service.name}
             functionName: ${vars.masterFunctionName}
             envKey: WEBHOOK_URL
+      post-deploy:
+        - component: fc invoke --event '{"path":"/api/common/init?prisma={{prisma}}"}'
     props:
       region: ${vars.region}
       service: ${vars.service}
@@ -175,24 +156,11 @@ services:
             - index.js
         layers:
           - acs:fc:cn-hongkong:official:layers/Nodejs16/versions/2
+          - acs:fc:${vars.region}:1940309364339785:layers/sqlite3/versions/1
         environmentVariables:
-          PATH: /opt/nodejs16/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/bin
-          # 用于链接数据库
-          DATABASE_URL: ${env.DATABASE_URL}
-          # 回调地址, 本地调试时需要填写
-          # WEBHOOK_URL: ${env.WEBHOOK_URL}
-          # 阿里云密钥
-          ACCOUNT_ID: ${env.ACCOUNT_ID}
-          ACCESS_KEY_ID: ${env.ACCESS_KEY_ID}
-          ACCESS_KEY_SECRET: ${env.ACCESS_KEY_SECRET}
-          # 部署的区域
-          REGION: ${vars.region}
-          # 部署函数的服务名称
-          SERVICE_NAME: ${vars.service.name}
-          # worker 函数的名称
-          WORKER_FUNCTION_NAME: ${vars.workerFunctionName}
-          # 上传的OSS地址
-          OSS_BUCKET: ${vars.ossBucket}
+          PATH: /opt:/opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
+          DATABASE_URL: ${vars.databaseUrl} # 用于链接数据库
+          LOG_LOCAL_PATH_PREFIX: ${vars.logLocalPathPrefix}
           JWT_SECRET: ${env.JWT_SECRET}
       triggers:
         - name: http-trigger

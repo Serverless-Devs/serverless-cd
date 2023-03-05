@@ -11,10 +11,11 @@ import SecretConfig from './components/SecretCofing';
 import TriggerConfig from './components/TriggerConfig';
 import CreateEnv from './components/CreateEnv';
 import { Toast } from '@/components/ToastContainer';
+import BasicInfo from '@/components/BasicInfo';
 
 const Details = ({
   match: {
-    params: { appId, envName },
+    params: { appId, envName, orgName },
   },
 }) => {
   const {
@@ -62,7 +63,7 @@ const Details = ({
           <Button
             type="primary"
             onClick={() => {
-              history?.push('/');
+              history?.push(`/${orgName}/application`);
               dialog.hide();
             }}
           >
@@ -82,7 +83,7 @@ const Details = ({
         const { success } = await removeEnv({ envName, appId });
         if (success) {
           Toast.success('环境删除成功');
-          history?.push(`/application/${appId}/detail`);
+          history?.push(`/${orgName}/application/${appId}`);
         }
         dialog.hide();
       },
@@ -96,11 +97,11 @@ const Details = ({
       breadcrumbs={[
         {
           name: '应用列表',
-          path: '/',
+          path: `/${orgName}/application`,
         },
         {
           name: appId,
-          path: `/application/${appId}/detail`,
+          path: `/${orgName}/application/${appId}`,
         },
         {
           name: envName,
@@ -111,7 +112,7 @@ const Details = ({
           <CreateEnv
             data={get(detailInfo, 'data', {})}
             appId={appId}
-            callback={async () => history?.push(`/application/${appId}/detail`)}
+            callback={async () => history?.push(`/${orgName}/application/${appId}`)}
           >
             <Button type="primary">创建环境</Button>
           </CreateEnv>
@@ -126,6 +127,7 @@ const Details = ({
           data={get(detailInfo, 'data', {})}
           refreshCallback={handleRefresh}
           envName={envName}
+          orgName={orgName}
         />
         <hr className="mb-20" />
         <TriggerConfig
@@ -135,6 +137,15 @@ const Details = ({
           appId={appId}
           refreshCallback={handleRefresh}
           envName={envName}
+        />
+        <BasicInfo
+          items={[
+            {
+              text: '指定yaml',
+              value: get(detailInfo, `data.environment.${envName}.cd_pipeline_yaml`),
+            },
+          ]}
+          sizePerRow={2}
         />
         <hr className="mb-20" />
         <SecretConfig
@@ -154,6 +165,7 @@ const Details = ({
           latestTaskId={taskId}
           refreshCallback={handleRefresh}
           envName={envName}
+          orgName={orgName}
         />
       </PageInfo>
     </PageLayout>
