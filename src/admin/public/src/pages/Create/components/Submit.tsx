@@ -14,10 +14,11 @@ import { TYPE as ENV_TYPE } from '@/components/EnvType';
 interface IProps {
   field: Field;
   orgName: string;
+  disabled?: boolean;
 }
 
 const Submit = (props: IProps) => {
-  const { orgName, field } = props;
+  const { orgName, field, disabled = false } = props;
   const CD_PIPELINE_YAML = getConsoleConfig('CD_PIPELINE_YAML', 'serverless-pipeline.yaml');
   const [loading, setLoading] = useState(false);
   const { validate } = field;
@@ -118,7 +119,7 @@ const Submit = (props: IProps) => {
   };
 
   return (
-    <Button className="mt-32 mr-8" type="primary" onClick={submit} loading={loading}>
+    <Button className="mt-32 mr-8" type="primary" onClick={submit} disabled={disabled} loading={loading}>
       创建
     </Button>
   );

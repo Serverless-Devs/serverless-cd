@@ -70,3 +70,26 @@
     }
   }
 }
+
+
+.applications-template {
+  margin-right: -8px;
+  margin-left: -8px;
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  .applications-card {
+    position: relative;
+    width: calc((100% - 48px) / 3);
+    margin: 8px;
+    overflow: initial;
+    border: 1px solid #e3e4e6;
+
+    &:hover {
+      border: 1px solid #0077cc;
+      box-sizing: border-box;
+      box-shadow: none;
+      transition: all 0.1s;
+    }
+  }
+}
