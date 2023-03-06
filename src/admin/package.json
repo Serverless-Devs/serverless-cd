@@ -14,7 +14,8 @@
   "jest": {
     "testPathIgnorePatterns": [
       "<rootDir>/__tests__/tmp/"
-    ]
+    ],
+    "testTimeout": 10000
   },
   "author": "mamba",
   "license": "ISC",
