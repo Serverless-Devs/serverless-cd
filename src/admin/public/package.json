@@ -7,6 +7,7 @@
     "@alicloud/console-components-actions": "^1.0.19",
     "@alicloud/console-components-slide-panel": "^2.2.14",
     "@serverless-cd/auth-ui": "^0.0.1-beta-7",
+    "@serverless-cd/app-card-ui": "^0.0.2",
     "@serverless-cd/trigger-ui": "^0.0.21",
     "@serverless-cd/ui": "^0.0.1-beta.9",
     "@serverless-cd/variable-ui": "^0.0.3",
