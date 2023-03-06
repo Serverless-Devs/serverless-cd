@@ -40,18 +40,18 @@ const CreateType = (props) => {
       </Row>
       <Row className="application-type-select-content">
         <Title
-          value={CREATE_TYPE.Template}
-          onClick={() => onChange(CREATE_TYPE.Template)}
-          active={value}
-          title={'通过模版创建应用'}
-          subTitle={'您可以通过Github、Gitee等仓库，快速导入符合Serverless-CD规范的应用'}
-        />
-        <Title
           value={CREATE_TYPE.Repository}
           onClick={() => onChange(CREATE_TYPE.Repository)}
           active={value}
           title={'通过仓库导入应用'}
           subTitle={'Serverless-CD提供了海量应用模版，帮助您快速创建Serverless-CD应用'}
+        />
+        <Title
+          value={CREATE_TYPE.Template}
+          onClick={() => onChange(CREATE_TYPE.Template)}
+          active={value}
+          title={'通过模版创建应用'}
+          subTitle={'您可以通过Github、Gitee等仓库，快速导入符合Serverless-CD规范的应用'}
         />
       </Row>
     </div>

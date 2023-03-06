@@ -1,6 +1,6 @@
 import React, { useEffect, ReactNode, useState } from 'react';
 import { useRequest } from 'ice';
-import { Select, Icon, Field, Form } from '@alicloud/console-components';
+import { Select, Icon, Field, Form, Input } from '@alicloud/console-components';
 import store from '@/store';
 import { noop, map, find, isEmpty, cloneDeep, get } from 'lodash';
 import RefreshIcon from '@/components/RefreshIcon';
@@ -23,6 +23,7 @@ interface IProps {
   field: Field;
   value?: IRepoItem | undefined;
   onChange?: (value: IRepoItem) => void;
+  createType?: string;
 }
 
 const initRepoTypeList = [
@@ -42,7 +43,7 @@ const initRepoTypeList = [
 ];
 
 const Repos = (props: IProps) => {
-  const { value, onChange = noop, field } = props;
+  const { value, onChange = noop, field, createType = 'repo' } = props;
   const { data, loading, request } = useRequest(githubOrgs);
   const orgRepos = useRequest(githubOrgRepos);
   const [, userDispatchers] = store.useModel('user');
@@ -204,6 +205,7 @@ const Repos = (props: IProps) => {
     setCurrentRepoType(value);
     onChange({});
   };
+
   return (
     <div className="flex-r position-r">
       <Form field={field} className="flex-r position-r" style={{ width: '100%' }}>
@@ -222,36 +224,52 @@ const Repos = (props: IProps) => {
             disabled={loading}
           />
         </FormItem>
-        <FormItem style={{ flexBasis: '68%', marginBottom: 0 }}>
-          <Select
-            {...(init('repoName', {
-              rules: [
-                {
-                  required: true,
-                  message: '请选择仓库名称',
-                },
-              ],
-              props: {
-                value: value?.name,
-                onChange: handleChange,
-              },
-            }) as any)}
-            className="full-width"
-            placeholder="请选择"
-            showSearch
-            dataSource={getValue('userRepos')}
-            state={orgRepos.loading || effectsState.getUserRepos.isLoading ? 'loading' : undefined}
-            disabled={loading || effectsState.getUserRepos.isLoading || orgRepos.loading}
-            valueRender={valueRender}
-            popupClassName="icon-right"
-          />
-        </FormItem>
+        {
+          createType === 'repo' && (
+            <>
+              <FormItem style={{ flexBasis: '68%', marginBottom: 0 }}>
+                <Select
+                  {...(init('repoName', {
+                    rules: [
+                      {
+                        required: true,
+                        message: '请选择仓库名称',
+                      },
+                    ],
+                    props: {
+                      value: value?.name,
+                      onChange: handleChange,
+                    },
+                  }) as any)}
+                  className="full-width"
+                  placeholder="请选择"
+                  showSearch
+                  dataSource={getValue('userRepos')}
+                  state={orgRepos.loading || effectsState.getUserRepos.isLoading ? 'loading' : undefined}
+                  disabled={loading || effectsState.getUserRepos.isLoading || orgRepos.loading}
+                  valueRender={valueRender}
+                  popupClassName="icon-right"
+                />
+              </FormItem>
+              <RefreshIcon
+                style={{ position: 'absolute', right: -20, top: getError('repoName') ? 5 : 'auto' }}
+                refreshCallback={refresh}
+                loading={refreshLoading}
+              />
+            </>
+          )
+        }
+        {
+          createType === 'template' && (
+            <FormItem style={{ flexBasis: '68%', marginBottom: 0 }}>
+              <Input
+                {...(init('repoName') as any)}
+                className="full-width"
+              />
+            </FormItem>
+          )
+        }
       </Form>
-      <RefreshIcon
-        style={{ position: 'absolute', right: -20, top: getError('repoName') ? 5 : 'auto' }}
-        refreshCallback={refresh}
-        loading={refreshLoading}
-      />
     </div>
   );
 };

@@ -4,8 +4,7 @@ import TemplateList from './TemplateList';
 import { getParam } from '@/utils';
 import { noop } from 'lodash';
 
-
-const CreateTemplate = ({ field, forceUpdate = noop }, ref) => {
+const CreateTemplate = ({ field, forceUpdate = noop, orgName }, ref) => {
   const [template, setTemplate] = useState();
 
   useImperativeHandle(ref, () => ({
@@ -21,7 +20,7 @@ const CreateTemplate = ({ field, forceUpdate = noop }, ref) => {
     <>
       {
         template ? (
-          <TemplateContent field={field} template={template} forceUpdate={forceUpdate} />
+          <TemplateContent field={field} template={template} forceUpdate={forceUpdate} orgName={orgName} />
         ) : (
           <TemplateList forceUpdate={forceUpdate} />
         )

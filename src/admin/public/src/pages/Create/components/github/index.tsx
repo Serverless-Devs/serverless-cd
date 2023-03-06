@@ -7,16 +7,19 @@ import Trigger from './Trigger';
 import ConfigEdit from '@/components/ConfigEdit';
 import { PUSH } from '../constant';
 import { get } from 'lodash';
+import Submit from '../Submit';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 
 interface IProps {
   field: Field;
+  createType?: string;
+  orgName: string
 }
 
 const Github = (props: IProps) => {
-  const { field } = props;
+  const { field, createType, orgName } = props;
   const { init, getValue, resetToDefault } = field;
   const secretsRef: any = useRef(null);
 
@@ -67,6 +70,7 @@ const Github = (props: IProps) => {
         <FormItem label="仓库名称" required>
           <Repo
             field={field}
+            createType={createType}
             {...(init('repo', {
               rules: [
                 {
@@ -99,6 +103,7 @@ const Github = (props: IProps) => {
           </>
         )}
       </Form>
+      <Submit field={field} orgName={orgName} disabled={createType === 'template'} />
     </>
   );
 };
