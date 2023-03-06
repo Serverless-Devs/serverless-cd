@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const core = require('@serverless-devs/core');
-const { push } = require('@serverless-devs/git');
+const { push } = require('@serverless-cd/git');
 const debug = require('debug')('serverless-cd:application');
 const path = require('path');
 const fs = require('fs-extra');
