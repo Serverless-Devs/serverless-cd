@@ -15,7 +15,7 @@ const RadioGroup = Radio.Group;
 interface IProps {
   field: Field;
   createType?: string;
-  orgName: string
+  orgName: string;
 }
 
 const Github = (props: IProps) => {
@@ -103,7 +103,12 @@ const Github = (props: IProps) => {
           </>
         )}
       </Form>
-      <Submit field={field} orgName={orgName} disabled={createType === 'template'} />
+      <Submit
+        field={field}
+        orgName={orgName}
+        disabled={createType === 'template'}
+        createType={createType as any}
+      />
     </>
   );
 };

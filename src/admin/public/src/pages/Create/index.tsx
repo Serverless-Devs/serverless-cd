@@ -32,7 +32,9 @@ const Create = ({
 export const CreateAppLication = ({ orgName }) => {
   const field = Field.useField();
   const template = getParam('template');
-  const [createType, setCreateType] = useState(template ? CREATE_TYPE.Template : CREATE_TYPE.Repository);
+  const [createType, setCreateType] = useState(
+    template ? CREATE_TYPE.Template : CREATE_TYPE.Repository,
+  );
   const [pageKey, forceUpdate] = useState(0);
   const templateRef: any = useRef(null);
   const onChangeCreateType = (type) => {
@@ -43,8 +45,18 @@ export const CreateAppLication = ({ orgName }) => {
   return (
     <div className="appliaction-create-container">
       {!template && <CreateType value={createType} onChange={onChangeCreateType} />}
-      {createType === CREATE_TYPE.Template && <CreateTemplate key={pageKey} forceUpdate={() => forceUpdate(pageKey + 1)} field={field} ref={templateRef} orgName={orgName} />}
-      {createType === CREATE_TYPE.Repository && <Github field={field} orgName={orgName} />}
+      {createType === CREATE_TYPE.Template && (
+        <CreateTemplate
+          key={pageKey}
+          forceUpdate={() => forceUpdate(pageKey + 1)}
+          field={field}
+          ref={templateRef}
+          orgName={orgName}
+        />
+      )}
+      {createType === CREATE_TYPE.Repository && (
+        <Github field={field} createType={CREATE_TYPE.Repository} orgName={orgName} />
+      )}
     </div>
   );
 };
