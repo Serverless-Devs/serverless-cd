@@ -4,7 +4,8 @@ const gitProvider = require('@serverless-cd/git-provider');
 
 const taskModel = require('../models/task.mode');
 const orgModel = require('../models/org.mode');
-const applicationService = require('./application.service');
+const applicationModel = require('../models/application.mode');
+
 const taskService = require('./task.service');
 const orgService = require('./org.service');
 
@@ -55,7 +56,7 @@ async function redeploy(dispatchOrgId, orgName, { taskId, appId } = {}) {
     throw new ValidationError('没有找到被触发的环境名称');
   }
 
-  const applicationResult = await applicationService.getAppById(appId);
+  const applicationResult = await applicationModel.getAppById(appId);
   if (_.isEmpty(applicationResult)) {
     throw new ValidationError('没有查到应用信息');
   }
@@ -78,9 +79,7 @@ async function redeploy(dispatchOrgId, orgName, { taskId, appId } = {}) {
   const ownerSecrets = _.get(ownerOrgData, 'secrets') || {};
   const appSecrets = _.get(environment, `${envName}.secrets`) || {};
 
-
-  const userResult = await orgService.getOwnerUserByName(orgName);
-  const providerToken = _.get(userResult, `third_part.${provider}.access_token`, '');
+  const providerToken = await orgService.getProviderToken(orgName, provider);
   _.merge(trigger_payload.authorization, {
     secrets: _.merge(ownerSecrets, appSecrets),
     dispatchOrgId,
@@ -138,7 +137,7 @@ async function cancelTask({ taskId } = {}) {
     completed: true,
     status: CANCEL,
   };
-  await applicationService.update(app_id, { environment });
+  await applicationService.updateAppById(app_id, { environment });
 }
 
 async function manualTask(dispatchOrgId, orgName, body = {}) {
@@ -150,7 +149,7 @@ async function manualTask(dispatchOrgId, orgName, body = {}) {
     throw new ValidationError('ref 必填');
   }
 
-  const applicationResult = await applicationService.getAppById(appId);
+  const applicationResult = await applicationModel.getAppById(appId);
   if (_.isEmpty(applicationResult)) {
     throw new ValidationError('没有查到应用信息');
   }
@@ -158,8 +157,7 @@ async function manualTask(dispatchOrgId, orgName, body = {}) {
   const { owner, provider, repo_name, repo_url, environment, owner_org_id } = applicationResult;
 
   debug('find provider access token');
-  const userResult = await orgService.getOwnerUserByName(orgName);
-  const providerToken = _.get(userResult, `third_part.${provider}.access_token`, '');
+  const providerToken = await orgService.getProviderToken(orgName, provider);
   if (_.isEmpty(providerToken)) {
     throw new ValidationError(`${provider} 密钥查询异常`);
   }
@@ -221,4 +219,5 @@ module.exports = {
   manualTask,
   redeploy,
   cancelTask,
+  invokeFunction,
 };

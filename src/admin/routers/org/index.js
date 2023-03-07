@@ -7,6 +7,7 @@ const { OWNER_ROLE_KEYS, ADMIN_ROLE_KEYS, ROLE_KEYS } = require('@serverless-cd/
 const auth = require('../../middleware/auth');
 const orgService = require('../../services/org.service');
 const userService = require('../../services/user.service');
+const gitService = require('../../services/git.service');
 
 // 查看团队信息
 router.get('/detail', auth(ROLE_KEYS), async (req, res) => {
@@ -27,15 +28,6 @@ router.get('/listUsers', auth(ROLE_KEYS), async (req, res) => {
   } = req;
   const result = await orgService.listByOrgName(orgId, orgName);
   res.json(Result.ofSuccess(orgService.desensitization(result)));
-});
-
-/**
- * 获取用户
- */
-router.get('/ownerUserInfo', auth(ADMIN_ROLE_KEYS), async (req, res) => {
-  const { query: { orgName } } = req;
-  const result = await orgService.getOwnerUserByName(orgName);
-  res.json(Result.ofSuccess(userService.desensitization(result)));
 });
 
 // 加入/邀请团队
@@ -68,6 +60,17 @@ router.post('/update', auth(ADMIN_ROLE_KEYS), async (req, res) => {
   await orgService.updateOwnerByName(orgName, { secrets });
   res.json(Result.ofSuccess());
 });
+
+/**
+ * 绑定 github token
+ */
+router.put('/token', auth(OWNER_ROLE_KEYS), async function (req, res) {
+  const { orgName } = req;
+  const { token, provider } = _.get(req, 'body.data', {});
+  await orgService.updateThirdPart(orgName, { token, provider });
+  return res.json(Result.ofSuccess());
+});
+
 
 // 删除成员
 router.post('/removeUser', auth(OWNER_ROLE_KEYS), async (req, res) => {

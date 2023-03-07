@@ -50,11 +50,9 @@ router.get('/detail', auth(ROLE_KEYS), async function (req, res) {
  * 创建应用
  */
 router.post('/create', auth(ADMIN_ROLE_KEYS), async function (req, res) {
-  const { userId, orgId, orgName } = req;
-  const { provider } = req.body;
-  const providerToken = await userService.getProviderToken(orgId, userId, provider);
+  const { orgId, orgName } = req;
 
-  const appInfo = await appService.create(orgId, orgName, providerToken, req.body);
+  const appInfo = await appService.create(orgId, orgName, req.body);
   return res.json(Result.ofSuccess(appInfo));
 });
 
@@ -88,8 +86,7 @@ router.post('/createByTemplate', auth(ADMIN_ROLE_KEYS), async function (req, res
  * 应用删除
  */
 router.delete('/delete', auth(ADMIN_ROLE_KEYS), async function (req, res) {
-  const { userId, orgId } = req;
-  await appService.remove(orgId, userId, req.query.appId);
+  await appService.remove(req.orgName, req.query.appId);
 
   res.json(Result.ofSuccess({ message: '删除应用成功' }));
 });

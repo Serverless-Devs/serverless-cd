@@ -18,7 +18,6 @@ model User {
   avatar String?
   password String?
   github_unionid String?
-  third_part String?
 }
 
 model Org {
@@ -28,6 +27,7 @@ model Org {
   name String             // 
   role String             // owner / admin / member
   description String?
+  third_part String?
 }
 
 model Application {

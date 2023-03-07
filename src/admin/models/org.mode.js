@@ -14,8 +14,21 @@ const getOrgInfo = (result) => {
   if (result.secrets) {
     result.secrets = JSON.parse(result.secrets);
   }
+  if (result.third_part) {
+    result.third_part = JSON.parse(result.third_part)
+  }
   return result;
 };
+
+const saveOrg = (data) => {
+  if (data.secrets) {
+    data.secrets = JSON.stringify(data.secrets);
+  }
+  if (data.third_part) {
+    data.third_part = JSON.stringify(data.third_part);
+  }
+  return data;
+}
 
 module.exports = {
   async getOwnerOrgByName(name = '') {
@@ -31,23 +44,19 @@ module.exports = {
   },
   async createOrg({ userId, name, role, description, secrets }) {
     const orgId = generateOrgIdByUserIdAndOrgName(userId, name);
-    const result = await orgPrisma.create({
-      data: {
-        id: orgId,
-        user_id: userId,
-        name,
-        role: role || ROLE.OWNER,
-        description,
-        secrets: secrets ? JSON.stringify(secrets) : '',
-      },
-    });
+    const data = {
+      id: orgId,
+      user_id: userId,
+      name,
+      role: role || ROLE.OWNER,
+      description,
+      secrets,
+    };
+    const result = await orgPrisma.create({ data: saveOrg(data) });
     return result;
   },
   async updateOrg(id, data) {
-    if (data.secrets) {
-      data.secrets = JSON.stringify(data.secrets);
-    }
-    const result = await orgPrisma.update({ where: { id }, data });
+    const result = await orgPrisma.update({ where: { id }, data: saveOrg(data) });
     return result;
   },
   async remove(id) {

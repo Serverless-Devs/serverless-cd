@@ -21,7 +21,7 @@ async function retryFunctions(f, ...args) {
     return await client[f](...args);
   } catch (err) {
     console.log(`fetch ${f} error`);
-    return await fn(...args);
+    return await client[f](...args);
   }
 }
 

@@ -3,7 +3,7 @@ import { Form, Select, Button, Dialog, Input, Field, Message } from '@alicloud/c
 import store from '@/store';
 import { get, noop, find } from 'lodash';
 import { updateUserProviderToken } from '@/services/user';
-import { ownerUserInfo } from '@/services/org';
+import { orgDetail } from '@/services/org';
 import { useRequest } from 'ice';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import RefreshIcon from '@/components/RefreshIcon';
@@ -36,14 +36,14 @@ const AuthDialog = (props: IProps) => {
   const [visible, setVisible] = useState(false);
   const [refreshLoading, setRefreshLoading] = useState(false);
   const { loading, request } = useRequest(updateUserProviderToken);
-  const ownerUserInfoRequest = useRequest(ownerUserInfo);
+  const orgDetailRequest = useRequest(orgDetail);
   const [userState] = store.useModel('user');
   const field = Field.useField();
   const { init, validate, setValue, getValue } = field;
-  const isAuth = Boolean(get(ownerUserInfoRequest.data, 'data.third_part.github.owner'));
-  const isOwner = get(ownerUserInfoRequest.data, 'data.id') === get(userState, 'userInfo.id');
+  const isAuth = Boolean(get(orgDetailRequest.data, 'data.third_part.github.owner'));
+  const isOwner = get(orgDetailRequest.data, 'data.user_id') === get(userState, 'userInfo.id');
   useEffect(() => {
-    ownerUserInfoRequest.request();
+    orgDetailRequest.request();
   }, []);
 
   useEffect(() => {
@@ -61,7 +61,7 @@ const AuthDialog = (props: IProps) => {
       setValue('user_list', []);
       return;
     }
-    const userInfo = get(ownerUserInfoRequest.data, 'data', {}) as IUserInfo;
+    const userInfo = get(orgDetailRequest.data, 'data', {}) as IUserInfo;
     const avatar = get(userInfo, 'third_part.github.avatar', '');
     const value = get(userInfo, 'third_part.github.owner', '');
     userInfo.value = value;
@@ -115,7 +115,7 @@ const AuthDialog = (props: IProps) => {
         reset();
         // 重置当前组件的数据
         field.reset();
-        ownerUserInfoRequest.refresh();
+        orgDetailRequest.refresh();
       },
     });
   };
@@ -138,7 +138,7 @@ const AuthDialog = (props: IProps) => {
 
   const refresh = async () => {
     setRefreshLoading(true);
-    await ownerUserInfoRequest.refresh();
+    await orgDetailRequest.refresh();
     setRefreshLoading(false);
   };
 
@@ -149,8 +149,8 @@ const AuthDialog = (props: IProps) => {
           className="full-width"
           placeholder="请选择"
           dataSource={getValue('user_list')}
-          state={ownerUserInfoRequest.loading ? 'loading' : undefined}
-          disabled={ownerUserInfoRequest.loading}
+          state={orgDetailRequest.loading ? 'loading' : undefined}
+          disabled={orgDetailRequest.loading}
           value={value?.value}
           onChange={handleChange}
           valueRender={valueRender}

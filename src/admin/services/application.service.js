@@ -10,7 +10,7 @@ const taskModel = require('../models/task.mode');
 const orgModel = require('../models/org.mode');
 
 const webhookService = require('./webhook.service');
-const userService = require('./user.service');
+const orgService = require('./org.service');
 
 async function listByOrgName(orgName = '') {
   const { id: orgId } = await orgModel.getOwnerOrgByName(orgName);
@@ -32,7 +32,7 @@ async function preview(body = {}) {
   }
 }
 
-async function create(orgId, orgName, providerToken, body) {
+async function create(orgId, orgName, body) {
   await preview(body);
 
   const {
@@ -46,6 +46,8 @@ async function create(orgId, orgName, providerToken, body) {
   } = body;
   const appId = unionId();
   const webHookSecret = unionId();
+  const providerToken = await orgService.getProviderToken(orgName, provider);
+  debug(`providerToken: ${providerToken}`);
   debug('start add webhook');
   await webhookService.add({ owner, repo, token: providerToken, webHookSecret, appId, provider });
   debug('start create app');
@@ -66,13 +68,14 @@ async function create(orgId, orgName, providerToken, body) {
   debug('create app success');
   return { id: appId };
 }
+
 /**
  * 幂等
  * @param {*} param0 
  * @param {*} body 
  * @returns 
  */
-async function createByTemplate({ type, userId, orgId, orgName }, body) {
+async function createByTemplate({ type, orgId, orgName }, body) {
   const { provider, appId: oldAppId, owner, repo } = body;
   const appId = oldAppId || unionId();
   const execDir = `/tmp/${appId}`;
@@ -94,7 +97,7 @@ async function createByTemplate({ type, userId, orgId, orgName }, body) {
   }
   // 2. 初始化Repo
   if (type === 'initRepo') {
-    const token = await userService.getProviderToken(orgId, userId, provider);
+    const token = await orgService.getProviderToken(orgName, provider);
     await gitService.createRepoWithWebhook({
       owner,
       repo,
@@ -178,7 +181,7 @@ async function update(appId, params) {
   await appModel.updateAppById(appId, { ...appDetail, ...params });
 }
 
-async function remove(orgId, userId, appId) {
+async function remove(orgName, appId) {
   const appDetail = await getAppById(appId);
 
   if (_.isEmpty(appDetail)) {
@@ -186,7 +189,7 @@ async function remove(orgId, userId, appId) {
   }
 
   const { owner, repo_name, provider } = appDetail;
-  const token = await userService.getProviderToken(orgId, userId, provider);
+  const token = await orgService.getProviderToken(orgName, provider);
 
   debug('Start remove task');
   const taskList = await taskModel.deleteByAppId(appId);
