@@ -71,9 +71,9 @@ async function create(orgId, orgName, body) {
 
 /**
  * 幂等
- * @param {*} param0 
- * @param {*} body 
- * @returns 
+ * @param {*} param0
+ * @param {*} body
+ * @returns
  */
 async function createByTemplate({ type, orgId, orgName }, body) {
   const { provider, appId: oldAppId, owner, repo } = body;

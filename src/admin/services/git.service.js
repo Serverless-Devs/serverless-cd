@@ -88,27 +88,27 @@ async function createRepoWithWebhook({ owner, repo, token, secret, appId, provid
     await providerClient.createRepo({
       name: repo,
       private: false,
-      description: "Create by serverles-cd"
+      description: 'Create by serverles-cd',
     });
   }
   debug(`Repo is exist`);
-  debug(`Add webhook ${(owner, repo, token, secret, appId, provider)}`);
-  webhookService.add({ owner, repo, token, webHookSecret: secret, appId, provider });
+  debug(`Add webhook ${owner} ${repo} ${token} ${secret} ${appId} ${provider}`);
+  await webhookService.add({ owner, repo, token, webHookSecret: secret, appId, provider });
 }
 
 /**
  * git init
  * git config
- * git remote add origin 
- * 
+ * git remote add origin
+ *
  * git add .
  * git commit
- * @param {*} param0 
+ * @param {*} param0
  */
 async function initAndCommit({ provider, repoUrl, execDir, branch }) {
-  const gitClient = null;
+  let gitClient = null;
   if (!fs.existsSync(path.join(execDir, '.git'))) {
-    debug("git init config");
+    debug('git init config');
     gitClient = await initConfig({
       userName: 'serverless-cd',
       userEmail: 'serverless@serverless-cd',
@@ -117,22 +117,38 @@ async function initAndCommit({ provider, repoUrl, execDir, branch }) {
   }
   debug(`git set remote: ${repoUrl}`);
   try {
-    await setRemote({
-      provider_platform: provider,
-      repoUrl,
-      execDir,
-    }, gitClient);
+    await setRemote(
+      {
+        provider_platform: provider,
+        repoUrl,
+        execDir,
+      },
+      gitClient,
+    );
   } catch (error) {
     // ignore error
   }
 
   debug(`git add and commit`);
-  await addCommit({
-    execDir,
-    branch: branch || 'master',
-  }, gitClient);
+  await addCommit(
+    {
+      execDir,
+      branch: branch || 'master',
+    },
+    gitClient,
+  );
 }
 
+/**
+ * git push
+ */
+async function pushFile({ execDir, branch }) {
+  debug(`git push`);
+  await push({
+    execDir,
+    branch: branch || 'master',
+  });
+}
 
 module.exports = {
   getUser,
@@ -143,4 +159,5 @@ module.exports = {
   getProviderRepos,
   createRepoWithWebhook,
   initAndCommit,
+  pushFile,
 };
