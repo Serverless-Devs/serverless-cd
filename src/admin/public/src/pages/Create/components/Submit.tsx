@@ -15,10 +15,11 @@ interface IProps {
   field: Field;
   orgName: string;
   disabled?: boolean;
+  createType: `${CREATE_TYPE}`;
 }
 
 const Submit = (props: IProps) => {
-  const { orgName, field, disabled = false } = props;
+  const { orgName, field, disabled = false, createType } = props;
   const CD_PIPELINE_YAML = getConsoleConfig('CD_PIPELINE_YAML', 'serverless-pipeline.yaml');
   const [loading, setLoading] = useState(false);
   const { validate } = field;
@@ -109,7 +110,7 @@ const Submit = (props: IProps) => {
         },
       },
     };
-    return await createApp(dataMap[get(values, 'createType')]);
+    return await createApp(dataMap[createType]);
   };
   const doManualDeployApp = async (appId: string, branch: string) => {
     await manualDeployApp({
@@ -119,7 +120,13 @@ const Submit = (props: IProps) => {
   };
 
   return (
-    <Button className="mt-32 mr-8" type="primary" onClick={submit} disabled={disabled} loading={loading}>
+    <Button
+      className="mt-32 mr-8"
+      type="primary"
+      onClick={submit}
+      disabled={disabled}
+      loading={loading}
+    >
       创建
     </Button>
   );
