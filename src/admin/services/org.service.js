@@ -26,6 +26,7 @@ async function getOrgById(orgId = '') {
     return data;
   }
   const ownerData = await orgModel.getOwnerOrgByName(name);
+  _.set(data, 'third_part', ownerData.third_part);
   const secrets = _.get(ownerData, 'secrets', {});
   if (_.includes(ADMIN_ROLE_KEYS, role)) {
     _.set(data, 'secrets', secrets);
@@ -200,7 +201,7 @@ function desensitization(data) {
       id: item.id,
       avatar: item.avatar,
     }));
-    return _.omit(item, ['secrets'])
+    return item;
   };
 
 

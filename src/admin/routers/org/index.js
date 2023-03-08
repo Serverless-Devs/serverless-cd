@@ -24,7 +24,7 @@ router.get('/detail', auth(ROLE_KEYS), async (req, res) => {
 router.get('/listUsers', auth(ROLE_KEYS), async (req, res) => {
   const {
     orgId,
-    query: { orgName },
+    orgName,
   } = req;
   const result = await orgService.listByOrgName(orgId, orgName);
   res.json(Result.ofSuccess(orgService.desensitization(result)));

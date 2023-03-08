@@ -12,7 +12,7 @@ const orgService = require('./org.service');
 const { ValidationError, Client, unionToken } = require('../util');
 const {
   FC: { workerFunction: { region, serviceName, functionName } },
-  TASK_STATUS: { CANCEL, RUNNING }
+  TASK_STATUS: { CANCEL, RUNNING, PENDING }
 } = require('@serverless-cd/config');
 
 async function retryOnce(fnName, ...args) {
@@ -105,16 +105,18 @@ async function cancelTask({ taskId } = {}) {
     throw new ValidationError('没有查到部署信息');
   }
 
-  const { steps = [], app_id, trigger_payload } = taskResult;
+  const { steps = [], app_id, trigger_payload, status } = taskResult;
   try {
     const path = `/services/${serviceName}/functions/${functionName}/stateful-async-invocations/${taskId}`;
     await retryOnce('put', path);
   } catch (e) {
     debug(`cancel invoke error: ${e.code}, ${e.message}`);
-    if (e.code === 412 || e.code === 'StatefulAsyncInvocationAlreadyCompleted') {
-      throw new ValidationError('任务运行已经被停止');
+    if (![RUNNING, PENDING].includes(status)) {
+      if (e.code === 412 || e.code === 'StatefulAsyncInvocationAlreadyCompleted') {
+        throw new ValidationError('任务运行已经被停止');
+      }
+      throw new Error(e.toString());
     }
-    throw new Error(e.toString());
   }
 
   const updateTaskPayload = {
@@ -137,7 +139,7 @@ async function cancelTask({ taskId } = {}) {
     completed: true,
     status: CANCEL,
   };
-  await applicationService.updateAppById(app_id, { environment });
+  await applicationModel.updateAppById(app_id, { environment });
 }
 
 async function manualTask(dispatchOrgId, orgName, body = {}) {
