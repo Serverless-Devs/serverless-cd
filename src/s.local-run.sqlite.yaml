@@ -2,7 +2,9 @@ edition: 1.0.0
 name: serverless-cd
 access: dankun
 
-# 本地启动和部署日志和 databaseUrl 不太一样，需要注意
+# - 启动的时候根据需要修改的字段 domain databaseUrl(本地启动和部署日志和 databaseUrl 不太一样，需要注意)
+# - 生成domain参考：http://www.devsapp.cn/details.html?name=domain  type为fc
+# - role 需要手动添加 fcfull 的权限，否则会影响取消部署、worker异常处理、自动加载runtime 等能力
 
 vars:
   region: "cn-hongkong"
@@ -11,7 +13,6 @@ vars:
     description: Serverless-cd 应用
     logConfig: auto
     nasConfig: auto
-    role: acs:ram::1740298130743624:role/aliyunfcdefaultrole
   masterFunctionName: master
   workerFunctionName: worker
   adminFunctionName: admin
