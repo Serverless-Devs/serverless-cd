@@ -1,5 +1,4 @@
 const router = require('express').Router();
-const _ = require('lodash');
 const debug = require('debug')('serverless-cd:provider-github');
 
 const { Result } = require('../../../util');

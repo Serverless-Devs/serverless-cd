@@ -6,8 +6,6 @@ const { Result, generateOrgIdByUserIdAndOrgName } = require('../../util');
 const { OWNER_ROLE_KEYS, ADMIN_ROLE_KEYS, ROLE_KEYS } = require('@serverless-cd/config');
 const auth = require('../../middleware/auth');
 const orgService = require('../../services/org.service');
-const userService = require('../../services/user.service');
-const gitService = require('../../services/git.service');
 
 // 查看团队信息
 router.get('/detail', auth(ROLE_KEYS), async (req, res) => {
@@ -73,7 +71,7 @@ router.put('/token', auth(OWNER_ROLE_KEYS), async function (req, res) {
 
 
 // 删除成员
-router.post('/removeUser', auth(OWNER_ROLE_KEYS), async (req, res) => {
+router.post('/removeUser', auth(ADMIN_ROLE_KEYS), async (req, res) => {
   const {
     orgName,
     body: { inviteUserId },
