@@ -4,14 +4,15 @@ const gitProvider = require('@serverless-cd/git-provider');
 
 const taskModel = require('../models/task.mode');
 const orgModel = require('../models/org.mode');
-const applicationService = require('./application.service');
+const applicationModel = require('../models/application.mode');
+
 const taskService = require('./task.service');
 const orgService = require('./org.service');
 
 const { ValidationError, Client, unionToken } = require('../util');
 const {
   FC: { workerFunction: { region, serviceName, functionName } },
-  TASK_STATUS: { CANCEL, RUNNING }
+  TASK_STATUS: { CANCEL, RUNNING, PENDING }
 } = require('@serverless-cd/config');
 
 async function retryOnce(fnName, ...args) {
@@ -55,7 +56,7 @@ async function redeploy(dispatchOrgId, orgName, { taskId, appId } = {}) {
     throw new ValidationError('没有找到被触发的环境名称');
   }
 
-  const applicationResult = await applicationService.getAppById(appId);
+  const applicationResult = await applicationModel.getAppById(appId);
   if (_.isEmpty(applicationResult)) {
     throw new ValidationError('没有查到应用信息');
   }
@@ -78,9 +79,7 @@ async function redeploy(dispatchOrgId, orgName, { taskId, appId } = {}) {
   const ownerSecrets = _.get(ownerOrgData, 'secrets') || {};
   const appSecrets = _.get(environment, `${envName}.secrets`) || {};
 
-
-  const userResult = await orgService.getOwnerUserByName(orgName);
-  const providerToken = _.get(userResult, `third_part.${provider}.access_token`, '');
+  const providerToken = await orgService.getProviderToken(orgName, provider);
   _.merge(trigger_payload.authorization, {
     secrets: _.merge(ownerSecrets, appSecrets),
     dispatchOrgId,
@@ -106,16 +105,18 @@ async function cancelTask({ taskId } = {}) {
     throw new ValidationError('没有查到部署信息');
   }
 
-  const { steps = [], app_id, trigger_payload } = taskResult;
+  const { steps = [], app_id, trigger_payload, status } = taskResult;
   try {
     const path = `/services/${serviceName}/functions/${functionName}/stateful-async-invocations/${taskId}`;
     await retryOnce('put', path);
   } catch (e) {
     debug(`cancel invoke error: ${e.code}, ${e.message}`);
-    if (e.code === 412 || e.code === 'StatefulAsyncInvocationAlreadyCompleted') {
-      throw new ValidationError('任务运行已经被停止');
+    if (![RUNNING, PENDING].includes(status)) {
+      if (e.code === 412 || e.code === 'StatefulAsyncInvocationAlreadyCompleted') {
+        throw new ValidationError('任务运行已经被停止');
+      }
+      throw new Error(e.toString());
     }
-    throw new Error(e.toString());
   }
 
   const updateTaskPayload = {
@@ -138,7 +139,7 @@ async function cancelTask({ taskId } = {}) {
     completed: true,
     status: CANCEL,
   };
-  await applicationService.update(app_id, { environment });
+  await applicationModel.updateAppById(app_id, { environment });
 }
 
 async function manualTask(dispatchOrgId, orgName, body = {}) {
@@ -150,7 +151,7 @@ async function manualTask(dispatchOrgId, orgName, body = {}) {
     throw new ValidationError('ref 必填');
   }
 
-  const applicationResult = await applicationService.getAppById(appId);
+  const applicationResult = await applicationModel.getAppById(appId);
   if (_.isEmpty(applicationResult)) {
     throw new ValidationError('没有查到应用信息');
   }
@@ -158,8 +159,7 @@ async function manualTask(dispatchOrgId, orgName, body = {}) {
   const { owner, provider, repo_name, repo_url, environment, owner_org_id } = applicationResult;
 
   debug('find provider access token');
-  const userResult = await orgService.getOwnerUserByName(orgName);
-  const providerToken = _.get(userResult, `third_part.${provider}.access_token`, '');
+  const providerToken = await orgService.getProviderToken(orgName, provider);
   if (_.isEmpty(providerToken)) {
     throw new ValidationError(`${provider} 密钥查询异常`);
   }
@@ -221,4 +221,5 @@ module.exports = {
   manualTask,
   redeploy,
   cancelTask,
+  invokeFunction,
 };

@@ -40,29 +40,8 @@ async function getOrganizationOwnerIdByOrgId(orgId) {
   return await getUserById(ownerUserId);
 }
 
-/**
- * 根据团队Id获取拥有者用户Token
- */
-async function getProviderToken(orgId, userId, provider) {
-  const userInfo = await getOrganizationOwnerIdByOrgId(orgId);
-  const token = _.get(userInfo, `third_part.${provider}.access_token`, '');
-  if (!token) {
-    if (_.get(userInfo, 'id', '') === userId) {
-      throw new ValidationError(`${provider} 授权令牌不存在，请重新授权`);
-    }
-    throw new NoPermissionError(`没有找到 ${provider}.access_token`);
-  }
-
-  return token;
-}
-
 function desensitization(data) {
   const filterData = (item) => {
-    item.third_part = _.mapValues(_.get(data, 'third_part', {}), (item = {}) => ({
-      owner: item.owner,
-      id: item.id,
-      avatar: item.avatar,
-    }));
     return _.omit(item, ['password', 'secrets'])
   };
 
@@ -79,6 +58,5 @@ module.exports = {
   desensitization,
   getUserById,
   updateUserById,
-  getProviderToken,
   getOrganizationOwnerIdByOrgId,
 };

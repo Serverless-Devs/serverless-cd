@@ -9,6 +9,7 @@ src/example
 /src/s.local-run.sqlite.yaml
 /src/s.local-run.mysql.yaml
 /src/serverless-cd.yaml
+/src/***/prisma/migrations
 /Makefile
 /package.json
 /package-lock.json

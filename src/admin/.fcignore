@@ -4,3 +4,10 @@
 ./public/.ice
 ./node_modules/@prisma/engines
 ./node_modules/.prisma/client/libquery_engine-darwin.dylib.node
+__tests__
+public/abc.json
+public/build.json
+public/package.json
+public/package-lock.json
+public/.npmrc
+public/tsconfig.json
