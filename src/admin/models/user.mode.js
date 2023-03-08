@@ -5,19 +5,7 @@ const { unionId, md5Encrypt, prisma } = require('../util');
 const userPrisma = prisma[TABLE.USER];
 
 const getUserInfo = (result) => {
-  if (!result) {
-    return null;
-  }
-  const handlerUserInfo = (user) => {
-    user.third_part = _.isString(user.third_part)
-      ? JSON.parse(user.third_part)
-      : user.third_part;
-    return user;
-  }
-  if (_.isArray(result)) {
-    return _.map(result, handlerUserInfo);
-  }
-  return handlerUserInfo(result);
+  return result;
 };
 
 module.exports = {

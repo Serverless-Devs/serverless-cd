@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const { Result } = require('../../util');
 const authServices = require('../../services/auth.service');
-const userServices = require('../../services/user.service');
 
 /**
  * 注册

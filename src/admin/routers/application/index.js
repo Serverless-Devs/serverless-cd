@@ -2,17 +2,15 @@ const router = require('express').Router();
 const _ = require('lodash');
 const debug = require('debug')('serverless-cd:application');
 const { push } = require('@serverless-cd/git');
-const { Result, ValidationError, ParamsValidationError, unionId } = require('../../util');
+const { Result, ValidationError } = require('../../util');
 const auth = require('../../middleware/auth');
-const gitService = require('../../services/git.service');
 const appService = require('../../services/application.service');
-const userService = require('../../services/user.service');
-const { ADMIN_ROLE_KEYS, OWNER_ROLE_KEYS, ROLE_KEYS } = require('@serverless-cd/config');
+const { ADMIN_ROLE_KEYS, MEMBER_ROLE_KEYS, ROLE_KEYS } = require('@serverless-cd/config');
 
 /**
  * 创建应用预检测
  */
-router.post('/preview', async function (req, res) {
+router.post('/preview', auth(ADMIN_ROLE_KEYS), async function (req, res) {
   await appService.preview(req.body);
   return res.json(Result.ofSuccess());
 });
@@ -20,7 +18,7 @@ router.post('/preview', async function (req, res) {
 /**
  * 转让【owner】
  */
-router.post('/transfer', auth(OWNER_ROLE_KEYS), async (req, res) => {
+router.post('/transfer', auth(ADMIN_ROLE_KEYS), async (req, res) => {
   const { transferOrgName, appId } = req.body;
   const result = await appService.transfer(appId, transferOrgName);
   res.json(Result.ofSuccess(result));
@@ -50,11 +48,9 @@ router.get('/detail', auth(ROLE_KEYS), async function (req, res) {
  * 创建应用
  */
 router.post('/create', auth(ADMIN_ROLE_KEYS), async function (req, res) {
-  const { userId, orgId, orgName } = req;
-  const { provider } = req.body;
-  const providerToken = await userService.getProviderToken(orgId, userId, provider);
+  const { orgId, orgName } = req;
 
-  const appInfo = await appService.create(orgId, orgName, providerToken, req.body);
+  const appInfo = await appService.create(orgId, orgName, req.body);
   return res.json(Result.ofSuccess(appInfo));
 });
 
@@ -88,8 +84,7 @@ router.post('/createByTemplate', auth(ADMIN_ROLE_KEYS), async function (req, res
  * 应用删除
  */
 router.delete('/delete', auth(ADMIN_ROLE_KEYS), async function (req, res) {
-  const { userId, orgId } = req;
-  await appService.remove(orgId, userId, req.query.appId);
+  await appService.remove(req.orgName, req.query.appId);
 
   res.json(Result.ofSuccess({ message: '删除应用成功' }));
 });
@@ -97,7 +92,7 @@ router.delete('/delete', auth(ADMIN_ROLE_KEYS), async function (req, res) {
 /**
  * 修改应用
  */
-router.post('/update', auth(ADMIN_ROLE_KEYS), async function (req, res) {
+router.post('/update', auth(MEMBER_ROLE_KEYS), async function (req, res) {
   const { appId, environment } = req.body;
   await appService.update(appId, { environment });
   res.json(Result.ofSuccess());
@@ -106,7 +101,7 @@ router.post('/update', auth(ADMIN_ROLE_KEYS), async function (req, res) {
 /**
  * 删除环境
  */
-router.post('/removeEnv', auth(ADMIN_ROLE_KEYS), async function (req, res) {
+router.post('/removeEnv', auth(MEMBER_ROLE_KEYS), async function (req, res) {
   const { appId, envName } = req.body;
   if (!(appId || envName)) {
     throw new ValidationError(`appId 和 envName 必填。appId: ${appId}, envName: ${envName}`);

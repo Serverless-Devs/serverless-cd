@@ -1,37 +1,27 @@
 const debug = require('debug')('serverless-cd:git');
 const git = require('@serverless-cd/git-provider');
-const { checkFile, initConfig, addCommit, setRemote, push } = require('@serverless-cd/git');
-const { CD_PIPELINE_YAML } = require('@serverless-cd/config');
-const userService = require('./user.service');
-const path = require('path');
-const appService = require('./application.service');
-const webhookService = require('./webhook.service');
-const { ValidationError } = require('../util');
 const _ = require('lodash');
 const { fs } = require('@serverless-cd/core');
+const { checkFile, initConfig, addCommit, setRemote } = require('@serverless-cd/git');
+const { CD_PIPELINE_YAML } = require('@serverless-cd/config');
+const path = require('path');
 
-async function getProviderToken(orgId, provider) {
-  // 获取 owner 代码仓库的 token
-  const result = await userService.getOrganizationOwnerIdByOrgId(orgId);
-  const token = _.get(result, `third_part.${provider}.access_token`, '');
-  if (!token) {
-    throw new ValidationError(`没有找到${provider}.access_token`);
-  }
-  return token;
-}
+const appService = require('./application.service');
+const orgService = require('./org.service');
+const webhookService = require('./webhook.service');
 
-async function getProviderClient(orgId, provider) {
-  const token = await getProviderToken(orgId, provider);
+async function getProviderClient(orgName, provider) {
+  const token = await orgService.getProviderToken(orgName, provider);
   return git(provider, { access_token: token });
 }
 
-async function getProviderOrgs(orgId, provider) {
-  const providerClient = await getProviderClient(orgId, provider);
+async function getProviderOrgs(orgName, provider) {
+  const providerClient = await getProviderClient(orgName, provider);
   return await providerClient.listOrgs();
 }
 
-async function getProviderRepos(orgId, orgName, provider, { org } = {}) {
-  const providerClient = await getProviderClient(orgId, provider);
+async function getProviderRepos(orgName, provider, { org } = {}) {
+  const providerClient = await getProviderClient(orgName, provider);
   const applicationResult = await appService.listByOrgName(orgName);
 
   let rows;
@@ -55,28 +45,28 @@ async function getProviderRepos(orgId, orgName, provider, { org } = {}) {
   return rows;
 }
 
-async function getBranches(orgId, provider, query) {
-  const providerClient = await getProviderClient(orgId, provider);
+async function getBranches(orgName, provider, query) {
+  const providerClient = await getProviderClient(orgName, provider);
   return await providerClient.listBranches(query);
 }
 
-async function checkProviderFile(orgId, provider, body = {}) {
-  const token = await getProviderToken(orgId, provider);
+async function checkProviderFile(orgName, provider, body = {}) {
+  const token = await orgService.getProviderToken(orgName, provider);
   return await checkFile({ file: CD_PIPELINE_YAML, ...body, token });
 }
 
-async function putFile(orgId, provider, body) {
-  const { owner, repo, ref, sha } = body;
-  const providerClient = await getProviderClient(orgId, provider);
+async function putFile(orgName, provider, body) {
+  // const { owner, repo, ref, sha } = body;
+  const providerClient = await getProviderClient(orgName, provider);
   // TODO: 直接创建分支，后续守帅会优化
   try {
     // TODO: 如果分支存在，创建会报错
     await providerClient.octokit.request('POST /repos/{owner}/{repo}/git/refs', body);
-  } catch (error) {}
+  } catch (error) { }
   try {
     // TODO: 如果文件存在，putFile会报错
     return await providerClient.putFile(body);
-  } catch (error) {}
+  } catch (error) { }
 }
 
 async function getUser(provider, access_token) {
