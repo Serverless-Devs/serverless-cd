@@ -2,6 +2,8 @@ edition: 1.0.0
 name: serverless-cd
 access: dankun
 
+# 本地启动和部署日志和 databaseUrl 不太一样，需要注意
+
 vars:
   region: "cn-hongkong"
   service:
@@ -9,7 +11,7 @@ vars:
     description: Serverless-cd 应用
     logConfig: auto
     nasConfig: auto
-    role: acs:ram::1740298130743624:role/aliyunfcdefaultrole # 需要手动添加 fcfull 的权限
+    role: acs:ram::1740298130743624:role/aliyunfcdefaultrole
   masterFunctionName: master
   workerFunctionName: worker
   adminFunctionName: admin
@@ -88,14 +90,14 @@ services:
     component: fc
     actions:
       pre-deploy:
-      # - run: npm install --registry=https://registry.npmmirror.com --force
-      #   path: "./admin/public"
-      # - run: npm run build
-      #   path: "./admin/public"
-      # - run: npm install --registry=https://registry.npmmirror.com
-      #   path: "./admin"
-      # - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
-      #   path: "./admin"
+        - run: npm install --registry=https://registry.npmmirror.com --force
+          path: "./admin/public"
+        - run: npm run build
+          path: "./admin/public"
+        - run: npm install --registry=https://registry.npmmirror.com
+          path: "./admin"
+        - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
+          path: "./admin"
       post-deploy:
         - component: fc invoke --event '{"path":"/api/common/init?prisma=sqlite"}'
     props:

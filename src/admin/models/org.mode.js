@@ -11,9 +11,7 @@ const getOrgInfo = (result) => {
   if (_.isArray(result)) {
     result = _.first(result);
   }
-  if (result.secrets) {
-    result.secrets = JSON.parse(result.secrets);
-  }
+  result.secrets = result.secrets ? JSON.parse(result.secrets) : {};
   if (result.third_part) {
     result.third_part = JSON.parse(result.third_part)
   }

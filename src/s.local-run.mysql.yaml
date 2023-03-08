@@ -1,58 +1,28 @@
 edition: 1.0.0
 name: serverless-cd
-access: default
+access: dankun
+
+# 启动的时候根据需要修改的字段：role domain logLocalPathPrefix databaseUrl
 
 vars:
   region: "cn-hongkong"
   service:
-    name: "serverless-cd"
+    name: "wss"
     description: Serverless-cd 应用
     logConfig: auto
     nasConfig: auto
+    role: acs:ram::1740298130743624:role/aliyunfcdefaultrole
   masterFunctionName: master
   workerFunctionName: worker
   adminFunctionName: admin
   workerDeliverFunctionName: workerDeliver
-  domain: "0.0.0.0"
-  logLocalPathPrefix: ../logs
+  domain: "auto.wss.1740298130743624.cn-hongkong.fc.devsapp.net"
+  logLocalPathPrefix: /mnt/auto/logs
   databaseUrl: "${env.DATABASE_URL}"
   prisma: "mysql"
   JWT_SECRET: 0df85e4e140f6
 
 services:
-  master:
-    component: fc
-    actions:
-      pre-deploy:
-        - run: npm install --registry=https://registry.npmmirror.com
-          path: "./master"
-        - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
-          path: "./master"
-    props:
-      region: ${vars.region}
-      service: ${vars.service}
-      function:
-        name: ${vars.masterFunctionName}
-        description: 用于验证 CD的触发方式、请求的合法性以及组装一些 worker 函数需要的内容
-        runtime: nodejs14
-        codeUri: ./master
-        handler: index.handler
-        memorySize: 640
-        timeout: 12
-        instanceConcurrency: 20
-        layers:
-          - acs:fc:${vars.region}:1940309364339785:layers/sqlite3/versions/1
-        environmentVariables:
-          PATH: /opt:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
-          DATABASE_URL: ${vars.databaseUrl} # 用于链接数据库
-      triggers:
-        - name: http-trigger
-          type: http
-          config:
-            authType: anonymous
-            methods:
-              - POST
-
   worker:
     component: fc
     actions:
@@ -95,12 +65,6 @@ services:
 
   worker-deliver:
     component: fc
-    # actions:
-    #   pre-deploy:
-    #     - run: npm install --registry=https://registry.npmmirror.com
-    #       path: "./worker"
-    #     - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
-    #       path: "./worker"
     props:
       region: ${vars.region}
       service: ${vars.service}
@@ -132,12 +96,6 @@ services:
           path: "./admin"
         - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
           path: "./admin"
-        - plugin: get-http-function-url # 获取依赖的 trigger 函数的触发器地址，会覆盖 environmentVariables 的 WEBHOOK_URL
-          args:
-            region: ${vars.region}
-            serviceName: ${vars.service.name}
-            functionName: ${vars.masterFunctionName}
-            envKey: WEBHOOK_URL
       post-deploy:
         - component: fc invoke --event '{"path":"/api/common/init?prisma=mysql"}'
     props:
@@ -165,6 +123,7 @@ services:
           DATABASE_URL: ${vars.databaseUrl} # 用于链接数据库
           LOG_LOCAL_PATH_PREFIX: ${vars.logLocalPathPrefix}
           JWT_SECRET: ${vars.JWT_SECRET}
+          WEBHOOK_URL: http://${vars.domain}
       triggers:
         - name: http-trigger
           type: http
