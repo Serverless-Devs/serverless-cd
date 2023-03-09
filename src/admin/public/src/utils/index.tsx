@@ -139,3 +139,16 @@ export function isJson(str) {
   }
   return true;
 }
+
+
+export function setSearchParams(params) {
+  const out = new URL(window.location.href);
+  Object.keys(params).forEach((key) => {
+    out.searchParams.set(key, String(params[key]));
+  });
+  const url = out.toString();
+
+  if (url !== window.location.href && window.history.pushState) {
+    window.history.pushState({ path: url }, '', url);
+  }
+}

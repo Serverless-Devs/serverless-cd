@@ -1,10 +1,20 @@
 const _ = require('lodash');
 const debug = require('debug')('serverless-cd:org-service');
 const { ROLE, ROLE_KEYS, OWNER_ROLE_KEYS, ADMIN_ROLE_KEYS } = require('@serverless-cd/config');
+const git = require('@serverless-cd/git-provider');
 const orgModel = require('../models/org.mode');
 const applicationModel = require('../models/application.mode');
 const userModel = require('../models/user.mode');
 const { ValidationError, NoPermissionError, generateOrgIdByUserIdAndOrgName } = require('../util');
+
+async function getProviderToken(orgName, provider) {
+  const result = await orgModel.getOwnerOrgByName(orgName);
+  const token = _.get(result, `third_part.${provider}.access_token`, '');
+  if (!token) {
+    throw new ValidationError(`没有找到${provider}.access_token`);
+  }
+  return token;
+}
 
 async function getOrgById(orgId = '') {
   const data = await orgModel.getOrgById(orgId);
@@ -16,6 +26,7 @@ async function getOrgById(orgId = '') {
     return data;
   }
   const ownerData = await orgModel.getOwnerOrgByName(name);
+  _.set(data, 'third_part', ownerData.third_part);
   const secrets = _.get(ownerData, 'secrets', {});
   if (_.includes(ADMIN_ROLE_KEYS, role)) {
     _.set(data, 'secrets', secrets);
@@ -123,11 +134,28 @@ async function deleteUser(orgName, inviteUserId) {
 async function remove(orgId, orgName) {
   await orgModel.deleteMany({ name: orgName });
   await applicationModel.deleteAppByOwnerOrgId(orgId);
+  // TODO: 删除webhook
 }
 
 async function updateOwnerByName(orgName, data) {
   const { id: orgId } = await orgModel.getOwnerOrgByName(orgName);
   await orgModel.updateOrg(orgId, data);
+}
+
+async function updateThirdPart(orgName, { token, provider }) {
+  const data = await orgModel.getOwnerOrgByName(orgName);
+  if (_.isEmpty(token)) {
+    _.set(data, `third_part.${provider}`, {});
+  } else {
+    const providerClient = git(provider, { access_token: token });
+    const { login, id, avatar } = await providerClient.user();
+    _.set(data, `third_part.${provider}.access_token`, token);
+    _.set(data, `third_part.${provider}.owner`, login);
+    _.set(data, `third_part.${provider}.id`, id);
+    _.set(data, `third_part.${provider}.avatar`, avatar);
+  }
+
+  await orgModel.updateOrg(data.id, data);
 }
 
 async function transfer(orgId, orgName, transferUserName) {
@@ -167,11 +195,20 @@ async function transfer(orgId, orgName, transferUserName) {
 }
 
 function desensitization(data) {
-  return data;
-  // if (_.isArray(data)) {
-  //   return _.map(data, item => _.omit(item, ['secrets']))
-  // }
-  // return _.omit(data, ['secrets']);
+  const filterData = (item) => {
+    item.third_part = _.mapValues(_.get(data, 'third_part', {}), (item = {}) => ({
+      owner: item.owner,
+      id: item.id,
+      avatar: item.avatar,
+    }));
+    return item;
+  };
+
+
+  if (_.isArray(data)) {
+    return _.map(data, filterData)
+  }
+  return filterData(data);
 }
 
 async function getOwnerUserByName(orgName) {
@@ -180,6 +217,7 @@ async function getOwnerUserByName(orgName) {
 }
 
 module.exports = {
+  updateThirdPart,
   getOwnerUserByName,
   updateOwnerByName,
   desensitization,
@@ -192,4 +230,5 @@ module.exports = {
   getOrgById,
   listByUserId,
   listByOrgName,
+  getProviderToken,
 };

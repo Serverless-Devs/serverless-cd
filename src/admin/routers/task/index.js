@@ -5,7 +5,7 @@ const debug = require('debug')('serverless-cd:task');
 
 const { Result, Client, ValidationError, NotFoundError } = require('../../util');
 const auth = require('../../middleware/auth');
-const { ADMIN_ROLE_KEYS, LOG_LOCAL_PATH_PREFIX } = require('@serverless-cd/config');
+const { MEMBER_ROLE_KEYS, LOG_LOCAL_PATH_PREFIX } = require('@serverless-cd/config');
 const taskService = require('../../services/task.service');
 
 /**
@@ -67,7 +67,7 @@ router.get('/log', async function (req, res) {
 /**
  * 删除 task
  */
-router.post('/remove', auth(ADMIN_ROLE_KEYS), async function (req, res) {
+router.post('/remove', auth(MEMBER_ROLE_KEYS), async function (req, res) {
   const taskId = _.get(req.body, 'taskId');
   await taskService.remove(taskId);
   res.json(Result.ofSuccess());

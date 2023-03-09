@@ -3,7 +3,14 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const { prisma } = require('../util');
 
-async function testConnection() {
+async function testConnection(_dbType) {
+  // try {
+  //   spawnSync(`npx prisma generate --schema=./prisma/${dbType}.prisma`, {
+  //     encoding: 'utf8',
+  //     stdio: 'inherit',
+  //     shell: true,
+  //   });
+  // } catch (e) { }
   // 判断数据表是否已经存在
   try {
     await prisma.user.findUnique({ where: { id: '2' } });
@@ -60,7 +67,7 @@ module.exports = async function (dbType) {
   }
 
   for (let i = 1; i < 4; i++) {
-    const connection = await testConnection();
+    const connection = await testConnection(dbType);
     console.log(`第 ${i} 次，connection: ${connection}, dbType: ${dbType}`);
     if (connection) {
       return;
@@ -71,7 +78,7 @@ module.exports = async function (dbType) {
     // 修改函数 强制访问新的容器
   }
 
-  const connection = await testConnection();
+  const connection = await testConnection(dbType);
   if (!connection) {
     throw new Error('没有链接上数据表');
   }

@@ -27,11 +27,18 @@ test('create repo and Webhook', async () => {
   });
 });
 
-test.only('git init and commit', async () => {
+test('git init and commit', async () => {
   await gitService.initAndCommit({
     provider,
     execDir,
     repoUrl: `https://${provider}.com/${owner}/${repo}.git`,
+    branch: 'master',
+  });
+});
+
+test('git push', async () => {
+  await gitService.pushFile({
+    execDir,
     branch: 'master',
   });
 });

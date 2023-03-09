@@ -147,7 +147,7 @@ const CommitList: FC<IProps> = (props) => {
                       ) : (
                         <CancelDeploy
                           isText
-                          taskId={latestTaskId as string}
+                          taskId={taskId as string}
                           appId={appId}
                           repoName={get(application, 'repo_name', '') as string}
                           refreshCallback={refresh}

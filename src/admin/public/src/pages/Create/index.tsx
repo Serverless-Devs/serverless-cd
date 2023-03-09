@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Field } from '@alicloud/console-components';
 import PageLayout from '@/layouts/PageLayout';
 import CreateType, { CREATE_TYPE } from './components/CreateType';
 import Github from './components/github/index';
-import Submit from './components/Submit';
+import CreateTemplate from './components/template/index';
+import { setSearchParams, getParam } from '@/utils/index';
 import './index.less';
 
 const Create = ({
@@ -30,15 +31,31 @@ const Create = ({
 
 export const CreateAppLication = ({ orgName }) => {
   const field = Field.useField();
-  const { init, getValue } = field;
+  const template = getParam('template');
+  const [createType, setCreateType] = useState(
+    template ? CREATE_TYPE.Template : CREATE_TYPE.Repository,
+  );
+  const [pageKey, forceUpdate] = useState(0);
+  const templateRef: any = useRef(null);
+  const onChangeCreateType = (type) => {
+    setSearchParams({ template: '' });
+    setCreateType(type);
+  };
 
   return (
     <div className="appliaction-create-container">
-      <CreateType {...init('createType', { initValue: CREATE_TYPE.Repository })} />
-      {getValue('createType') === CREATE_TYPE.Repository && <Github field={field} />}
-      {getValue('createType') === CREATE_TYPE.Template && <h1>敬请期待...</h1>}
-      {getValue('createType') === CREATE_TYPE.Repository && (
-        <Submit field={field} orgName={orgName} />
+      {!template && <CreateType value={createType} onChange={onChangeCreateType} />}
+      {createType === CREATE_TYPE.Template && (
+        <CreateTemplate
+          key={pageKey}
+          forceUpdate={() => forceUpdate(pageKey + 1)}
+          field={field}
+          ref={templateRef}
+          orgName={orgName}
+        />
+      )}
+      {createType === CREATE_TYPE.Repository && (
+        <Github field={field} createType={CREATE_TYPE.Repository} orgName={orgName} />
       )}
     </div>
   );
