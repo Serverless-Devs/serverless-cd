@@ -122,11 +122,16 @@ async function createByTemplate({ type, orgId, orgName }, body) {
   }
   // 4. 提交代码
   if (type === 'push') {
-    await push({
+    const token = await orgService.getProviderToken(orgName, provider);
+    const data = await gitService.pushFile({
+      owner,
+      repo,
       execDir,
       branch: 'master',
+      provider,
+      token,
     });
-    return {};
+    return data;
   }
 
   // 5. 创建应用
