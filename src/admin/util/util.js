@@ -69,8 +69,8 @@ const generateOrgIdByUserIdAndOrgName = (id, name) => {
   if (!checkNameAvailable(name)) {
     throw new ValidationError('输入的名称不符合规则');
   }
-  return `${id}:${name}`
-}
+  return `${id}:${name}`;
+};
 
 class Webhook {
   static ROUTE = 'webhookTriggered';

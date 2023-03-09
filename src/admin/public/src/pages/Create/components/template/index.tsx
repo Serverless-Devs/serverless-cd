@@ -8,26 +8,28 @@ const CreateTemplate = ({ field, forceUpdate = noop, orgName }, ref) => {
   const [template, setTemplate] = useState();
 
   useImperativeHandle(ref, () => ({
-    template
-  }))
+    template,
+  }));
 
   useEffect(() => {
     const template: any = getParam('template');
     setTemplate(template);
-  }, [])
+  }, []);
 
   return (
     <>
-      {
-        template ? (
-          <TemplateContent field={field} template={template} forceUpdate={forceUpdate} orgName={orgName} />
-        ) : (
-          <TemplateList forceUpdate={forceUpdate} />
-        )
-      }
+      {template ? (
+        <TemplateContent
+          field={field}
+          template={template}
+          forceUpdate={forceUpdate}
+          orgName={orgName}
+        />
+      ) : (
+        <TemplateList forceUpdate={forceUpdate} />
+      )}
     </>
-  )
-}
-
+  );
+};
 
 export default forwardRef(CreateTemplate);

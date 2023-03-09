@@ -30,10 +30,7 @@ const Login = () => {
         shape="square"
       />
       <AccountLoginOrSignUp pageType="signUp" request={signUp} /> */}
-      <AccountSingUp
-        title={title}
-        request={signUp}
-      />
+      <AccountSingUp title={title} request={signUp} />
     </div>
   );
 };

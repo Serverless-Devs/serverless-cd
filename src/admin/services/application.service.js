@@ -8,6 +8,8 @@ const { ValidationError, unionId } = require('../util');
 const appModel = require('../models/application.mode');
 const taskModel = require('../models/task.mode');
 const orgModel = require('../models/org.mode');
+const gitService = require('./git.service');
+const os = require('os');
 
 const webhookService = require('./webhook.service');
 const orgService = require('./org.service');
@@ -78,10 +80,10 @@ async function create(orgId, orgName, body) {
 async function createByTemplate({ type, orgId, orgName }, body) {
   const { provider, appId: oldAppId, owner, repo } = body;
   const appId = oldAppId || unionId();
-  const execDir = `/tmp/${appId}`;
+  const execDir = path.join(os.tmpdir(), repo);
   // 1. 初始化模版
   if (type === 'initTemplate') {
-    const { template, parameters = {} } = req.body;
+    const { template, parameters = {} } = body;
     if (_.isEmpty(template)) {
       throw new ParamsValidationError('参数校验失败，template必填 ');
     }
@@ -98,7 +100,7 @@ async function createByTemplate({ type, orgId, orgName }, body) {
   // 2. 初始化Repo
   if (type === 'initRepo') {
     const token = await orgService.getProviderToken(orgName, provider);
-    await gitService.createRepoWithWebhook({
+    const res = await gitService.createRepoWithWebhook({
       owner,
       repo,
       token,
@@ -106,7 +108,7 @@ async function createByTemplate({ type, orgId, orgName }, body) {
       appId,
       provider,
     });
-    return { appId, webhookSecret };
+    return { appId, ...res };
   }
   // 3. 初始化commit信息
   if (type === 'initCommit') {

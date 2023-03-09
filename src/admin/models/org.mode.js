@@ -13,7 +13,7 @@ const getOrgInfo = (result) => {
   }
   result.secrets = result.secrets ? JSON.parse(result.secrets) : {};
   if (result.third_part) {
-    result.third_part = JSON.parse(result.third_part)
+    result.third_part = JSON.parse(result.third_part);
   }
   return result;
 };
@@ -26,7 +26,7 @@ const saveOrg = (data) => {
     data.third_part = JSON.stringify(data.third_part);
   }
   return data;
-}
+};
 
 module.exports = {
   async getOwnerOrgByName(name = '') {

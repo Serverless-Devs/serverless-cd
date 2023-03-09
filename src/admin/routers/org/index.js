@@ -20,10 +20,7 @@ router.get('/detail', auth(ROLE_KEYS), async (req, res) => {
 
 // 显示团队成员
 router.get('/listUsers', auth(ROLE_KEYS), async (req, res) => {
-  const {
-    orgId,
-    orgName,
-  } = req;
+  const { orgId, orgName } = req;
   const result = await orgService.listByOrgName(orgId, orgName);
   res.json(Result.ofSuccess(orgService.desensitization(result)));
 });
@@ -68,7 +65,6 @@ router.put('/token', auth(OWNER_ROLE_KEYS), async function (req, res) {
   await orgService.updateThirdPart(orgName, { token, provider });
   return res.json(Result.ofSuccess());
 });
-
 
 // 删除成员
 router.post('/removeUser', auth(ADMIN_ROLE_KEYS), async (req, res) => {

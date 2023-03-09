@@ -84,7 +84,7 @@ module.exports = {
         data: {
           owner_org_id: targetOrgId,
         },
-      })
+      }),
     ]);
   },
 };

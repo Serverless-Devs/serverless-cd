@@ -79,7 +79,10 @@ async function handler(event, _context, callback) {
     logger.info('checkout success');
 
     // 解析 pipeline
-    const pipLineYaml = path.join(cwdPath, _.get(environment, `${envName}.cd_pipeline_yaml`) || CD_PIPELINE_YAML);
+    const pipLineYaml = path.join(
+      cwdPath,
+      _.get(environment, `${envName}.cd_pipeline_yaml`) || CD_PIPELINE_YAML,
+    );
     logger.info(`parse spec: ${pipLineYaml}`);
     const pipelineContext = core.parseSpec(pipLineYaml);
     logger.debug(`pipelineContext:: ${JSON.stringify(pipelineContext)}`);

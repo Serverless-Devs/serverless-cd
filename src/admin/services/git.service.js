@@ -6,7 +6,7 @@ const { checkFile, initConfig, addCommit, setRemote } = require('@serverless-cd/
 const { CD_PIPELINE_YAML } = require('@serverless-cd/config');
 const path = require('path');
 
-const appService = require('./application.service');
+const commonService = require('./common.service');
 const orgService = require('./org.service');
 const webhookService = require('./webhook.service');
 
@@ -22,7 +22,7 @@ async function getProviderOrgs(orgName, provider) {
 
 async function getProviderRepos(orgName, provider, { org } = {}) {
   const providerClient = await getProviderClient(orgName, provider);
-  const applicationResult = await appService.listByOrgName(orgName);
+  const applicationResult = await commonService.listByOrgName(orgName);
 
   let rows;
   if (org) {
@@ -62,11 +62,11 @@ async function putFile(orgName, provider, body) {
   try {
     // TODO: 如果分支存在，创建会报错
     await providerClient.octokit.request('POST /repos/{owner}/{repo}/git/refs', body);
-  } catch (error) { }
+  } catch (error) {}
   try {
     // TODO: 如果文件存在，putFile会报错
     return await providerClient.putFile(body);
-  } catch (error) { }
+  } catch (error) {}
 }
 
 async function getUser(provider, access_token) {
@@ -83,17 +83,26 @@ async function createRepoWithWebhook({ owner, repo, token, secret, appId, provid
   const providerClient = git(provider, { access_token: token });
 
   const hasRepoResult = await providerClient.hasRepo({ owner, repo });
+  let res = {
+    id: _.get(hasRepoResult, 'id'),
+    url: _.get(hasRepoResult, 'url'),
+  };
   if (!_.get(hasRepoResult, 'isExist')) {
     debug(`Repo not exist, create repo ${(owner, repo)}`);
-    await providerClient.createRepo({
+    const data = await providerClient.createRepo({
       name: repo,
       private: false,
       description: 'Create by serverles-cd',
     });
+    res = {
+      id: _.get(data, 'id'),
+      url: _.get(data, 'url'),
+    };
   }
   debug(`Repo is exist`);
   debug(`Add webhook ${owner} ${repo} ${token} ${secret} ${appId} ${provider}`);
   await webhookService.add({ owner, repo, token, webHookSecret: secret, appId, provider });
+  return res;
 }
 
 /**
@@ -128,7 +137,6 @@ async function initAndCommit({ provider, repoUrl, execDir, branch }) {
   } catch (error) {
     // ignore error
   }
-
   debug(`git add and commit`);
   await addCommit(
     {

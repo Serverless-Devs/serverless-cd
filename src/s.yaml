@@ -1,11 +1,11 @@
 edition: 1.0.0
 name: serverless-cd
-access: "{{ access }}"
+access: '{{ access }}'
 
 vars:
-  region: "{{region}}"
+  region: '{{region}}'
   service:
-    name: "{{serviceName}}"
+    name: '{{serviceName}}'
     description: Serverless-cd 应用
     logConfig: auto
     nasConfig: auto
@@ -15,10 +15,10 @@ vars:
   workerFunctionName: worker
   adminFunctionName: admin
   workerDeliverFunctionName: workerDeliver
-  domain: "{{domain}}"
+  domain: '{{domain}}'
   logLocalPathPrefix: /mnt/auto/logs
-  databaseUrl: "{{databaseUrl}}"
-  prisma: "{{prisma}}"
+  databaseUrl: '{{databaseUrl}}'
+  prisma: '{{prisma}}'
 
 services:
   worker:
@@ -26,9 +26,9 @@ services:
     actions:
       pre-deploy:
         - run: npm install --registry=https://registry.npmmirror.com
-          path: "./worker"
+          path: './worker'
         - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
-          path: "./worker"
+          path: './worker'
       post-deploy:
         - component: fc api UpdateFunction --region ${vars.region} --header '{"x-fc-disable-container-reuse":"True"}' --path '{"serviceName":"${vars.service.name}","functionName":"${vars.workerFunctionName}"}'
     props:
@@ -85,13 +85,13 @@ services:
     actions:
       pre-deploy:
         - run: npm install --registry=https://registry.npmmirror.com --force
-          path: "./admin/public"
+          path: './admin/public'
         - run: npm run build
-          path: "./admin/public"
+          path: './admin/public'
         - run: npm install --registry=https://registry.npmmirror.com
-          path: "./admin"
+          path: './admin'
         - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
-          path: "./admin"
+          path: './admin'
       post-deploy:
         - component: fc invoke --event '{"path":"/api/common/init?prisma={{prisma}}"}'
     props:

@@ -4,14 +4,13 @@ import { Link, history } from 'ice';
 import store from '@/store';
 import './singIn.css';
 
-
 const SingInupBase = (props) => {
   const {
     title,
     request: { loading, data, request },
   } = props;
   const [, userDispatchers] = store.useModel('user');
-  
+
   useEffect(() => {
     goAppList();
   }, [JSON.stringify(data)]);
@@ -34,11 +33,7 @@ const SingInupBase = (props) => {
   };
   return (
     <React.Fragment>
-      <Auth
-        title={title}
-        type="LOGIN"
-        onSingIn={btnClick}
-      >
+      <Auth title={title} type="LOGIN" onSingIn={btnClick}>
         <div className="singup-or-rememberme">
           <Link to="/signUp" style={{ textDecoration: 'underline' }}>
             没有账号？去注册
