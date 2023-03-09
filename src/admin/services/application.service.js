@@ -112,10 +112,11 @@ async function createByTemplate({ type, orgId, orgName }, body) {
   }
   // 3. 初始化commit信息
   if (type === 'initCommit') {
+    const token = await orgService.getProviderToken(orgName, provider);
     await gitService.initAndCommit({
       provider,
       execDir,
-      repoUrl: `https://${provider}.com/${owner}/${repo}.git`,
+      repoUrl: `https://${token}@${provider}.com/${owner}/${repo}.git`,
       branch: 'master',
     });
     return {};
