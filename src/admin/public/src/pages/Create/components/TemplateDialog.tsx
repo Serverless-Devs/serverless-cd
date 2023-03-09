@@ -32,9 +32,8 @@ declare type Repo = {
 
 const TemplateDialog = (props: IProps) => {
   const { value, createType } = props;
-  const repoName = 'cd-demoTest11';
+  const repoName = get(value, 'repoName');
   const provider = 'github';
-
   const appId = get(getParams(location?.search), 'template');
   const owner = get(value, 'gitUser.value');
   const body = {

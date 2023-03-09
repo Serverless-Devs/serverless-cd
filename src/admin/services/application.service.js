@@ -9,6 +9,7 @@ const appModel = require('../models/application.mode');
 const taskModel = require('../models/task.mode');
 const orgModel = require('../models/org.mode');
 const gitService = require('./git.service');
+const os = require('os');
 
 const webhookService = require('./webhook.service');
 const orgService = require('./org.service');
@@ -79,7 +80,7 @@ async function create(orgId, orgName, body) {
 async function createByTemplate({ type, orgId, orgName }, body) {
   const { provider, appId: oldAppId, owner, repo } = body;
   const appId = oldAppId || unionId();
-  const execDir = `/Users/hazel/projects/${appId}`;
+  const execDir = path.join(os.tmpdir(), repo);
   // 1. 初始化模版
   if (type === 'initTemplate') {
     const { template, parameters = {} } = body;
