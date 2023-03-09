@@ -13,7 +13,7 @@ router.get('/info', async function (req, res) {
     throw new NeedLogin('用户信息异常');
   }
 
-  const listOrgs = await orgService.listByUserId(userId)
+  const listOrgs = await orgService.listByUserId(userId);
   const userInfo = {
     ...userService.desensitization(result),
     listOrgs: orgService.desensitization(listOrgs),

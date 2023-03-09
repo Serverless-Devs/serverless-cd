@@ -12,7 +12,7 @@ const orgModel = require('../models/org.mode');
 const ignoreRunFunctionError = async (fn, ...args) => {
   try {
     return await fn(...args);
-  } catch (ex) { }
+  } catch (ex) {}
 };
 
 async function add({ owner, repo, token: access_token, webHookSecret: secret, appId, provider }) {
@@ -67,7 +67,13 @@ async function triggered(appId, headers, body) {
   if (_.isEmpty(applicationResult)) {
     throw new ValidationError('没有查到应用信息');
   }
-  const { owner_org_id: ownerOrgId, environment = {}, webhook_secret, owner = '', secrets = {} } = applicationResult;
+  const {
+    owner_org_id: ownerOrgId,
+    environment = {},
+    webhook_secret,
+    owner = '',
+    secrets = {},
+  } = applicationResult;
   const orgResult = await orgModel.getOrgById(ownerOrgId);
   const accessToken = _.get(orgResult, `third_part.${provider}.access_token`, '');
   if (_.isEmpty(accessToken)) {
@@ -82,7 +88,11 @@ async function triggered(appId, headers, body) {
     eventConfig[provider].secret = webhook_secret;
     debug(`${key} eventConfig: ${JSON.stringify(eventConfig)}`);
     // 验证是否被触发
-    const triggerConfig = await ignoreRunFunctionError(verifyLegitimacy, eventConfig, triggerInputs);
+    const triggerConfig = await ignoreRunFunctionError(
+      verifyLegitimacy,
+      eventConfig,
+      triggerInputs,
+    );
     if (!_.get(triggerConfig, 'success')) {
       console.log(`env ${key} validate trigger failed`);
       continue;

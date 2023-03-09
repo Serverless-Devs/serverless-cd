@@ -30,11 +30,11 @@ const makeSetTaskData = (data) => {
     data.trigger_payload = JSON.stringify(data.trigger_payload);
   }
   return data;
-}
+};
 
 module.exports = {
   async getTaskById(id) {
-    const result = await taskPrisma.findUnique({ where: { id } });;
+    const result = await taskPrisma.findUnique({ where: { id } });
     return getTaskInfo(result);
   },
   async list(where, option = {}) {
@@ -53,7 +53,7 @@ module.exports = {
   async deleteById(id = '') {
     return await taskPrisma.delete({
       where: { id },
-    })
+    });
   },
   async deleteByAppIdAndEnvName(appId = '', envName = '') {
     return await taskPrisma.deleteMany({
@@ -61,16 +61,16 @@ module.exports = {
         app_id: appId,
         env_name: envName,
       },
-    })
+    });
   },
   async deleteByAppId(appId = '') {
     return await taskPrisma.deleteMany({
       where: {
         app_id: appId,
       },
-    })
+    });
   },
   async updateTask(id, data) {
     return await taskPrisma.update({ where: { id }, data: makeSetTaskData(data) });
   },
-};;
+};

@@ -31,7 +31,11 @@ async function getOrgById(orgId = '') {
   if (_.includes(ADMIN_ROLE_KEYS, role)) {
     _.set(data, 'secrets', secrets);
   } else {
-    _.set(data, 'secrets', _.mapValues(secrets, () => ''));
+    _.set(
+      data,
+      'secrets',
+      _.mapValues(secrets, () => ''),
+    );
   }
 
   return data;
@@ -50,7 +54,9 @@ async function listByOrgName(orgId, name = '') {
   const ownerData = _.find(result, ({ role }) => role === ROLE.OWNER);
   const { role } = _.find(result, ({ id }) => id === orgId);
   const ownerSecrets = _.get(ownerData, 'secrets', {});
-  const secrets = _.includes(ADMIN_ROLE_KEYS, role) ? ownerSecrets : _.mapValues(ownerSecrets, () => '');
+  const secrets = _.includes(ADMIN_ROLE_KEYS, role)
+    ? ownerSecrets
+    : _.mapValues(ownerSecrets, () => '');
 
   const names = await Promise.all(
     _.map(result, async ({ user_id: userId }) => {
@@ -171,7 +177,7 @@ async function transfer(orgId, orgName, transferUserName) {
   const orgData = await orgModel.getOrgById(orgId);
   // 获取目标用户的数据
   const transferUserId = transferUserConfig.id;
-  const transferOrgId = generateOrgIdByUserIdAndOrgName(`${transferUserId}:${orgName}`)
+  const transferOrgId = generateOrgIdByUserIdAndOrgName(`${transferUserId}:${orgName}`);
   const transferOrgData = await orgModel.getOrgById(transferOrgId);
   // 组合目标团队的数据
   const payload = {
@@ -179,7 +185,7 @@ async function transfer(orgId, orgName, transferUserName) {
     role: ROLE.OWNER,
     description: _.get(orgData, 'description'),
     secrets: _.get(orgData, 'secrets'),
-  }
+  };
 
   if (_.isEmpty(transferOrgData)) {
     _.set(payload, 'userId', transferUserId);
@@ -204,9 +210,8 @@ function desensitization(data) {
     return item;
   };
 
-
   if (_.isArray(data)) {
-    return _.map(data, filterData)
+    return _.map(data, filterData);
   }
   return filterData(data);
 }

@@ -41,7 +41,6 @@ const Secrets = () => {
   };
 
   const formaSecrets = (secrets) => {
-
     return map(keys(secrets), (key) => {
       return {
         key,
@@ -52,7 +51,7 @@ const Secrets = () => {
   };
 
   return (
-    <div className='mt-16'>
+    <div className="mt-16">
       <PageInfo
         extra={
           <Button type="primary" onClick={() => showDrawer(false)}>

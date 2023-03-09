@@ -7,9 +7,9 @@ access: dankun
 # - role 需要手动添加 fcfull 的权限，否则会影响取消部署、worker异常处理、自动加载runtime 等能力
 
 vars:
-  region: "cn-hongkong"
+  region: 'cn-hongkong'
   service:
-    name: "wss"
+    name: 'wss'
     description: Serverless-cd 应用
     logConfig: auto
     nasConfig: auto
@@ -17,10 +17,10 @@ vars:
   workerFunctionName: worker
   adminFunctionName: admin
   workerDeliverFunctionName: workerDeliver
-  domain: "auto.wss.1740298130743624.cn-hongkong.fc.devsapp.net"
+  domain: 'auto.wss.1740298130743624.cn-hongkong.fc.devsapp.net'
   logLocalPathPrefix: /mnt/auto/logs
-  databaseUrl: "${env.DATABASE_URL}"
-  prisma: "mysql"
+  databaseUrl: '${env.DATABASE_URL}'
+  prisma: 'mysql'
   JWT_SECRET: 0df85e4e140f6
 
 services:
@@ -29,9 +29,9 @@ services:
     actions:
       pre-deploy:
         - run: npm install --registry=https://registry.npmmirror.com
-          path: "./worker"
+          path: './worker'
         - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
-          path: "./worker"
+          path: './worker'
       post-deploy:
         - component: fc api UpdateFunction --region ${vars.region} --header
             '{"x-fc-disable-container-reuse":"True"}' --path
@@ -90,13 +90,13 @@ services:
     actions:
       pre-deploy:
         - run: npm install --registry=https://registry.npmmirror.com --force
-          path: "./admin/public"
+          path: './admin/public'
         - run: npm run build
-          path: "./admin/public"
+          path: './admin/public'
         - run: npm install --registry=https://registry.npmmirror.com
-          path: "./admin"
+          path: './admin'
         - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
-          path: "./admin"
+          path: './admin'
       post-deploy:
         - component: fc invoke --event '{"path":"/api/common/init?prisma=mysql"}'
     props:

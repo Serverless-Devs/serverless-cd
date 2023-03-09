@@ -4,7 +4,6 @@ import { Link, history } from 'ice';
 import './index.css';
 import store from '@/store';
 
-
 const AccountSingUp = (props) => {
   const {
     title,
@@ -34,11 +33,7 @@ const AccountSingUp = (props) => {
   };
   return (
     <React.Fragment>
-      <Auth 
-        title={title}
-        type="REGISTER"
-        onSignUp={btnClick}
-      >
+      <Auth title={title} type="REGISTER" onSignUp={btnClick}>
         <div className="already-account-sing-in">
           <Link to="/login" style={{ textDecoration: 'underline' }}>
             已经有账户？前往登录

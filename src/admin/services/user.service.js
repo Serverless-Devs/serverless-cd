@@ -42,16 +42,15 @@ async function getOrganizationOwnerIdByOrgId(orgId) {
 
 function desensitization(data) {
   const filterData = (item) => {
-    return _.omit(item, ['password', 'secrets'])
+    return _.omit(item, ['password', 'secrets']);
   };
 
   if (_.isArray(data)) {
-    return _.map(data, item => filterData(item));
+    return _.map(data, (item) => filterData(item));
   }
 
   return filterData(data);
 }
-
 
 module.exports = {
   fuzzyQueriesByName,

@@ -17,33 +17,34 @@ const TemplateContent = (props: IProps) => {
   // 生成随机数
   const generateRandom = () => Math.random().toString(36).substring(2, 6);
 
-  const { setValue } = field
+  const { setValue } = field;
 
   const goTemplateList = () => {
     setSearchParams({ template: '' });
-    forceUpdate?.()
-  }
+    forceUpdate?.();
+  };
 
   useEffect(() => {
     if (template) {
       setInitValue();
     }
-  }, [template])
+  }, [template]);
 
   const setInitValue = () => {
     const templateInfo = find(SERVERLESS_DEVS_LIST, { package: template });
     setValue('repoName', `${template}-${generateRandom()}`);
     setValue('description', get(templateInfo, 'description', ''));
-  }
+  };
 
   return (
     <>
-      <h1 style={{ marginTop: 0 }}><Icon type="wind-arrow-left" className='mr-16 cursor-pointer' onClick={goTemplateList} />模版列表</h1>
-      <Github field={field} createType='template' orgName={orgName} />
+      <h1 style={{ marginTop: 0 }}>
+        <Icon type="wind-arrow-left" className="mr-16 cursor-pointer" onClick={goTemplateList} />
+        模版列表
+      </h1>
+      <Github field={field} createType="template" orgName={orgName} />
     </>
   );
 };
 
-export default TemplateContent
-
-
+export default TemplateContent;
