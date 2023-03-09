@@ -120,7 +120,6 @@ const Github = (props: IProps) => {
         title="创建应用"
         onCancel={() => setVisible(false)}
         onOk={() => {
-          Toast.success('应用创建成功');
           history?.push(`/${orgName}`);
         }}
       >
