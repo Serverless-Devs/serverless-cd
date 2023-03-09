@@ -14,18 +14,19 @@ datasource db {
 model User {
   id    String     @id
   username String  @unique
+  email String  @unique
   avatar String?
   password String?
   github_unionid String?
-  third_part String?  @db.Text
 }
 
 model Org {
-  id    String     @id
+  id    String     @id    // 生成格式变更为：user_id:name
+  third_part String?  @db.Text
   user_id String
   secrets String?
-  name String             // 
-  role String             // owner / admin / member
+  name String
+  role String
   description String?
 }
 
