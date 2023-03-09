@@ -1,3 +1,4 @@
+require('@serverless-cd/config');
 const core = require('@serverless-devs/core');
 const path = require('path');
 const { spawnSync } = require('child_process');
