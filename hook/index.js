@@ -45,7 +45,6 @@ async function postInit(inputObj) {
   _.set(parameters, '_custom_secret_list.JWT_SECRET', Math.random().toString(16).substring(2));
   logger.debug('jwt 处理结束');
 
-
   logger.debug('域名处理');
   const domainName = await genDomain(logger, access, region, serviceName);
   _.set(parameters, 'domain', domainName);
@@ -53,16 +52,21 @@ async function postInit(inputObj) {
 
   logger.debug('数据库连接地址处理');
   if (prisma === 'mysql') {
-    logger.log('\n\n注意：需要在 .env 文件中配置DATABASE_URL，否则会影响链接数据库\n  示例：mysql://USER:PASSWORD@HOST:PORT/DATABASE', 'red');
+    logger.log(
+      '\n\n注意：需要在 .env 文件中配置DATABASE_URL，否则会影响链接数据库\n  示例：mysql://USER:PASSWORD@HOST:PORT/DATABASE',
+      'red',
+    );
     _.set(parameters, '_custom_secret_list.DATABASE_URL', ' # 需要填写配置路径');
-    _.set(parameters, 'databaseUrl', "${env.DATABASE_URL}");
+    _.set(parameters, 'databaseUrl', '${env.DATABASE_URL}');
   } else {
     _.set(parameters, 'databaseUrl', 'file:/mnt/auto/dev.db');
     try {
       // const dbPath = path.join(targetPath, 'local.db');
       // _.set(parameters, '_custom_secret_list.DATABASE_URL', dbPath);
       // TODO: 通过 inputObj.fse 写一个 db 文件
-    } catch (e) {/** */ }
+    } catch (e) {
+      /** */
+    }
   }
   logger.debug('数据库连接地址处理结束');
 

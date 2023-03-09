@@ -6,8 +6,8 @@ const prisma = new PrismaClient({
   datasources: {
     db: {
       url: DATABASE_URL,
-    }
-  }
+    },
+  },
 });
 const applicationPrisma = prisma[TABLE.APPLICATION];
 const taskPrisma = prisma[TABLE.TASK];
@@ -20,7 +20,7 @@ const makeSetTaskData = (data) => {
     data.trigger_payload = JSON.stringify(data.trigger_payload);
   }
   return data;
-}
+};
 const getTaskInfo = (result) => {
   if (!result) {
     return {};
@@ -41,24 +41,25 @@ const getTaskInfo = (result) => {
 
 /**
  * 通过 appId 修改应用信息
- * @param {*} id 
- * @returns 
+ * @param {*} id
+ * @returns
  */
 async function updateAppEnvById(id, envName, latestTask) {
   const result = await applicationPrisma.findUnique({ where: { id } });
   if (_.isEmpty(result)) {
     throw new Error(`Not found app with id ${id}`);
   }
-  result.environment = _.isString(result.environment) ? JSON.parse(result.environment) : result.environment;
+  result.environment = _.isString(result.environment)
+    ? JSON.parse(result.environment)
+    : result.environment;
   _.set(result, `environment.[${envName}].latest_task`, latestTask);
   result.environment = JSON.stringify(result.environment);
   console.log('result: ', result);
   return applicationPrisma.update({ where: { id }, data: result });
 }
 
-
 async function getTask(id) {
-  const result = await taskPrisma.findUnique({ where: { id } });;
+  const result = await taskPrisma.findUnique({ where: { id } });
   return getTaskInfo(result);
 }
 
@@ -72,9 +73,9 @@ async function updateTask(id, data) {
 
 /**
  * 处理 task
- * @param {*} id 
- * @param {*} params 
- * @returns 
+ * @param {*} id
+ * @param {*} params
+ * @returns
  */
 async function makeTask(id, data = {}) {
   const result = await getTask(id);
@@ -82,7 +83,7 @@ async function makeTask(id, data = {}) {
     return await createTask({
       ...data,
       id,
-    })
+    });
   }
 
   return await updateTask(id, data);
@@ -92,4 +93,4 @@ module.exports = {
   updateAppEnvById,
   makeTask,
   getTask,
-}
+};

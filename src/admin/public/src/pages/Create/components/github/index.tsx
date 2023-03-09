@@ -1,13 +1,16 @@
-import React, { useRef } from 'react';
-import { Form, Radio, Field, Input, Divider, Switch } from '@alicloud/console-components';
+import React, { useRef, useState } from 'react';
+import { Form, Radio, Field, Input, Divider, Switch, Dialog } from '@alicloud/console-components';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import AuthDialog from './AuthDialog';
 import Repo from './Repo';
 import Trigger from './Trigger';
 import ConfigEdit from '@/components/ConfigEdit';
+import { Toast } from '@/components/ToastContainer';
 import { PUSH } from '../constant';
 import { get } from 'lodash';
 import Submit from '../Submit';
+import TemplateDialog from '../TemplateDialog';
+import { history } from 'ice';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -21,6 +24,7 @@ interface IProps {
 const Github = (props: IProps) => {
   const { field, createType, orgName } = props;
   const { init, getValue, resetToDefault } = field;
+  const [dialogVisible, setVisible] = useState(false);
   const secretsRef: any = useRef(null);
 
   const secretsValidator = async (_, value, callback) => {
@@ -106,9 +110,22 @@ const Github = (props: IProps) => {
       <Submit
         field={field}
         orgName={orgName}
-        disabled={createType === 'template'}
+        createTemplate={createType === 'template'}
+        setVisible={setVisible}
         createType={createType as any}
       />
+      <Dialog
+        visible={dialogVisible}
+        onClose={() => setVisible(false)}
+        title="创建应用"
+        onCancel={() => setVisible(false)}
+        onOk={() => {
+          Toast.success('应用创建成功');
+          history?.push(`/${orgName}`);
+        }}
+      >
+        <TemplateDialog value={field.getValues()} createType={createType as any}></TemplateDialog>
+      </Dialog>
     </>
   );
 };

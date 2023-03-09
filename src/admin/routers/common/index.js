@@ -13,19 +13,20 @@ router.post(`/${Webhook.ROUTE}`, async function (req, res) {
   const {
     headers,
     body,
-    query: { app_id: appId }
+    query: { app_id: appId },
   } = req;
   if (!appId) {
     throw new ValidationError('Not a standard Serverless-cd trigger, lacks app_id');
   }
 
   const taskId = await webhook.triggered(appId, headers, body);
-  res.json(Result.ofSuccess({
-    taskId,
-    success: true,
-    message: 'OK',
-  }));
+  res.json(
+    Result.ofSuccess({
+      taskId,
+      success: true,
+      message: 'OK',
+    }),
+  );
 });
-
 
 module.exports = router;

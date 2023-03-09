@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 const { NeedLogin, generateOrgIdByUserIdAndOrgName } = require('../util');
 const debug = require('debug')('serverless-cd:middleware');
 
-
 module.exports = async function (req, _res, next) {
   const token = _.get(req, 'cookies.jwt');
   const skipCheckJwt = _.includes(EXCLUDE_AUTH_URL, req._parsedUrl.pathname);

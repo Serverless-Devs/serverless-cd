@@ -18,7 +18,7 @@ async function initUser({ username, password, email }) {
     throw new ValidationError('用户名已存在');
   }
   const dataEmail = await userModel.getUserByEmail(email);
-  
+
   if (_.get(dataEmail, 'email', '')) {
     throw new ValidationError('邮箱已存在');
   }
@@ -57,7 +57,8 @@ async function loginWithPassword({ loginname, password }) {
  * 设置 jwt
  */
 async function setJwt({ userId }, res) {
-  const SESSION_EXPIRATION_EXP = Math.floor(Date.now() / 1000) + Math.floor(SESSION_EXPIRATION / 1000);
+  const SESSION_EXPIRATION_EXP =
+    Math.floor(Date.now() / 1000) + Math.floor(SESSION_EXPIRATION / 1000);
   debug(`session expiration exp ${SESSION_EXPIRATION_EXP}`);
   const jwtSign = {
     userId,

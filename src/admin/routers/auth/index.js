@@ -31,5 +31,4 @@ router.post('/logout', async function (req, res) {
   return res.json(Result.ofSuccess());
 });
 
-
 module.exports = router;

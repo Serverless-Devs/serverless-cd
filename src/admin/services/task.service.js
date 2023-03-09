@@ -6,9 +6,9 @@ const { ValidationError, formatBranch } = require('../util');
 
 /**
  * 获取 task 列表
- * @param {{ appId: 应用ID; envName?: 环境名称; }} param0 
+ * @param {{ appId: 应用ID; envName?: 环境名称; }} param0
  * currentPage  pageSize
- * @returns 
+ * @returns
  */
 async function list({ appId, envName, pageSize, currentPage, taskId } = {}) {
   if (_.isEmpty(appId)) {

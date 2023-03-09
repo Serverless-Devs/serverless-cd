@@ -12,7 +12,7 @@ const getYamlName = () => {
     }
   }
   return 's';
-}
+};
 
 const getYamlPath = () => {
   const yamlName = getYamlName();
@@ -33,7 +33,7 @@ const getYamlPath = () => {
     return sPath;
   }
   console.warn('没有找到 yaml 文件');
-}
+};
 
 const parseYaml = async (sPath) => {
   const parse = new core.ParseVariable(sPath);
@@ -41,7 +41,11 @@ const parseYaml = async (sPath) => {
   let parsedObj = await parse.init();
   // 第二次解析 兼容vars下的魔法变量，需再次解析
   parsedObj = await parse.init(parsedObj.realVariables);
-  const env = _.get(parsedObj, 'realVariables.services.admin.props.function.environmentVariables', {});
+  const env = _.get(
+    parsedObj,
+    'realVariables.services.admin.props.function.environmentVariables',
+    {},
+  );
   _.merge(process.env, env);
   const region = _.get(parsedObj, 'realVariables.services.admin.props.region', '');
   const serviceName = _.get(parsedObj, 'realVariables.services.admin.props.service.name', '');
@@ -57,17 +61,14 @@ const parseYaml = async (sPath) => {
   const ACCOUNT_ID = process.env.ACCOUNT_ID || process.env.FC_ACCOUNT_ID;
   if (_.isEmpty(ACCOUNT_ID)) {
     const access = _.get(parsedObj, 'realVariables.access', '');
-    const {
-      SecurityToken,
-      AccountID,
-      AccessKeyID,
-      AccessKeySecret,
-    } = await core.getCredential(access);
+    const { SecurityToken, AccountID, AccessKeyID, AccessKeySecret } = await core.getCredential(
+      access,
+    );
     const cred = {
       ACCOUNT_ID: AccountID,
       ACCESS_KEY_ID: AccessKeyID,
       ACCESS_KEY_SECRET: AccessKeySecret,
-    }
+    };
     if (SecurityToken) {
       _.set(cred, 'SECURITY_TOKEN', SecurityToken);
     }
@@ -91,7 +92,7 @@ const parseYaml = async (sPath) => {
   }
 
   return parsedObj;
-}
+};
 
 (async function () {
   const sPath = getYamlPath();
@@ -106,7 +107,7 @@ const parseYaml = async (sPath) => {
         shell: true,
         stdio: 'inherit',
       });
-      await (require('./services/init.service')(prisma));
+      await require('./services/init.service')(prisma);
     }
   }
   console.debug(`初始化结束`);
@@ -116,4 +117,4 @@ const parseYaml = async (sPath) => {
     shell: true,
     stdio: 'inherit',
   });
-})()
+})();

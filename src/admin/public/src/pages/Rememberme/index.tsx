@@ -23,9 +23,7 @@ const RememberMe = () => {
   );
   return (
     <div className="session-container">
-      <AccountLoginRememberMe
-        title={title}
-      />
+      <AccountLoginRememberMe title={title} />
     </div>
   );
 };
