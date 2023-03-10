@@ -1,6 +1,10 @@
 const _ = require('lodash');
 const { default: Client } = require('@alicloud/fc-open20210406');
-const { CREDENTIALS, FC: { workerFunction }, TASK_STATUS } = require('@serverless-cd/config');
+const {
+  CREDENTIALS,
+  FC: { workerFunction },
+  TASK_STATUS,
+} = require('@serverless-cd/config');
 const { updateAppEnvById, getTask, makeTask } = require('./model');
 
 const { RUNNING, FAILURE: FAILED_STATUS } = TASK_STATUS;
@@ -26,12 +30,9 @@ async function retryFunctions(f, ...args) {
 }
 
 async function getWorkerMaxAsyncRetryAttempts() {
-  const result = await retryFunctions(
-    'getFunctionAsyncInvokeConfig',
-    serviceName,
-    functionName,
-    { qualifier },
-  );
+  const result = await retryFunctions('getFunctionAsyncInvokeConfig', serviceName, functionName, {
+    qualifier,
+  });
   return _.get(result, 'body.maxAsyncRetryAttempts', 0);
 }
 
@@ -91,7 +92,9 @@ async function handler(event, context, callback) {
     const appTaskConfig = { taskId, commit, message, ref };
 
     const latestTask = {
-      ...appTaskConfig, completed: true, status: FAILED_STATUS
+      ...appTaskConfig,
+      completed: true,
+      status: FAILED_STATUS,
     };
     await updateAppEnvById(appId, envName, latestTask);
 
@@ -105,7 +108,7 @@ async function handler(event, context, callback) {
           stepCount,
           status: status === RUNNING ? FAILED_STATUS : status,
         })),
-      }
+      };
     } else {
       makeTaskPayload = {
         env_name: envName,
@@ -113,7 +116,7 @@ async function handler(event, context, callback) {
         app_id: appId,
         status: FAILED_STATUS,
         trigger_payload: payload,
-      }
+      };
     }
     await makeTask(taskId, makeTaskPayload);
   } else {

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Field, Button } from '@alicloud/console-components';
-import { createApp } from '@/services/applist';
-import { manualDeployApp } from '@/services/task';
+import { doCreateApp, doManualDeployApp } from '@/services/common';
 import { checkFile, githubPutFile } from '@/services/git';
 import { history } from 'ice';
 import { CREATE_TYPE, SERVERLESS_PIPELINE_CONTENT, PUSH } from './constant';
@@ -9,24 +8,28 @@ import { get } from 'lodash';
 import { getConsoleConfig, sleep } from '@/utils';
 import { Toast } from '@/components/ToastContainer';
 import yaml from 'js-yaml';
-import { TYPE as ENV_TYPE } from '@/components/EnvType';
 
 interface IProps {
   field: Field;
   orgName: string;
   disabled?: boolean;
   createType: `${CREATE_TYPE}`;
+  createTemplate?: boolean;
+  setVisible?: any;
 }
 
 const Submit = (props: IProps) => {
-  const { orgName, field, disabled = false, createType } = props;
+  const { orgName, field, disabled = false, createType, createTemplate, setVisible } = props;
   const CD_PIPELINE_YAML = getConsoleConfig('CD_PIPELINE_YAML', 'serverless-pipeline.yaml');
   const [loading, setLoading] = useState(false);
   const { validate } = field;
 
+  const submitByTemplate = async () => {
+    setVisible(true);
+  };
+
   const submit = async () => {
     validate(async (errors, values) => {
-      console.log(errors, values);
       if (errors) return;
       const push = get(values, 'trigger.push');
       setLoading(true);
@@ -59,10 +62,9 @@ const Submit = (props: IProps) => {
       content: yaml.dump(SERVERLESS_PIPELINE_CONTENT),
       branch,
     });
-
     if (!putFileSuccess) return;
     // 创建应用
-    const { success: createAppSuccess, data } = await doCreateApp(values);
+    const { success: createAppSuccess, data } = await doCreateApp(values, createType);
     if (!createAppSuccess) return;
     // 部署应用
     await doManualDeployApp(data.id, branch);
@@ -80,7 +82,7 @@ const Submit = (props: IProps) => {
     });
     if (!checkFileSuccess) return;
     // 创建应用
-    const { success: createAppSuccess, data } = await doCreateApp(values);
+    const { success: createAppSuccess, data } = await doCreateApp(values, createType);
     if (!createAppSuccess) return;
     // 部署应用
     const deployEnable = get(values, 'deployEnable', false);
@@ -88,42 +90,11 @@ const Submit = (props: IProps) => {
     return { success: true };
   };
 
-  const doCreateApp = async (values) => {
-    const trigger_spec: any = {
-      [values['gitType']]: { push: { branches: { precise: [get(values, 'trigger.branch')] } } },
-    };
-    const dataMap = {
-      [CREATE_TYPE.Repository]: {
-        provider: get(values, 'gitType'),
-        description: get(values, 'description'),
-        repo_url: get(values, 'repo.url'),
-        repo: get(values, 'repo.name'),
-        owner: get(values, 'repo.owner'),
-        provider_repo_id: String(get(values, 'repo.id')),
-        environment: {
-          default: {
-            type: ENV_TYPE.TESTING,
-            trigger_spec,
-            secrets: get(values, 'secrets', {}),
-            cd_pipeline_yaml: CD_PIPELINE_YAML,
-          },
-        },
-      },
-    };
-    return await createApp(dataMap[createType]);
-  };
-  const doManualDeployApp = async (appId: string, branch: string) => {
-    await manualDeployApp({
-      appId,
-      ref: `refs/heads/${branch}`,
-    });
-  };
-
   return (
     <Button
       className="mt-32 mr-8"
       type="primary"
-      onClick={submit}
+      onClick={createTemplate ? submitByTemplate : submit}
       disabled={disabled}
       loading={loading}
     >

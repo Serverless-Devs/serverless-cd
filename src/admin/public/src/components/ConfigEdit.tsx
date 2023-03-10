@@ -8,17 +8,14 @@ interface Props {
   onChange?: (value: any) => void;
 }
 
-
 const ConfigEdit = ({ value, onChange }: Props, ref) => {
   const varRef: any = useRef(null);
 
   useImperativeHandle(ref, () => ({
-    validate: varRef?.current?.validate
-  }))
+    validate: varRef?.current?.validate,
+  }));
 
-  return (
-    <VariableUi value={value} onChange={onChange} ref={varRef} />
-  );
+  return <VariableUi value={value} onChange={onChange} ref={varRef} />;
 };
 
 export default forwardRef(ConfigEdit);

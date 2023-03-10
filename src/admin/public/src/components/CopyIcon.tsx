@@ -8,7 +8,7 @@ interface Props {
   size?: any;
   type?: string;
   text?: string;
-  children?: any
+  children?: any;
 }
 const CopyIcon = ({ content, size = 'medium', type = 'icon', text, children }: Props) => {
   return (

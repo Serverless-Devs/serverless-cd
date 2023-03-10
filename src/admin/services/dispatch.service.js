@@ -11,8 +11,10 @@ const orgService = require('./org.service');
 
 const { ValidationError, Client, unionToken } = require('../util');
 const {
-  FC: { workerFunction: { region, serviceName, functionName } },
-  TASK_STATUS: { CANCEL, RUNNING, PENDING }
+  FC: {
+    workerFunction: { region, serviceName, functionName },
+  },
+  TASK_STATUS: { CANCEL, RUNNING, PENDING },
 } = require('@serverless-cd/config');
 
 async function retryOnce(fnName, ...args) {
@@ -34,7 +36,7 @@ async function invokeFunction(trigger_payload) {
       'x-fc-stateful-async-invocation-id': trigger_payload.taskId,
     },
     // process.env.qualifier,
-  );;
+  );
 }
 
 async function redeploy(dispatchOrgId, orgName, { taskId, appId } = {}) {
@@ -92,7 +94,7 @@ async function redeploy(dispatchOrgId, orgName, { taskId, appId } = {}) {
   return {
     'x-fc-request-id': _.get(asyncInvokeRes, 'headers[x-fc-request-id]'),
     taskId: newTaskId,
-  }
+  };
 }
 
 async function cancelTask({ taskId } = {}) {

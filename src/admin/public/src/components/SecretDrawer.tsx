@@ -32,7 +32,7 @@ const SecretDrawer = ({ title, loading = false, onSubmit, secretsData }: Props, 
       const res = await secretsRef.current.validate();
       if (error || !res) return;
       onSubmit(value['secrets']);
-    })
+    });
   };
 
   return (
@@ -45,14 +45,7 @@ const SecretDrawer = ({ title, loading = false, onSubmit, secretsData }: Props, 
       onCancel={closeDrawer}
       isProcessing={loading}
     >
-      {
-        visible && (
-          <ConfigEdit
-            {...(init('secrets', { initValue: secretsData }))}
-            ref={secretsRef}
-          />
-        )
-      }
+      {visible && <ConfigEdit {...init('secrets', { initValue: secretsData })} ref={secretsRef} />}
     </SlidePanel>
   );
 };

@@ -34,11 +34,14 @@ const DB_TYPE = {
     fs.ensureDirSync(path.dirname(filePath));
     await fs.outputFile(filePath, '');
     console.log('invoke end: ', fs.pathExistsSync(filePath));
-    spawnSync('npm i @prisma/engines@4.9.0 --no-save --registry=https://registry.npmmirror.com --force', {
-      encoding: 'utf8',
-      stdio: 'inherit',
-      shell: true,
-    });
+    spawnSync(
+      'npm i @prisma/engines@4.9.0 --no-save --registry=https://registry.npmmirror.com --force',
+      {
+        encoding: 'utf8',
+        stdio: 'inherit',
+        shell: true,
+      },
+    );
     spawnSync(`npx prisma migrate dev --name init --schema=./prisma/sqlite.prisma`, {
       encoding: 'utf8',
       stdio: 'inherit',
@@ -46,18 +49,21 @@ const DB_TYPE = {
     });
   },
   mysql: async () => {
-    spawnSync('npm i @prisma/engines@4.9.0 --no-save --registry=https://registry.npmmirror.com --force', {
-      encoding: 'utf8',
-      stdio: 'inherit',
-      shell: true,
-    });
+    spawnSync(
+      'npm i @prisma/engines@4.9.0 --no-save --registry=https://registry.npmmirror.com --force',
+      {
+        encoding: 'utf8',
+        stdio: 'inherit',
+        shell: true,
+      },
+    );
     spawnSync(`npx prisma migrate dev --name init --schema=./prisma/mysql.prisma`, {
       encoding: 'utf8',
       stdio: 'inherit',
       shell: true,
     });
   },
-}
+};
 
 module.exports = async function (dbType) {
   // 需要能够获取到链接地址
@@ -82,4 +88,4 @@ module.exports = async function (dbType) {
   if (!connection) {
     throw new Error('没有链接上数据表');
   }
-}
+};

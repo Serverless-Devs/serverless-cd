@@ -5,6 +5,7 @@ const { push } = require('@serverless-cd/git');
 const { Result, ValidationError } = require('../../util');
 const auth = require('../../middleware/auth');
 const appService = require('../../services/application.service');
+const commonService = require('../../services/common.service');
 const { ADMIN_ROLE_KEYS, MEMBER_ROLE_KEYS, ROLE_KEYS } = require('@serverless-cd/config');
 
 /**
@@ -29,7 +30,7 @@ router.post('/transfer', auth(ADMIN_ROLE_KEYS), async (req, res) => {
  */
 router.get('/list', auth(ROLE_KEYS), async function (req, res) {
   const { orgName } = req;
-  const appList = await appService.listByOrgName(orgName);
+  const appList = await commonService.listByOrgName(orgName);
   return res.json(Result.ofSuccess(appList));
 });
 
@@ -49,7 +50,6 @@ router.get('/detail', auth(ROLE_KEYS), async function (req, res) {
  */
 router.post('/create', auth(ADMIN_ROLE_KEYS), async function (req, res) {
   const { orgId, orgName } = req;
-
   const appInfo = await appService.create(orgId, orgName, req.body);
   return res.json(Result.ofSuccess(appInfo));
 });
@@ -75,8 +75,12 @@ router.post('/create', auth(ADMIN_ROLE_KEYS), async function (req, res) {
  *  - appId
  */
 router.post('/createByTemplate', auth(ADMIN_ROLE_KEYS), async function (req, res) {
-  const { type, userId, orgId, orgName } = req.query;
-  const result = appService.createByTemplate({ type, userId, orgId, orgName }, req.body);
+  const { userId, orgId, orgName } = req;
+  const { type, provider, appId, owner, repo, template } = req.body.params;
+  const result = await appService.createByTemplate(
+    { type, userId, orgId, orgName },
+    { provider, appId, owner, repo, template },
+  );
   return res.json(Result.ofSuccess(result));
 });
 

@@ -140,7 +140,6 @@ export function isJson(str) {
   return true;
 }
 
-
 export function setSearchParams(params) {
   const out = new URL(window.location.href);
   Object.keys(params).forEach((key) => {

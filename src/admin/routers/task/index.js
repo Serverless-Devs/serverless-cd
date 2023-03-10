@@ -14,10 +14,12 @@ const taskService = require('../../services/task.service');
  */
 router.get('/list', async function (req, res) {
   const { totalCount, result } = await taskService.list(req.query);
-  return res.json(Result.ofSuccess({
-    result: _.map(result, taskService.getTaskConfig),
-    totalCount,
-  }));
+  return res.json(
+    Result.ofSuccess({
+      result: _.map(result, taskService.getTaskConfig),
+      totalCount,
+    }),
+  );
 });
 
 /**
@@ -52,7 +54,7 @@ router.get('/log', async function (req, res) {
         throw new NotFoundError('此运行的日志已过期，不再可用。');
       }
       console.error(ex.status, ex.code, ex.message);
-      throw ex
+      throw ex;
     }
   } else {
     try {

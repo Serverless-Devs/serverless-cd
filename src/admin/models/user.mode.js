@@ -15,8 +15,8 @@ module.exports = {
     }
     const result = await userPrisma.findMany({
       where: {
-        username: { contains: containsName }
-      }
+        username: { contains: containsName },
+      },
     });
     return getUserInfo(result);
   },
