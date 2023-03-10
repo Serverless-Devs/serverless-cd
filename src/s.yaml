@@ -14,7 +14,7 @@ vars:
   workerFunctionName: worker
   adminFunctionName: admin
   workerDeliverFunctionName: workerDeliver
-  domain: '{{domain}}'
+  domain: '{{domain}}' # - domain 如果过期或者生成查看 s.domain.yaml
   logLocalPathPrefix: /mnt/auto/logs
   databaseUrl: '{{databaseUrl}}'
   prisma: '{{prisma}}'

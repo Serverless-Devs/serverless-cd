@@ -3,7 +3,7 @@ name: serverless-cd
 access: dankun
 
 # - 启动的时候根据需要修改的字段 domain databaseUrl(本地启动和部署日志和 databaseUrl 不太一样，需要注意)
-# - 生成domain参考：http://www.devsapp.cn/details.html?name=domain  type为fc
+# - domain 如果过期或者生成查看 s.domain.yaml
 # - role 需要手动添加 fcfull 的权限，否则会影响取消部署、worker异常处理、自动加载runtime 等能力
 
 vars:
