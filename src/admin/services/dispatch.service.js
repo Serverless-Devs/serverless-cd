@@ -178,8 +178,6 @@ async function manualTask(dispatchOrgId, orgName, body = {}) {
         ref,
         repo: repo_name,
       });
-      console.log('11111', { owner, ref, repo: repo_name });
-      console.log(',,,,', commitConfig);
       commit = commitConfig.sha;
       msg = commitConfig.message;
     } catch (ex) {

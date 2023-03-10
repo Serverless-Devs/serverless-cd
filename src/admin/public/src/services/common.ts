@@ -7,7 +7,6 @@ import { manualDeployApp } from '@/services/task';
 const CD_PIPELINE_YAML = getConsoleConfig('CD_PIPELINE_YAML', 'serverless-pipeline.yaml');
 
 const doCreateApp = async (values, createType) => {
-  console.log('44444', createType);
   const trigger_spec: any = {
     [values['gitType']]: { push: { branches: { precise: [get(values, 'trigger.branch')] } } },
   };
