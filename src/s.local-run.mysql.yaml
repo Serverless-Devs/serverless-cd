@@ -9,7 +9,7 @@ access: dankun
 vars:
   region: 'cn-hongkong'
   service:
-    name: 'wss'
+    name: 'serverless-cd'
     description: Serverless-cd 应用
     logConfig: auto
     nasConfig: auto
@@ -17,7 +17,7 @@ vars:
   workerFunctionName: worker
   adminFunctionName: admin
   workerDeliverFunctionName: workerDeliver
-  domain: 'auto.wss.1740298130743624.cn-hongkong.fc.devsapp.net'
+  domain: 'auto.serverless-cd.1740298130743624.cn-hongkong.fc.devsapp.net'
   logLocalPathPrefix: /mnt/auto/logs
   databaseUrl: '${env.DATABASE_URL}'
   prisma: 'mysql'
