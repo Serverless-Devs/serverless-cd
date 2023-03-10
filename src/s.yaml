@@ -11,7 +11,6 @@ vars:
     nasConfig: auto
     # role 需要手动添加 fcfull 的权限，否则会影响取消部署、worker异常处理、自动加载runtime 等能力
     # 如果需要上传到 oss，也需要授予 oss 的权限
-  masterFunctionName: master
   workerFunctionName: worker
   adminFunctionName: admin
   workerDeliverFunctionName: workerDeliver
