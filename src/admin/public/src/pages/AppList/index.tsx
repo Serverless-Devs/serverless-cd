@@ -7,7 +7,7 @@ import PageLayout from '@/layouts/PageLayout';
 import NotAppliaction from './components/NotAppliaction';
 import { CreateAppLication } from '../Create';
 import { formatTime } from '@/utils';
-import EnvList from '@/pages/AppDetail/components/EnvList';
+import EnvList from './components/EnvList';
 import { C_REPOSITORY } from '@/constants/repository';
 import ExternalLink from '@/components/ExternalLink';
 import { Toast } from '@/components/ToastContainer';
