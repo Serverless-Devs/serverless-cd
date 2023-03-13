@@ -112,7 +112,7 @@ services:
             - node
             - index.js
         layers:
-          - acs:fc:cn-hongkong:official:layers/Nodejs16/versions/2
+          - acs:fc:${vars.region}:official:layers/Nodejs16/versions/2
           - acs:fc:${vars.region}:1940309364339785:layers/sqlite3/versions/1
         environmentVariables:
           PATH: /opt:/opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin

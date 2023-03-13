@@ -2,7 +2,7 @@ const debug = require('debug')('serverless-cd:git');
 const git = require('@serverless-cd/git-provider');
 const _ = require('lodash');
 const { fs } = require('@serverless-cd/core');
-const { checkFile, initConfig, addCommit, setRemote } = require('@serverless-cd/git');
+const { checkFile, initConfig, addCommit, setRemote, push } = require('@serverless-cd/git');
 const { CD_PIPELINE_YAML } = require('@serverless-cd/config');
 const path = require('path');
 
@@ -150,12 +150,15 @@ async function initAndCommit({ provider, repoUrl, execDir, branch }) {
 /**
  * git push
  */
-async function pushFile({ execDir, branch }) {
+async function pushFile({ execDir, branch, owner, repo, provider, token }) {
   debug(`git push`);
   await push({
     execDir,
     branch: branch || 'master',
   });
+  const providerClient = git(provider, { access_token: token });
+
+  return await providerClient.checkRepoEmpty({ owner, repo });
 }
 
 module.exports = {

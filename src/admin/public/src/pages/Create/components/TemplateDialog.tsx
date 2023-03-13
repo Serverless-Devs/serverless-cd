@@ -70,7 +70,11 @@ const TemplateDialog = (props: IProps) => {
           successMsg: '初始化模版成功',
           errorMsg: '初始化模版失败',
           run: async () => {
-            await createByTemplate({ ...body, type: 'initTemplate' });
+            try {
+              return await createByTemplate({ ...body, type: 'initTemplate' });
+            } catch (e) {
+              return Promise.reject();
+            }
           },
         },
         {
@@ -80,8 +84,12 @@ const TemplateDialog = (props: IProps) => {
           successMsg: '远程仓库创建成功',
           errorMsg: '远程仓库创建失败',
           run: async () => {
-            const { data } = await createByTemplate({ ...body, type: 'initRepo' });
-            setRepo(data);
+            try {
+              const { data } = await createByTemplate({ ...body, type: 'initRepo' });
+              setRepo(data);
+            } catch (e) {
+              return Promise.reject();
+            }
           },
         },
         {
@@ -92,7 +100,10 @@ const TemplateDialog = (props: IProps) => {
           errorMsg: '同步远程代码到仓库失败',
           run: async () => {
             await createByTemplate({ ...body, type: 'initCommit' });
-            await createByTemplate({ ...body, type: 'push' });
+            const res = await createByTemplate({ ...body, type: 'push' });
+            if (get(res, 'data.isEmpty')) {
+              return Promise.reject();
+            }
           },
         },
       ],
@@ -112,15 +123,19 @@ const TemplateDialog = (props: IProps) => {
           successMsg: '创建应用成功',
           errorMsg: '创建应用失败',
           run: async () => {
-            // 创建应用
-            const { success: createAppSuccess, data } = await doCreateApp(
-              { ...value, repo },
-              createType,
-            );
-            if (!createAppSuccess) return;
-            // 部署应用
-            await doManualDeployApp(data.id, 'master');
-            return { success: true };
+            try {
+              // 创建应用
+              const { success: createAppSuccess, data } = await doCreateApp(
+                { ...value, repo },
+                createType,
+              );
+              if (!createAppSuccess) return;
+              // 部署应用
+              await doManualDeployApp(data.id, 'master');
+              return { success: true };
+            } catch (e) {
+              return Promise.reject();
+            }
           },
         },
       ],
