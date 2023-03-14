@@ -1,17 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { useRequest, history } from 'ice';
-import { Button, Dialog, Loading } from '@alicloud/console-components';
+import { Button, Dialog, Loading, Select, Tab } from '@alicloud/console-components';
 import PageLayout from '@/layouts/PageLayout';
 import CommitList from './components/CommitList';
 import BasicInfoDetail from './components/BasicInfoDetail';
 import { applicationDetail, removeEnv } from '@/services/applist';
 import PageInfo from '@/components/PageInfo';
-import { get, isEmpty, isBoolean } from 'lodash';
+import { get, isEmpty, isBoolean, keys } from 'lodash';
 import SecretConfig from './components/SecretCofing';
 import TriggerConfig from './components/TriggerConfig';
 import CreateEnv from './components/CreateEnv';
 import { Toast } from '@/components/ToastContainer';
 import BasicInfo from '@/components/BasicInfo';
+import { getParam } from '@/utils';
+
+enum TAB {
+  OVERVIEW = 'overview',
+  CICD = 'cicd',
+}
 
 const Details = ({
   match: {
@@ -25,6 +31,9 @@ const Details = ({
     cancel,
   } = useRequest(applicationDetail, { pollingInterval: 5000 });
   const [loading, setLoading] = useState(false);
+  const [pageKey, forceUpdate] = useState(0);
+  const defaultTab = getParam('tab') || TAB.OVERVIEW;
+  const [tabKey, setTabKey] = useState(defaultTab);
 
   const provider = get(detailInfo, 'data.provider');
   const trigger_spec = get(detailInfo, `data.environment.${envName}.trigger_spec`, {});
@@ -90,10 +99,22 @@ const Details = ({
     });
   };
 
+  const handleChangeEnv = async (value: string) => {
+    history?.push(`/${orgName}/application/${appId}/${value}?tab=${tabKey}`);
+    forceUpdate(Date.now());
+  };
+
   return (
     <PageLayout
-      title="环境详情"
-      subhead={envName}
+      title="环境切换"
+      key={pageKey}
+      subhead={
+        <Select
+          value={envName}
+          dataSource={keys(get(detailInfo, 'data.environment'))}
+          onChange={handleChangeEnv}
+        />
+      }
       breadcrumbs={[
         {
           name: '应用列表',
@@ -101,7 +122,6 @@ const Details = ({
         },
         {
           name: appId,
-          path: `/${orgName}/application/${appId}`,
         },
         {
           name: envName,
@@ -122,52 +142,59 @@ const Details = ({
         </>
       }
     >
-      <Loading visible={loading} style={{ width: '100%' }}>
-        <BasicInfoDetail
-          data={get(detailInfo, 'data', {})}
-          refreshCallback={handleRefresh}
-          envName={envName}
-          orgName={orgName}
-        />
-        <hr className="mb-20" />
-        <TriggerConfig
-          data={get(detailInfo, 'data', {})}
-          triggerSpec={trigger_spec}
-          provider={provider}
-          appId={appId}
-          refreshCallback={handleRefresh}
-          envName={envName}
-        />
-        <BasicInfo
-          items={[
-            {
-              text: '指定yaml',
-              value: get(detailInfo, `data.environment.${envName}.cd_pipeline_yaml`),
-            },
-          ]}
-          sizePerRow={2}
-        />
-        <hr className="mb-20" />
-        <SecretConfig
-          data={get(detailInfo, 'data', {})}
-          secrets={secrets}
-          provider={provider}
-          appId={appId}
-          refreshCallback={handleRefresh}
-          envName={envName}
-        />
-        <hr className="mb-20 mt-20" />
-      </Loading>
-      <PageInfo title="部署历史">
-        <CommitList
-          appId={appId}
-          application={get(detailInfo, 'data', {})}
-          latestTaskId={taskId}
-          refreshCallback={handleRefresh}
-          envName={envName}
-          orgName={orgName}
-        />
-      </PageInfo>
+      <Tab shape="wrapped" activeKey={tabKey} onChange={(value: string) => setTabKey(value)}>
+        <Tab.Item key={TAB.OVERVIEW} title="应用概览">
+          <Loading visible={loading} inline={false} className="mt-16">
+            <BasicInfoDetail
+              data={get(detailInfo, 'data', {})}
+              refreshCallback={handleRefresh}
+              envName={envName}
+              orgName={orgName}
+            />
+            <hr className="mb-20 mt-20" />
+            <PageInfo title="部署历史">
+              <CommitList
+                appId={appId}
+                application={get(detailInfo, 'data', {})}
+                latestTaskId={taskId}
+                refreshCallback={handleRefresh}
+                envName={envName}
+                orgName={orgName}
+              />
+            </PageInfo>
+          </Loading>
+        </Tab.Item>
+        <Tab.Item key={TAB.CICD} title="CI/CD">
+          <Loading visible={loading} inline={false} className="mt-16">
+            <TriggerConfig
+              data={get(detailInfo, 'data', {})}
+              triggerSpec={trigger_spec}
+              provider={provider}
+              appId={appId}
+              refreshCallback={handleRefresh}
+              envName={envName}
+            />
+            <BasicInfo
+              items={[
+                {
+                  text: '指定yaml',
+                  value: get(detailInfo, `data.environment.${envName}.cd_pipeline_yaml`),
+                },
+              ]}
+              sizePerRow={2}
+            />
+            <hr className="mb-20" />
+            <SecretConfig
+              data={get(detailInfo, 'data', {})}
+              secrets={secrets}
+              provider={provider}
+              appId={appId}
+              refreshCallback={handleRefresh}
+              envName={envName}
+            />
+          </Loading>
+        </Tab.Item>
+      </Tab>
     </PageLayout>
   );
 };

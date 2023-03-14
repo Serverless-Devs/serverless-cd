@@ -115,9 +115,6 @@ const AppList = ({
     {
       title: '应用名称',
       dataIndex: 'repo_name',
-      cell: (value, index, record) => {
-        return <Link to={`/${orgName}/application/${record.id}`}>{value}</Link>;
-      },
     },
     {
       key: 'created_time',
