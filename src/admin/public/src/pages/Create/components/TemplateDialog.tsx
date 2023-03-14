@@ -1,16 +1,17 @@
 import React from 'react';
 import CreateTemplateDialog from '@serverless-cd/creating-ui';
-import { Field } from '@alicloud/console-components';
 import { createByTemplate } from '@/services/applist';
 import { doManualDeployApp, doCreateApp } from '@/services/common';
-import { getParams } from '@/utils';
+import { getParams, getConsoleConfig } from '@/utils';
 import { get } from 'lodash';
-import { CREATE_TYPE } from './constant';
+import { CREATE_TYPE, SERVERLESS_PIPELINE_CONTENT_TEMPLATE } from './constant';
+import { history } from 'ice';
+import yaml from 'js-yaml';
 
 interface IProps {
-  field?: Field;
-  value?: any;
+  value: any;
   createType?: `${CREATE_TYPE}`;
+  orgName: string;
 }
 declare type status = 'wait' | 'finish';
 declare type Request = {
@@ -31,9 +32,10 @@ declare type Repo = {
 };
 
 const TemplateDialog = (props: IProps) => {
-  const { value, createType } = props;
+  const { value, createType, orgName } = props;
   const repoName = get(value, 'repoName');
   const provider = 'github';
+  const branch = get(value, 'trigger.branch') || 'master';
   const appId = get(getParams(location?.search), 'template');
   const owner = get(value, 'gitUser.value');
   const body = {
@@ -41,7 +43,7 @@ const TemplateDialog = (props: IProps) => {
     appId: appId,
     owner: owner,
     repo: repoName,
-    template: 'devsapp/start-express',
+    template: `devsapp/${appId}`,
   };
   let repo: Repo = {
     name: repoName,
@@ -70,10 +72,19 @@ const TemplateDialog = (props: IProps) => {
           successMsg: '初始化模版成功',
           errorMsg: '初始化模版失败',
           run: async () => {
-            try {
-              return await createByTemplate({ ...body, type: 'initTemplate' });
-            } catch (e) {
-              return Promise.reject();
+            console.log('999');
+            const pathName = getConsoleConfig('CD_PIPELINE_YAML', 'serverless-pipeline.yaml');
+            const content = yaml.dump(SERVERLESS_PIPELINE_CONTENT_TEMPLATE);
+            const res = await createByTemplate({
+              ...body,
+              type: 'initTemplate',
+              content,
+              pathName,
+            });
+            if (!res.success) {
+              throw new Error(res.message);
+            } else {
+              return res.data;
             }
           },
         },
@@ -84,11 +95,28 @@ const TemplateDialog = (props: IProps) => {
           successMsg: '远程仓库创建成功',
           errorMsg: '远程仓库创建失败',
           run: async () => {
-            try {
-              const { data } = await createByTemplate({ ...body, type: 'initRepo' });
+            const res = await createByTemplate({ ...body, type: 'initRepo' });
+            if (!res.success) {
+              throw new Error(res.message);
+            } else {
+              const { data } = res;
               setRepo(data);
-            } catch (e) {
-              return Promise.reject();
+              return data;
+            }
+          },
+        },
+        {
+          key: 'initCommit',
+          title: '初始化commit信息',
+          runningMsg: '初始化commit信息中',
+          successMsg: '初始化commit信息成功',
+          errorMsg: '初始化commit信息失败',
+          run: async () => {
+            const res = await createByTemplate({ ...body, type: 'initCommit' });
+            if (!res.success) {
+              throw new Error(res.message);
+            } else {
+              return res.data;
             }
           },
         },
@@ -99,46 +127,65 @@ const TemplateDialog = (props: IProps) => {
           successMsg: '同步远程代码到仓库成功',
           errorMsg: '同步远程代码到仓库失败',
           run: async () => {
-            await createByTemplate({ ...body, type: 'initCommit' });
             const res = await createByTemplate({ ...body, type: 'push' });
-            if (get(res, 'data.isEmpty')) {
-              return Promise.reject();
+            if (!res.success) {
+              throw new Error(res.message);
+            } else {
+              return res.data;
             }
           },
         },
       ],
     },
     {
-      title: '创建',
+      key: 'createApp',
+      title: '创建应用',
       runStatus: 'wait',
-      key: 'create',
-      runningMsg: '创建中...',
-      successMsg: '创建成功',
-      errorMsg: '创建失败',
-      tasks: [
-        {
-          key: 'createApp',
-          title: '创建应用',
-          runningMsg: '创建应用中',
-          successMsg: '创建应用成功',
-          errorMsg: '创建应用失败',
-          run: async () => {
-            try {
-              // 创建应用
-              const { success: createAppSuccess, data } = await doCreateApp(
-                { ...value, repo },
-                createType,
-              );
-              if (!createAppSuccess) return;
-              // 部署应用
-              await doManualDeployApp(data.id, 'master');
-              return { success: true };
-            } catch (e) {
-              return Promise.reject();
-            }
-          },
-        },
-      ],
+      runningMsg: '创建应用中',
+      successMsg: '创建应用成功',
+      errorMsg: '创建应用失败',
+      run: async () => {
+        // 创建应用
+        const res = await doCreateApp({ ...value, repo }, createType);
+        if (!res.success) {
+          throw new Error(res.message);
+        } else {
+          return res.data;
+        }
+      },
+    },
+    {
+      title: '部署',
+      runStatus: 'wait',
+      key: 'deploy',
+      runningMsg: '部署中...',
+      successMsg: '部署成功',
+      errorMsg: '部署失败',
+      run: async (params) => {
+        const { id } = params.content.createApp.result;
+        const res = await doManualDeployApp(id, branch);
+        if (!res.success) {
+          throw new Error(res.message);
+        } else {
+          return res.data;
+        }
+      },
+    },
+    {
+      key: 'success',
+      title: '完成创建，即将跳去应用列表页面',
+      runStatus: 'wait',
+      runningMsg: '完成创建，即将跳去应用列表页面',
+      successMsg: '即将跳转',
+      errorMsg: '跳转失败',
+      run: async () => {
+        return await new Promise((resolve, reject) => {
+          setTimeout(() => {
+            history?.push(`/${orgName}`);
+            resolve();
+          }, 3000);
+        });
+      },
     },
   ];
 

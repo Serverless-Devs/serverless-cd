@@ -47,6 +47,32 @@ export const SERVERLESS_PIPELINE_CONTENT = {
   ],
 };
 
+export const SERVERLESS_PIPELINE_CONTENT_TEMPLATE = {
+  name: 'Deploy Express application to FC',
+  steps: [
+    {
+      run: 'npm i @serverless-devs/s -g --registry=https://registry.npmmirror.com',
+    },
+    {
+      run: 's -v',
+    },
+    {
+      run: 'echo ${{secrets.ALIYUN_ACCOUNTID}}',
+    },
+    {
+      run: 'echo ${{secrets.ALIYUN_AK}}',
+    },
+    {
+      run: 'echo ${{secrets.ALIYUN_SK}}',
+    },
+    {
+      run: 's config add --AccountID ${{secrets.ALIYUN_ACCOUNTID}}  --AccessKeyID ${{secrets.ALIYUN_AK}}  --AccessKeySecret ${{secrets.ALIYUN_SK}} -a default -f',
+    },
+    // {
+    //   run: 's deploy --use-local -y',
+    // },
+  ],
+};
 export const SERVERLESS_DEVS_LIST = [
   {
     title: 'Egg.js',

@@ -5,12 +5,10 @@ import AuthDialog from './AuthDialog';
 import Repo from './Repo';
 import Trigger from './Trigger';
 import ConfigEdit from '@/components/ConfigEdit';
-import { Toast } from '@/components/ToastContainer';
 import { PUSH } from '../constant';
 import { get } from 'lodash';
 import Submit from '../Submit';
 import TemplateDialog from '../TemplateDialog';
-import { history } from 'ice';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -88,22 +86,31 @@ const Github = (props: IProps) => {
         <FormItem label="描述">
           <Input {...init('description')} placeholder="请输入描述" />
         </FormItem>
-        <Divider className="mt-32" />
-        <div className="text-bold mt-16 mb-16">环境配置</div>
-        <Trigger repo={getValue('repo')} {...(init('trigger') as any)} />
-        {get(getValue('trigger'), 'push') === PUSH.SPECIFY && (
+        {createType !== 'template' && (
           <>
-            <FormItem label="立即部署">
-              <Switch {...init('deployEnable', { valueName: 'checked', initValue: true })} />
-            </FormItem>
-            <FormItem label="Secrets" help="">
-              <ConfigEdit
-                {...init('secrets', {
-                  rules: [{ validator: secretsValidator }],
-                })}
-                ref={secretsRef}
-              />
-            </FormItem>
+            <Divider className="mt-32" />
+
+            <div className="text-bold mt-16 mb-16">环境配置</div>
+            <Trigger
+              repo={getValue('repo')}
+              {...(init('trigger') as any)}
+              createTemplate={createType === 'template'}
+            />
+            {get(getValue('trigger'), 'push') === PUSH.SPECIFY && (
+              <>
+                <FormItem label="立即部署">
+                  <Switch {...init('deployEnable', { valueName: 'checked', initValue: true })} />
+                </FormItem>
+                <FormItem label="Secrets" help="">
+                  <ConfigEdit
+                    {...init('secrets', {
+                      rules: [{ validator: secretsValidator }],
+                    })}
+                    ref={secretsRef}
+                  />
+                </FormItem>
+              </>
+            )}
           </>
         )}
       </Form>
@@ -114,16 +121,12 @@ const Github = (props: IProps) => {
         setVisible={setVisible}
         createType={createType as any}
       />
-      <Dialog
-        visible={dialogVisible}
-        onClose={() => setVisible(false)}
-        title="创建应用"
-        onCancel={() => setVisible(false)}
-        onOk={() => {
-          history?.push(`/${orgName}`);
-        }}
-      >
-        <TemplateDialog value={field.getValues()} createType={createType as any}></TemplateDialog>
+      <Dialog visible={dialogVisible} footer={false} title="创建应用" closeMode={[]}>
+        <TemplateDialog
+          value={field.getValues()}
+          createType={createType as any}
+          orgName={orgName}
+        ></TemplateDialog>
       </Dialog>
     </>
   );
