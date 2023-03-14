@@ -121,10 +121,7 @@ const Details = ({
           path: `/${orgName}/application`,
         },
         {
-          name: appId,
-        },
-        {
-          name: envName,
+          name: `${appId}(${envName})`,
         },
       ]}
       breadcrumbExtra={

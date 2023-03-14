@@ -137,11 +137,7 @@ const Details = ({
           path: `/${orgName}/application`,
         },
         {
-          name: appId,
-          path: `/${orgName}/application/${appId}`,
-        },
-        {
-          name: envName,
+          name: `${appId}(${envName})`,
           path: `/${orgName}/application/${appId}/${envName}`,
         },
         {
