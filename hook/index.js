@@ -1,5 +1,6 @@
 const path = require('path');
 const core = require('./core');
+const lodash = core.lodash;
 
 async function preInit(inputObj) {
   const logger = new inputObj.Logger('');
@@ -31,12 +32,29 @@ async function genDomain(logger, access, region, serviceName) {
   return domainName;
 }
 
+async function getAccess(access) {
+  if (process.env.BUILD_IMAGE_ENV !== 'fc-backend') {
+    return access;
+  }
+
+  const accessPath = path.join(core.getRootHome(), 'access.yaml');
+  const data = await core.getYamlContent(accessPath);
+  if (lodash.isEmpty(data)) {
+    return access;
+  }
+  if (data[access]) {
+    return access;
+  }
+  return Object.keys(data)[0];
+}
+
 async function postInit(inputObj) {
-  const { lodash: _, parameters, Logger, targetPath } = inputObj;
+  const { lodash: _, parameters, Logger } = inputObj;
   const logger = new Logger('serverless-cd');
 
-  const { region, serviceName, access, prisma } = parameters;
-  if (access === '{{ access }}') {
+  const { region, serviceName, prisma } = parameters;
+  const access = await getAccess(parameters.access);
+  if (!access || access === '{{ access }}') {
     logger.warn('您没有选择密钥，我们将跳过一些自动化，请仔细阅读文档xxxxx完成初始化动作');
     return parameters;
   }
