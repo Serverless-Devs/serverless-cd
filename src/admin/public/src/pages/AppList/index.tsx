@@ -7,7 +7,7 @@ import PageLayout from '@/layouts/PageLayout';
 import NotAppliaction from './components/NotAppliaction';
 import { CreateAppLication } from '../Create';
 import { formatTime } from '@/utils';
-import EnvList from '@/pages/AppDetail/components/EnvList';
+import EnvList from './components/EnvList';
 import { C_REPOSITORY } from '@/constants/repository';
 import ExternalLink from '@/components/ExternalLink';
 import { Toast } from '@/components/ToastContainer';
@@ -115,9 +115,6 @@ const AppList = ({
     {
       title: '应用名称',
       dataIndex: 'repo_name',
-      cell: (value, index, record) => {
-        return <Link to={`/${orgName}/application/${record.id}`}>{value}</Link>;
-      },
     },
     {
       key: 'created_time',
