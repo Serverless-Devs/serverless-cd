@@ -30,7 +30,7 @@ import EnvList from './components/EnvList';
 import { C_REPOSITORY } from '@/constants/repository';
 import ExternalLink from '@/components/ExternalLink';
 import { Toast } from '@/components/ToastContainer';
-import { sleep, localStorageGet } from '@/utils';
+import { sleep, localStorageGet, localStorageSet } from '@/utils';
 import store from '@/store';
 import Status from '@/components/DeployStatus';
 
@@ -53,7 +53,12 @@ const AppList = ({
   const [userState] = store.useModel('user');
 
   if (isEmpty(orgName)) {
-    const username = localStorageGet('orgName') || get(userState, 'userInfo.username');
+    const newOrgName = localStorageGet('orgName');
+    if (newOrgName) {
+      return history?.push(`/${newOrgName}/application`);
+    }
+    const username = get(userState, 'userInfo.username');
+    localStorageSet('orgName', username);
     return history?.push(`/${username}/application`);
   }
 

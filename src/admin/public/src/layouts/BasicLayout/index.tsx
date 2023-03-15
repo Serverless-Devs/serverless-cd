@@ -19,7 +19,7 @@ import { get, map } from 'lodash';
 import ToastContainer from '@/components/ToastContainer';
 import { listOrgs } from '@/services/user';
 import style from 'styled-components';
-import { localStorageSet } from '@/utils';
+import { localStorageGet, localStorageSet } from '@/utils';
 import './index.css';
 
 const StyledLi = style.li`
@@ -121,7 +121,7 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
         <Divider key="divider1" className="m-t-b-10" />
         <Menu.Item key="/application">应用管理</Menu.Item>
         <Menu.Item>
-          <div onClick={openOrgDialog}>切换团队({orgName})</div>
+          <div onClick={openOrgDialog}>切换团队({localStorageGet('orgName')})</div>
         </Menu.Item>
         <Menu.Item key="/organizations">团队管理</Menu.Item>
         <Divider key="divider2" className="m-t-b-10" />
@@ -157,7 +157,7 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
         fixedHeader={false}
       >
         <Shell.Branding>
-          <Logo image={LOGO_URL} url={`/${orgName}/application`} />
+          <Logo image={LOGO_URL} url={`/${localStorageGet('orgName')}/application`} />
         </Shell.Branding>
         {match?.path !== '/login' && (
           <Shell.Action>
