@@ -6,9 +6,9 @@
   "scripts": {
     "prettier": "cd ../.. && npm run prettier",
     "start": "DEBUG=serverless-cd:* nodemon index.js",
-    "local-start": "node local-run",
-    "sqlite-start": "node local-run --filename=s.local-run.sqlite",
-    "mysql-start": "node local-run --filename=s.local-run.mysql",
+    "local-start": "node serverless-scripts",
+    "sqlite-start": "node serverless-scripts --filename=s.local-run.sqlite",
+    "mysql-start": "node serverless-scripts --filename=s.local-run.mysql",
     "test": "DEBUG=serverless-cd:* jest"
   },
   "jest": {

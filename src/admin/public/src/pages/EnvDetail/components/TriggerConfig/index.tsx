@@ -75,7 +75,7 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, en
         </Button>
       }
     >
-      <div className="mt-16" key={triggerKey}>
+      <div key={triggerKey}>
         {triggerSpec[provider] && <Trigger.Preview dataSource={triggerSpec[provider]} />}
       </div>
       <Drawer
