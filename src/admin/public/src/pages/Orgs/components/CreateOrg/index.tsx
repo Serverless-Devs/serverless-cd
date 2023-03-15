@@ -27,7 +27,7 @@ const CreateOrg: FC<IProps> = (props) => {
       if (errors) return;
       const { success } = await request(values);
       if (success) {
-        Toast.success('创建组织成功');
+        Toast.success('创建团队成功');
         setVisible(false);
         resetToDefault();
         await callback();
@@ -39,7 +39,7 @@ const CreateOrg: FC<IProps> = (props) => {
     <>
       <span onClick={() => setVisible(true)}>{children}</span>
       <SlidePanel
-        title={'创建组织'}
+        title={'新建团队'}
         width="large"
         isShowing={visible}
         onClose={handleClose}
@@ -48,13 +48,13 @@ const CreateOrg: FC<IProps> = (props) => {
         isProcessing={loading}
       >
         <Form field={field} {...FORM_ITEM_LAYOUT}>
-          <FormItem label="组织名称" required>
+          <FormItem label="团队名称" required>
             <Input
               {...init('name', {
                 rules: [
                   {
                     required: true,
-                    message: '请输入组织名称',
+                    message: '请输入团队名称',
                   },
                 ],
               })}

@@ -22,12 +22,12 @@ function Orgs() {
 
   const handleDelete = (record) => {
     const dialog = Dialog.alert({
-      title: `删除组织：${record.name}`,
-      content: '您确定删除当前组织吗?',
+      title: `删除团队：${record.name}`,
+      content: '您确定删除当前团队吗?',
       onOk: async () => {
         const { success } = await removeOrg({ orgName: record.name });
         if (success) {
-          Toast.success('组织删除成功');
+          Toast.success('团队删除成功');
           refresh();
         }
         dialog.hide();
@@ -37,7 +37,7 @@ function Orgs() {
 
   const columns = [
     {
-      title: '组织名称',
+      title: '团队名称',
       key: 'name',
       dataIndex: 'name',
       cell: (value, _index, record) => <Link to={`/${value}`}>{value}</Link>,
@@ -77,7 +77,7 @@ function Orgs() {
     <div className="mt-16">
       <div className="flex-r mb-16">
         <CreateOrg callback={refresh}>
-          <Button type="primary">创建组织</Button>
+          <Button type="primary">新建团队</Button>
         </CreateOrg>
         <Button onClick={refresh}>
           <Icon type="refresh" />

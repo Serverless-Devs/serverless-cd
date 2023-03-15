@@ -95,14 +95,14 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
           <span className="user-name">{username}</span>
         </Menu.Item>
         <Divider key="divider1" className="m-t-b-10" />
-        <Menu.Item key="/application">Your repositories</Menu.Item>
-        <Menu.Item key="/organizations">Your organizations</Menu.Item>
+        <Menu.Item key="/application">应用管理</Menu.Item>
+        <Menu.Item key="/organizations">团队管理</Menu.Item>
         <Divider key="divider2" className="m-t-b-10" />
         <Menu.Item key="/settings" className="m-t-b-10">
-          Settings
+          个人设置
         </Menu.Item>
         <Divider key="divider4" className="m-t-b-10" />
-        <Menu.Item key="/login">Sign out</Menu.Item>
+        <Menu.Item key="/login">退出登录</Menu.Item>
       </Menu>
     );
   };
