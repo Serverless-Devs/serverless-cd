@@ -1,8 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useRequest, history, Link } from 'ice';
 import { listApp, deleteApp } from '@/services/applist';
-import { Button, Search, Loading, Table, Dialog, Icon } from '@alicloud/console-components';
-import { filter, includes, debounce, isEmpty, get, isBoolean, isUndefined } from 'lodash';
+import {
+  Button,
+  Search,
+  Loading,
+  Table,
+  Dialog,
+  Icon,
+  Balloon,
+} from '@alicloud/console-components';
+import {
+  filter,
+  includes,
+  debounce,
+  isEmpty,
+  get,
+  isBoolean,
+  isUndefined,
+  first,
+  keys,
+  map,
+} from 'lodash';
 import PageLayout from '@/layouts/PageLayout';
 import NotAppliaction from './components/NotAppliaction';
 import { CreateAppLication } from '../Create';
@@ -13,6 +32,9 @@ import ExternalLink from '@/components/ExternalLink';
 import { Toast } from '@/components/ToastContainer';
 import { sleep } from '@/utils';
 import store from '@/store';
+import Status from '@/components/DeployStatus';
+
+const { Tooltip } = Balloon;
 
 interface IItem {
   providerUid: number;
@@ -111,10 +133,32 @@ const AppList = ({
     });
   };
 
+  const repoNameRender = (value, _index, record) => {
+    const firstEnvName = first(keys(record.environment));
+    return (
+      <Tooltip
+        trigger={<Link to={`/${orgName}/application/${record.id}/${firstEnvName}`}>{value}</Link>}
+        align="r"
+      >
+        <div className="text-bold">环境名称</div>
+        {map(record.environment, (ele, envName) => {
+          return (
+            <div className="align-center mt-8">
+              <Link to={`/${orgName}/application/${record.id}/${envName}`}>{envName}</Link>
+              <span className="ml-2 mr-8">:</span>
+              <Status status={get(ele, 'latest_task.status', 'init')} />
+            </div>
+          );
+        })}
+      </Tooltip>
+    );
+  };
+
   const columns = [
     {
       title: '应用名称',
       dataIndex: 'repo_name',
+      cell: repoNameRender,
     },
     {
       key: 'created_time',
