@@ -1,14 +1,5 @@
-import React, { useState } from 'react';
-import {
-  Shell,
-  ConfigProvider,
-  Dropdown,
-  Menu,
-  Avatar,
-  Divider,
-  Dialog,
-  Icon,
-} from '@alicloud/console-components';
+import React, { useState, useEffect } from 'react';
+import { Shell, ConfigProvider, Dropdown, Menu, Avatar, Icon } from '@alicloud/console-components';
 import PageNav from './components/PageNav';
 import Logo from './components/Logo';
 import { LOGO_URL } from '@/constants/public';
@@ -20,18 +11,28 @@ import ToastContainer from '@/components/ToastContainer';
 import { listOrgs } from '@/services/user';
 import style from 'styled-components';
 import { localStorageGet, localStorageSet } from '@/utils';
-import './index.css';
 
-const StyledLi = style.li`
-  height: 56px;
-  padding: 10px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  :hover {
-    color: #1b9aee;
+const StyledMenu = style.div`
+.next-menu{
+  width: 180px;
+  .next-menu-item{
+    padding: 4px 16px;
   }
+  .border-bottom {
+    border-bottom: 1px solid #e3e9ed!important;
+  }
+}
+`;
+
+const OrgMenu = style.div`
+left: unset !important;
+right: 200px;
+.next-menu{
+  width: 150px;
+  .next-menu-item{
+    padding: 4px 16px;
+  }
+}
 `;
 
 const menuConfig = ['/settings/tokens', '/settings/secrets'];
@@ -69,8 +70,7 @@ interface IBasicLayoutProps {
   match: object | any;
   location: object | any;
 }
-export function BasicLayout({ children, match, location: { pathname } }: IBasicLayoutProps) {
-  const { orgName } = match.params;
+export function BasicLayout({ children, match }: IBasicLayoutProps) {
   const getDevice: IGetDevice = (width) => {
     const isPhone =
       typeof navigator !== 'undefined' && navigator && navigator.userAgent.match(/phone/gi);
@@ -85,7 +85,6 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
   };
   const [device, setDevice] = useState(getDevice(NaN));
   const [isCollapse, setIsCollapse] = useState<any>(false);
-  const [visible, setVisible] = useState(false);
   const { request } = useRequest(logout);
   const orgRequest = useRequest(listOrgs);
   const [userState, userDispatchers] = store.useModel('user');
@@ -93,6 +92,10 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
   const username = get(userState, 'userInfo.username', '');
   // const showMenu = menuConfig.includes(pathname);
   const showMenu = false;
+
+  useEffect(() => {
+    orgRequest.request();
+  }, []);
 
   const menu = () => {
     const onItemClick = (key) => {
@@ -107,30 +110,59 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
       }
       history?.push(`/${username}${key}`);
     };
-    const openOrgDialog = async (e) => {
+    const stopEvent = async (e) => {
       e.stopPropagation();
       e.preventDefault();
-      await orgRequest.request();
-      setVisible(true);
     };
+    const handleChangeOrg = async (value: string) => {
+      localStorageSet('orgName', value);
+      history?.push('/');
+    };
+    const orgRender = (
+      <Dropdown
+        trigger={
+          <div onClick={stopEvent} className="flex-r">
+            <span className="ellipsis">切换团队({localStorageGet('orgName')})</span>
+            <Icon type="arrow-right" size="xs" style={{ color: '#888' }} />
+          </div>
+        }
+        offset={[0, -38]}
+      >
+        <OrgMenu>
+          <Menu>
+            {map(get(orgRequest, 'data.result'), (item) => {
+              return (
+                <Menu.Item>
+                  <div className="flex-r" onClick={() => handleChangeOrg(item.name)}>
+                    <span className="ellipsis">{item.name}</span>
+                    {localStorageGet('orgName') === item.name && (
+                      <Icon type="select" size="xs" style={{ color: '#21ba45' }} />
+                    )}
+                  </div>
+                </Menu.Item>
+              );
+            })}
+          </Menu>
+        </OrgMenu>
+      </Dropdown>
+    );
     return (
-      <Menu className="user-menu" onItemClick={onItemClick}>
-        <Menu.Item key="/username">
-          <span className="user-name">{username}</span>
-        </Menu.Item>
-        <Divider key="divider1" className="m-t-b-10" />
-        <Menu.Item key="/application">应用管理</Menu.Item>
-        <Menu.Item>
-          <div onClick={openOrgDialog}>切换团队({localStorageGet('orgName')})</div>
-        </Menu.Item>
-        <Menu.Item key="/organizations">团队管理</Menu.Item>
-        <Divider key="divider2" className="m-t-b-10" />
-        <Menu.Item key="/settings" className="m-t-b-10">
-          个人设置
-        </Menu.Item>
-        <Divider key="divider4" className="m-t-b-10" />
-        <Menu.Item key="/login">退出登录</Menu.Item>
-      </Menu>
+      <StyledMenu>
+        <Menu onItemClick={onItemClick}>
+          <Menu.Item key="/username" className="border-bottom">
+            <span>{username}</span>
+          </Menu.Item>
+          <Menu.Item key="/application">应用管理</Menu.Item>
+          <Menu.Item>{orgRender}</Menu.Item>
+          <Menu.Item key="/organizations" className="border-bottom">
+            团队管理
+          </Menu.Item>
+          <Menu.Item key="/settings" className="border-bottom">
+            个人设置
+          </Menu.Item>
+          <Menu.Item key="/login">退出登录</Menu.Item>
+        </Menu>
+      </StyledMenu>
     );
   };
 
@@ -140,12 +172,6 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
       setDevice(getDevice(deviceWidth));
     });
   }
-
-  const handleChangeOrg = async (value: string) => {
-    setVisible(false);
-    localStorageSet('orgName', value);
-    history?.push(`/${value}`);
-  };
 
   return (
     <ConfigProvider device={device}>
@@ -163,14 +189,15 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
           <Shell.Action>
             <Dropdown
               trigger={
-                avatar ? (
-                  <Avatar className="cursor-pointer" src={avatar} size="small" />
-                ) : (
-                  <div className="avatar-content cursor-pointer">{username.slice(0, 1)}</div>
-                )
+                <div style={{ position: 'absolute', right: 0, padding: '12px 16px' }}>
+                  {avatar ? (
+                    <Avatar className="cursor-pointer" src={avatar} size="small" />
+                  ) : (
+                    <div className="avatar-content cursor-pointer">{username.slice(0, 1)}</div>
+                  )}
+                </div>
               }
-              triggerType={['click']}
-              offset={[0, 0]}
+              offset={[-16, 0]}
             >
               {menu()}
             </Dropdown>
@@ -188,27 +215,6 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
         <Shell.Content>
           {children}
           <ToastContainer />
-          <Dialog
-            title="切换团队"
-            size="small"
-            visible={visible}
-            onClose={() => setVisible(false)}
-            footer={false}
-          >
-            <ul style={{ minHeight: 500 }}>
-              {map(get(orgRequest, 'data.result'), (item) => {
-                return (
-                  <StyledLi onClick={() => handleChangeOrg(item.name)}>
-                    <div className="align-center">
-                      <div className="avatar-content">{item.name.slice(0, 1)}</div>
-                      <span className="fz-16 ml-8">{item.name}</span>
-                    </div>
-                    <Icon type="arrow-right" size="xs" />
-                  </StyledLi>
-                );
-              })}
-            </ul>
-          </Dialog>
         </Shell.Content>
       </Shell>
     </ConfigProvider>

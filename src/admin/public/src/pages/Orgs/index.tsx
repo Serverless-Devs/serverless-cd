@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useRequest, Link, history } from 'ice';
+import { useRequest, history } from 'ice';
 import { Button, Icon, Table, Dialog } from '@alicloud/console-components';
 import Actions, { LinkButton } from '@alicloud/console-components-actions';
 import CreateOrg from './components/CreateOrg';
@@ -36,9 +36,9 @@ function Orgs() {
     });
   };
 
-  const handleChangeOrg = async (record) => {
-    localStorageSet('orgName', record.name);
-    history?.push(`/${record.name}`);
+  const handleChangeOrg = async (value: string) => {
+    localStorageSet('orgName', value);
+    history?.push(`/${value}`);
   };
 
   const columns = [
@@ -46,7 +46,11 @@ function Orgs() {
       title: '团队名称',
       key: 'name',
       dataIndex: 'name',
-      cell: (value, _index, record) => <Link to={`/${value}`}>{value}</Link>,
+      cell: (value, _index, record) => (
+        <Button type="primary" text onClick={() => handleChangeOrg(value)}>
+          {value}
+        </Button>
+      ),
     },
     {
       title: '角色',
@@ -62,7 +66,7 @@ function Orgs() {
       title: '操作',
       cell: (value, _index, record) => (
         <Actions>
-          <LinkButton type="primary" onClick={() => handleChangeOrg(record)}>
+          <LinkButton type="primary" onClick={() => handleChangeOrg(record.name)}>
             切换
           </LinkButton>
           <TransferOrg callback={refresh} dataSource={{ name: record.name }}>

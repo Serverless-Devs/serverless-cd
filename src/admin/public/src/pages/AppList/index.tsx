@@ -143,7 +143,7 @@ const AppList = ({
     return (
       <Tooltip
         trigger={<Link to={`/${orgName}/application/${record.id}/${firstEnvName}`}>{value}</Link>}
-        align="r"
+        align="t"
       >
         <div className="text-bold">环境名称</div>
         {map(record.environment, (ele, envName) => {
