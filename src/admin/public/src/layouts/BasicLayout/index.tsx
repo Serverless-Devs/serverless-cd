@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Shell, ConfigProvider, Dropdown, Menu, Avatar, Icon } from '@alicloud/console-components';
+import {
+  Shell,
+  ConfigProvider,
+  Dropdown,
+  Menu,
+  Avatar,
+  Icon,
+  Button,
+} from '@alicloud/console-components';
 import PageNav from './components/PageNav';
 import Logo from './components/Logo';
 import { LOGO_URL } from '@/constants/public';
@@ -179,11 +187,22 @@ export function BasicLayout({ children, match }: IBasicLayoutProps) {
         <Shell.Branding>
           <Logo image={LOGO_URL} url={`/${localStorageGet('orgName')}/application`} />
         </Shell.Branding>
-        {match?.path !== '/login' && (
-          <Shell.Action>
+
+        <Shell.Action>
+          <Button
+            type="primary"
+            className="mr-8"
+            text
+            component="a"
+            href="http://serverless-cd.cn"
+            target="_blank"
+          >
+            帮助文档
+          </Button>
+          {match?.path !== '/login' && (
             <Dropdown
               trigger={
-                <div style={{ position: 'absolute', right: 0, padding: '12px 16px' }}>
+                <div style={{ padding: '12px 8px' }}>
                   {avatar ? (
                     <Avatar className="cursor-pointer" src={avatar} size="small" />
                   ) : (
@@ -191,12 +210,12 @@ export function BasicLayout({ children, match }: IBasicLayoutProps) {
                   )}
                 </div>
               }
-              offset={[-16, 0]}
+              offset={[0, 0]}
             >
               {menu()}
             </Dropdown>
-          </Shell.Action>
-        )}
+          )}
+        </Shell.Action>
         {showMenu && (
           <Shell.Navigation
             direction={'ver'}
