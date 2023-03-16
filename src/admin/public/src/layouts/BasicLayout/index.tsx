@@ -23,6 +23,9 @@ import { localStorageGet, localStorageSet } from '@/utils';
 const StyledMenu = style.div`
 .next-menu{
   width: 180px;
+  border: 1px solid #dadee3;
+  border-radius: .28571429rem;
+  box-shadow: 0 4px 8px -2px rgb(9 30 66 / 25%), 0 0 1px 0 rgb(9 30 66 / 31%);
   .next-menu-item{
     padding: 4px 16px;
   }
@@ -37,6 +40,9 @@ left: unset !important;
 right: 200px;
 .next-menu{
   width: 150px;
+  border: 1px solid #dadee3;
+  border-radius: .28571429rem;
+  box-shadow: 0 4px 8px -2px rgb(9 30 66 / 25%), 0 0 1px 0 rgb(9 30 66 / 31%);
   .next-menu-item{
     padding: 4px 16px;
   }
@@ -141,7 +147,7 @@ export function BasicLayout({ children, match }: IBasicLayoutProps) {
                   <div className="flex-r" onClick={() => handleChangeOrg(item.name)}>
                     <span className="ellipsis">{item.name}</span>
                     {localStorageGet('orgName') === item.name && (
-                      <Icon type="select" size="xs" style={{ color: '#21ba45' }} />
+                      <Icon type="select" size="xs" style={{ color: '#0070cc' }} />
                     )}
                   </div>
                 </Menu.Item>

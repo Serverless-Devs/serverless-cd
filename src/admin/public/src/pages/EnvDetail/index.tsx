@@ -92,7 +92,8 @@ const Details = ({
         const { success } = await removeEnv({ envName, appId });
         if (success) {
           Toast.success('环境删除成功');
-          history?.push(`/${orgName}/application/${appId}`);
+          history?.push(`/${orgName}/application/${appId}/default`);
+          forceUpdate(Date.now());
         }
         dialog.hide();
       },
@@ -129,11 +130,20 @@ const Details = ({
           <CreateEnv
             data={get(detailInfo, 'data', {})}
             appId={appId}
-            callback={async () => history?.push(`/${orgName}/application/${appId}`)}
+            callback={async (value) => {
+              history?.push(`/${orgName}/application/${appId}/${value}`);
+              forceUpdate(Date.now());
+            }}
           >
             <Button type="primary">创建环境</Button>
           </CreateEnv>
-          <Button className="ml-8" type="primary" warning onClick={handleDelete}>
+          <Button
+            disabled={envName === 'default'}
+            className="ml-8"
+            type="primary"
+            warning
+            onClick={handleDelete}
+          >
             删除环境
           </Button>
         </>

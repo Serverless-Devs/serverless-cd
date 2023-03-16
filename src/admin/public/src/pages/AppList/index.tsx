@@ -139,10 +139,9 @@ const AppList = ({
   };
 
   const repoNameRender = (value, _index, record) => {
-    const firstEnvName = first(keys(record.environment));
     return (
       <Tooltip
-        trigger={<Link to={`/${orgName}/application/${record.id}/${firstEnvName}`}>{value}</Link>}
+        trigger={<Link to={`/${orgName}/application/${record.id}/default`}>{value}</Link>}
         align="t"
       >
         <div className="text-bold">环境名称</div>
