@@ -236,7 +236,6 @@ async function initTemplate({ template, parameters, execDir, appName, content })
   await loadApplication(template, options);
   await fs.writeFile(path.join(execDir, 'serverless-pipeline.yaml'), content, (err) => {
     if (err) {
-      console.log(err);
       return;
     }
     debug('文件写入成功');
