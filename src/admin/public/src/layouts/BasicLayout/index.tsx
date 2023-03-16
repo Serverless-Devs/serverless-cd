@@ -105,9 +105,6 @@ export function BasicLayout({ children, match }: IBasicLayoutProps) {
         userDispatchers.removeStateInfo();
         return history?.push(key);
       }
-      if (key === '/organizations') {
-        return history?.push(key);
-      }
       history?.push(`/${username}${key}`);
     };
     const stopEvent = async (e) => {
@@ -122,7 +119,7 @@ export function BasicLayout({ children, match }: IBasicLayoutProps) {
       <Dropdown
         trigger={
           <div onClick={stopEvent} className="flex-r">
-            <span className="ellipsis">切换团队({localStorageGet('orgName')})</span>
+            <span className="ellipsis">团队切换({localStorageGet('orgName')})</span>
             <Icon type="arrow-right" size="xs" style={{ color: '#888' }} />
           </div>
         }
@@ -154,11 +151,8 @@ export function BasicLayout({ children, match }: IBasicLayoutProps) {
           </Menu.Item>
           <Menu.Item key="/application">应用管理</Menu.Item>
           <Menu.Item>{orgRender}</Menu.Item>
-          <Menu.Item key="/organizations" className="border-bottom">
-            团队管理
-          </Menu.Item>
           <Menu.Item key="/settings" className="border-bottom">
-            个人设置
+            设置
           </Menu.Item>
           <Menu.Item key="/login">退出登录</Menu.Item>
         </Menu>
