@@ -24,6 +24,8 @@ const Github = (props: IProps) => {
   const { init, getValue, resetToDefault } = field;
   const [dialogVisible, setVisible] = useState(false);
   const secretsRef: any = useRef(null);
+  const specify = get(getValue('trigger'), 'push') === PUSH.SPECIFY;
+  const template = createType === 'template';
 
   const secretsValidator = async (_, value, callback) => {
     if (get(getValue('trigger'), 'push') === PUSH.NEW) return callback();
@@ -73,7 +75,7 @@ const Github = (props: IProps) => {
           <Repo
             field={field}
             createType={createType}
-            createTemplate={createType === 'template'}
+            createTemplate={template}
             {...(init('repo', {
               rules: [
                 {
@@ -90,14 +92,10 @@ const Github = (props: IProps) => {
         <Divider className="mt-32" />
 
         <div className="text-bold mt-16 mb-16">环境配置</div>
-        <Trigger
-          repo={getValue('repo')}
-          {...(init('trigger') as any)}
-          createTemplate={createType === 'template'}
-        />
-        {get(getValue('trigger'), 'push') === PUSH.SPECIFY && (
+        <Trigger repo={getValue('repo')} {...(init('trigger') as any)} createTemplate={template} />
+        {(specify || template) && (
           <>
-            {createType !== 'template' && (
+            {!template && (
               <FormItem label="立即部署">
                 <Switch {...init('deployEnable', { valueName: 'checked', initValue: true })} />
               </FormItem>
@@ -116,7 +114,7 @@ const Github = (props: IProps) => {
       <Submit
         field={field}
         orgName={orgName}
-        createTemplate={createType === 'template'}
+        createTemplate={template}
         setVisible={setVisible}
         createType={createType as any}
       />
