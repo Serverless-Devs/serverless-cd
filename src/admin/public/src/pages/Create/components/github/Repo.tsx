@@ -336,7 +336,15 @@ const Repos = (props: IProps) => {
         {createType === CREATE_TYPE.Template && (
           <FormItem style={{ flexBasis: '68%', marginBottom: 0 }}>
             <Input value={inputValue} onChange={onRepoNameChange} className="full-width" />
-            <span style={{ position: 'absolute', height: 32, lineHeight: '32px', width: '65px' }}>
+            <span
+              style={{
+                position: 'absolute',
+                height: 32,
+                lineHeight: '32px',
+                width: '65px',
+                marginLeft: '8px',
+              }}
+            >
               {createTemplate && verifyRepoName()}
             </span>
           </FormItem>
