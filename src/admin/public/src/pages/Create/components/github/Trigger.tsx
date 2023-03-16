@@ -32,7 +32,7 @@ const Trigger = (props: IProps) => {
   };
 
   const defaultValueTemplate = {
-    push: PUSH.NEW,
+    push: PUSH.SPECIFY,
     branch: 'master',
   };
 
