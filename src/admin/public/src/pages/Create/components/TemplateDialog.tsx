@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import CreateTemplateDialog from '@serverless-cd/creating-ui';
 import { createByTemplate } from '@/services/applist';
 import { doManualDeployApp, doCreateApp } from '@/services/common';
-import { getParams, getConsoleConfig } from '@/utils';
+import { getParams } from '@/utils';
 import { get } from 'lodash';
+import { Toast } from '@/components/ToastContainer';
 import { CREATE_TYPE, SERVERLESS_PIPELINE_CONTENT_TEMPLATE } from './constant';
 import { history } from 'ice';
 import yaml from 'js-yaml';
@@ -33,6 +34,7 @@ declare type Repo = {
 
 const TemplateDialog = (props: IProps) => {
   const { value, createType, orgName } = props;
+  const [retryType, setRetryType] = useState('current');
   const repoName = get(value, 'repoName');
   const provider = 'github';
   const branch = get(value, 'trigger.branch') || 'master';
@@ -72,14 +74,11 @@ const TemplateDialog = (props: IProps) => {
           successMsg: '初始化模版成功',
           errorMsg: '初始化模版失败',
           run: async () => {
-            console.log('999');
-            const pathName = getConsoleConfig('CD_PIPELINE_YAML', 'serverless-pipeline.yaml');
             const content = yaml.dump(SERVERLESS_PIPELINE_CONTENT_TEMPLATE);
             const res = await createByTemplate({
               ...body,
               type: 'initTemplate',
               content,
-              pathName,
             });
             if (!res.success) {
               throw new Error(res.message);
@@ -99,6 +98,11 @@ const TemplateDialog = (props: IProps) => {
             if (!res.success) {
               throw new Error(res.message);
             } else {
+              if (res.data.isFolderEmpty) {
+                setRetryType('all');
+                Toast.error('下载模板已被清空，请重试');
+                throw new Error();
+              }
               const { data } = res;
               setRepo(data);
               return data;
@@ -116,6 +120,11 @@ const TemplateDialog = (props: IProps) => {
             if (!res.success) {
               throw new Error(res.message);
             } else {
+              if (res.data.isFolderEmpty) {
+                setRetryType('all');
+                Toast.error('下载模板已被清空，请重试');
+                throw new Error();
+              }
               return res.data;
             }
           },
@@ -131,6 +140,11 @@ const TemplateDialog = (props: IProps) => {
             if (!res.success) {
               throw new Error(res.message);
             } else {
+              if (res.data.isFolderEmpty) {
+                setRetryType('all');
+                Toast.error('下载模板已被清空，请重试');
+                throw new Error();
+              }
               return res.data;
             }
           },
@@ -163,12 +177,7 @@ const TemplateDialog = (props: IProps) => {
       errorMsg: '部署失败',
       run: async (params) => {
         const { id } = params.content.createApp.result;
-        const res = await doManualDeployApp(id, branch);
-        if (!res.success) {
-          throw new Error(res.message);
-        } else {
-          return res.data;
-        }
+        await doManualDeployApp(id, branch);
       },
     },
     {
@@ -178,10 +187,11 @@ const TemplateDialog = (props: IProps) => {
       runningMsg: '完成创建，即将跳去应用列表页面',
       successMsg: '即将跳转',
       errorMsg: '跳转失败',
-      run: async () => {
+      run: async (params) => {
         return await new Promise((resolve, reject) => {
+          const { id } = params.content.createApp.result;
           setTimeout(() => {
-            history?.push(`/${orgName}`);
+            history?.push(`/${orgName}/application/${id}/default`);
             resolve();
           }, 3000);
         });
@@ -189,7 +199,9 @@ const TemplateDialog = (props: IProps) => {
     },
   ];
 
-  return <CreateTemplateDialog dataSource={dataSource}></CreateTemplateDialog>;
+  return (
+    <CreateTemplateDialog dataSource={dataSource} retryType={retryType}></CreateTemplateDialog>
+  );
 };
 
 export default TemplateDialog;

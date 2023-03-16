@@ -73,6 +73,7 @@ const Github = (props: IProps) => {
           <Repo
             field={field}
             createType={createType}
+            createTemplate={createType === 'template'}
             {...(init('repo', {
               rules: [
                 {
@@ -86,31 +87,29 @@ const Github = (props: IProps) => {
         <FormItem label="描述">
           <Input {...init('description')} placeholder="请输入描述" />
         </FormItem>
-        {createType !== 'template' && (
-          <>
-            <Divider className="mt-32" />
+        <Divider className="mt-32" />
 
-            <div className="text-bold mt-16 mb-16">环境配置</div>
-            <Trigger
-              repo={getValue('repo')}
-              {...(init('trigger') as any)}
-              createTemplate={createType === 'template'}
-            />
-            {get(getValue('trigger'), 'push') === PUSH.SPECIFY && (
-              <>
-                <FormItem label="立即部署">
-                  <Switch {...init('deployEnable', { valueName: 'checked', initValue: true })} />
-                </FormItem>
-                <FormItem label="Secrets" help="">
-                  <ConfigEdit
-                    {...init('secrets', {
-                      rules: [{ validator: secretsValidator }],
-                    })}
-                    ref={secretsRef}
-                  />
-                </FormItem>
-              </>
+        <div className="text-bold mt-16 mb-16">环境配置</div>
+        <Trigger
+          repo={getValue('repo')}
+          {...(init('trigger') as any)}
+          createTemplate={createType === 'template'}
+        />
+        {get(getValue('trigger'), 'push') === PUSH.SPECIFY && (
+          <>
+            {createType !== 'template' && (
+              <FormItem label="立即部署">
+                <Switch {...init('deployEnable', { valueName: 'checked', initValue: true })} />
+              </FormItem>
             )}
+            <FormItem label="Secrets" help="">
+              <ConfigEdit
+                {...init('secrets', {
+                  rules: [{ validator: secretsValidator }],
+                })}
+                ref={secretsRef}
+              />
+            </FormItem>
           </>
         )}
       </Form>

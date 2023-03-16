@@ -151,3 +151,20 @@ export function setSearchParams(params) {
     window.history.pushState({ path: url }, '', url);
   }
 }
+
+export function localStorageGet(key) {
+  try {
+    const value = localStorage.getItem(key);
+    if (value && isJson(value)) {
+      return JSON.parse(value);
+    }
+    return value;
+  } catch (error) {}
+}
+
+export function localStorageSet(key, value) {
+  try {
+    const newValue = typeof value === 'object' ? JSON.stringify(value) : value;
+    localStorage.setItem(key, newValue);
+  } catch (error) {}
+}

@@ -9,7 +9,7 @@ const taskModel = require('../models/task.mode');
 const orgModel = require('../models/org.mode');
 const gitService = require('./git.service');
 const os = require('os');
-const loadApplication = require('@serverless-devs/load-application');
+const { default: loadApplication } = require('@serverless-devs/load-application');
 
 const webhookService = require('./webhook.service');
 const orgService = require('./org.service');
@@ -71,6 +71,19 @@ async function create(orgId, orgName, body) {
   return { id: appId };
 }
 
+async function checkFolderEmpty(execDir) {
+  try {
+    const res = await fs.readdir(execDir);
+    if (res.length === 0) {
+      return { isFolderEmpty: true };
+    } else {
+      return { isFolderEmpty: false };
+    }
+  } catch (e) {
+    return { isFolderEmpty: true };
+  }
+}
+
 /**
  * 幂等
  * @param {*} param0
@@ -81,6 +94,12 @@ async function createByTemplate({ type, orgName }, body) {
   const { provider, appId: oldAppId, owner, repo } = body;
   const appId = oldAppId || unionId();
   const execDir = path.join(os.tmpdir(), owner, repo);
+  if (type != 'initTemplate') {
+    const { isFolderEmpty } = await checkFolderEmpty(execDir);
+    if (isFolderEmpty) {
+      return { isFolderEmpty };
+    }
+  }
   // 1. 初始化模版
   if (type === 'initTemplate') {
     const { template, parameters = {}, content } = body;
@@ -211,7 +230,7 @@ async function initTemplate({ template, parameters, execDir, appName, content })
   const options = {
     dest: path.dirname(execDir),
     appName,
-    parameters,
+    parameters: { serviceName: 'web-framework-1' },
     projectName: path.basename(execDir),
   };
   await loadApplication(template, options);

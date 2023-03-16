@@ -1,8 +1,8 @@
-import React, { useEffect, ReactNode, useState } from 'react';
+import React, { useEffect, ReactNode, useState, useRef } from 'react';
 import { useRequest } from 'ice';
 import { Select, Icon, Field, Form, Input } from '@alicloud/console-components';
 import store from '@/store';
-import { noop, map, find, isEmpty, cloneDeep, get } from 'lodash';
+import { noop, map, find, isEmpty, cloneDeep, get, debounce } from 'lodash';
 import RefreshIcon from '@/components/RefreshIcon';
 import { githubOrgs, githubOrgRepos } from '@/services/git';
 import { CREATE_TYPE } from '../constant';
@@ -25,6 +25,7 @@ interface IProps {
   value?: IRepoItem | undefined;
   onChange?: (value: IRepoItem) => void;
   createType?: `${CREATE_TYPE}`;
+  createTemplate: boolean;
 }
 
 const initRepoTypeList = [
@@ -44,16 +45,31 @@ const initRepoTypeList = [
 ];
 
 const Repos = (props: IProps) => {
-  const { value, onChange = noop, field, createType = CREATE_TYPE.Repository } = props;
+  const {
+    value,
+    onChange = noop,
+    field,
+    createType = CREATE_TYPE.Repository,
+    createTemplate = false,
+  } = props;
   const { data, loading, request } = useRequest(githubOrgs);
   const orgRepos = useRequest(githubOrgRepos);
   const [, userDispatchers] = store.useModel('user');
   const effectsState = store.useModelEffectsState('user');
   const [refreshLoading, setRefreshLoading] = useState(false);
   const [currentRepoType, setCurrentRepoType] = useState('personal');
+  const [verifyStatus, setVerifyStatus] = useState('');
+  const [inputValue, setInputValue] = useState('');
   const { getValue, setValue, init, getError } = field;
   // owner是否授权
   const isAuth = Boolean(get(getValue('gitUser'), 'third_part.github.owner'));
+
+  useEffect(() => {
+    setInputValue(getValue('repoName'));
+    (async () => {
+      await validateRepoName.current(getValue('repoName'));
+    })();
+  }, [getValue('repoName')]);
 
   useEffect(() => {
     if (!isEmpty(data)) {
@@ -74,8 +90,21 @@ const Repos = (props: IProps) => {
   useEffect(() => {
     if (!isAuth) return;
     onRepoTypeChange('personal');
-    request();
+    !createTemplate && request();
   }, [isAuth]);
+
+  const validateRepoName = useRef(
+    debounce(async (value) => {
+      setVerifyStatus('loading');
+      const res = await userDispatchers.getUserRepos();
+      const data = find(res, (item: IRepoItem) => item.name === value);
+      if (data) {
+        setVerifyStatus('error');
+      } else {
+        setVerifyStatus('success');
+      }
+    }, 500),
+  );
 
   const valueRender = ({ value }) => {
     const userRepos = (getValue('userRepos') as IRepoItem[]) || ([] as IRepoItem[]);
@@ -207,6 +236,41 @@ const Repos = (props: IProps) => {
     onChange({});
   };
 
+  const onRepoNameChange = async (value) => {
+    setInputValue(value);
+    setValue('repoName', value);
+    setVerifyStatus('');
+    validateRepoName.current(value);
+  };
+
+  const verifyRepoName = () => {
+    switch (verifyStatus) {
+      case 'loading':
+        return (
+          <span>
+            <Icon type="loading" size="xs" />
+            <span>校验中...</span>
+          </span>
+        );
+      case 'error':
+        return (
+          <span>
+            <Icon type="error" size="xs" className="color-error" />
+            <span>不可用</span>
+          </span>
+        );
+      case 'success':
+        return (
+          <span>
+            <Icon type="success" size="xs" className="color-success" />
+            <span>可用</span>
+          </span>
+        );
+      default:
+        return '';
+    }
+  };
+
   return (
     <div className="flex-r position-r">
       <Form field={field} className="flex-r position-r" style={{ width: '100%' }}>
@@ -214,7 +278,16 @@ const Repos = (props: IProps) => {
           <Select
             className="full-width"
             placeholder="请选择个人/组织"
-            dataSource={getValue('repoTypeList')}
+            dataSource={
+              createTemplate
+                ? [
+                    {
+                      value: 'personal',
+                      label: '个人仓库',
+                    },
+                  ]
+                : getValue('repoTypeList')
+            }
             {...init('repoTypeValue', {
               initValue: 'personal',
               props: {
@@ -262,7 +335,10 @@ const Repos = (props: IProps) => {
         )}
         {createType === CREATE_TYPE.Template && (
           <FormItem style={{ flexBasis: '68%', marginBottom: 0 }}>
-            <Input {...(init('repoName') as any)} className="full-width" />
+            <Input value={inputValue} onChange={onRepoNameChange} className="full-width" />
+            <span style={{ position: 'absolute', height: 32, lineHeight: '32px', width: '65px' }}>
+              {createTemplate && verifyRepoName()}
+            </span>
           </FormItem>
         )}
       </Form>

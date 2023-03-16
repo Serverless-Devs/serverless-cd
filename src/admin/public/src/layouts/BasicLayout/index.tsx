@@ -6,6 +6,8 @@ import {
   Menu,
   Avatar,
   Divider,
+  Dialog,
+  Icon,
 } from '@alicloud/console-components';
 import PageNav from './components/PageNav';
 import Logo from './components/Logo';
@@ -13,9 +15,24 @@ import { LOGO_URL } from '@/constants/public';
 import { logout } from '@/services/auth';
 import { history, useRequest } from 'ice';
 import store from '@/store';
-import { get } from 'lodash';
+import { get, map } from 'lodash';
 import ToastContainer from '@/components/ToastContainer';
+import { listOrgs } from '@/services/user';
+import style from 'styled-components';
+import { localStorageGet, localStorageSet } from '@/utils';
 import './index.css';
+
+const StyledLi = style.li`
+  height: 56px;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  :hover {
+    color: #1b9aee;
+  }
+`;
 
 const menuConfig = ['/settings/tokens', '/settings/secrets'];
 
@@ -66,10 +83,11 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
       return 'desktop';
     }
   };
-
   const [device, setDevice] = useState(getDevice(NaN));
   const [isCollapse, setIsCollapse] = useState<any>(false);
+  const [visible, setVisible] = useState(false);
   const { request } = useRequest(logout);
+  const orgRequest = useRequest(listOrgs);
   const [userState, userDispatchers] = store.useModel('user');
   const avatar = get(userState, 'userInfo.avatar');
   const username = get(userState, 'userInfo.username', '');
@@ -89,20 +107,29 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
       }
       history?.push(`/${username}${key}`);
     };
+    const openOrgDialog = async (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      await orgRequest.request();
+      setVisible(true);
+    };
     return (
       <Menu className="user-menu" onItemClick={onItemClick}>
         <Menu.Item key="/username">
           <span className="user-name">{username}</span>
         </Menu.Item>
         <Divider key="divider1" className="m-t-b-10" />
-        <Menu.Item key="/application">Your repositories</Menu.Item>
-        <Menu.Item key="/organizations">Your organizations</Menu.Item>
+        <Menu.Item key="/application">应用管理</Menu.Item>
+        <Menu.Item>
+          <div onClick={openOrgDialog}>切换团队({localStorageGet('orgName')})</div>
+        </Menu.Item>
+        <Menu.Item key="/organizations">团队管理</Menu.Item>
         <Divider key="divider2" className="m-t-b-10" />
         <Menu.Item key="/settings" className="m-t-b-10">
-          Settings
+          个人设置
         </Menu.Item>
         <Divider key="divider4" className="m-t-b-10" />
-        <Menu.Item key="/login">Sign out</Menu.Item>
+        <Menu.Item key="/login">退出登录</Menu.Item>
       </Menu>
     );
   };
@@ -114,6 +141,12 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
     });
   }
 
+  const handleChangeOrg = async (value: string) => {
+    setVisible(false);
+    localStorageSet('orgName', value);
+    history?.push(`/${value}`);
+  };
+
   return (
     <ConfigProvider device={device}>
       <Shell
@@ -124,7 +157,7 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
         fixedHeader={false}
       >
         <Shell.Branding>
-          <Logo image={LOGO_URL} url={`/${orgName}/application`} />
+          <Logo image={LOGO_URL} url={`/${localStorageGet('orgName')}/application`} />
         </Shell.Branding>
         {match?.path !== '/login' && (
           <Shell.Action>
@@ -155,6 +188,27 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
         <Shell.Content>
           {children}
           <ToastContainer />
+          <Dialog
+            title="切换团队"
+            size="small"
+            visible={visible}
+            onClose={() => setVisible(false)}
+            footer={false}
+          >
+            <ul style={{ minHeight: 500 }}>
+              {map(get(orgRequest, 'data.result'), (item) => {
+                return (
+                  <StyledLi onClick={() => handleChangeOrg(item.name)}>
+                    <div className="align-center">
+                      <div className="avatar-content">{item.name.slice(0, 1)}</div>
+                      <span className="fz-16 ml-8">{item.name}</span>
+                    </div>
+                    <Icon type="arrow-right" size="xs" />
+                  </StyledLi>
+                );
+              })}
+            </ul>
+          </Dialog>
         </Shell.Content>
       </Shell>
     </ConfigProvider>
