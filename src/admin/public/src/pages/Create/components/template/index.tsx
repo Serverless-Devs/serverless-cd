@@ -5,7 +5,7 @@ import { getParam } from '@/utils';
 import { noop } from 'lodash';
 
 const CreateTemplate = ({ field, forceUpdate = noop, orgName }, ref) => {
-  const [template, setTemplate] = useState();
+  const [template, setTemplate] = useState('');
 
   useImperativeHandle(ref, () => ({
     template,

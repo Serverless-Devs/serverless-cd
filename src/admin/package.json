@@ -6,9 +6,9 @@
   "scripts": {
     "prettier": "cd ../.. && npm run prettier",
     "start": "DEBUG=serverless-cd:* nodemon index.js",
-    "local-start": "node local-run",
-    "sqlite-start": "node local-run --filename=s.local-run.sqlite",
-    "mysql-start": "node local-run --filename=s.local-run.mysql",
+    "local-start": "node serverless-scripts",
+    "sqlite-start": "export RUN_TYPE=\"s.local-run.sqlite.yaml\" && node serverless-scripts",
+    "mysql-start": "export RUN_TYPE=\"s.local-run.mysql.yaml\" && node serverless-scripts",
     "test": "DEBUG=serverless-cd:* jest"
   },
   "jest": {
@@ -23,11 +23,11 @@
     "@prisma/client": "^4.10.1",
     "@serverless-cd/config": "^0.0.15",
     "@serverless-cd/core": "^0.0.15",
-    "@serverless-cd/git": "^0.0.5",
+    "@serverless-cd/git": "^0.0.6",
     "@serverless-cd/git-provider": "^0.1.2",
     "@serverless-cd/srm-aliyun-fc2": "^0.0.5",
     "@serverless-cd/trigger": "^0.0.12",
-    "@serverless-devs/core": "^0.1.45",
+    "@serverless-devs/load-application": "^0.0.1",
     "ali-oss": "^6.17.1",
     "axios": "^0.27.2",
     "cookie-parser": "^1.4.6",

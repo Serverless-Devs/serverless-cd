@@ -9,7 +9,7 @@ interface PageLayoutProps {
   title?: string;
   breadcrumbExtra?: React.ReactNode;
   hideBackground?: boolean;
-  subhead?: string;
+  subhead?: React.ReactNode;
   description?: string;
 }
 

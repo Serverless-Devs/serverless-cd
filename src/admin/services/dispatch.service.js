@@ -16,6 +16,7 @@ const {
   },
   TASK_STATUS: { CANCEL, RUNNING, PENDING },
 } = require('@serverless-cd/config');
+const MANUAL = 'manual';
 
 async function retryOnce(fnName, ...args) {
   try {
@@ -69,6 +70,7 @@ async function redeploy(dispatchOrgId, orgName, { taskId, appId } = {}) {
   }
   _.unset(environment, 'latest_task');
   _.set(trigger_payload, 'environment', environment);
+  _.set(trigger_payload, 'trigger_type', MANUAL);
 
   // 重新设置新的 task id
   const newTaskId = unionToken();
@@ -178,8 +180,6 @@ async function manualTask(dispatchOrgId, orgName, body = {}) {
         ref,
         repo: repo_name,
       });
-      console.log('11111', { owner, ref, repo: repo_name });
-      console.log(',,,,', commitConfig);
       commit = commitConfig.sha;
       msg = commitConfig.message;
     } catch (ex) {
@@ -211,6 +211,7 @@ async function manualTask(dispatchOrgId, orgName, body = {}) {
     environment,
     envName: targetEnvName,
     customInputs: inputs,
+    trigger_type: MANUAL,
   };
   debug(`manual run task ${targetEnvName}, payload: ${JSON.stringify(payload)}`);
 

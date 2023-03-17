@@ -1,6 +1,5 @@
 const _ = require('lodash');
 const core = require('@serverless-devs/core');
-const { push } = require('@serverless-cd/git');
 const debug = require('debug')('serverless-cd:application');
 const path = require('path');
 const fs = require('fs-extra');
@@ -10,6 +9,7 @@ const taskModel = require('../models/task.mode');
 const orgModel = require('../models/org.mode');
 const gitService = require('./git.service');
 const os = require('os');
+const { default: loadApplication } = require('@serverless-devs/load-application');
 
 const webhookService = require('./webhook.service');
 const orgService = require('./org.service');
@@ -71,19 +71,38 @@ async function create(orgId, orgName, body) {
   return { id: appId };
 }
 
+async function checkFolderEmpty(execDir) {
+  try {
+    const res = await fs.readdir(execDir);
+    if (res.length === 0) {
+      return { isFolderEmpty: true };
+    } else {
+      return { isFolderEmpty: false };
+    }
+  } catch (e) {
+    return { isFolderEmpty: true };
+  }
+}
+
 /**
  * 幂等
  * @param {*} param0
  * @param {*} body
  * @returns
  */
-async function createByTemplate({ type, orgId, orgName }, body) {
+async function createByTemplate({ type, orgName }, body) {
   const { provider, appId: oldAppId, owner, repo } = body;
   const appId = oldAppId || unionId();
-  const execDir = path.join(os.tmpdir(), repo);
+  const execDir = path.join(os.tmpdir(), owner, repo);
+  if (type != 'initTemplate') {
+    const { isFolderEmpty } = await checkFolderEmpty(execDir);
+    if (isFolderEmpty) {
+      return { isFolderEmpty };
+    }
+  }
   // 1. 初始化模版
   if (type === 'initTemplate') {
-    const { template, parameters = {} } = body;
+    const { template, parameters = {}, content } = body;
     if (_.isEmpty(template)) {
       throw new ParamsValidationError('参数校验失败，template必填 ');
     }
@@ -93,6 +112,7 @@ async function createByTemplate({ type, orgId, orgName }, body) {
       execDir,
       appName: appId,
       access: 'default',
+      content,
     });
     debug('init template');
     return { appId };
@@ -112,42 +132,28 @@ async function createByTemplate({ type, orgId, orgName }, body) {
   }
   // 3. 初始化commit信息
   if (type === 'initCommit') {
+    const token = await orgService.getProviderToken(orgName, provider);
     await gitService.initAndCommit({
       provider,
       execDir,
-      repoUrl: `https://${provider}.com/${owner}/${repo}.git`,
+      repoUrl: `https://${token}@${provider}.com/${owner}/${repo}.git`,
       branch: 'master',
     });
     return {};
   }
   // 4. 提交代码
   if (type === 'push') {
-    await push({
+    const token = await orgService.getProviderToken(orgName, provider);
+    const data = await gitService.pushFile({
+      owner,
+      repo,
       execDir,
       branch: 'master',
-    });
-    return {};
-  }
-
-  // 5. 创建应用
-  if (type === 'createApp') {
-    const { repo_url, provider_repo_id: providerRepoId, description, environment } = body;
-    const ownerOrg = await orgModel.getOwnerOrgByName(orgName);
-    await appModel.createApp({
-      id: appId,
-      org_id: orgId,
-      owner_org_id: _.get(ownerOrg, 'id'),
-      description,
-      owner,
       provider,
-      environment,
-      provider_repo_id: providerRepoId,
-      repo_name: repo,
-      repo_url,
-      webhook_secret: webHookSecret,
+      token,
     });
+    return data;
   }
-
   throw new ValidationError('请求路径不正确');
 }
 
@@ -218,16 +224,21 @@ async function transfer(appId, transferOrgName) {
 /**
  * 初始化模版
  */
-async function initTemplate({ template, parameters, execDir, appName }) {
+async function initTemplate({ template, parameters, execDir, appName, content }) {
   await fs.remove(execDir);
   debug(`Init template: ${(template, parameters, execDir, appName)}`);
-  await core.loadApplication({
-    source: template,
-    target: path.dirname(execDir),
-    name: path.basename(execDir),
-    parameters,
+  const options = {
+    dest: path.dirname(execDir),
     appName,
-    access: 'default',
+    parameters: { serviceName: 'web-framework-1' },
+    projectName: path.basename(execDir),
+  };
+  await loadApplication(template, options);
+  await fs.writeFile(path.join(execDir, 'serverless-pipeline.yaml'), content, (err) => {
+    if (err) {
+      return;
+    }
+    debug('文件写入成功');
   });
 }
 

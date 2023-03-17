@@ -1,16 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import CreateTemplateDialog from '@serverless-cd/creating-ui';
-import { Field } from '@alicloud/console-components';
 import { createByTemplate } from '@/services/applist';
 import { doManualDeployApp, doCreateApp } from '@/services/common';
 import { getParams } from '@/utils';
 import { get } from 'lodash';
-import { CREATE_TYPE } from './constant';
+import { Toast } from '@/components/ToastContainer';
+import { CREATE_TYPE, SERVERLESS_PIPELINE_CONTENT_TEMPLATE } from './constant';
+import { history } from 'ice';
+import yaml from 'js-yaml';
 
 interface IProps {
-  field?: Field;
-  value?: any;
+  value: any;
   createType?: `${CREATE_TYPE}`;
+  orgName: string;
 }
 declare type status = 'wait' | 'finish';
 declare type Request = {
@@ -31,9 +33,11 @@ declare type Repo = {
 };
 
 const TemplateDialog = (props: IProps) => {
-  const { value, createType } = props;
+  const { value, createType, orgName } = props;
+  const [retryType, setRetryType] = useState('current');
   const repoName = get(value, 'repoName');
   const provider = 'github';
+  const branch = get(value, 'trigger.branch') || 'master';
   const appId = get(getParams(location?.search), 'template');
   const owner = get(value, 'gitUser.value');
   const body = {
@@ -41,7 +45,7 @@ const TemplateDialog = (props: IProps) => {
     appId: appId,
     owner: owner,
     repo: repoName,
-    template: 'devsapp/start-express',
+    template: `devsapp/${appId}`,
   };
   let repo: Repo = {
     name: repoName,
@@ -70,7 +74,17 @@ const TemplateDialog = (props: IProps) => {
           successMsg: '初始化模版成功',
           errorMsg: '初始化模版失败',
           run: async () => {
-            await createByTemplate({ ...body, type: 'initTemplate' });
+            const content = yaml.dump(SERVERLESS_PIPELINE_CONTENT_TEMPLATE);
+            const res = await createByTemplate({
+              ...body,
+              type: 'initTemplate',
+              content,
+            });
+            if (!res.success) {
+              throw new Error(res.message);
+            } else {
+              return res.data;
+            }
           },
         },
         {
@@ -80,8 +94,39 @@ const TemplateDialog = (props: IProps) => {
           successMsg: '远程仓库创建成功',
           errorMsg: '远程仓库创建失败',
           run: async () => {
-            const { data } = await createByTemplate({ ...body, type: 'initRepo' });
-            setRepo(data);
+            const res = await createByTemplate({ ...body, type: 'initRepo' });
+            if (!res.success) {
+              throw new Error(res.message);
+            } else {
+              if (res.data.isFolderEmpty) {
+                setRetryType('all');
+                Toast.error('下载模板已被清空，请重试');
+                throw new Error();
+              }
+              const { data } = res;
+              setRepo(data);
+              return data;
+            }
+          },
+        },
+        {
+          key: 'initCommit',
+          title: '初始化commit信息',
+          runningMsg: '初始化commit信息中',
+          successMsg: '初始化commit信息成功',
+          errorMsg: '初始化commit信息失败',
+          run: async () => {
+            const res = await createByTemplate({ ...body, type: 'initCommit' });
+            if (!res.success) {
+              throw new Error(res.message);
+            } else {
+              if (res.data.isFolderEmpty) {
+                setRetryType('all');
+                Toast.error('下载模板已被清空，请重试');
+                throw new Error();
+              }
+              return res.data;
+            }
           },
         },
         {
@@ -91,43 +136,72 @@ const TemplateDialog = (props: IProps) => {
           successMsg: '同步远程代码到仓库成功',
           errorMsg: '同步远程代码到仓库失败',
           run: async () => {
-            await createByTemplate({ ...body, type: 'initCommit' });
-            await createByTemplate({ ...body, type: 'push' });
+            const res = await createByTemplate({ ...body, type: 'push' });
+            if (!res.success) {
+              throw new Error(res.message);
+            } else {
+              if (res.data.isFolderEmpty) {
+                setRetryType('all');
+                Toast.error('下载模板已被清空，请重试');
+                throw new Error();
+              }
+              return res.data;
+            }
           },
         },
       ],
     },
     {
-      title: '创建',
+      key: 'createApp',
+      title: '创建应用',
       runStatus: 'wait',
-      key: 'create',
-      runningMsg: '创建中...',
-      successMsg: '创建成功',
-      errorMsg: '创建失败',
-      tasks: [
-        {
-          key: 'createApp',
-          title: '创建应用',
-          runningMsg: '创建应用中',
-          successMsg: '创建应用成功',
-          errorMsg: '创建应用失败',
-          run: async () => {
-            // 创建应用
-            const { success: createAppSuccess, data } = await doCreateApp(
-              { ...value, repo },
-              createType,
-            );
-            if (!createAppSuccess) return;
-            // 部署应用
-            await doManualDeployApp(data.id, 'master');
-            return { success: true };
-          },
-        },
-      ],
+      runningMsg: '创建应用中',
+      successMsg: '创建应用成功',
+      errorMsg: '创建应用失败',
+      run: async () => {
+        // 创建应用
+        const res = await doCreateApp({ ...value, repo }, createType);
+        if (!res.success) {
+          throw new Error(res.message);
+        } else {
+          return res.data;
+        }
+      },
+    },
+    {
+      title: '部署',
+      runStatus: 'wait',
+      key: 'deploy',
+      runningMsg: '部署中...',
+      successMsg: '部署成功',
+      errorMsg: '部署失败',
+      run: async (params) => {
+        const { id } = params.content.createApp.result;
+        await doManualDeployApp(id, branch);
+      },
+    },
+    {
+      key: 'success',
+      title: '完成创建，即将跳去应用列表页面',
+      runStatus: 'wait',
+      runningMsg: '完成创建，即将跳去应用列表页面',
+      successMsg: '即将跳转',
+      errorMsg: '跳转失败',
+      run: async (params) => {
+        return await new Promise((resolve, reject) => {
+          const { id } = params.content.createApp.result;
+          setTimeout(() => {
+            history?.push(`/${orgName}/application/${id}/default`);
+            resolve();
+          }, 3000);
+        });
+      },
     },
   ];
 
-  return <CreateTemplateDialog dataSource={dataSource}></CreateTemplateDialog>;
+  return (
+    <CreateTemplateDialog dataSource={dataSource} retryType={retryType}></CreateTemplateDialog>
+  );
 };
 
 export default TemplateDialog;
