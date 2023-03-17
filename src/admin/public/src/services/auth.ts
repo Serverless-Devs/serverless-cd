@@ -17,8 +17,6 @@ export const accountBinding = async (body) => {
   return await request.post('/api/auth/callback/bindingAccount', body);
 };
 
-export const getAuthGithub = async (params) => {
-  return await request.get('/api/auth/callback/github', {
-    params,
-  });
+export const getAuthGithub = async (body) => {
+  return await request.post('/api/auth/callback/github', body);
 };

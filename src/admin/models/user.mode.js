@@ -32,6 +32,10 @@ module.exports = {
     const userInfo = await userPrisma.findUnique({ where: { email } });
     return getUserInfo(userInfo);
   },
+  async getGithubById(github_unionid) {
+    const userInfo = await userPrisma.findFirst({ where: { github_unionid: `${github_unionid}` } });
+    return getUserInfo(userInfo);
+  },
   async updateUserById(id, data) {
     if (data.third_part) {
       data.third_part = JSON.stringify(data.third_part);

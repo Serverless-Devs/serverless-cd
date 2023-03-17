@@ -1,15 +1,16 @@
 const jwt = require('jsonwebtoken');
 const debug = require('debug')('serverless-cd:auth');
 const _ = require('lodash');
-const { JWT_SECRET, ADMIN_ROLE_KEYS, SESSION_EXPIRATION } = require('@serverless-cd/config');
+const { JWT_SECRET, ADMIN_ROLE_KEYS, SESSION_EXPIRATION, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } = require('@serverless-cd/config');
 const userModel = require('../models/user.mode');
 const orgModel = require('../models/org.mode');
 const { md5Encrypt, ValidationError, checkNameAvailable, NoAuthError } = require('../util');
+const axios = require('axios');
 
 /**
  * 注册用户
  */
-async function initUser({ username, password, email }) {
+async function initUser({ username, password, email, github_unionid }) {
   if (!checkNameAvailable(username)) {
     throw new ValidationError('用户名称不合法，预期格式：/^[a-zA-Z0-9-_]{1,50}$/');
   }
@@ -27,8 +28,8 @@ async function initUser({ username, password, email }) {
     throw new ValidationError('团队名称已存在');
   }
 
-  const { id: userId } = await userModel.createUser({ username, password, email });
-  const { id: orgId } = await orgModel.createOrg({ userId, name: username });
+  const { id: userId } = await userModel.createUser({ username, password, email, github_unionid });
+  const { id: orgId } = await orgModel.createOrg({ userId, name: username, github_unionid });
 
   return { userId, orgId };
 }
@@ -36,23 +37,71 @@ async function initUser({ username, password, email }) {
 /**
  * 通过密码登陆账户
  */
-async function loginWithPassword({ loginname, password }) {
+async function loginWithPassword({ loginname = '', password = '', github_unionid }) {
   // 通过账户 / 邮箱 登录
   // 通过密码登录
   let data;
-  if (loginname.indexOf('@') > -1) {
-    data = await userModel.getUserByEmail(loginname);
+  if (github_unionid) {
+    data = await userModel.getGithubById(github_unionid);
   } else {
-    data = await userModel.getUserByName(loginname);
+    if (loginname.indexOf('@') > -1) {
+      data = await userModel.getUserByEmail(loginname);
+    } else {
+      data = await userModel.getUserByName(loginname);
+    }
   }
-  const isTrue = _.get(data, 'password', '') === md5Encrypt(password);
-  if (!isTrue) {
+  
+  const isTrue =  _.get(data, 'password', '') === md5Encrypt(password);
+  if (!github_unionid && !isTrue) {
     throw new ValidationError('用户名或密码不正确');
   }
 
   return data;
 }
 
+
+/**
+ * github授权
+ */
+
+async function getGithubUserInfo(access_token) {
+  try {
+    const { data } = await axios(
+      {
+        method: 'get',
+        url: 'https://api.github.com/user',
+        headers: {
+          accept: 'application/json',
+          Authorization: `token ${access_token}`
+        }
+      }
+    )
+    return data;
+  } catch(err) {
+    throw err;
+  }
+}
+async function loginGithub({ code }) {
+  try {
+    const { data: { access_token } } = await axios(
+      {
+        method: 'post',
+        url: `https://github.com/login/oauth/access_token?client_id=${GITHUB_CLIENT_ID}&client_secret=${GITHUB_CLIENT_SECRET}&code=${code}`,
+        headers: {
+          accept: 'application/json'
+        }
+      }
+    );
+    const info = await getGithubUserInfo(access_token);
+    const { id } = info;
+    const data = await userModel.getGithubById(id);
+    const github_unionid = String(_.get(data, 'github_unionid', ''));
+    return  { ...info, github_unionid };
+  } catch (err) {
+    // TODO: 处理
+    throw err;
+  }
+}
 /**
  * 设置 jwt
  */
@@ -89,5 +138,7 @@ module.exports = {
   setJwt,
   initUser,
   loginWithPassword,
+  loginGithub,
   checkOrganizationRole,
+  
 };

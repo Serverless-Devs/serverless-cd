@@ -2,15 +2,17 @@ import { runApp, IAppConfig, history } from 'ice';
 import React from 'react';
 import { Toast } from './components/ToastContainer';
 import { userInfo } from '@/services/user';
-import { getOrgName } from '@/utils';
+import { getOrgName, getParams } from '@/utils';
 import { startsWith, get } from 'lodash';
 import { CODE } from '@/constants';
 
+const { search } = window.location;
+const code = get(getParams(search), 'code', '');
 const appConfig: IAppConfig = {
   app: {
     rootId: 'ice-container',
     getInitialData: async () => {
-      const user = await userInfo();
+      const user = !code && await userInfo();
       return {
         initialStates: {
           user: {

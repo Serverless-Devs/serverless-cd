@@ -6,7 +6,7 @@ import { C_REPOSITORY } from '@/constants/repository';
 import { accountBinding, getAuthGithub } from '@/services/auth';
 import AccountForm from '../components/AccountForm';
 import { getParams } from '@/utils';
-import '@/pages/components/LoginorsignupBase/index.css';
+import '@/pages/components/AccountLoginOrGithub/index.css';
 
 const Login = ({ location: { search } }) => {
   const [bindingStatus, setBindingStatus] = useState(false);

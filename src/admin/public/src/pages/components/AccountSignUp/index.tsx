@@ -1,15 +1,21 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Auth from '@serverless-cd/auth-ui';
 import { Link, history } from 'ice';
+import { get } from 'lodash';
+import './index.css';
 import store from '@/store';
-import './singIn.css';
+import { getConsoleConfig, getParams } from '@/utils';
 
-const SingInupBase = (props) => {
+const AccountSingUp = (props) => {
   const {
     title,
     request: { loading, data, request },
   } = props;
   const [, userDispatchers] = store.useModel('user');
+  const { search } = window.location;
+  const github_unionid = get(getParams(search), 'github_unionid', '');
+
+
 
   useEffect(() => {
     goAppList();
@@ -29,14 +35,14 @@ const SingInupBase = (props) => {
   };
 
   const btnClick = (values) => {
-    request(values);
+    request({ ...values, github_unionid });
   };
   return (
     <React.Fragment>
-      <Auth title={title} type="LOGIN" onSingIn={btnClick}>
-        <div className="singup-or-rememberme">
-          <Link to="/signUp" style={{ textDecoration: 'underline' }}>
-            没有账号？去注册
+      <Auth title={title} type="REGISTER" onSignUp={btnClick}>
+        <div className="already-account-sing-in">
+          <Link to="/login" style={{ textDecoration: 'underline' }}>
+            已经有账户？前往登录
           </Link>
         </div>
       </Auth>
@@ -44,4 +50,4 @@ const SingInupBase = (props) => {
   );
 };
 
-export default SingInupBase;
+export default AccountSingUp;
