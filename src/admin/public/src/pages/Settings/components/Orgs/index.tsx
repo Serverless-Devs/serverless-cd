@@ -10,7 +10,7 @@ import { Toast } from '@/components/ToastContainer';
 import { get } from 'lodash';
 import { ROLE } from '@/constants';
 import store from '@/store';
-import { localStorageSet } from '@/utils';
+import { localStorageSet, localStorageRemove } from '@/utils';
 
 function Orgs() {
   const { data, request, refresh, loading } = useRequest(listOrgs);
@@ -29,6 +29,7 @@ function Orgs() {
         const { success } = await removeOrg({ orgName: record.name });
         if (success) {
           Toast.success('团队删除成功');
+          localStorageRemove('orgName');
           refresh();
         }
         dialog.hide();

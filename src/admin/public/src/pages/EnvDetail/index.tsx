@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRequest, history } from 'ice';
-import { Button, Dialog, Loading, Select, Tab } from '@alicloud/console-components';
+import { Button, Dialog, Loading, Select, Tab, Balloon } from '@alicloud/console-components';
 import PageLayout from '@/layouts/PageLayout';
 import CommitList from './components/CommitList';
 import BasicInfoDetail from './components/BasicInfoDetail';
@@ -13,6 +13,8 @@ import CreateEnv from './components/CreateEnv';
 import { Toast } from '@/components/ToastContainer';
 import BasicInfo from '@/components/BasicInfo';
 import { getParam } from '@/utils';
+
+const { Tooltip } = Balloon;
 
 enum TAB {
   OVERVIEW = 'overview',
@@ -137,15 +139,23 @@ const Details = ({
           >
             <Button type="primary">创建环境</Button>
           </CreateEnv>
-          <Button
-            disabled={envName === 'default'}
-            className="ml-8"
-            type="primary"
-            warning
-            onClick={handleDelete}
-          >
-            删除环境
-          </Button>
+
+          {envName === 'default' ? (
+            <Tooltip
+              align="t"
+              trigger={
+                <Button disabled className="ml-8" type="primary" warning onClick={handleDelete}>
+                  删除环境
+                </Button>
+              }
+            >
+              不允许删除默认环境
+            </Tooltip>
+          ) : (
+            <Button className="ml-8" type="primary" warning onClick={handleDelete}>
+              删除环境
+            </Button>
+          )}
         </>
       }
     >
