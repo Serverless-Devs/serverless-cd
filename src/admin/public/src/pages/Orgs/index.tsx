@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useRequest, Link } from 'ice';
+import { useRequest, Link, history } from 'ice';
 import { Button, Icon, Table, Dialog } from '@alicloud/console-components';
 import Actions, { LinkButton } from '@alicloud/console-components-actions';
 import CreateOrg from './components/CreateOrg';
@@ -10,6 +10,7 @@ import { Toast } from '@/components/ToastContainer';
 import { get } from 'lodash';
 import { ROLE } from '@/constants';
 import store from '@/store';
+import { localStorageSet } from '@/utils';
 
 function Orgs() {
   const { data, request, refresh, loading } = useRequest(listOrgs);
@@ -22,12 +23,12 @@ function Orgs() {
 
   const handleDelete = (record) => {
     const dialog = Dialog.alert({
-      title: `删除组织：${record.name}`,
-      content: '您确定删除当前组织吗?',
+      title: `删除团队：${record.name}`,
+      content: '您确定删除当前团队吗?',
       onOk: async () => {
         const { success } = await removeOrg({ orgName: record.name });
         if (success) {
-          Toast.success('组织删除成功');
+          Toast.success('团队删除成功');
           refresh();
         }
         dialog.hide();
@@ -35,9 +36,14 @@ function Orgs() {
     });
   };
 
+  const handleChangeOrg = async (record) => {
+    localStorageSet('orgName', record.name);
+    history?.push(`/${record.name}`);
+  };
+
   const columns = [
     {
-      title: '组织名称',
+      title: '团队名称',
       key: 'name',
       dataIndex: 'name',
       cell: (value, _index, record) => <Link to={`/${value}`}>{value}</Link>,
@@ -56,6 +62,9 @@ function Orgs() {
       title: '操作',
       cell: (value, _index, record) => (
         <Actions>
+          <LinkButton type="primary" onClick={() => handleChangeOrg(record)}>
+            切换
+          </LinkButton>
           <TransferOrg callback={refresh} dataSource={{ name: record.name }}>
             <LinkButton disabled={record.role !== ROLE.OWNER || record.name === username}>
               转让
@@ -77,7 +86,7 @@ function Orgs() {
     <div className="mt-16">
       <div className="flex-r mb-16">
         <CreateOrg callback={refresh}>
-          <Button type="primary">创建组织</Button>
+          <Button type="primary">新建团队</Button>
         </CreateOrg>
         <Button onClick={refresh}>
           <Icon type="refresh" />

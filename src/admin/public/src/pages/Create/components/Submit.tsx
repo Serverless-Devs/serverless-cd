@@ -98,7 +98,7 @@ const Submit = (props: IProps) => {
       disabled={disabled}
       loading={loading}
     >
-      创建
+      {createTemplate ? '创建并部署' : '创建'}
     </Button>
   );
 };

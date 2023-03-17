@@ -16,7 +16,6 @@ const AppList = lazy(() => import(/* webpackChunkName: 'user-login' */ '@/pages/
 const Login = lazy(() => import(/* webpackChunkName: 'Login' */ '@/pages/Login'));
 const Signup = lazy(() => import(/* webpackChunkName: 'Signup' */ '@/pages/Signup'));
 const Create = lazy(() => import(/* webpackChunkName: 'Create' */ '@/pages/Create'));
-const AppDetail = lazy(() => import(/* webpackChunkName: 'AppDetail' */ '@/pages/AppDetail'));
 const EnvDetail = lazy(() => import(/* webpackChunkName: 'AppDetail' */ '@/pages/EnvDetail'));
 const TaskDetails = lazy(() => import(/* webpackChunkName: 'TaskDetails' */ '@/pages/TaskDetails'));
 const Auth = lazy(() => import(/* webpackChunkName: 'Auth' */ '@/pages/Auth'));
@@ -73,11 +72,6 @@ const routerConfig: IRouterConfig[] = [
     path: '/:orgName/application/:appId',
     component: BasicLayout,
     children: [
-      {
-        path: '/',
-        exact: true,
-        component: AppDetail,
-      },
       {
         path: '/:envName',
         exact: true,

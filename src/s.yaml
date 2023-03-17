@@ -11,11 +11,10 @@ vars:
     nasConfig: auto
     # role 需要手动添加 fcfull 的权限，否则会影响取消部署、worker异常处理、自动加载runtime 等能力
     # 如果需要上传到 oss，也需要授予 oss 的权限
-  masterFunctionName: master
   workerFunctionName: worker
   adminFunctionName: admin
   workerDeliverFunctionName: workerDeliver
-  domain: '{{domain}}'
+  domain: '{{domain}}' # - domain 如果过期或者生成查看 s.domain.yaml
   logLocalPathPrefix: /mnt/auto/logs
   databaseUrl: '{{databaseUrl}}'
   prisma: '{{prisma}}'
@@ -47,7 +46,7 @@ services:
         timeout: 3600
         layers:
           - acs:fc:${vars.region}:official:layers/Nodejs16/versions/1
-          - acs:fc:${vars.region}:1940309364339785:layers/sqlite3/versions/1
+          - acs:fc:${vars.region}:official:layers/SQLite3/versions/1
         environmentVariables:
           PATH: /opt:/opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
           DOMAIN: ${vars.domain} # 用于给用户显示日志链接地址
@@ -73,7 +72,7 @@ services:
         memorySize: 640
         timeout: 600
         layers:
-          - acs:fc:${vars.region}:1940309364339785:layers/sqlite3/versions/1
+          - acs:fc:${vars.region}:official:layers/SQLite3/versions/1
         environmentVariables:
           PATH: /opt:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
           DATABASE_URL: ${vars.databaseUrl} # 用于链接数据库
@@ -84,16 +83,18 @@ services:
     component: fc
     actions:
       pre-deploy:
-        - run: npm install --registry=https://registry.npmmirror.com --force
-          path: './admin/public'
-        - run: npm run build
-          path: './admin/public'
+        # - run: npm install --registry=https://registry.npmmirror.com
+        #   path: './src/admin/public'
+        # - run: npm run build
+        #   path: './src/admin/public'
         - run: npm install --registry=https://registry.npmmirror.com
           path: './admin'
         - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
           path: './admin'
-      post-deploy:
-        - component: fc invoke --event '{"path":"/api/common/init?prisma={{prisma}}"}'
+      {{if prisma === 'mysql'}}
+        - run: export RUN_TYPE='deploy' && node serverless-scripts
+          path: './admin'
+      {{/if}}
     props:
       region: ${vars.region}
       service: ${vars.service}
@@ -103,6 +104,8 @@ services:
         runtime: custom
         codeUri: ./admin
         handler: index.handler
+        initializer: index.initializer
+        initializationTimeout: 30
         memorySize: 640
         timeout: 360
         caPort: 9000
@@ -113,7 +116,7 @@ services:
             - index.js
         layers:
           - acs:fc:${vars.region}:official:layers/Nodejs16/versions/2
-          - acs:fc:${vars.region}:1940309364339785:layers/sqlite3/versions/1
+          - acs:fc:${vars.region}:official:layers/SQLite3/versions/1
         environmentVariables:
           PATH: /opt:/opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
           DATABASE_URL: ${vars.databaseUrl} # 用于链接数据库

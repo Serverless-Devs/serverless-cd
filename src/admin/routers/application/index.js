@@ -76,10 +76,10 @@ router.post('/create', auth(ADMIN_ROLE_KEYS), async function (req, res) {
  */
 router.post('/createByTemplate', auth(ADMIN_ROLE_KEYS), async function (req, res) {
   const { userId, orgId, orgName } = req;
-  const { type, provider, appId, owner, repo, template } = req.body.params;
+  const { type, provider, appId, owner, repo, template, content } = req.body.params;
   const result = await appService.createByTemplate(
     { type, userId, orgId, orgName },
-    { provider, appId, owner, repo, template },
+    { provider, appId, owner, repo, template, content },
   );
   return res.json(Result.ofSuccess(result));
 });

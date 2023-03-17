@@ -11,7 +11,7 @@ const PageHeader = (props) => {
         <Breadcrumb className={styles.breadcrumbs} separator=" / ">
           {breadcrumbs.map((item, idx) => (
             <Breadcrumb.Item
-              className="cursor-pointer "
+              className="cursor-pointer"
               key={idx}
               onClick={() => history?.push(item.path)}
             >
@@ -23,13 +23,9 @@ const PageHeader = (props) => {
 
       <div className="flex-r" style={{ alignItems: 'self-end' }}>
         {title && (
-          <div className="flex-r" style={{ alignItems: 'flex-start' }}>
+          <div className="align-center">
             <Typography.Text className={styles.title}>{title}</Typography.Text>
-            {subhead && (
-              <span className="ml-8" style={{ lineHeight: '24px' }}>
-                {subhead}
-              </span>
-            )}
+            {subhead && <span className="ml-8">{subhead}</span>}
           </div>
         )}
         <div> {breadcrumbExtra && breadcrumbExtra}</div>
