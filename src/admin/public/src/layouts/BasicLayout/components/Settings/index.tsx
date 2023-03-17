@@ -4,6 +4,7 @@ import { logout } from '@/services/auth';
 import { history, useRequest } from 'ice';
 import store from '@/store';
 import { get } from 'lodash';
+import { stopPropagation } from '@/utils';
 
 type Props = {};
 
@@ -14,25 +15,21 @@ const Settings: FC<Props> = (props) => {
   const username = get(userState, 'userInfo.username', '');
 
   const menu = () => {
-    const onItemClick = (key) => {
-      if (key === '/username') return;
-      if (key === '/login') {
-        request();
-        userDispatchers.removeStateInfo();
-        return history?.push(key);
-      }
-      history?.push(`/${username}${key}`);
+    const onLogout = () => {
+      request();
+      userDispatchers.removeStateInfo();
+      history?.push('/login');
     };
 
     return (
-      <Menu onItemClick={onItemClick}>
-        <Menu.Item key="/username" className="border-bottom">
-          <span>{username}</span>
+      <Menu>
+        <Menu.Item className="border-bottom">
+          <span onClick={stopPropagation}>{username}</span>
         </Menu.Item>
-        <Menu.Item key="/settings" className="border-bottom">
+        <Menu.Item className="border-bottom" onClick={() => history?.push('/organizations')}>
           个人设置
         </Menu.Item>
-        <Menu.Item key="/login">退出登录</Menu.Item>
+        <Menu.Item onClick={onLogout}>退出登录</Menu.Item>
       </Menu>
     );
   };

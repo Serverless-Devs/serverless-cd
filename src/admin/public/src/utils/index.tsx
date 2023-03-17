@@ -174,3 +174,8 @@ export function localStorageRemove(key) {
     localStorage.removeItem(key);
   } catch (error) {}
 }
+
+export const stopPropagation = async (e) => {
+  e.stopPropagation();
+  e.preventDefault();
+};

@@ -3,7 +3,7 @@ import { Dropdown, Menu, Icon } from '@alicloud/console-components';
 import { history, useRequest } from 'ice';
 import style from 'styled-components';
 import { ORG_LOGO } from '@/constants/public';
-import { localStorageSet } from '@/utils';
+import { localStorageSet, stopPropagation } from '@/utils';
 import { listOrgs } from '@/services/user';
 import { get, map } from 'lodash';
 
@@ -27,13 +27,9 @@ const Org: FC<Props> = (props) => {
 
   const menu = () => {
     const onItemClick = (key: string) => {
-      // history?.push(`/${orgName}${key}`);
+      history?.push(`/${orgName}${key}`);
     };
 
-    const stopEvent = async (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-    };
     const handleChangeOrg = async (value: string) => {
       localStorageSet('orgName', value);
       history?.push('/');
@@ -41,8 +37,8 @@ const Org: FC<Props> = (props) => {
     const orgRender = (
       <Dropdown
         trigger={
-          <div onClick={stopEvent} className="flex-r">
-            <span className="ellipsis">团队切换({orgName})</span>
+          <div onClick={stopPropagation} className="flex-r">
+            <span>团队切换</span>
             <Icon type="arrow-right" size="xs" style={{ color: '#888' }} />
           </div>
         }
@@ -69,7 +65,7 @@ const Org: FC<Props> = (props) => {
       <StyledMenu>
         <Menu onItemClick={onItemClick}>
           <Menu.Item className="border-bottom">{orgRender}</Menu.Item>
-          <Menu.Item key="/createOrg">团队设置</Menu.Item>
+          <Menu.Item key="/settings">团队设置</Menu.Item>
         </Menu>
       </StyledMenu>
     );
@@ -77,8 +73,9 @@ const Org: FC<Props> = (props) => {
   return (
     <Dropdown
       trigger={
-        <div className="layout-center">
-          <img className="cursor-pointer" src={ORG_LOGO} style={{ width: 32, height: 32 }} />
+        <div className="layout-center cursor-pointer">
+          <img src={ORG_LOGO} style={{ width: 32, height: 32 }} />
+          <span className="ml-4 fz-18 text-bold ellipsis">{orgName}</span>
         </div>
       }
       offset={[0, 0]}

@@ -87,7 +87,7 @@ export function BasicLayout({ children, match }: IBasicLayoutProps) {
               <Add orgName={orgName} />
               <Button
                 type="primary"
-                className="mr-8"
+                className="mr-16"
                 text
                 component="a"
                 href="http://serverless-cd.cn"
@@ -95,7 +95,7 @@ export function BasicLayout({ children, match }: IBasicLayoutProps) {
               >
                 帮助文档
               </Button>
-              <Settings orgName={orgName} />
+              <Settings />
             </>
           )}
         </Shell.Action>

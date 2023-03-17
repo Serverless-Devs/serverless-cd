@@ -28,8 +28,8 @@ const Add: FC<Props> = (props) => {
   return (
     <Dropdown
       trigger={
-        <div className="layout-center">
-          <Icon type="plus-circle-fill" className="pr-8 mr-8" style={{ color: '#0070cc' }} />
+        <div className="layout-center mr-16 cursor-pointer">
+          <Icon type="plus-circle-fill" style={{ color: '#0070cc' }} />
         </div>
       }
       offset={[0, 0]}
