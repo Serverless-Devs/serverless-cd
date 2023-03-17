@@ -10,7 +10,6 @@
     "@serverless-cd/auth-ui": "^0.0.1-beta-7",
     "@serverless-cd/creating-ui": "^0.0.3",
     "@serverless-cd/trigger-ui": "^0.0.21",
-    "@serverless-cd/ui": "^0.0.1-beta.9",
     "@serverless-cd/variable-ui": "^0.0.3",
     "ansi-to-html": "^0.7.2",
     "build-plugin-moment-locales": "^0.1.0",

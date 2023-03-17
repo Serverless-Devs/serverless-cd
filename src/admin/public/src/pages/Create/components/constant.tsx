@@ -19,6 +19,15 @@ export enum IFilterType {
   BRANCH = 'branch',
   INPUT = 'input',
 }
+export const REGISTRY_URL = 'https://registry.devsapp.cn/console/applications?type=fc&lang=zh';
+
+export const SERVERLESS_DEVS_LIST_PACKAGE = [
+  'start-egg',
+  'start-express',
+  'website-docusaurus',
+  'start-koa',
+  'start-django',
+];
 
 export const SERVERLESS_PIPELINE_CONTENT = {
   env: {
@@ -57,87 +66,25 @@ export const SERVERLESS_PIPELINE_CONTENT_TEMPLATE = {
       run: 's -v',
     },
     {
-      run: 'echo ${{secrets.ALIYUN_ACCOUNTID}}',
-    },
-    {
       run: 'echo ${{secrets.ALIYUN_AK}}',
     },
     {
       run: 'echo ${{secrets.ALIYUN_SK}}',
     },
     {
-      run: 's config add --AccountID ${{secrets.ALIYUN_ACCOUNTID}}  --AccessKeyID ${{secrets.ALIYUN_AK}}  --AccessKeySecret ${{secrets.ALIYUN_SK}} -a default -f',
+      run: 's config add  --AccessKeyID ${{secrets.ALIYUN_AK}}  --AccessKeySecret ${{secrets.ALIYUN_SK}} -a default -f',
     },
     {
       run: 's deploy --use-local -y',
     },
   ],
 };
-export const SERVERLESS_DEVS_LIST = [
-  {
-    title: 'Egg.js',
-    package: 'start-egg',
-    description: '为企业级框架和应用而生（部署到Custom运行时）',
-    download: 643,
-    logo: 'https://example-static.oss-cn-beijing.aliyuncs.com/serverless-app-store/Egg.js.png',
-    demo: '',
-    tags: ['Egg', 'Web框架', 'Custom Runtime'],
-    url: 'https://github.com/devsapp/start-web-framework/blob/master/web-framework/nodejs/egg/src',
-    user: 1,
-  },
-  {
-    title: 'Express.js',
-    package: 'start-express',
-    description: '基于 Node.js 平台，快速、开放、极简的 Web 开发框架（部署到Custom运行时）',
-    download: 17241,
-    logo: 'https://example-static.oss-cn-beijing.aliyuncs.com/serverless-app-store/express.png',
-    demo: '',
-    tags: ['Web框架', 'Express.js', 'Custom Runtime'],
-    url: 'https://github.com/devsapp/start-web-framework/tree/master/web-framework/nodejs/express/src',
-    user: 1,
-  },
-  {
-    title: 'Docusaurus',
-    package: 'website-docusaurus',
-    description: '部署Docusaurus 文档系统到函数计算',
-    download: 384,
-    logo: 'https://example-static.oss-cn-beijing.aliyuncs.com/serverless-app-store/Docusaurus.png',
-    demo: '',
-    tags: ['静态网站', 'jamstack'],
-    url: 'https://github.com/devsapp/start-website/tree/master/website-docusaurus/src',
-    user: 1,
-  },
-  {
-    title: 'Koa.js',
-    package: 'start-koa',
-    description:
-      'Koa 是一个新的 web 框架，由 Express 幕后的原班人马打造， 致力于成为 web 应用和 API 开发领域中的一个更小、更富有表现力、更健壮的基石（部署到Custom运行时）',
-    download: 767,
-    logo: 'https://example-static.oss-cn-beijing.aliyuncs.com/serverless-app-store/Koa.png',
-    demo: '',
-    tags: ['Web框架', 'Koa.js', 'Custom Runtime'],
-    url: 'https://github.com/devsapp/start-web-framework/blob/master/web-framework/nodejs/koa/src',
-    user: 1,
-  },
-  {
-    title: 'Django',
-    package: 'start-django',
-    description:
-      'Django是一个开放源代码的Web应用框架，由Python写成。采用了MTV的框架模式，即模型M，视图V和模版T',
-    download: 17900,
-    logo: 'https://example-static.oss-cn-beijing.aliyuncs.com/serverless-app-store/django.png',
-    demo: '',
-    tags: ['Web框架', 'Django'],
-    url: 'https://github.com/devsapp/start-web-framework/tree/master/web-framework/python/django/src',
-    user: 1,
-  },
-];
 
 export const TEMPLATE_TABS = [
   {
     key: 'devs',
     name: 'Serverless-Devs模版',
-    templateList: SERVERLESS_DEVS_LIST,
+    templateList: [],
   },
   {
     key: 'other',
