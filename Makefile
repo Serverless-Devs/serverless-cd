@@ -6,7 +6,7 @@ install: clear
 	cd src/admin && npm install
 	cd src/admin/public && npm install
 
-#  启动 ui
+# 启动 ui
 ui-start:
 	cd src/admin/public && npm run start
 	
