@@ -1,23 +1,21 @@
 edition: 1.0.0
 name: serverless-cd
-access: '{{ access }}'
+access: 'dk'
 
 vars:
-  region: '{{region}}'
+  region: 'ap-southeast-1'
   service:
-    name: '{{serviceName}}'
+    name: 'serverless-cd'
     description: Serverless-cd 应用
     logConfig: auto
     nasConfig: auto
-    # role 需要手动添加 fcfull 的权限，否则会影响取消部署、worker异常处理、自动加载runtime 等能力
-    # 如果需要上传到 oss，也需要授予 oss 的权限
   workerFunctionName: worker
   adminFunctionName: admin
   workerDeliverFunctionName: workerDeliver
-  domain: '{{domain}}' # - domain 如果过期或者生成查看 s.domain.yaml
+  domain: 'app.serverless-cd.cn'
   logLocalPathPrefix: /mnt/auto/logs
-  databaseUrl: '{{databaseUrl}}'
-  prisma: '{{prisma}}'
+  databaseUrl: '${env.DATABASE_URL}'
+  prisma: 'mysql'
 
 services:
   worker:
@@ -25,11 +23,13 @@ services:
     actions:
       pre-deploy:
         - run: npm install --registry=https://registry.npmmirror.com
-          path: './worker'
+          path: './src/worker'
         - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
-          path: './worker'
+          path: './src/worker'
       post-deploy:
-        - component: fc api UpdateFunction --region ${vars.region} --header '{"x-fc-disable-container-reuse":"True"}' --path '{"serviceName":"${vars.service.name}","functionName":"${vars.workerFunctionName}"}'
+        - component: fc api UpdateFunction --region ${vars.region} --header
+            '{"x-fc-disable-container-reuse":"True"}' --path
+            '{"serviceName":"${vars.service.name}","functionName":"${vars.workerFunctionName}"}'
     props:
       region: ${vars.region}
       service: ${vars.service}
@@ -37,7 +37,7 @@ services:
         name: ${vars.workerFunctionName}
         description: 执行用户配置的 CD 流程。
         runtime: custom
-        codeUri: ./worker
+        codeUri: ./src/worker
         customRuntimeConfig:
           command:
             - node
@@ -67,7 +67,7 @@ services:
         name: ${vars.workerDeliverFunctionName}
         description: 执行用户配置的 CD 流程。
         runtime: nodejs14
-        codeUri: ./worker
+        codeUri: ./src/worker
         handler: deliver.handler
         memorySize: 640
         timeout: 600
@@ -83,18 +83,17 @@ services:
     component: fc
     actions:
       pre-deploy:
-        # - run: npm install --registry=https://registry.npmmirror.com
-        #   path: './src/admin/public'
-        # - run: npm run build
-        #   path: './src/admin/public'
         - run: npm install --registry=https://registry.npmmirror.com
-          path: './admin'
+          path: './src/admin/public'
+        - run: npm run build
+          path: './src/admin/public'
+        - run: npm install --registry=https://registry.npmmirror.com
+          path: './src/admin'
         - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
-          path: './admin'
-      {{if prisma === 'mysql'}}
+          path: './src/admin'
         - run: export RUN_TYPE='deploy' && node serverless-scripts
-          path: './admin'
-      {{/if}}
+          path: './src/admin'
+
     props:
       region: ${vars.region}
       service: ${vars.service}
@@ -102,7 +101,7 @@ services:
         name: ${vars.adminFunctionName}
         description: serverless-cd 前端应用接口
         runtime: custom
-        codeUri: ./admin
+        codeUri: ./src/admin
         handler: index.handler
         initializer: index.initializer
         initializationTimeout: 30
@@ -137,9 +136,26 @@ services:
               - PUT
               - PATCH
       customDomains:
-        - domainName: ${vars.domain}
-          protocol: HTTP
+        - domainName: 'app.serverless-cd.cn'
+          protocol: HTTPS
+          certId: 9493156
+          tlsConfig:
+            minVersion: TLSv1.2
+            maxVersion: TLSv1.3
+            cipherSuites:
+            - TLS_RSA_WITH_AES_128_CBC_SHA
+            - TLS_RSA_WITH_AES_256_CBC_SHA
+            - TLS_RSA_WITH_AES_128_GCM_SHA256
+            - TLS_RSA_WITH_AES_256_GCM_SHA384
+            - TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA
+            - TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA
+            - TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+            - TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA
+            - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+            - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+            - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+            - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+            - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+            - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
           routeConfigs:
             - path: /*
-              serviceName: ${vars.service.name}
-              functionName: ${vars.adminFunctionName}

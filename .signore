@@ -13,6 +13,7 @@ src/example
 /Makefile
 /package.json
 /package-lock.json
+/deploy
 
 /README.md
 _mock

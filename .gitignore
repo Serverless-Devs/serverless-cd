@@ -11,7 +11,6 @@ _routes
 
 .ice
 **.log
-/Makefile
 /s.yaml
 s.dev.yaml
 dev.db
