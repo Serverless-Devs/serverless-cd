@@ -1,16 +1,23 @@
+clear:
+	cd src/admin && rm -rf ./prisma/dev.db-journal ./prisma/migrations node_modules public/.ice
+
 # 安装依赖
-install:
+install: clear
 	cd src/admin && npm install
 	cd src/admin/public && npm install
 
+#  启动 ui
+ui-start:
+	cd src/admin/public && npm run start
+	
 # 默认启动 sqlite
 start: sqlite-start
 
-# 启动 sqlite
+# 启动 admin sqlite
 sqlite-start:
 	cd src/admin && npm run sqlite-start
 
-# 启动 mysql
+# 启动 admin mysql
 mysql-start:
 	cd src/admin && npm run mysql-start
 
