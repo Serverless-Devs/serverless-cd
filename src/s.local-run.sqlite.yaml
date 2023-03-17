@@ -19,8 +19,8 @@ vars:
   workerDeliverFunctionName: workerDeliver
   domain: 'auto.serverless-cd.1740298130743624.cn-hongkong.fc.devsapp.net'
   # logLocalPathPrefix: ../logs
-  # databaseUrl: "file:./dev.db"
   logLocalPathPrefix: /mnt/auto/logs
+  # databaseUrl: "file:./dev.db"
   databaseUrl: 'file:/mnt/auto/dev.db'
   prisma: 'sqlite'
   JWT_SECRET: 0df85e4e140f6

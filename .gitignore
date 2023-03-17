@@ -16,3 +16,4 @@ _routes
 s.dev.yaml
 dev.db
 dev.db-journal
+!/src/admin/prisma/dev.db
