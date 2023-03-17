@@ -28,7 +28,7 @@ const TransferOrg: FC<IProps> = (props) => {
       if (errors) return;
       const { success } = await request({ ...values, orgName: dataSource.name });
       if (success) {
-        Toast.success('转让组织成功');
+        Toast.success('转让团队成功');
         setVisible(false);
         resetToDefault();
         await callback();
@@ -40,7 +40,7 @@ const TransferOrg: FC<IProps> = (props) => {
     <>
       <span onClick={() => setVisible(true)}>{children}</span>
       <SlidePanel
-        title={'转让组织'}
+        title={'转让团队'}
         width="large"
         isShowing={visible}
         onClose={handleClose}
@@ -49,13 +49,13 @@ const TransferOrg: FC<IProps> = (props) => {
         isProcessing={loading}
       >
         <Form field={field} {...FORM_ITEM_LAYOUT}>
-          <FormItem label="组织名称" required>
+          <FormItem label="团队名称" required>
             <Input
               {...init('transferUserName', {
                 rules: [
                   {
                     required: true,
-                    message: '请输入组织名称',
+                    message: '请输入团队名称',
                   },
                 ],
               })}
