@@ -168,17 +168,6 @@ const Details = ({
               envName={envName}
               orgName={orgName}
             />
-            <hr className="mb-20 mt-20" />
-            <PageInfo title="部署历史">
-              <CommitList
-                appId={appId}
-                application={get(detailInfo, 'data', {})}
-                latestTaskId={taskId}
-                refreshCallback={handleRefresh}
-                envName={envName}
-                orgName={orgName}
-              />
-            </PageInfo>
           </Loading>
         </Tab.Item>
         <Tab.Item key={TAB.CICD} title="CI/CD">
@@ -209,6 +198,17 @@ const Details = ({
               refreshCallback={handleRefresh}
               envName={envName}
             />
+            <hr className="mb-20 mt-20" />
+            <PageInfo title="部署历史">
+              <CommitList
+                appId={appId}
+                application={get(detailInfo, 'data', {})}
+                latestTaskId={taskId}
+                refreshCallback={handleRefresh}
+                envName={envName}
+                orgName={orgName}
+              />
+            </PageInfo>
           </Loading>
         </Tab.Item>
       </Tab>
