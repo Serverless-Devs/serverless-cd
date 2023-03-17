@@ -1,15 +1,13 @@
 import React, { FC } from 'react';
 import { Dropdown, Menu, Icon } from '@alicloud/console-components';
 import { history } from 'ice';
-import { localStorageGet } from '@/utils';
 
 type Props = {
   orgName: string;
 };
 
 const Add: FC<Props> = (props) => {
-  const orgName = props.orgName || localStorageGet('orgName');
-
+  const { orgName } = props;
   const menu = () => {
     const onItemClick = (url: string) => {
       history?.push(url);

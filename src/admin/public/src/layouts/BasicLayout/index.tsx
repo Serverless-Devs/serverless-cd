@@ -5,6 +5,9 @@ import ToastContainer from '@/components/ToastContainer';
 import Settings from './components/Settings';
 import Org from './components/Org';
 import Add from './components/Add';
+import store from '@/store';
+import { get } from 'lodash';
+import { localStorageGet } from '@/utils';
 import './index.less';
 
 const menuConfig = ['/settings/tokens', '/settings/secrets'];
@@ -43,7 +46,10 @@ interface IBasicLayoutProps {
   location: object | any;
 }
 export function BasicLayout({ children, match }: IBasicLayoutProps) {
-  const { orgName } = match.params;
+  const [userState] = store.useModel('user');
+  const user_id = get(userState, 'userInfo.id');
+  const orgName = get(match, 'params.orgName', localStorageGet(user_id));
+
   const getDevice: IGetDevice = (width) => {
     const isPhone =
       typeof navigator !== 'undefined' && navigator && navigator.userAgent.match(/phone/gi);

@@ -29,7 +29,7 @@ function Orgs() {
         const { success } = await removeOrg({ orgName: record.name });
         if (success) {
           Toast.success('团队删除成功');
-          localStorageRemove('orgName');
+          localStorageRemove(record.user_id);
           refresh();
         }
         dialog.hide();
@@ -37,9 +37,9 @@ function Orgs() {
     });
   };
 
-  const handleChangeOrg = async (value: string) => {
-    localStorageSet('orgName', value);
-    history?.push(`/${value}`);
+  const handleChangeOrg = async (record) => {
+    localStorageSet(record.user_id, record.name);
+    history?.push(`/${record.name}`);
   };
 
   const columns = [
@@ -48,7 +48,7 @@ function Orgs() {
       key: 'name',
       dataIndex: 'name',
       cell: (value, _index, record) => (
-        <Button type="primary" text onClick={() => handleChangeOrg(value)}>
+        <Button type="primary" text onClick={() => handleChangeOrg(record)}>
           {value}
         </Button>
       ),

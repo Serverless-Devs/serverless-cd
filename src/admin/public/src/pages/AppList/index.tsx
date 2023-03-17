@@ -10,18 +10,7 @@ import {
   Icon,
   Balloon,
 } from '@alicloud/console-components';
-import {
-  filter,
-  includes,
-  debounce,
-  isEmpty,
-  get,
-  isBoolean,
-  isUndefined,
-  first,
-  keys,
-  map,
-} from 'lodash';
+import { filter, includes, debounce, isEmpty, get, isBoolean, isUndefined, map } from 'lodash';
 import PageLayout from '@/layouts/PageLayout';
 import NotAppliaction from './components/NotAppliaction';
 import { CreateAppLication } from '../Create';
@@ -51,15 +40,15 @@ const AppList = ({
   },
 }) => {
   const [userState] = store.useModel('user');
+  const userInfo: any = get(userState, 'userInfo', {});
 
   if (isEmpty(orgName)) {
-    const newOrgName = localStorageGet('orgName');
+    const newOrgName = localStorageGet(userInfo.id);
     if (newOrgName) {
       return history?.push(`/${newOrgName}/application`);
     }
-    const username = get(userState, 'userInfo.username');
-    localStorageSet('orgName', username);
-    return history?.push(`/${username}/application`);
+    localStorageSet(userInfo.id, userInfo.username);
+    return history?.push(`/${userInfo.username}/application`);
   }
 
   const { data, request, refresh, cancel } = useRequest(listApp, {

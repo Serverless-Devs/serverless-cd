@@ -3,7 +3,7 @@ import { Dropdown, Menu, Icon } from '@alicloud/console-components';
 import { history, useRequest } from 'ice';
 import style from 'styled-components';
 import { ORG_LOGO } from '@/constants/public';
-import { localStorageSet, stopPropagation, localStorageGet } from '@/utils';
+import { localStorageSet, stopPropagation } from '@/utils';
 import { listOrgs } from '@/services/user';
 import { get, map } from 'lodash';
 
@@ -18,7 +18,7 @@ type Props = {
 };
 
 const Org: FC<Props> = (props) => {
-  const orgName = props.orgName || localStorageGet('orgName');
+  const { orgName } = props;
   const orgRequest = useRequest(listOrgs);
 
   useEffect(() => {
@@ -30,8 +30,8 @@ const Org: FC<Props> = (props) => {
       history?.push(`/${orgName}${key}`);
     };
 
-    const handleChangeOrg = async (value: string) => {
-      localStorageSet('orgName', value);
+    const handleChangeOrg = async (item) => {
+      localStorageSet(item.user_id, item.name);
       history?.push('/');
     };
     const orgRender = (
@@ -48,7 +48,7 @@ const Org: FC<Props> = (props) => {
           {map(get(orgRequest, 'data.result'), (item) => {
             return (
               <Menu.Item>
-                <div className="flex-r" onClick={() => handleChangeOrg(item.name)}>
+                <div className="flex-r" onClick={() => handleChangeOrg(item)}>
                   <span className="ellipsis">{item.name}</span>
                   {orgName === item.name && (
                     <Icon type="select" size="xs" style={{ color: '#0070cc' }} />
