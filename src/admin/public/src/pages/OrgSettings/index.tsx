@@ -3,12 +3,16 @@ import PageLayout from '@/layouts/PageLayout';
 import { Tab } from '@alicloud/console-components';
 import Secrets from './components/Secrets';
 import Members from './components/Members';
-import { getParam } from '@/utils';
+import { getParam, setSearchParams } from '@/utils';
 
 function Settings() {
   const defaultActiveKey = getParam('activeTab') || 'members';
 
   const [activeKey, setActiveKey] = useState(defaultActiveKey as string);
+  const handleChangeTab = (key: string) => {
+    setSearchParams({ activeTab: key });
+    setActiveKey(key);
+  };
   return (
     <PageLayout
       breadcrumbs={[
@@ -21,7 +25,7 @@ function Settings() {
         },
       ]}
     >
-      <Tab shape="wrapped" activeKey={activeKey} onChange={(val: string) => setActiveKey(val)}>
+      <Tab shape="wrapped" activeKey={activeKey} onChange={handleChangeTab}>
         <Tab.Item key="members" title="成员管理">
           <Members />
         </Tab.Item>

@@ -1,27 +1,31 @@
 import React, { FC } from 'react';
 import { Dropdown, Menu, Icon } from '@alicloud/console-components';
 import { history } from 'ice';
+import { localStorageGet } from '@/utils';
 
 type Props = {
   orgName: string;
 };
 
 const Add: FC<Props> = (props) => {
-  const { orgName } = props;
+  const orgName = props.orgName || localStorageGet('orgName');
+
   const menu = () => {
-    const onItemClick = (key: string) => {
-      history?.push(`/${orgName}${key}`);
+    const onItemClick = (url: string) => {
+      history?.push(url);
     };
 
     return (
       <Menu onItemClick={onItemClick}>
-        <Menu.Item key="/create" className="border-bottom">
+        <Menu.Item key={`/${orgName}/create`} className="border-bottom">
           新建应用
         </Menu.Item>
-        <Menu.Item key="/createOrg" className="border-bottom">
+        <Menu.Item key={`/organizations?showSlide=true&activeTab=orgs`} className="border-bottom">
           新建团队
         </Menu.Item>
-        <Menu.Item key="/addMember">添加成员</Menu.Item>
+        <Menu.Item key={`/${orgName}/settings?showSlide=true&activeTab=members`}>
+          添加成员
+        </Menu.Item>
       </Menu>
     );
   };

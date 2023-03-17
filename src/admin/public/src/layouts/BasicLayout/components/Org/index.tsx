@@ -3,7 +3,7 @@ import { Dropdown, Menu, Icon } from '@alicloud/console-components';
 import { history, useRequest } from 'ice';
 import style from 'styled-components';
 import { ORG_LOGO } from '@/constants/public';
-import { localStorageSet, stopPropagation } from '@/utils';
+import { localStorageSet, stopPropagation, localStorageGet } from '@/utils';
 import { listOrgs } from '@/services/user';
 import { get, map } from 'lodash';
 
@@ -18,7 +18,7 @@ type Props = {
 };
 
 const Org: FC<Props> = (props) => {
-  const { orgName } = props;
+  const orgName = props.orgName || localStorageGet('orgName');
   const orgRequest = useRequest(listOrgs);
 
   useEffect(() => {

@@ -1,10 +1,11 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import { useRequest } from 'ice';
 import SlidePanel from '@alicloud/console-components-slide-panel';
 import { Form, Field, Input } from '@alicloud/console-components';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import { Toast } from '@/components/ToastContainer';
 import { createOrg } from '@/services/org';
+import { getParam } from '@/utils';
 
 const FormItem = Form.Item;
 
@@ -16,6 +17,12 @@ const CreateOrg: FC<IProps> = (props) => {
   const { children, callback } = props;
   const { request, loading } = useRequest(createOrg);
   const [visible, setVisible] = React.useState(false);
+  useEffect(() => {
+    if (getParam('showSlide') === 'true') {
+      setVisible(true);
+    }
+  }, [getParam('showSlide')]);
+
   const field = Field.useField();
   const { init, resetToDefault, validate } = field;
   const handleClose = () => {
