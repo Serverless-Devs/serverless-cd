@@ -13,6 +13,7 @@ interface IProps {
   value?: IInfo;
   onChange?: (value: IInfo) => void;
   repo: IRepoItem;
+  createTemplate: boolean;
 }
 
 export interface IInfo {
@@ -22,13 +23,20 @@ export interface IInfo {
 }
 
 const Trigger = (props: IProps) => {
-  const { value, repo, onChange = noop } = props;
+  const { value, repo, onChange = noop, createTemplate } = props;
   const { data, request, loading } = useRequest(githubBranches);
 
   const defaultValue = {
     push: PUSH.NEW,
     branch: DEFAULT_NEW_BRANCH,
   };
+
+  const defaultValueTemplate = {
+    push: PUSH.NEW,
+    branch: 'master',
+  };
+
+  const branchLabel = createTemplate ? '分支名称' : '触发分支';
 
   const newVal = isEmpty(value)
     ? {
@@ -39,7 +47,11 @@ const Trigger = (props: IProps) => {
   const [info, setInfo] = useState<IInfo>(newVal);
 
   const doRepoChange = async () => {
-    setInfo(defaultValue);
+    if (createTemplate) {
+      setInfo(defaultValueTemplate);
+    } else {
+      setInfo(defaultValue);
+    }
     if (!isEmpty(repo)) {
       const res = await request({ owner: repo.owner, repo: repo.name });
       const commitObj = find(res, (obj) => obj.name === repo.default_branch);
@@ -68,17 +80,19 @@ const Trigger = (props: IProps) => {
 
   return (
     <Form {...FORM_ITEM_LAYOUT}>
-      <Form.Item label="触发条件" required>
-        <RadioGroup
-          size="medium"
-          value={info.push}
-          onChange={(value: string) => handleChangeValue('push', value)}
-        >
-          <Radio value={PUSH.NEW}>Push代码到新分支</Radio>
-          <Radio value={PUSH.SPECIFY}>Push代码到指定分支</Radio>
-        </RadioGroup>
-      </Form.Item>
-      <Form.Item label="触发分支" required>
+      {!createTemplate && (
+        <Form.Item label="触发条件" required>
+          <RadioGroup
+            size="medium"
+            value={info.push}
+            onChange={(value: string) => handleChangeValue('push', value)}
+          >
+            <Radio value={PUSH.NEW}>Push代码到新分支</Radio>
+            <Radio value={PUSH.SPECIFY}>Push代码到指定分支</Radio>
+          </RadioGroup>
+        </Form.Item>
+      )}
+      <Form.Item label={branchLabel} required>
         {info.push === PUSH.SPECIFY ? (
           <Select
             className="full-width"
@@ -94,7 +108,14 @@ const Trigger = (props: IProps) => {
             dataSource={map(data, (obj) => ({ label: obj.name, value: obj.name }))}
           />
         ) : (
-          <Input value={info.branch} disabled className="full-width" />
+          <>
+            <Input value={info.branch} disabled className="full-width" />
+            {createTemplate && (
+              <div style={{ color: '#555' }}>
+                当前代码仓库还未创建，系统将会在完成代码仓库创建之后，自动为您创建master分支作为默认分支
+              </div>
+            )}
+          </>
         )}
       </Form.Item>
     </Form>
