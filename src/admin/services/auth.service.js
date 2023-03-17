@@ -59,10 +59,10 @@ async function loginWithPassword({ loginname, password }) {
 async function setJwt({ userId }, res) {
   const SESSION_EXPIRATION_EXP =
     Math.floor(Date.now() / 1000) + Math.floor(SESSION_EXPIRATION / 1000);
-  debug(`session expiration exp ${SESSION_EXPIRATION_EXP}`);
+  debug(`session expiration expires ${SESSION_EXPIRATION_EXP}`);
   const jwtSign = {
     userId,
-    exp: SESSION_EXPIRATION_EXP,
+    expires: SESSION_EXPIRATION_EXP,
   };
   debug(`setJwt start: ${userId}`);
   const token = await jwt.sign(jwtSign, JWT_SECRET);
@@ -72,6 +72,8 @@ async function setJwt({ userId }, res) {
     maxAge: SESSION_EXPIRATION,
     httpOnly: true,
   });
+
+  return { expires: SESSION_EXPIRATION_EXP };
 }
 
 /**

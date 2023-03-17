@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { Result } = require('../../util');
 const authServices = require('../../services/auth.service');
+const userServices = require('../../services/user.service');
 
 /**
  * 注册
@@ -8,8 +9,8 @@ const authServices = require('../../services/auth.service');
 router.post('/signUp', async function (req, res) {
   const { username, password, email } = req.body;
   const { userId } = await authServices.initUser({ username, password, email });
-  await authServices.setJwt({ userId }, res);
-  return res.json(Result.ofSuccess({ username, userId }));
+  const { expires } = await authServices.setJwt({ userId }, res);
+  return res.json(Result.ofSuccess({ username, userId, expires }));
 });
 
 /**
@@ -18,8 +19,9 @@ router.post('/signUp', async function (req, res) {
 router.post('/login', async function (req, res) {
   const { loginname, password } = req.body;
   const data = await authServices.loginWithPassword({ loginname, password });
-  await authServices.setJwt({ userId: data.id }, res);
-  return res.json(Result.ofSuccess(data));
+  const { expires } = await authServices.setJwt({ userId: data.id }, res);
+  data.expires = expires;
+  return res.json(Result.ofSuccess(userServices.desensitization(data)));
 });
 
 /**
