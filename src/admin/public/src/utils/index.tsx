@@ -168,3 +168,14 @@ export function localStorageSet(key, value) {
     localStorage.setItem(key, newValue);
   } catch (error) {}
 }
+
+export function localStorageRemove(key) {
+  try {
+    localStorage.removeItem(key);
+  } catch (error) {}
+}
+
+export const stopPropagation = async (e) => {
+  e.stopPropagation();
+  e.preventDefault();
+};

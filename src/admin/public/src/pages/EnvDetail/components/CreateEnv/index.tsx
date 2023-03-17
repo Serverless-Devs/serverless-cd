@@ -18,7 +18,7 @@ const FormItem = Form.Item;
 type IProps = {
   data: any;
   appId: string;
-  callback: () => Promise<any>;
+  callback: (envName: string) => Promise<any>;
 };
 
 const CreateEnv: FC<IProps> = (props) => {
@@ -69,7 +69,7 @@ const CreateEnv: FC<IProps> = (props) => {
         Toast.success('创建环境成功');
         setVisible(false);
         resetToDefault();
-        await callback();
+        await callback(envInfo.name);
       }
     });
   };

@@ -24,7 +24,7 @@ async function checkJwt(req, _res, next) {
           return next(new NeedLogin('登陆已过期'));
         }
         req.userId = user.userId;
-        const orgName = _.get(req, 'query.orgName', _.get(req, 'body.orgName'));
+        const orgName = _.get(req, 'body.orgName', _.get(req, 'query.orgName'));
         if (orgName) {
           req.orgName = orgName;
           req.orgId = generateOrgIdByUserIdAndOrgName(user.userId, orgName);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRequest, history } from 'ice';
-import { Button, Dialog, Loading, Select, Tab } from '@alicloud/console-components';
+import { Button, Dialog, Loading, Select, Tab, Balloon } from '@alicloud/console-components';
 import PageLayout from '@/layouts/PageLayout';
 import CommitList from './components/CommitList';
 import BasicInfoDetail from './components/BasicInfoDetail';
@@ -13,6 +13,8 @@ import CreateEnv from './components/CreateEnv';
 import { Toast } from '@/components/ToastContainer';
 import BasicInfo from '@/components/BasicInfo';
 import { getParam } from '@/utils';
+
+const { Tooltip } = Balloon;
 
 enum TAB {
   OVERVIEW = 'overview',
@@ -92,7 +94,8 @@ const Details = ({
         const { success } = await removeEnv({ envName, appId });
         if (success) {
           Toast.success('环境删除成功');
-          history?.push(`/${orgName}/application/${appId}`);
+          history?.push(`/${orgName}/application/${appId}/default`);
+          forceUpdate(Date.now());
         }
         dialog.hide();
       },
@@ -129,13 +132,30 @@ const Details = ({
           <CreateEnv
             data={get(detailInfo, 'data', {})}
             appId={appId}
-            callback={async () => history?.push(`/${orgName}/application/${appId}`)}
+            callback={async (value) => {
+              history?.push(`/${orgName}/application/${appId}/${value}`);
+              forceUpdate(Date.now());
+            }}
           >
             <Button type="primary">创建环境</Button>
           </CreateEnv>
-          <Button className="ml-8" type="primary" warning onClick={handleDelete}>
-            删除环境
-          </Button>
+
+          {envName === 'default' ? (
+            <Tooltip
+              align="t"
+              trigger={
+                <Button disabled className="ml-8" type="primary" warning onClick={handleDelete}>
+                  删除环境
+                </Button>
+              }
+            >
+              不允许删除默认环境
+            </Tooltip>
+          ) : (
+            <Button className="ml-8" type="primary" warning onClick={handleDelete}>
+              删除环境
+            </Button>
+          )}
         </>
       }
     >
@@ -148,17 +168,6 @@ const Details = ({
               envName={envName}
               orgName={orgName}
             />
-            <hr className="mb-20 mt-20" />
-            <PageInfo title="部署历史">
-              <CommitList
-                appId={appId}
-                application={get(detailInfo, 'data', {})}
-                latestTaskId={taskId}
-                refreshCallback={handleRefresh}
-                envName={envName}
-                orgName={orgName}
-              />
-            </PageInfo>
           </Loading>
         </Tab.Item>
         <Tab.Item key={TAB.CICD} title="CI/CD">
@@ -189,6 +198,17 @@ const Details = ({
               refreshCallback={handleRefresh}
               envName={envName}
             />
+            <hr className="mb-20 mt-20" />
+            <PageInfo title="部署历史">
+              <CommitList
+                appId={appId}
+                application={get(detailInfo, 'data', {})}
+                latestTaskId={taskId}
+                refreshCallback={handleRefresh}
+                envName={envName}
+                orgName={orgName}
+              />
+            </PageInfo>
           </Loading>
         </Tab.Item>
       </Tab>

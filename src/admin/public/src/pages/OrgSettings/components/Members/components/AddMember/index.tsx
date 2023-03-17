@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import { useRequest } from 'ice';
 import SlidePanel from '@alicloud/console-components-slide-panel';
 import { Form, Field, Select } from '@alicloud/console-components';
@@ -7,6 +7,7 @@ import { Toast } from '@/components/ToastContainer';
 import { inviteUser, updateAuth } from '@/services/org';
 import { debounce, map, filter, includes } from 'lodash';
 import { getContainsName } from '@/services/user';
+import { getParam } from '@/utils';
 
 const FormItem = Form.Item;
 
@@ -20,8 +21,15 @@ type IProps = {
 
 const AddMember: FC<IProps> = (props) => {
   const { children, callback, type = 'create', dataSource, existUsers } = props;
+  if (getParam('showSlide') === 'true' && type !== 'create') return null;
   const { request, loading } = useRequest(type === 'create' ? inviteUser : updateAuth);
   const [visible, setVisible] = React.useState(false);
+
+  useEffect(() => {
+    if (getParam('showSlide') === 'true') {
+      setVisible(true);
+    }
+  }, [getParam('showSlide')]);
   const field = Field.useField({
     values: dataSource,
   });
