@@ -30,7 +30,11 @@ export const removeEnv = async (body) => {
 };
 
 export const createByTemplate = async (params) => {
-  return await request.post('/api/application/createByTemplate', {
-    params,
-  });
+  return await request.post(
+    '/api/application/createByTemplate',
+    {
+      params,
+    },
+    { timeout: 10000 },
+  );
 };
