@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Shell, ConfigProvider, Button } from '@alicloud/console-components';
 import PageNav from './components/PageNav';
-import Logo from './components/Logo';
-import { LOGO_URL } from '@/constants/public';
 import ToastContainer from '@/components/ToastContainer';
 import Settings from './components/Settings';
+import Org from './components/Org';
 import Add from './components/Add';
+import './index.less';
 
 const menuConfig = ['/settings/tokens', '/settings/secrets'];
 
@@ -79,9 +79,8 @@ export function BasicLayout({ children, match }: IBasicLayoutProps) {
         fixedHeader={false}
       >
         <Shell.Branding>
-          <Logo image={LOGO_URL} url={`/${orgName}/application`} />
+          <Org orgName={orgName} />
         </Shell.Branding>
-
         <Shell.Action>
           {match?.path !== '/login' && (
             <>
