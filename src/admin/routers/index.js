@@ -13,6 +13,11 @@ router.get('/', jwtAuth, async function (req, res, _next) {
   res.render('index', { CONFIG: config });
 });
 
+router.post('/initialize', async (_req, res) => {
+  await require('../services/init.service')();
+  res.send('');
+})
+
 const defaultRoutes = [
   {
     path: '/auth',

@@ -4,35 +4,33 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const _ = core.lodash;
 const fs = core.fse;
+const { RUN_TYPE = '' } = process.env;
 
-const getYamlName = () => {
-  for (const arg of process.argv) {
-    if (arg.trim().startsWith('--filename=')) {
-      return arg.trim().split('=')[1];
-    }
+const getYamlPath = (yamlName) => {
+  let sPath = path.join(process.cwd(), yamlName);
+  if (fs.existsSync(sPath)) {
+    return sPath;
   }
-  return 's';
+  sPath = path.join(process.cwd(), '..', yamlName);
+  if (fs.existsSync(sPath)) {
+    return sPath;
+  }
 };
 
-const getYamlPath = () => {
-  const yamlName = getYamlName();
-  let sPath = path.join(process.cwd(), `${yamlName}.yaml`);
-  if (fs.existsSync(sPath)) {
-    return sPath;
+const getYaml = () => {
+  let sPath;
+  if (RUN_TYPE.endsWith('.yaml') || RUN_TYPE.endsWith('.yml')) {
+    sPath = getYamlPath(RUN_TYPE);
+  } else {
+    sPath = getYamlPath('s.yaml');
+    if (!sPath) {
+      sPath = getYamlPath('s.yml');
+    }
   }
-  sPath = path.join(process.cwd(), `${yamlName}.yml`);
-  if (fs.existsSync(sPath)) {
-    return sPath;
+  if (!sPath) {
+    console.warn('没有找到 yaml 文件');
   }
-  sPath = path.join(process.cwd(), '..', `${yamlName}.yaml`);
-  if (fs.existsSync(sPath)) {
-    return sPath;
-  }
-  sPath = path.join(process.cwd(), '..', `${yamlName}.yml`);
-  if (fs.existsSync(sPath)) {
-    return sPath;
-  }
-  console.warn('没有找到 yaml 文件');
+  return sPath;
 };
 
 const parseYaml = async (sPath) => {
@@ -75,32 +73,29 @@ const parseYaml = async (sPath) => {
     _.merge(process.env, cred);
   }
 
-  const { DATABASE_URL: databaseUrl } = process.env;
-  if (databaseUrl) {
-    if (databaseUrl.startsWith('${env.')) {
-      throw new Error('请先设置环境变量 DATABASE_URL 用于链接 mysql 数据库');
-    }
-    if (databaseUrl.startsWith('file:')) {
-      let filePath = databaseUrl.replace('file:', '');
-      if (!path.isAbsolute(filePath)) {
-        filePath = path.resolve(process.cwd(), filePath);
-        process.env.DATABASE_URL = `file:${filePath}`;
-      }
-    }
-  } else {
-    throw new Error('请先设置环境变量 DATABASE_URL 用于链接 mysql 数据库');
-  }
-
   return parsedObj;
 };
 
 (async function () {
-  const sPath = getYamlPath();
+  const sPath = getYaml();
   console.debug(`获取到 s yaml 路径: ${sPath}`);
   if (sPath) {
     const parsedObj = await parseYaml(sPath);
     const prisma = _.get(parsedObj, 'realVariables.vars.prisma', '');
     console.debug(`运行的 prisma 数据库类型: ${prisma}`);
+
+    const { DATABASE_URL: databaseUrl = '' } = process.env;
+    if (databaseUrl.startsWith('${env.') || !databaseUrl) {
+      throw new Error(`请先设置环境变量 DATABASE_URL 用于链接 ${prisma} 数据库`);
+    }
+    if (databaseUrl.startsWith('file:')) {
+      let filePath = databaseUrl.replace('file:', '').replace('/mnt/auto', '.');
+      if (!path.isAbsolute(filePath)) {
+        filePath = path.resolve(process.cwd(), filePath);
+        process.env.DATABASE_URL = `file:${filePath}`;
+      }
+    }
+
     if (prisma) {
       spawnSync(`npx prisma generate --schema=./prisma/${prisma}.prisma`, {
         encoding: 'utf8',
@@ -112,9 +107,11 @@ const parseYaml = async (sPath) => {
   }
   console.debug(`初始化结束`);
 
-  spawnSync('DEBUG=serverless-cd:* nodemon index.js', {
-    encoding: 'utf8',
-    shell: true,
-    stdio: 'inherit',
-  });
+  if (process.env.RUN_TYPE !== 'deploy') {
+    spawnSync('DEBUG=serverless-cd:* nodemon index.js', {
+      encoding: 'utf8',
+      shell: true,
+      stdio: 'inherit',
+    });
+  }
 })();

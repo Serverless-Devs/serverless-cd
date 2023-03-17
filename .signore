@@ -13,6 +13,7 @@ src/example
 /Makefile
 /package.json
 /package-lock.json
+/deploy
 
 /README.md
 _mock
@@ -24,3 +25,4 @@ serverless-pipeline.yaml
 
 dev.db
 dev.db-journal
+!/src/admin/prisma/dev.db
