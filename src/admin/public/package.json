@@ -6,6 +6,7 @@
     "@alicloud/console-components": "^1.5.10",
     "@alicloud/console-components-actions": "^1.0.19",
     "@alicloud/console-components-slide-panel": "^2.2.14",
+    "@alifd/theme-design-pro": "^0.8.1",
     "@serverless-cd/app-card-ui": "^0.0.2",
     "@serverless-cd/auth-ui": "^0.0.1-beta-7",
     "@serverless-cd/creating-ui": "^0.0.3",
