@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const { NeedLogin, generateOrgIdByUserIdAndOrgName } = require('../util');
 const debug = require('debug')('serverless-cd:middleware');
 
-module.exports = async function (req, _res, next) {
+async function checkJwt(req, _res, next) {
   const token = _.get(req, 'cookies.jwt');
   const skipCheckJwt = _.includes(EXCLUDE_AUTH_URL, req._parsedUrl.pathname) ||  req._parsedUrl.pathname === '/api/auth/callback/github'; 
   debug(`pathname: ${req._parsedUrl.pathname}, skip check token: ${skipCheckJwt}`);
@@ -17,11 +17,14 @@ module.exports = async function (req, _res, next) {
       try {
         const user = await jwt.verify(token, JWT_SECRET);
         if (_.isNil(user.userId)) {
-          next(new NeedLogin('没有用户或者团队信息'));
+          return next(new NeedLogin('没有用户或者团队信息'));
         }
         debug('verify user:: ', user);
+        if (Math.floor(Date.now() / 1000 > user.expires)) {
+          return next(new NeedLogin('登陆已过期'));
+        }
         req.userId = user.userId;
-        const orgName = _.get(req, 'query.orgName', _.get(req, 'body.orgName'));
+        const orgName = _.get(req, 'body.orgName', _.get(req, 'query.orgName'));
         if (orgName) {
           req.orgName = orgName;
           req.orgId = generateOrgIdByUserIdAndOrgName(user.userId, orgName);
@@ -38,3 +41,6 @@ module.exports = async function (req, _res, next) {
     next();
   }
 };
+
+
+module.exports = checkJwt;
