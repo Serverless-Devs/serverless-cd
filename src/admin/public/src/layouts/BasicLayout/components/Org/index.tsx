@@ -74,7 +74,10 @@ const Org: FC<Props> = (props) => {
     <Dropdown
       trigger={
         <div className="layout-center cursor-pointer">
-          <img src={ORG_LOGO} style={{ width: 32, height: 32 }} />
+          <img
+            src={ORG_LOGO}
+            style={{ width: 24, height: 24, margin: '0 8', borderRadius: '50%' }}
+          />
           <span className="ml-4 fz-18 text-bold ellipsis">{orgName}</span>
         </div>
       }
