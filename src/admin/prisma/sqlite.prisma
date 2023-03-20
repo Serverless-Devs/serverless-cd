@@ -24,10 +24,12 @@ model Org {
   id    String     @id    // 生成格式变更为：user_id:name
   user_id String
   secrets String?
-  name String             // 
-  role String             // owner / admin / member
+  name String
+  role String
+  logo String?
   description String?
   third_part String?
+  alias String?
 }
 
 model Application {

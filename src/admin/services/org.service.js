@@ -67,7 +67,8 @@ async function listByOrgName(orgId, name = '') {
   return _.merge(result, names);
 }
 
-async function createOrg(userId, name, description) {
+async function createOrg(userId, body) {
+  const { name } = body;
   if (_.isEmpty(name)) {
     throw new ValidationError('创建团队 name 是必填项');
   }
@@ -77,7 +78,7 @@ async function createOrg(userId, name, description) {
   if (!_.isEmpty(userData)) {
     throw new ValidationError('团队已存在');
   }
-  await orgModel.createOrg({ userId, name, description, role: ROLE.OWNER });
+  await orgModel.createOrg({ ...body, userId, role: ROLE.OWNER });
 }
 
 async function invite(orgName, inviteUserName, role = ROLE.MEMBER) {
@@ -92,16 +93,28 @@ async function invite(orgName, inviteUserName, role = ROLE.MEMBER) {
   }
 
   const userConfig = await userModel.getUserByName(inviteUserName);
+  const { id: userId } = userConfig;
   if (_.isEmpty(userConfig)) {
     throw new ValidationError(`没有找到此用户: ${inviteUserName}`);
   }
-  const inviteOrgId = generateOrgIdByUserIdAndOrgName(userConfig.id, orgName);
+  const ownerOrgConfig = await orgModel.getOwnerOrgByName(orgName);
+  if (!_.isEmpty(ownerOrgConfig)) {
+    throw new ValidationError(`没有找到此团队：${orgName}`);
+  }
+  const inviteOrgId = generateOrgIdByUserIdAndOrgName(userId, orgName);
   const inviteOrgConfig = await orgModel.getOrgById(inviteOrgId);
   if (!_.isEmpty(inviteOrgConfig)) {
     throw new ValidationError(`用户${inviteUserName}已经在${orgName}团队中存在`);
   }
 
-  await orgModel.createOrg({ userId: userConfig.id, name: orgName, role });
+  await orgModel.createOrg({
+    userId,
+    role,
+    name: orgName,
+    description: ownerOrgConfig.description,
+    logo: ownerOrgConfig.logo,
+    alias: ownerOrgConfig.alias,
+  });
 }
 
 async function updateUserRole(orgName, inviteUserName, role = ROLE.MEMBER) {
