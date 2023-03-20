@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useRequest, Link, history } from 'ice';
+import { useRequest, history } from 'ice';
 import { Button, Icon, Table, Dialog } from '@alicloud/console-components';
 import Actions, { LinkButton } from '@alicloud/console-components-actions';
 import CreateOrg from './components/CreateOrg';
@@ -10,7 +10,7 @@ import { Toast } from '@/components/ToastContainer';
 import { get } from 'lodash';
 import { ROLE } from '@/constants';
 import store from '@/store';
-import { localStorageSet } from '@/utils';
+import { localStorageSet, localStorageRemove } from '@/utils';
 
 function Orgs() {
   const { data, request, refresh, loading } = useRequest(listOrgs);
@@ -29,6 +29,7 @@ function Orgs() {
         const { success } = await removeOrg({ orgName: record.name });
         if (success) {
           Toast.success('团队删除成功');
+          localStorageRemove(record.user_id);
           refresh();
         }
         dialog.hide();
@@ -37,7 +38,7 @@ function Orgs() {
   };
 
   const handleChangeOrg = async (record) => {
-    localStorageSet('orgName', record.name);
+    localStorageSet(record.user_id, record.name);
     history?.push(`/${record.name}`);
   };
 
@@ -46,7 +47,11 @@ function Orgs() {
       title: '团队名称',
       key: 'name',
       dataIndex: 'name',
-      cell: (value, _index, record) => <Link to={`/${value}`}>{value}</Link>,
+      cell: (value, _index, record) => (
+        <Button type="primary" text onClick={() => handleChangeOrg(record)}>
+          {value}
+        </Button>
+      ),
     },
     {
       title: '角色',
@@ -62,7 +67,7 @@ function Orgs() {
       title: '操作',
       cell: (value, _index, record) => (
         <Actions>
-          <LinkButton type="primary" onClick={() => handleChangeOrg(record)}>
+          <LinkButton type="primary" onClick={() => handleChangeOrg(record.name)}>
             切换
           </LinkButton>
           <TransferOrg callback={refresh} dataSource={{ name: record.name }}>

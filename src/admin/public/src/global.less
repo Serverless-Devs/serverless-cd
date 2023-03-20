@@ -2,7 +2,10 @@
 @import './styles/details.less';
 @import './styles/status.less';
 @import 'react-toastify/dist/ReactToastify.css';
-@import '@alicloud/console-components/dist/wind.css';
+@import '@alifd/theme-design-pro/variables.css';
+@import '@alifd/theme-design-pro/dist/next.var.css';
+
+// @import '@alicloud/console-components/dist/wind.css';
 
 body {
   -webkit-font-smoothing: antialiased;
@@ -59,8 +62,8 @@ body {
 
 .page-content {
   background-color: #fff;
+  padding: 16px 24px;
   min-height: calc(100vh - 166px);
-  padding: 15px 15px 30px;
 }
 .next-dialog-message.next-message {
   margin-top: 0 !important;
@@ -229,4 +232,11 @@ body {
   .CodeMirror {
     height: auto;
   }
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-wrap: normal;
 }
