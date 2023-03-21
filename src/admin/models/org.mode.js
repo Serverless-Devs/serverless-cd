@@ -40,15 +40,17 @@ module.exports = {
     const result = await orgPrisma.findUnique({ where: { id } });
     return getOrgInfo(result);
   },
-  async createOrg({ userId, name, role, description, secrets }) {
+  async createOrg({ userId, name, role, description, secrets, alias, logo }) {
     const orgId = generateOrgIdByUserIdAndOrgName(userId, name);
     const data = {
       id: orgId,
       user_id: userId,
-      name,
       role: role || ROLE.OWNER,
+      name,
       description,
       secrets,
+      alias,
+      logo,
     };
     const result = await orgPrisma.create({ data: saveOrg(data) });
     return result;
