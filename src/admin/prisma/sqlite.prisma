@@ -55,7 +55,7 @@ model Task {
   status String?
   steps String?
   dispatch_org_id String?       // 记录谁操作的
-  trigger_payload  String
+  trigger_payload  String?
   created_time DateTime  @default(now())
   updated_time DateTime  @updatedAt
 }
