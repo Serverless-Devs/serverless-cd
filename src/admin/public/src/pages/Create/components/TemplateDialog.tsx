@@ -152,39 +152,49 @@ const TemplateDialog = (props: IProps) => {
       ],
     },
     {
-      key: 'createApp',
-      title: '创建应用',
+      key: 'create',
+      title: '创建',
       runStatus: 'wait',
-      runningMsg: '创建应用中',
-      successMsg: '创建应用成功',
-      errorMsg: '创建应用失败',
-      run: async () => {
-        // 创建应用
-        const res = await doCreateApp({ ...value, repo }, createType);
-        if (!res.success) {
-          throw new Error(res.message);
-        } else {
-          return res.data;
-        }
-      },
-    },
-    {
-      title: '部署',
-      runStatus: 'wait',
-      key: 'deploy',
-      runningMsg: '部署中...',
-      successMsg: '部署成功',
-      errorMsg: '部署失败',
-      run: async (params) => {
-        const { id } = params.content.createApp.result;
-        await doManualDeployApp(id, branch);
-      },
+      runningMsg: '创建中',
+      successMsg: '创建成功',
+      errorMsg: '创建失败',
+      tasks: [
+        {
+          key: 'createApp',
+          title: '创建应用',
+          runStatus: 'wait',
+          runningMsg: '创建应用中',
+          successMsg: '创建应用成功',
+          errorMsg: '创建应用失败',
+          run: async () => {
+            // 创建应用
+            const res = await doCreateApp({ ...value, repo }, createType);
+            if (!res.success) {
+              throw new Error(res.message);
+            } else {
+              return res.data;
+            }
+          },
+        },
+        {
+          title: '自动创建部署',
+          runStatus: 'wait',
+          key: 'deploy',
+          runningMsg: '自动创建部署中...',
+          successMsg: '自动创建部署成功',
+          errorMsg: '自动创建部署失败',
+          run: async (params) => {
+            const { id } = params.content.createApp.result;
+            await doManualDeployApp(id, branch);
+          },
+        },
+      ],
     },
     {
       key: 'success',
-      title: '完成创建，即将跳去应用列表页面',
+      title: '完成创建，即将跳去应用概览页面',
       runStatus: 'wait',
-      runningMsg: '完成创建，即将跳去应用列表页面',
+      runningMsg: '完成创建，即将跳去应用概览页面',
       successMsg: '即将跳转',
       errorMsg: '跳转失败',
       run: async (params) => {
