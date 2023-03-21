@@ -26,6 +26,7 @@ const Github = (props: IProps) => {
   const secretsRef: any = useRef(null);
   const specify = get(getValue('trigger'), 'push') === PUSH.SPECIFY;
   const template = createType === 'template';
+  const [createDisabled, setCreateDisabled] = useState(false);
 
   const secretsValidator = async (_, value, callback) => {
     if (get(getValue('trigger'), 'push') === PUSH.NEW) return callback();
@@ -76,6 +77,7 @@ const Github = (props: IProps) => {
             field={field}
             createType={createType}
             createTemplate={template}
+            setCreateDisabled={setCreateDisabled}
             {...(init('repo', {
               rules: [
                 {
@@ -103,6 +105,7 @@ const Github = (props: IProps) => {
             <FormItem label="Secrets" help="">
               <ConfigEdit
                 {...init('secrets', {
+                  initValue: { ALIYUN_AK: '', ALIYUN_SK: '' },
                   rules: [{ validator: secretsValidator }],
                 })}
                 ref={secretsRef}
@@ -117,6 +120,7 @@ const Github = (props: IProps) => {
         createTemplate={template}
         setVisible={setVisible}
         createType={createType as any}
+        createDisabled={createDisabled}
       />
       <Dialog visible={dialogVisible} footer={false} title="创建应用" closeMode={[]}>
         <TemplateDialog

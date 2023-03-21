@@ -5,6 +5,7 @@ import store from '@/store';
 import { noop, map, find, isEmpty, cloneDeep, get, debounce } from 'lodash';
 import RefreshIcon from '@/components/RefreshIcon';
 import { githubOrgs, githubOrgRepos } from '@/services/git';
+import { orgDetail } from '@/services/org';
 import { CREATE_TYPE } from '../constant';
 
 const FormItem = Form.Item;
@@ -26,6 +27,7 @@ interface IProps {
   onChange?: (value: IRepoItem) => void;
   createType?: `${CREATE_TYPE}`;
   createTemplate: boolean;
+  setCreateDisabled: (value: any) => void;
 }
 
 const initRepoTypeList = [
@@ -51,8 +53,10 @@ const Repos = (props: IProps) => {
     field,
     createType = CREATE_TYPE.Repository,
     createTemplate = false,
+    setCreateDisabled,
   } = props;
   const { data, loading, request } = useRequest(githubOrgs);
+  const orgDetailRequest = useRequest(orgDetail);
   const orgRepos = useRequest(githubOrgRepos);
   const [, userDispatchers] = store.useModel('user');
   const effectsState = store.useModelEffectsState('user');
@@ -62,14 +66,24 @@ const Repos = (props: IProps) => {
   const [inputValue, setInputValue] = useState('');
   const { getValue, setValue, init, getError } = field;
   // owner是否授权
-  const isAuth = Boolean(get(getValue('gitUser'), 'third_part.github.owner'));
+  const isAuth = Boolean(get(orgDetailRequest.data, 'data.third_part.github.owner'));
+
+  useEffect(() => {
+    orgDetailRequest.request();
+  },[])
 
   useEffect(() => {
     setInputValue(getValue('repoName'));
-    (async () => {
-      await validateRepoName.current(getValue('repoName'));
-    })();
   }, [getValue('repoName')]);
+
+  useEffect(() => {
+    if (!isAuth) return;
+    if (createTemplate) {
+      (async () => {
+        await validateRepoName.current(getValue('repoName'));
+      })();
+    }
+  }, [isAuth]);
 
   useEffect(() => {
     if (!isEmpty(data)) {
@@ -96,12 +110,14 @@ const Repos = (props: IProps) => {
   const validateRepoName = useRef(
     debounce(async (value) => {
       setVerifyStatus('loading');
+      setCreateDisabled(true);
       const res = await userDispatchers.getUserRepos();
       const data = find(res, (item: IRepoItem) => item.name === value);
       if (data) {
         setVerifyStatus('error');
       } else {
         setVerifyStatus('success');
+        setCreateDisabled(false);
       }
     }, 500),
   );
@@ -240,6 +256,7 @@ const Repos = (props: IProps) => {
     setInputValue(value);
     setValue('repoName', value);
     setVerifyStatus('');
+    setCreateDisabled(true);
     validateRepoName.current(value);
   };
 
