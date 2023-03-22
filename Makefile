@@ -21,6 +21,10 @@ sqlite-start:
 mysql-start:
 	cd src/admin && npm run mysql-start
 
+# 启动 admin mysql
+mongodb-start:
+	cd src/admin && npm run mongodb-start
+
 # 发布版本步骤：
 #  先安装依赖
 #  执行前端项目的 build【init 之后部署的优化，减少第一次部署的时间】

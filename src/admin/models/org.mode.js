@@ -25,6 +25,7 @@ const saveOrg = (data) => {
   if (data.third_part) {
     data.third_part = JSON.stringify(data.third_part);
   }
+  _.unset(data, 'id');
   return data;
 };
 

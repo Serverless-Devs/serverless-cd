@@ -9,6 +9,7 @@
     "local-start": "node serverless-scripts",
     "sqlite-start": "export RUN_TYPE=\"s.local-run.sqlite.yaml\" && node serverless-scripts",
     "mysql-start": "export RUN_TYPE=\"s.local-run.mysql.yaml\" && node serverless-scripts",
+    "mongodb-start": "export RUN_TYPE=\"s.local-run.mongodb.yaml\" && node serverless-scripts",
     "test": "DEBUG=serverless-cd:* jest"
   },
   "jest": {
