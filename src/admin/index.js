@@ -22,10 +22,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use('/', require('./routers/root'));
+app.post('/initialize', async (_req, res) => {
+  await require('./services/init.service')();
+  res.send('');
+});
 
-
-// 首页
+// 接口
 app.use('/api', jwtAuth, logger, require('./routers'));
 
 // 需要写在最后，为了兼容前端指定非 api 的路由
