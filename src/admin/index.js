@@ -23,11 +23,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // 首页
-app.use('/', require('./routers'));
+app.use('/', require('./routers/root'));
 app.use('/api', jwtAuth, logger, require('./routers'));
 
 // 兼容前端 brower history
-app.use('/*', require('./routers'));
+app.use('/*', require('./routers/root'));
 
 app.use(errorHandler);
 
