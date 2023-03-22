@@ -9,7 +9,7 @@ router.post('/initialize', async (_req, res) => {
 });
 
 // 首页
-router.get('/*', async function (req, res, _next) {
+router.get('/', async function (req, res, _next) {
   const config = {
     CD_PIPELINE_YAML,
     SUPPORT_LOGIN,
