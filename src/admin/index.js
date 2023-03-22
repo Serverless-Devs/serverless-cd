@@ -23,11 +23,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // 首页
-app.use('/', require('./routers'));
 app.use('/api', jwtAuth, logger, require('./routers'));
 
-// 兼容前端 brower history
-app.use('/*', require('./routers'));
+// 需要写在最后，为了兼容前端指定非 api 的路由
+app.use('/*', require('./routers/root'));
 
 app.use(errorHandler);
 

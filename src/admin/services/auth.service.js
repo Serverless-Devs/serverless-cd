@@ -10,9 +10,7 @@ const { md5Encrypt, ValidationError, checkNameAvailable, NoAuthError } = require
  * 注册用户
  */
 async function initUser({ username, password, email }) {
-  if (!checkNameAvailable(username)) {
-    throw new ValidationError('用户名称不合法，预期格式：/^[a-zA-Z0-9-_]{1,50}$/');
-  }
+  checkNameAvailable(username);
   const data = await userModel.getUserByName(username);
   if (_.get(data, 'username', '')) {
     throw new ValidationError('用户名已存在');
@@ -44,6 +42,9 @@ async function loginWithPassword({ loginname, password }) {
     data = await userModel.getUserByEmail(loginname);
   } else {
     data = await userModel.getUserByName(loginname);
+  }
+  if (_.isEmpty(data)) {
+    throw new ValidationError(`用户(${loginname})不存在`);
   }
   const isTrue = _.get(data, 'password', '') === md5Encrypt(password);
   if (!isTrue) {
