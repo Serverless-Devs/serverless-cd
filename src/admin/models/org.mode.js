@@ -53,7 +53,7 @@ module.exports = {
       alias,
       logo,
     };
-    const result = await orgPrisma.create({ data: saveOrg(data) });
+    const result = await orgPrisma.create({ data: { id: orgId, ...saveOrg(data), } });
     return result;
   },
   async updateOrg(id, data) {

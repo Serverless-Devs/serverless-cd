@@ -63,12 +63,17 @@ const md5Encrypt = (data) => {
   return crypted;
 };
 
-const checkNameAvailable = (name) => /^[a-zA-Z0-9-_]{1,50}$/.test(name);
+const checkNameAvailable = (name) => {
+  if (!/^[a-zA-Z0-9-_]{1,50}$/.test(name)) {
+    throw new ValidationError('用户名称不合法，预期格式：/^[a-zA-Z0-9-_]{1,50}$/');
+  }
+  if (['api'].includes(name)) {
+    throw new ValidationError('输入的名称是保留字，不能被创建');
+  }
+};
 
 const generateOrgIdByUserIdAndOrgName = (id, name) => {
-  if (!checkNameAvailable(name)) {
-    throw new ValidationError('输入的名称不符合规则');
-  }
+  checkNameAvailable(name);
   return `${id}:${name}`;
 };
 
