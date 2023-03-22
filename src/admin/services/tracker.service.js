@@ -55,6 +55,7 @@ async function tracker(payload = {}) {
     status, // 成功 ｜ 失败
     appId = '',
     envName = '',
+    time = new Date().getTime(),
   } = payload;
 
   if (!(appId || envName)) {
@@ -92,7 +93,7 @@ async function tracker(payload = {}) {
     )
   );
   // 将上报相关数据写进app表latest_task
-  _.set(environment, `${envName}.latest_task`, { taskId, status, completed: true });
+  _.set(environment, `${envName}.latest_task`, { time, taskId, status, completed: true });
   await applicationMode.updateAppById(appId, { environment });
 }
 

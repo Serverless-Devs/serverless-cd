@@ -142,6 +142,7 @@ async function cancelTask({ taskId } = {}) {
     ref,
     completed: true,
     status: CANCEL,
+    time: new Date().getTime(),
   };
   await applicationModel.updateAppById(app_id, { environment });
 }
