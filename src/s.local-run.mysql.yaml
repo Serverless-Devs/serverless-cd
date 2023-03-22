@@ -97,8 +97,8 @@ services:
           path: './admin'
         - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
           path: './admin'
-      post-deploy:
-        - component: fc invoke --event '{"path":"/api/common/init?prisma=mysql"}'
+        - run: export RUN_TYPE='deploy' && node serverless-scripts
+          path: './admin'
     props:
       region: ${vars.region}
       service: ${vars.service}

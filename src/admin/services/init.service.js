@@ -43,6 +43,10 @@ const DB_TYPE = {
       throw new Error('链接不上数据库，请查看xxx文档');
     }
   },
+  mongodb: async () => {
+    // 思路：链接远程数据库，然后使用 db 语法创建命名空间
+    console.debug('TODO handler mongodb start');
+  }
 };
 
 module.exports = async function () {
@@ -55,8 +59,10 @@ module.exports = async function () {
     dbType = 'sqlite';
   } else if (databaseUrl.startsWith('mysql:')) {
     dbType = 'mysql';
+  } else if (databaseUrl.startsWith('mongodb:')) {
+    dbType = 'mongodb';
   } else {
-    throw new Error('DATABASE_URL 配置不符合预期');
+    throw new Error('DATABASE_URL 配置不符合预期或者此数据库还没有支持');
   }
 
   let connection = await testConnection(dbType);

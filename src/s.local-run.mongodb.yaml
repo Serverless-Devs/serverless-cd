@@ -1,21 +1,27 @@
 edition: 1.0.0
 name: serverless-cd
-access: '{{access}}'
+access: dankun
+
+# - 启动的时候根据需要修改的字段 domain databaseUrl
+# - domain 如果过期或者生成查看 s.domain.yaml
+# - role 需要手动添加 fcfull 的权限，否则会影响取消部署、worker异常处理、自动加载runtime 等能力
 
 vars:
-  region: 'ap-southeast-1'
+  region: 'cn-hongkong'
   service:
     name: 'serverless-cd'
     description: Serverless-cd 应用
     logConfig: auto
     nasConfig: auto
+  masterFunctionName: master
   workerFunctionName: worker
   adminFunctionName: admin
   workerDeliverFunctionName: workerDeliver
-  domain: 'app.serverless-cd.cn'
+  domain: 'auto.serverless-cd.1740298130743624.cn-hongkong.fc.devsapp.net'
   logLocalPathPrefix: /mnt/auto/logs
   databaseUrl: '${env.DATABASE_URL}'
-  prisma: 'mysql'
+  prisma: 'mongodb'
+  JWT_SECRET: 0df85e4e140f6
 
 services:
   worker:
@@ -23,9 +29,9 @@ services:
     actions:
       pre-deploy:
         - run: npm install --registry=https://registry.npmmirror.com
-          path: './src/worker'
+          path: './worker'
         - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
-          path: './src/worker'
+          path: './worker'
       post-deploy:
         - component: fc api UpdateFunction --region ${vars.region} --header
             '{"x-fc-disable-container-reuse":"True"}' --path
@@ -37,7 +43,7 @@ services:
         name: ${vars.workerFunctionName}
         description: 执行用户配置的 CD 流程。
         runtime: custom
-        codeUri: ./src/worker
+        codeUri: ./worker
         customRuntimeConfig:
           command:
             - node
@@ -46,7 +52,7 @@ services:
         timeout: 3600
         layers:
           - acs:fc:${vars.region}:official:layers/Nodejs16/versions/1
-          - acs:fc:${vars.region}:official:layers/SQLite3/versions/1
+          - acs:fc:${vars.region}:1940309364339785:layers/sqlite3/versions/1
         environmentVariables:
           PATH: /opt:/opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
           DOMAIN: ${vars.domain} # 用于给用户显示日志链接地址
@@ -67,12 +73,12 @@ services:
         name: ${vars.workerDeliverFunctionName}
         description: 执行用户配置的 CD 流程。
         runtime: nodejs14
-        codeUri: ./src/worker
+        codeUri: ./worker
         handler: deliver.handler
         memorySize: 640
         timeout: 600
         layers:
-          - acs:fc:${vars.region}:official:layers/SQLite3/versions/1
+          - acs:fc:${vars.region}:1940309364339785:layers/sqlite3/versions/1
         environmentVariables:
           PATH: /opt:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
           DATABASE_URL: ${vars.databaseUrl} # 用于链接数据库
@@ -83,17 +89,14 @@ services:
     component: fc
     actions:
       pre-deploy:
-        - run: npm install --registry=https://registry.npmmirror.com
-          path: './src/admin/public'
+        - run: npm install --registry=https://registry.npmmirror.com --force
+          path: './admin/public'
         - run: npm run build
-          path: './src/admin/public'
+          path: './admin/public'
         - run: npm install --registry=https://registry.npmmirror.com
-          path: './src/admin'
+          path: './admin'
         - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
-          path: './src/admin'
-        - run: export RUN_TYPE='deploy' && node serverless-scripts
-          path: './src/admin'
-
+          path: './admin'
     props:
       region: ${vars.region}
       service: ${vars.service}
@@ -101,10 +104,8 @@ services:
         name: ${vars.adminFunctionName}
         description: serverless-cd 前端应用接口
         runtime: custom
-        codeUri: ./src/admin
+        codeUri: ./admin
         handler: index.handler
-        initializer: index.initializer
-        initializationTimeout: 30
         memorySize: 640
         timeout: 360
         caPort: 9000
@@ -114,13 +115,13 @@ services:
             - node
             - index.js
         layers:
-          - acs:fc:${vars.region}:official:layers/Nodejs16/versions/2
-          - acs:fc:${vars.region}:official:layers/SQLite3/versions/1
+          - acs:fc:cn-hongkong:official:layers/Nodejs16/versions/2
+          - acs:fc:${vars.region}:1940309364339785:layers/sqlite3/versions/1
         environmentVariables:
           PATH: /opt:/opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
           DATABASE_URL: ${vars.databaseUrl} # 用于链接数据库
           LOG_LOCAL_PATH_PREFIX: ${vars.logLocalPathPrefix}
-          JWT_SECRET: ${env.JWT_SECRET}
+          JWT_SECRET: ${vars.JWT_SECRET}
           WEBHOOK_URL: http://${vars.domain}
       triggers:
         - name: http-trigger
@@ -136,26 +137,9 @@ services:
               - PUT
               - PATCH
       customDomains:
-        - domainName: 'app.serverless-cd.cn'
-          protocol: HTTP,HTTPS
-          certId: 9493156
-          tlsConfig:
-            minVersion: TLSv1.2
-            maxVersion: TLSv1.3
-            cipherSuites:
-            - TLS_RSA_WITH_AES_128_CBC_SHA
-            - TLS_RSA_WITH_AES_256_CBC_SHA
-            - TLS_RSA_WITH_AES_128_GCM_SHA256
-            - TLS_RSA_WITH_AES_256_GCM_SHA384
-            - TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA
-            - TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA
-            - TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
-            - TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA
-            - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
-            - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
-            - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-            - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-            - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
-            - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
+        - domainName: ${vars.domain}
+          protocol: HTTP
           routeConfigs:
             - path: /*
+              serviceName: ${vars.service.name}
+              functionName: ${vars.adminFunctionName}
