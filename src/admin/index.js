@@ -22,6 +22,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+app.use('/', require('./routers/root'));
+
+
 // 首页
 app.use('/api', jwtAuth, logger, require('./routers'));
 
