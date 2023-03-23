@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import Auth from '@serverless-cd/auth-ui';
 import { Link, history } from 'ice';
+import { get } from 'lodash';
 import store from '@/store';
 import './singIn.css';
 
@@ -17,13 +18,10 @@ const SingInupBase = (props) => {
 
   const goAppList = async () => {
     if (!data) return;
-    const {
-      success,
-      data: { username },
-    } = data;
+    const { success } = data;
     if (success) {
       await userDispatchers.getUserInfo();
-      history?.push(`/${username}/application`);
+      history?.push(`/${get(data, 'data.username')}/application`);
       return;
     }
   };
