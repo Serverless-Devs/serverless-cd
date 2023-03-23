@@ -64,6 +64,7 @@ module.exports = {
     if (_.isPlainObject(data.environment)) {
       data.environment = JSON.stringify(data.environment);
     }
+    _.unset(data, 'id');
     const result = applicationPrisma.update({ where: { id }, data });
     return result;
   },
