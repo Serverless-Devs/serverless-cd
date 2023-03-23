@@ -22,8 +22,8 @@ const Org: FC<Props> = (props) => {
   const orgRequest = useRequest(listOrgs);
 
   useEffect(() => {
-    orgRequest.request();
-  }, []);
+    orgName && orgRequest.request();
+  }, [orgName]);
 
   const menu = () => {
     const onItemClick = (key: string) => {

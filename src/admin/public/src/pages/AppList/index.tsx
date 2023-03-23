@@ -41,7 +41,10 @@ const AppList = ({
 }) => {
   const [userState] = store.useModel('user');
   const userInfo: any = get(userState, 'userInfo', {});
-
+  /**
+   * 未请求到用户信息时，不渲染页面
+   */
+  if (isEmpty(userInfo)) return null;
   if (isEmpty(orgName)) {
     const newOrgName = localStorageGet(userInfo.id);
     if (newOrgName) {
