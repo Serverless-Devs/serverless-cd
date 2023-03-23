@@ -1,5 +1,7 @@
 const router = require('express').Router();
 const { Result, Webhook } = require('../../util');
+const auth = require('../../middleware/auth');
+const { MEMBER_ROLE_KEYS } = require('@serverless-cd/config');
 const init = require('../../services/init.service');
 const webhook = require('../../services/webhook.service');
 const { tracker } = require('../../services/tracker.service');
@@ -30,7 +32,7 @@ router.post(`/${Webhook.ROUTE}`, async function (req, res) {
   );
 });
 
-router.post('/tracker', async function (req, res) {
+router.post('/tracker', auth(MEMBER_ROLE_KEYS), async function (req, res) {
   await tracker(req.body);
   return res.json(Result.ofSuccess());
 });
