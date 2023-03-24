@@ -5,12 +5,12 @@ import ToastContainer from '@/components/ToastContainer';
 import Settings from './components/Settings';
 import Org from './components/Org';
 import Add from './components/Add';
+import Home from './components/Home';
 import store from '@/store';
 import { get } from 'lodash';
 import { localStorageGet } from '@/utils';
+import { menuConfig } from '@/constants/navConfig';
 import './index.less';
-
-const menuConfig = ['/settings/tokens', '/settings/secrets'];
 
 (function () {
   const throttle = function (type: string, name: string, obj: Window = window) {
@@ -45,7 +45,7 @@ interface IBasicLayoutProps {
   match: object | any;
   location: object | any;
 }
-export function BasicLayout({ children, match }: IBasicLayoutProps) {
+export function BasicLayout({ children, match, location: { pathname } }: IBasicLayoutProps) {
   const [userState] = store.useModel('user');
   const user_id = get(userState, 'userInfo.id');
   const orgName = get(match, 'params.orgName', localStorageGet(user_id));
@@ -65,8 +65,7 @@ export function BasicLayout({ children, match }: IBasicLayoutProps) {
   const [device, setDevice] = useState(getDevice(NaN));
   const [isCollapse, setIsCollapse] = useState<any>(false);
 
-  // const showMenu = menuConfig.includes(pathname);
-  const showMenu = false;
+  const showMenu = menuConfig.includes(pathname);
 
   if (typeof window !== 'undefined') {
     window.addEventListener('optimizedResize', (e) => {
@@ -85,6 +84,7 @@ export function BasicLayout({ children, match }: IBasicLayoutProps) {
         fixedHeader={false}
       >
         <Shell.Branding>
+          <Home />
           <Org orgName={orgName} />
         </Shell.Branding>
         <Shell.Action>

@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { history } from 'ice';
+import store from '@/store';
 import { ROLE } from '@/constants';
 
 import moment from 'moment';
@@ -181,9 +182,10 @@ export const stopPropagation = async (e) => {
   e.preventDefault();
 };
 
-export const isAdmin = (orgName: string, userState) => {
+export const isAdmin = (orgName: string) => {
+  const [userState] = store.useModel('user');
   const listOrgs = _.get(userState, 'userInfo.listOrgs.result', []);
-  const obj = _.find(listOrgs, (item) => item.name === orgName);
+  const obj: any = _.find(listOrgs, (item: any) => item.name === orgName);
   if (_.isEmpty(obj)) return false;
   return obj.role === ROLE.OWNER || obj.role === ROLE.ADMIN;
 };

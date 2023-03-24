@@ -32,8 +32,8 @@ const Settings: FC<Props> = (props) => {
         <Menu.Item className="border-bottom" onClick={() => history?.push('/organizations')}>
           个人设置
         </Menu.Item>
-        {isAdmin(orgName, userState) && (
-          <Menu.Item className="border-bottom" onClick={() => history?.push('/organizations')}>
+        {isAdmin(orgName) && (
+          <Menu.Item className="border-bottom" onClick={() => history?.push('/team')}>
             团队管理
           </Menu.Item>
         )}

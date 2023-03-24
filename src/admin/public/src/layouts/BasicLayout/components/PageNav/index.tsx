@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Link, withRouter, useRouteMatch } from 'ice';
 import { Nav } from '@alicloud/console-components';
 import { getMenuConfig } from '@/constants/navConfig';
+import styled from 'styled-components';
 import { find } from 'lodash';
 
 const { SubNav } = Nav;
@@ -12,7 +13,7 @@ const NavItem = Nav.Item;
 // Ref: https://ice.work/docs/guide/advance/auth#%E5%88%9D%E5%A7%8B%E5%8C%96%E6%9D%83%E9%99%90%E6%95%B0%E6%8D%AE
 const AUTH_CONFIG = {
   admin: true,
-  guest: false,
+  member: false,
 };
 
 export interface IMenuItem {
@@ -105,9 +106,9 @@ const Navigation = (props, context) => {
       hasArrow={false}
       mode={isCollapse ? 'popup' : 'inline'}
       onOpen={(keys) => {
-        // @ts-ignore
         setOpenKeys(keys);
       }}
+      footer={<Footer>footer</Footer>}
     >
       {getNavMenuItems(asideMenuConfig, 0, AUTH_CONFIG)}
     </Nav>
@@ -117,6 +118,15 @@ const Navigation = (props, context) => {
 Navigation.contextTypes = {
   isCollapse: PropTypes.bool,
 };
+
+const Footer = styled.div`
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 0 20px;
+  border-top: 1px solid #e3e9ed;
+  cursor: pointer;
+`;
 
 const PageNav = withRouter(Navigation);
 
