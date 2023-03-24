@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { Link, withRouter, useRouteMatch } from 'ice';
 import { Nav } from '@alicloud/console-components';
 import { getMenuConfig } from '@/constants/navConfig';
-import styled from 'styled-components';
 import { find } from 'lodash';
+import Footer from './components/Footer';
 
 const { SubNav } = Nav;
 const NavItem = Nav.Item;
@@ -108,7 +108,7 @@ const Navigation = (props, context) => {
       onOpen={(keys) => {
         setOpenKeys(keys);
       }}
-      footer={<Footer>footer</Footer>}
+      footer={<Footer />}
     >
       {getNavMenuItems(asideMenuConfig, 0, AUTH_CONFIG)}
     </Nav>
@@ -118,15 +118,6 @@ const Navigation = (props, context) => {
 Navigation.contextTypes = {
   isCollapse: PropTypes.bool,
 };
-
-const Footer = styled.div`
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  padding: 0 20px;
-  border-top: 1px solid #e3e9ed;
-  cursor: pointer;
-`;
 
 const PageNav = withRouter(Navigation);
 

@@ -19,7 +19,7 @@ import EnvList from './components/EnvList';
 import { C_REPOSITORY } from '@/constants/repository';
 import ExternalLink from '@/components/ExternalLink';
 import { Toast } from '@/components/ToastContainer';
-import { sleep, localStorageGet, localStorageSet } from '@/utils';
+import { sleep, getLocalOrgName, localStorageSet } from '@/utils';
 import store from '@/store';
 import Status from '@/components/DeployStatus';
 
@@ -46,7 +46,7 @@ const AppList = ({
    */
   if (isEmpty(userInfo)) return null;
   if (isEmpty(orgName)) {
-    const newOrgName = localStorageGet(userInfo.id);
+    const newOrgName = getLocalOrgName();
     if (newOrgName) {
       return history?.push(`/${newOrgName}/application`);
     }

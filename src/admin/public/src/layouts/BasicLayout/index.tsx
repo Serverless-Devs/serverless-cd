@@ -6,9 +6,8 @@ import Settings from './components/Settings';
 import Org from './components/Org';
 import Add from './components/Add';
 import Home from './components/Home';
-import store from '@/store';
 import { get } from 'lodash';
-import { localStorageGet } from '@/utils';
+import { getLocalOrgName } from '@/utils';
 import { menuConfig } from '@/constants/navConfig';
 import './index.less';
 
@@ -46,9 +45,7 @@ interface IBasicLayoutProps {
   location: object | any;
 }
 export function BasicLayout({ children, match, location: { pathname } }: IBasicLayoutProps) {
-  const [userState] = store.useModel('user');
-  const user_id = get(userState, 'userInfo.id');
-  const orgName = get(match, 'params.orgName', localStorageGet(user_id));
+  const orgName = get(match, 'params.orgName', getLocalOrgName());
 
   const getDevice: IGetDevice = (width) => {
     const isPhone =

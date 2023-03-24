@@ -182,10 +182,20 @@ export const stopPropagation = async (e) => {
   e.preventDefault();
 };
 
-export const isAdmin = (orgName: string) => {
+export const isAdmin = (orgName?: string) => {
   const [userState] = store.useModel('user');
+  if (_.isEmpty(userState)) return false;
+  const id = _.get(userState, 'userInfo.id');
+  let newOrgName = orgName || localStorageGet(id);
   const listOrgs = _.get(userState, 'userInfo.listOrgs.result', []);
-  const obj: any = _.find(listOrgs, (item: any) => item.name === orgName);
+  const obj: any = _.find(listOrgs, (item: any) => item.name === newOrgName);
   if (_.isEmpty(obj)) return false;
   return obj.role === ROLE.OWNER || obj.role === ROLE.ADMIN;
+};
+
+export const getLocalOrgName = () => {
+  const [userState] = store.useModel('user');
+  if (_.isEmpty(userState)) return;
+  const id = _.get(userState, 'userInfo.id');
+  return localStorageGet(id);
 };
