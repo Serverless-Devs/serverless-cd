@@ -10,7 +10,7 @@
     "sqlite-start": "export RUN_TYPE=\"s.local-run.sqlite.yaml\" && node serverless-scripts",
     "mysql-start": "export RUN_TYPE=\"s.local-run.mysql.yaml\" && node serverless-scripts",
     "mongodb-start": "export RUN_TYPE=\"s.local-run.mongodb.yaml\" && node serverless-scripts",
-    "test": "DEBUG=serverless-cd:* jest"
+    "test": "jest __tests__/auth.test.js --watch"
   },
   "jest": {
     "testPathIgnorePatterns": [
@@ -48,6 +48,8 @@
     "@serverless-devs/core": "^0.1.53",
     "jest": "^29.4.3",
     "nodemon": "^2.0.19",
-    "prisma": "^4.10.1"
+    "prisma": "^4.10.1",
+    "set-cookie-parser": "^2.6.0",
+    "supertest": "^6.3.3"
   }
 }
