@@ -20,9 +20,7 @@ const Create = lazy(() => import(/* webpackChunkName: 'Create' */ '@/pages/Creat
 const EnvDetail = lazy(() => import(/* webpackChunkName: 'AppDetail' */ '@/pages/EnvDetail'));
 const TaskDetails = lazy(() => import(/* webpackChunkName: 'TaskDetails' */ '@/pages/TaskDetails'));
 const Auth = lazy(() => import(/* webpackChunkName: 'Auth' */ '@/pages/Auth'));
-const UserSettings = lazy(
-  () => import(/* webpackChunkName: 'UserSettings' */ '@/pages/UserSettings'),
-);
+const OrgSettings = lazy(() => import(/* webpackChunkName: 'OrgSettings' */ '@/pages/OrgSettings'));
 const Members = lazy(() => import(/* webpackChunkName: 'Members' */ '@/pages/Members'));
 const Secrets = lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Secrets'));
 const NoAuth = lazy(() => import(/* webpackChunkName: 'NotAuth' */ '@/pages/NoAuth'));
@@ -91,7 +89,7 @@ const routerConfig: IRouterConfig[] = [
       {
         path: '/',
         exact: true,
-        component: UserSettings,
+        component: OrgSettings,
       },
     ],
   },
