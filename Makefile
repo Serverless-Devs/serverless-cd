@@ -34,3 +34,12 @@ publish: install
 	cd src/admin/public && npm run build
 	cd src/admin && rm -rf ./prisma/dev.db && export DATABASE_URL="file:dev.db" && npx prisma migrate dev --name init --schema=./prisma/sqlite.prisma && rm -rf ./prisma/migrations
 	s cli registry publish
+
+# 测试启动，防止产生线上脏数据
+test-start:
+	cd src/admin && \
+	DATABASE_URL="$(PWD)/src/admin/dev.db" \
+	RUN_TYPE="s.local-run.sqlite.yaml" \
+	node serverless-scripts
+test:
+	cd src/admin && npx jest __tests__/auth.test.js --watch
