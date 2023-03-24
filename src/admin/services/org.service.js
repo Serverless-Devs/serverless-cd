@@ -215,7 +215,7 @@ async function transfer(orgId, orgName, transferUserName) {
 
 function desensitization(data) {
   const filterData = (item) => {
-    item.third_part = _.mapValues(_.get(data, 'third_part', {}), (item = {}) => ({
+    item.third_part = _.mapValues(_.get(item, 'third_part', {}), (item = {}) => ({
       owner: item.owner,
       id: item.id,
       avatar: item.avatar,
@@ -225,6 +225,11 @@ function desensitization(data) {
 
   if (_.isArray(data)) {
     return _.map(data, filterData);
+  } else if (_.isPlainObject(data) && data.totalCount) {
+    return {
+      totalCount: data.totalCount,
+      result: _.map(data.result, filterData),
+    }
   }
   return filterData(data);
 }
