@@ -101,7 +101,7 @@ export function BasicLayout({ children, match }: IBasicLayoutProps) {
               >
                 帮助文档
               </Button>
-              <Settings />
+              <Settings orgName={orgName} />
             </>
           )}
         </Shell.Action>

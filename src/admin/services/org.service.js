@@ -98,7 +98,7 @@ async function invite(orgName, inviteUserName, role = ROLE.MEMBER) {
     throw new ValidationError(`没有找到此用户: ${inviteUserName}`);
   }
   const ownerOrgConfig = await orgModel.getOwnerOrgByName(orgName);
-  if (!_.isEmpty(ownerOrgConfig)) {
+  if (_.isEmpty(ownerOrgConfig)) {
     throw new ValidationError(`没有找到此团队：${orgName}`);
   }
   const inviteOrgId = generateOrgIdByUserIdAndOrgName(userId, orgName);

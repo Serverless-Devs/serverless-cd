@@ -4,11 +4,14 @@ import { logout } from '@/services/auth';
 import { history, useRequest } from 'ice';
 import store from '@/store';
 import { get } from 'lodash';
-import { stopPropagation } from '@/utils';
+import { stopPropagation, isAdmin } from '@/utils';
 
-type Props = {};
+type Props = {
+  orgName: string;
+};
 
 const Settings: FC<Props> = (props) => {
+  const { orgName } = props;
   const { request } = useRequest(logout);
   const [userState, userDispatchers] = store.useModel('user');
   const avatar = get(userState, 'userInfo.avatar');
@@ -29,6 +32,11 @@ const Settings: FC<Props> = (props) => {
         <Menu.Item className="border-bottom" onClick={() => history?.push('/organizations')}>
           个人设置
         </Menu.Item>
+        {isAdmin(orgName, userState) && (
+          <Menu.Item className="border-bottom" onClick={() => history?.push('/organizations')}>
+            团队管理
+          </Menu.Item>
+        )}
         <Menu.Item onClick={onLogout}>退出登录</Menu.Item>
       </Menu>
     );
