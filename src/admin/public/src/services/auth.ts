@@ -28,3 +28,8 @@ export const getAuthGitee = async (body) => {
 export const accountSingupAuth = async (body) => {
   return await request.post('/api/auth/callback/auth', body);
 };
+
+export const updateInfo = async (body) => {
+  const res = await request.post('/api/auth/updata', body);
+  return res.data;
+};

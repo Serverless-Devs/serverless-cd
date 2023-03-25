@@ -64,7 +64,7 @@ async function loginWithPassword({ loginname = '', password = '', github_unionid
 /**
  * 更新用户信息
  */
-async function updateUser({ loginname = '', password = '', github_unionid, gitee_unionid }) {
+async function updateUser({ loginname = '', password = '', new_password , github_unionid, gitee_unionid }) {
   let data, username, email;
   if (loginname.indexOf('@') > -1) {
     email = loginname;
@@ -77,10 +77,12 @@ async function updateUser({ loginname = '', password = '', github_unionid, gitee
     throw new ValidationError(`用户(${loginname})不存在`);
   }
   const isTrue = _.get(data, 'password', '') === md5Encrypt(password);
-  if (!isTrue) {
+  if (!isTrue && !new_password) {
     throw new ValidationError('用户名或密码不正确');
+  } else if (!isTrue && new_password) {
+    throw new ValidationError('当前密码不正确');
   }
-  const Data = await userModel.updateUser({ username, email, password, github_unionid, gitee_unionid });
+  const Data = await userModel.updateUser({ username, email, password, github_unionid, gitee_unionid, new_password });
   return Data;
 }
 

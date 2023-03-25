@@ -64,4 +64,15 @@ router.post('/callback/auth', async function (req, res) {
   return res.json(Result.ofSuccess(data));
 });
 
+/**
+ * 更新数据库
+ */
+
+router.post('/updata', async function (req, res) {
+  const { username: loginname, password, new_password } = req.body;
+  const data = await authServices.updateUser({ loginname, password, new_password });
+  return res.json(Result.ofSuccess(data));
+});
+
+
 module.exports = router;

@@ -65,7 +65,7 @@ module.exports = {
     return result;
   },
   async updateUser(data) {
-    const { username, email, github_unionid, gitee_unionid } = data;
+    const { username, email, github_unionid, gitee_unionid, new_password } = data;
     if (data.third_part) {
       data.third_part = JSON.stringify(data.third_part);
     }
@@ -83,14 +83,15 @@ module.exports = {
        ...mate,
        gitee_unionid,
       }
-   };
+    };
+    const password = new_password ? new_password : data.password;
     const result = await userPrisma.update({
       where: {
         ...mate,
       },
       data: {
         ...params,
-        password: data.password ? md5Encrypt(data.password) : '',
+        password: password ? md5Encrypt(password) : '',
       },
     });
     return result;
