@@ -100,9 +100,9 @@ router.post('/transfer', auth(OWNER_ROLE_KEYS), async (req, res) => {
 router.post('/create', async (req, res) => {
   const {
     userId,
-    body: { name, description },
+    body, // { name: '', secrets?: {}, logo?: '', description?: '', alias?: ''}
   } = req;
-  await orgService.createOrg(userId, name, description);
+  await orgService.createOrg(userId, body);
   res.json(Result.ofSuccess());
 });
 

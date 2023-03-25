@@ -18,7 +18,7 @@
 <body>
   <div id="ice-container"></div>
   <script>
-    var CONFIG = JSON.parse(decodeURI(`<%- encodeURI(JSON.stringify(CONFIG)) %>`));
+    var CONFIG = <%- JSON.stringify(CONFIG) %>
     if (window && !window.global) {
       window.global = window;
     }

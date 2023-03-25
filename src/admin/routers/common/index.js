@@ -1,7 +1,10 @@
 const router = require('express').Router();
 const { Result, Webhook } = require('../../util');
+const auth = require('../../middleware/auth');
+const { MEMBER_ROLE_KEYS } = require('@serverless-cd/config');
 const init = require('../../services/init.service');
 const webhook = require('../../services/webhook.service');
+const { tracker } = require('../../services/tracker.service');
 
 router.get('/init', async function (req, res) {
   const { prisma = 'sqlite' } = req.query;
@@ -27,6 +30,11 @@ router.post(`/${Webhook.ROUTE}`, async function (req, res) {
       message: 'OK',
     }),
   );
+});
+
+router.post('/tracker', auth(MEMBER_ROLE_KEYS), async function (req, res) {
+  await tracker(req.body);
+  return res.json(Result.ofSuccess());
 });
 
 module.exports = router;

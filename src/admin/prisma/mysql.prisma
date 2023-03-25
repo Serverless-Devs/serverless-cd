@@ -29,6 +29,8 @@ model Org {
   name String
   role String
   description String?
+  alias String?
+  logo String?
 }
 
 model Application {
@@ -51,10 +53,10 @@ model Task {
   id String @id
   env_name String
   app_id String
+  trigger_payload  String? @db.Text
   status String?
   steps String?   @db.Text
   dispatch_org_id String?       // 记录谁操作的
-  trigger_payload  String @db.Text
   created_time DateTime  @default(now())
   updated_time DateTime  @updatedAt
 }

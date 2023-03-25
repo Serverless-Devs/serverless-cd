@@ -69,9 +69,9 @@ async function postInit(inputObj) {
   logger.debug('域名处理结束');
 
   logger.debug('数据库连接地址处理');
-  if (prisma === 'mysql') {
+  if (['mysql', 'mongodb'].includes(prisma)) {
     logger.log(
-      '\n\n注意：需要在 .env 文件中配置DATABASE_URL，否则会影响链接数据库\n  示例：mysql://USER:PASSWORD@HOST:PORT/DATABASE',
+      `\n\n注意：需要在 .env 文件中配置DATABASE_URL，否则会影响链接数据库\n  示例：${prisma}://USER:PASSWORD@HOST:PORT/DATABASE`,
       'red',
     );
     _.set(parameters, '_custom_secret_list.DATABASE_URL', ' # 需要填写配置路径');

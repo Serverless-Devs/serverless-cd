@@ -52,8 +52,12 @@ async function updateAppEnvById(id, envName, latestTask) {
   result.environment = _.isString(result.environment)
     ? JSON.parse(result.environment)
     : result.environment;
+  if (latestTask && !latestTask.time) {
+    _.set(latestTask, 'time', new Date(latestTask.time));
+  }
   _.set(result, `environment.[${envName}].latest_task`, latestTask);
   result.environment = JSON.stringify(result.environment);
+  _.unset(result, 'id')
   console.log('result: ', result);
   return applicationPrisma.update({ where: { id }, data: result });
 }

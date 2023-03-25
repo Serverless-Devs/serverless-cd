@@ -73,8 +73,10 @@ async function updateUser({ loginname = '', password = '', github_unionid, gitee
     username = loginname;
     data = await userModel.getUserByName(loginname);
   }
-  
-  const isTrue =  _.get(data, 'password', '') === md5Encrypt(password);
+  if (_.isEmpty(data)) {
+    throw new ValidationError(`用户(${loginname})不存在`);
+  }
+  const isTrue = _.get(data, 'password', '') === md5Encrypt(password);
   if (!isTrue) {
     throw new ValidationError('用户名或密码不正确');
   }

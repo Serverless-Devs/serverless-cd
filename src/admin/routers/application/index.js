@@ -107,6 +107,9 @@ router.post('/update', auth(MEMBER_ROLE_KEYS), async function (req, res) {
  */
 router.post('/removeEnv', auth(MEMBER_ROLE_KEYS), async function (req, res) {
   const { appId, envName } = req.body;
+  if (envName === 'default') {
+    throw new ValidationError('默认环境不允许删除');
+  }
   if (!(appId || envName)) {
     throw new ValidationError(`appId 和 envName 必填。appId: ${appId}, envName: ${envName}`);
   }

@@ -33,6 +33,9 @@ const makeSetTaskData = (data) => {
 };
 
 module.exports = {
+  async create(data) {
+    return await taskPrisma.create({ data: makeSetTaskData(data) });
+  },
   async getTaskById(id) {
     const result = await taskPrisma.findUnique({ where: { id } });
     return getTaskInfo(result);

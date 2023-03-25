@@ -25,6 +25,7 @@ const saveOrg = (data) => {
   if (data.third_part) {
     data.third_part = JSON.stringify(data.third_part);
   }
+  _.unset(data, 'id');
   return data;
 };
 
@@ -40,17 +41,19 @@ module.exports = {
     const result = await orgPrisma.findUnique({ where: { id } });
     return getOrgInfo(result);
   },
-  async createOrg({ userId, name, role, description, secrets }) {
+  async createOrg({ userId, name, role, description, secrets, alias, logo }) {
     const orgId = generateOrgIdByUserIdAndOrgName(userId, name);
     const data = {
       id: orgId,
       user_id: userId,
-      name,
       role: role || ROLE.OWNER,
+      name,
       description,
       secrets,
+      alias,
+      logo,
     };
-    const result = await orgPrisma.create({ data: saveOrg(data) });
+    const result = await orgPrisma.create({ data: { id: orgId, ...saveOrg(data), } });
     return result;
   },
   async updateOrg(id, data) {

@@ -99,8 +99,6 @@ services:
           path: './admin'
         - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
           path: './admin'
-      post-deploy:
-        - component: fc invoke --event '{"path":"/api/common/init?prisma=sqlite"}'
     props:
       region: ${vars.region}
       service: ${vars.service}

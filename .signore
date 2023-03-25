@@ -6,8 +6,7 @@ src/example
 .s
 /s.yaml
 /src/s.dev.yaml
-/src/s.local-run.sqlite.yaml
-/src/s.local-run.mysql.yaml
+/src/s.local-run.*.yaml
 /src/serverless-cd.yaml
 /src/***/prisma/migrations
 /Makefile

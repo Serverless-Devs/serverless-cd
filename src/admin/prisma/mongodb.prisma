@@ -7,22 +7,22 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id    String     @id
+  id    String     @id  @map("_id")
   username String  @unique
-  email String?  @unique
+  email String  @unique
   avatar String?
   password String?
   github_unionid String?
-  gitee_unionid String?
 }
 
 model Org {
-  id    String     @id    // 生成格式变更为：user_id:name
+  // 生成格式为：user_id:name
+  id    String @id @map("_id")
   user_id String
   secrets String?
   name String
@@ -34,7 +34,7 @@ model Org {
 }
 
 model Application {
-  id String @id
+  id String @id @map("_id")
   org_id String
   owner_org_id String
   description String?
@@ -50,7 +50,7 @@ model Application {
 }
 
 model Task {
-  id String @id
+  id String @id @map("_id")
   env_name String
   app_id String
   status String?

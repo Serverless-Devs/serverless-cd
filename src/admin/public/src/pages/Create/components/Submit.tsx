@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Field, Button } from '@alicloud/console-components';
+import { Field, Button, Dialog } from '@alicloud/console-components';
 import { doCreateApp, doManualDeployApp } from '@/services/common';
 import { checkFile, githubPutFile } from '@/services/git';
 import { history } from 'ice';
@@ -16,16 +16,35 @@ interface IProps {
   createType: `${CREATE_TYPE}`;
   createTemplate?: boolean;
   setVisible?: any;
+  createDisabled?: boolean;
 }
 
 const Submit = (props: IProps) => {
-  const { orgName, field, disabled = false, createType, createTemplate, setVisible } = props;
+  const {
+    orgName,
+    field,
+    disabled = false,
+    createType,
+    createTemplate,
+    setVisible,
+    createDisabled,
+  } = props;
   const CD_PIPELINE_YAML = getConsoleConfig('CD_PIPELINE_YAML', 'serverless-pipeline.yaml');
   const [loading, setLoading] = useState(false);
   const { validate } = field;
 
   const submitByTemplate = async () => {
     setVisible(true);
+  };
+
+  const skipValidate = async () => {
+    Dialog.confirm({
+      title: '确定跳过校验吗',
+      content: '若您跳过校验，将不会检测仓库名称是否合法化',
+      onOk: async () => {
+        createTemplate ? submitByTemplate() : await submit();
+      },
+    });
   };
 
   const submit = async () => {
@@ -91,15 +110,28 @@ const Submit = (props: IProps) => {
   };
 
   return (
-    <Button
-      className="mt-32 mr-8"
-      type="primary"
-      onClick={createTemplate ? submitByTemplate : submit}
-      disabled={disabled}
-      loading={loading}
-    >
-      {createTemplate ? '创建并部署' : '创建'}
-    </Button>
+    <div>
+      <Button
+        className="mt-32 mr-8"
+        type="primary"
+        onClick={createTemplate ? submitByTemplate : submit}
+        disabled={disabled || (createTemplate && createDisabled)}
+        loading={loading}
+      >
+        创建
+      </Button>
+      {createTemplate && (
+        <Button
+          className="mt-32 mr-8"
+          type="normal"
+          onClick={skipValidate}
+          disabled={disabled || !(createTemplate && createDisabled)}
+          loading={loading}
+        >
+          跳过校验直接创建
+        </Button>
+      )}
+    </div>
   );
 };
 
