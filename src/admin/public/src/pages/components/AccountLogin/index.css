@@ -1,0 +1,29 @@
+.github-btn {
+  border-color: #24292e !important;
+  background: #24292e !important;
+  color: #fff !important;
+}
+
+.github-btn:hover {
+  background: #555 !important;
+}
+.session-container {
+  background: #fff;
+  max-width: 460px;
+  /* padding: 20px 40px 40px 40px; */
+  /* text-align: center; */
+  margin: 80px auto;
+  border-radius: 5px;
+  box-shadow: -2px 4px 26px 0 rgb(0 0 0 / 10%);
+}
+
+.singup-or-rememberme {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.account-public-content {
+  width: 460px !important;
+  background: #fff;
+}

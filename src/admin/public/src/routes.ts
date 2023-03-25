@@ -62,7 +62,7 @@ const routerConfig: IRouterConfig[] = [
     component: LoginLayout,
     children: [
       {
-        path: '/:provider/callback',
+        path: '/',
         exact: true,
         component: Auth,
       },

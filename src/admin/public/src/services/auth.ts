@@ -20,3 +20,11 @@ export const accountBinding = async (body) => {
 export const getAuthGithub = async (body) => {
   return await request.post('/api/auth/callback/github', body);
 };
+
+export const getAuthGitee = async (body) => {
+  return await request.post('/api/auth/callback/gitee', body);
+};
+
+export const accountSingupAuth = async (body) => {
+  return await request.post('/api/auth/callback/auth', body);
+};

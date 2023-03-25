@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const debug = require('debug')('serverless-cd:auth');
 const _ = require('lodash');
-const { JWT_SECRET, ADMIN_ROLE_KEYS, SESSION_EXPIRATION, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } = require('@serverless-cd/config');
+const { JWT_SECRET, ADMIN_ROLE_KEYS, SESSION_EXPIRATION, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITEE_CLIENT_ID, GITEE_CLIENT_SECRET, GITEE_REDIRECT_URI } = require('@serverless-cd/config');
 const userModel = require('../models/user.mode');
 const orgModel = require('../models/org.mode');
 const { md5Encrypt, ValidationError, checkNameAvailable, NoAuthError } = require('../util');
@@ -10,7 +10,7 @@ const axios = require('axios');
 /**
  * 注册用户
  */
-async function initUser({ username, password, email, github_unionid }) {
+async function initUser({ username, password, email, github_unionid, gitee_unionid }) {
   if (!checkNameAvailable(username)) {
     throw new ValidationError('用户名称不合法，预期格式：/^[a-zA-Z0-9-_]{1,50}$/');
   }
@@ -28,8 +28,8 @@ async function initUser({ username, password, email, github_unionid }) {
     throw new ValidationError('团队名称已存在');
   }
 
-  const { id: userId } = await userModel.createUser({ username, password, email, github_unionid });
-  const { id: orgId } = await orgModel.createOrg({ userId, name: username, github_unionid });
+  const { id: userId } = await userModel.createUser({ username, password, email, github_unionid, gitee_unionid });
+  const { id: orgId } = await orgModel.createOrg({ userId, name: username, github_unionid, gitee_unionid });
 
   return { userId, orgId };
 }
@@ -37,12 +37,14 @@ async function initUser({ username, password, email, github_unionid }) {
 /**
  * 通过密码登陆账户
  */
-async function loginWithPassword({ loginname = '', password = '', github_unionid }) {
+async function loginWithPassword({ loginname = '', password = '', github_unionid, gitee_unionid }) {
   // 通过账户 / 邮箱 登录
   // 通过密码登录
   let data;
-  if (github_unionid) {
+  if (!!github_unionid) {
     data = await userModel.getGithubById(github_unionid);
+  } else if (!!gitee_unionid) {
+    data = await userModel.getGiteeById(gitee_unionid);
   } else {
     if (loginname.indexOf('@') > -1) {
       data = await userModel.getUserByEmail(loginname);
@@ -52,13 +54,33 @@ async function loginWithPassword({ loginname = '', password = '', github_unionid
   }
   
   const isTrue =  _.get(data, 'password', '') === md5Encrypt(password);
-  if (!github_unionid && !isTrue) {
+  if ((!github_unionid && !gitee_unionid) && !isTrue) {
     throw new ValidationError('用户名或密码不正确');
   }
 
   return data;
 }
 
+/**
+ * 更新用户信息
+ */
+async function updateUser({ loginname = '', password = '', github_unionid, gitee_unionid }) {
+  let data, username, email;
+  if (loginname.indexOf('@') > -1) {
+    email = loginname;
+    data = await userModel.getUserByEmail(loginname);
+  } else {
+    username = loginname;
+    data = await userModel.getUserByName(loginname);
+  }
+  
+  const isTrue =  _.get(data, 'password', '') === md5Encrypt(password);
+  if (!isTrue) {
+    throw new ValidationError('用户名或密码不正确');
+  }
+  const Data = await userModel.updateUser({ username, email, password, github_unionid, gitee_unionid });
+  return Data;
+}
 
 /**
  * github授权
@@ -102,6 +124,50 @@ async function loginGithub({ code }) {
     throw err;
   }
 }
+
+
+/**
+ * githee授权
+ */
+
+async function getGiteeUserInfo(access_token) {
+  try {
+    const { data } = await axios(
+      {
+        method: 'get',
+        url: `https://gitee.com/api/v5/user?access_token=${access_token}`,
+        headers: {
+          accept: 'application/json',
+        }
+      }
+    )
+    return data;
+  } catch(err) {
+    throw err;
+  }
+}
+async function loginGitee({ code }) {
+  try {
+    const { data: { access_token } } = await axios(
+      {
+        method: 'post',
+        url: `https://gitee.com/oauth/token?grant_type=authorization_code&code=${code}&client_id=${GITEE_CLIENT_ID}&redirect_uri=${GITEE_REDIRECT_URI}&client_secret=${GITEE_CLIENT_SECRET}`,
+        headers: {
+          accept: 'application/json'
+        }
+      }
+    );
+    const info = await getGiteeUserInfo(access_token);
+    const { id } = info;
+    const data = await userModel.getGiteeById(id);
+    const gitee_unionid = String(_.get(data, 'gitee_unionid', ''));
+    return  { ...info, gitee_unionid };
+  } catch (err) {
+    // TODO: 处理
+    throw err;
+  }
+}
+
 /**
  * 设置 jwt
  */
@@ -139,8 +205,9 @@ async function checkOrganizationRole(orgId, orgRoleKeys = ADMIN_ROLE_KEYS) {
 module.exports = {
   setJwt,
   initUser,
+  updateUser,
   loginWithPassword,
   loginGithub,
+  loginGitee,
   checkOrganizationRole,
-  
 };
