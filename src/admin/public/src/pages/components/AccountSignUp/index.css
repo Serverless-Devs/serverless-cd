@@ -4,3 +4,8 @@
   align-items: center;
   flex-direction: column;
 }
+
+.account-public-content {
+  width: 460px !important;
+  background: #fff;
+}

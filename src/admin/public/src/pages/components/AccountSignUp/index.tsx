@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Auth from '@serverless-cd/auth-ui';
 import { Link, history } from 'ice';
-import { get } from 'lodash';
 import './index.css';
 import store from '@/store';
-import { getConsoleConfig, getParams } from '@/utils';
 
 const AccountSingUp = (props) => {
   const {
@@ -35,7 +33,7 @@ const AccountSingUp = (props) => {
   };
   return (
     <React.Fragment>
-      <Auth title={title} type="REGISTER" onSignUp={btnClick}>
+      <Auth className="account-public-content" title={title} type="REGISTER" onSignUp={btnClick}>
         <div className="already-account-sing-in">
           <Link to={'/login'} style={{ textDecoration: 'underline' }}>
             已经有账户？前往登录

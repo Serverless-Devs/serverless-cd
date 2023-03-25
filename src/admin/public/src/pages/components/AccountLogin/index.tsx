@@ -79,9 +79,6 @@ const AccountLogin = (props) => {
           <Link to="/signUp" style={{ textDecoration: 'underline' }}>
             没有账号？去注册
           </Link>
-          <Link to="/auth" style={{ textDecoration: 'underline' }}>
-            去授权
-          </Link>
         </div>
       </Auth>
     </React.Fragment>
