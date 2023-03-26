@@ -6,7 +6,7 @@ const debug = require('debug')('serverless-cd:middleware');
 
 async function checkJwt(req, _res, next) {
   const token = _.get(req, 'cookies.jwt');
-  const skipCheckJwt = _.includes(EXCLUDE_AUTH_URL, req._parsedUrl.pathname);
+  const skipCheckJwt = _.includes(EXCLUDE_AUTH_URL, req._parsedUrl.pathname); 
   debug(`pathname: ${req._parsedUrl.pathname}, skip check token: ${skipCheckJwt}`);
   if (skipCheckJwt) {
     return next();

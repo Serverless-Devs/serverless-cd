@@ -15,7 +15,6 @@ import { LoginLayout } from '@/layouts/LoginLayout';
 const AppList = lazy(() => import(/* webpackChunkName: 'user-login' */ '@/pages/AppList'));
 const Login = lazy(() => import(/* webpackChunkName: 'Login' */ '@/pages/Login'));
 const Signup = lazy(() => import(/* webpackChunkName: 'Signup' */ '@/pages/Signup'));
-const Rememberme = lazy(() => import(/* webpackChunkName: 'Rmememberme' */ '@/pages/Rememberme'));
 const Create = lazy(() => import(/* webpackChunkName: 'Create' */ '@/pages/Create'));
 const EnvDetail = lazy(() => import(/* webpackChunkName: 'AppDetail' */ '@/pages/EnvDetail'));
 const TaskDetails = lazy(() => import(/* webpackChunkName: 'TaskDetails' */ '@/pages/TaskDetails'));
@@ -42,7 +41,7 @@ const routerConfig: IRouterConfig[] = [
     children: [
       {
         path: '/',
-        exact: true,
+        exact: false,
         component: Login,
       },
     ],
@@ -59,22 +58,11 @@ const routerConfig: IRouterConfig[] = [
     ],
   },
   {
-    path: '/rememberMe',
-    component: LoginLayout,
-    children: [
-      {
-        path: '/',
-        exact: true,
-        component: Rememberme,
-      },
-    ],
-  },
-  {
     path: '/auth',
     component: LoginLayout,
     children: [
       {
-        path: '/:provider/callback',
+        path: '/',
         exact: true,
         component: Auth,
       },

@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import Auth from '@serverless-cd/auth-ui';
-import { Link, history } from 'ice';
+import { useRequest, Link, history } from 'ice';
+import { get } from 'lodash';
 import './index.css';
 import store from '@/store';
+import { accountSignUp } from '@/services/auth';
 
 const AccountSingUp = (props) => {
   const {
     title,
-    request: { loading, data, request },
+    github_unionid,
+    gitee_unionid,
   } = props;
   const [, userDispatchers] = store.useModel('user');
+  const { data, request } = useRequest(accountSignUp);
+
+
 
   useEffect(() => {
     goAppList();
@@ -29,17 +35,11 @@ const AccountSingUp = (props) => {
   };
 
   const btnClick = (values) => {
-    request(values);
+    request({ ...values, github_unionid, gitee_unionid });
   };
   return (
     <React.Fragment>
-      <Auth title={title} type="REGISTER" onSignUp={btnClick}>
-        <div className="already-account-sing-in">
-          <Link to="/login" style={{ textDecoration: 'underline' }}>
-            已经有账户？前往登录
-          </Link>
-        </div>
-      </Auth>
+      <Auth className="account-public-content" title={title} type="REGISTER" onSignUp={btnClick} accountBtnName="注册并绑定" />
     </React.Fragment>
   );
 };

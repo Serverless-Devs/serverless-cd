@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PageLayout from '@/layouts/PageLayout';
 import { Tab } from '@alicloud/console-components';
 import Orgs from './components/Orgs';
+import AccountInfo from './components/AccountInfo'
 import { getParam } from '@/utils';
 
 function Settings() {
@@ -23,6 +24,9 @@ function Settings() {
       <Tab shape="wrapped" activeKey={activeKey} onChange={(val: string) => setActiveKey(val)}>
         <Tab.Item key="orgs" title="团队管理">
           <Orgs />
+        </Tab.Item>
+        <Tab.Item key="userinfo" title="账号信息">
+          <AccountInfo />
         </Tab.Item>
       </Tab>
     </PageLayout>

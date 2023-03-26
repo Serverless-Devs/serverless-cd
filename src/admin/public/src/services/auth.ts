@@ -17,8 +17,19 @@ export const accountBinding = async (body) => {
   return await request.post('/api/auth/callback/bindingAccount', body);
 };
 
-export const getAuthGithub = async (params) => {
-  return await request.get('/api/auth/callback/github', {
-    params,
-  });
+export const getAuthGithub = async (body) => {
+  return await request.post('/api/auth/callback/github', body);
+};
+
+export const getAuthGitee = async (body) => {
+  return await request.post('/api/auth/callback/gitee', body);
+};
+
+export const accountSingupAuth = async (body) => {
+  return await request.post('/api/auth/callback/auth', body);
+};
+
+export const updateInfo = async (body) => {
+  const res = await request.post('/api/auth/updata', body);
+  return res.data;
 };
