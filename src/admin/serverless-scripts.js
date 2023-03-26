@@ -94,6 +94,7 @@ const parseYaml = async (sPath) => {
         filePath = path.resolve(process.cwd(), filePath);
         process.env.DATABASE_URL = `file:${filePath}`;
       }
+      console.log('db file path: ' + process.env.DATABASE_URL);
     }
 
     if (prisma) {
@@ -108,7 +109,7 @@ const parseYaml = async (sPath) => {
   console.debug(`初始化结束`);
 
   if (process.env.RUN_TYPE !== 'deploy') {
-    spawnSync('DEBUG=serverless-cd:* nodemon index.js', {
+    spawnSync(`DEBUG=serverless-cd:* npx nodemon index.js --ignore __tests__`, {
       encoding: 'utf8',
       shell: true,
       stdio: 'inherit',
