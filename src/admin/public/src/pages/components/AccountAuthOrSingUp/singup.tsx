@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Auth from '@serverless-cd/auth-ui';
-import { useRequest, Link, history } from 'ice';
-import { get } from 'lodash';
+import { useRequest, history } from 'ice';
 import './index.css';
 import store from '@/store';
 import { accountSignUp } from '@/services/auth';
@@ -14,8 +13,6 @@ const AccountSingUp = (props) => {
   } = props;
   const [, userDispatchers] = store.useModel('user');
   const { data, request } = useRequest(accountSignUp);
-
-
 
   useEffect(() => {
     goAppList();

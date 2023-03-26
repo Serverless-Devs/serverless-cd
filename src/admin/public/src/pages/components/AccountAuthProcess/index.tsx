@@ -4,7 +4,6 @@ import { C_REPOSITORY } from '@/constants/repository';
 import { upperFirst } from 'lodash';
 
 
-const LOGINTYPE = { github: 'Github', gitee: 'Gitee' };
 const AccountAuthProcess = ({ type }) => {
   return (
     <div style={{ width: '100%', textAlign: 'center', marginBottom: -12 }}>

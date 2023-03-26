@@ -69,25 +69,12 @@ module.exports = {
     if (data.third_part) {
       data.third_part = JSON.stringify(data.third_part);
     }
-    let mate = {}, params = {};
-    if (!!username) mate = { username };
-    if (!!email) mate = {email};
-    if (!!github_unionid) {
-       params = {
-        ...mate,
-        github_unionid,
-       };
-    }
-    if (!!gitee_unionid) {
-      params = {
-       ...mate,
-       gitee_unionid,
-      }
-    };
+    const userIdentify = username ? { username } : { email }
+    const params = github_unionid ? { ...userIdentify, github_unionid } : { ...userIdentify, gitee_unionid }
     const password = new_password ? new_password : data.password;
     const result = await userPrisma.update({
       where: {
-        ...mate,
+        ...userIdentify,
       },
       data: {
         ...params,
