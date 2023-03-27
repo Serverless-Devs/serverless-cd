@@ -1,17 +1,16 @@
 import React, { useEffect } from 'react';
 import Auth from '@serverless-cd/auth-ui';
-import { Link, history } from 'ice';
 import { get } from 'lodash';
 import store from '@/store';
 import { localStorageSet } from '@/utils';
-import './singIn.css';
+import { useRequest, history } from 'ice';
+import './index.css';
+import { accountSignUp } from '@/services/auth';
 
-const SingInupBase = (props) => {
-  const {
-    title,
-    request: { loading, data, request },
-  } = props;
+const AccountSingUp = (props) => {
+  const { title, github_unionid, gitee_unionid } = props;
   const [, userDispatchers] = store.useModel('user');
+  const { data, request } = useRequest(accountSignUp);
 
   useEffect(() => {
     goAppList();
@@ -29,19 +28,19 @@ const SingInupBase = (props) => {
   };
 
   const btnClick = (values) => {
-    request(values);
+    request({ ...values, github_unionid, gitee_unionid });
   };
   return (
     <React.Fragment>
-      <Auth title={title} type="LOGIN" onSingIn={btnClick}>
-        <div className="singup-or-rememberme">
-          <Link to="/signUp" style={{ textDecoration: 'underline' }}>
-            没有账号？去注册
-          </Link>
-        </div>
-      </Auth>
+      <Auth
+        className="account-public-content"
+        title={title}
+        type="REGISTER"
+        onSignUp={btnClick}
+        accountBtnName="注册并绑定"
+      />
     </React.Fragment>
   );
 };
 
-export default SingInupBase;
+export default AccountSingUp;

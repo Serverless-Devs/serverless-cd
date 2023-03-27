@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const { ROLE, TABLE } = require('@serverless-cd/config');
 const { unionId, md5Encrypt, prisma } = require('../util');
+const { param } = require('../routers/auth');
 
 const userPrisma = prisma[TABLE.USER];
 
@@ -32,6 +33,14 @@ module.exports = {
     const userInfo = await userPrisma.findUnique({ where: { email } });
     return getUserInfo(userInfo);
   },
+  async getGithubById(github_unionid) {
+    const userInfo = await userPrisma.findFirst({ where: { github_unionid: `${github_unionid}` } });
+    return getUserInfo(userInfo);
+  },
+  async getGiteeById(gitee_unionid) {
+    const userInfo = await userPrisma.findFirst({ where: { gitee_unionid: `${gitee_unionid}` } });
+    return getUserInfo(userInfo);
+  },
   async updateUserById(id, data) {
     if (data.third_part) {
       data.third_part = JSON.stringify(data.third_part);
@@ -51,6 +60,25 @@ module.exports = {
         id: userId,
         ...data,
         password: data.password ? md5Encrypt(data.password) : '',
+      },
+    });
+    return result;
+  },
+  async updateUser(data) {
+    const { username, email, github_unionid, gitee_unionid, new_password } = data;
+    if (data.third_part) {
+      data.third_part = JSON.stringify(data.third_part);
+    }
+    const userIdentify = username ? { username } : { email }
+    const params = github_unionid ? { ...userIdentify, github_unionid } : { ...userIdentify, gitee_unionid }
+    const password = new_password ? new_password : data.password;
+    const result = await userPrisma.update({
+      where: {
+        ...userIdentify,
+      },
+      data: {
+        ...params,
+        password: password ? md5Encrypt(password) : '',
       },
     });
     return result;

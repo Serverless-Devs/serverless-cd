@@ -29,13 +29,13 @@ const AccountSingUp = (props) => {
   };
 
   const btnClick = (values) => {
-    request(values);
+    request({ ...values });
   };
   return (
     <React.Fragment>
-      <Auth title={title} type="REGISTER" onSignUp={btnClick}>
+      <Auth className="account-public-content" title={title} type="REGISTER" onSignUp={btnClick}>
         <div className="already-account-sing-in">
-          <Link to="/login" style={{ textDecoration: 'underline' }}>
+          <Link to={'/login'} style={{ textDecoration: 'underline' }}>
             已经有账户？前往登录
           </Link>
         </div>

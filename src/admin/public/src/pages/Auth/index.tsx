@@ -1,93 +1,88 @@
-import React, { useEffect, useState } from 'react';
-import { useRequest, history, Link } from 'ice';
-import _, { get, isEmpty } from 'lodash';
-import { Avatar, Icon, Field, Button, Loading } from '@alicloud/console-components';
-import { C_REPOSITORY } from '@/constants/repository';
-import { accountBinding, getAuthGithub } from '@/services/auth';
-import AccountForm from '../components/AccountForm';
+import React, { useState, useEffect } from 'react';
+import { useRequest, Link, history } from 'ice';
+import { get } from 'lodash';
+import { Loading } from '@alicloud/console-components';
+import { LOGIN_LOGO_URL } from '@/constants/public';
+import '@/pages/components/AccountAuthOrSingUp/index.css';
+import AccountAuth from '@/pages/components/AccountAuthOrSingUp';
 import { getParams } from '@/utils';
-import '@/pages/components/LoginorsignupBase/index.css';
+import { accountLogin, getAuthGithub, getAuthGitee } from '@/services/auth';
+import AccountAuthProcess from '../components/AccountAuthProcess';
+import store from '@/store';
 
-const Login = ({ location: { search } }) => {
-  const [bindingStatus, setBindingStatus] = useState(false);
-  const [githubInfo, getGithubInfo] = useState({});
-  const { request, data, loading } = useRequest(accountBinding);
+const LOGINTYPE = { GITHUB: 'github', GITEE: 'gitee' };
+const Auth = ({ location: { search } }) => {
+  const [isAuth, setAuth] = useState<string>('');
+ 
+  const [, userDispatchers] = store.useModel('user');
+  const { data, request } = useRequest(accountLogin);
   const GetAuthGithub = useRequest(getAuthGithub);
-  const field = Field.useField();
-  const { init, getValue, validate, getError } = field;
+  const GetAuthGitee = useRequest(getAuthGitee);
   const code = get(getParams(search), 'code', '');
+  const type = get(getParams(search), 'type', '');
 
   useEffect(() => {
-    GetAuthGithub.request({ code });
+    !!code && type === LOGINTYPE['GITHUB'] && githubLoginOrSingup();
+    !!code && type === LOGINTYPE['GITEE'] && giteeLoginOrSingup();
+  }, [code, type]);
+
+  useEffect(() => {
+    return () => {
+      setAuth('');
+    }
   }, []);
 
-  useEffect(() => {
-    if (data && data.success) {
-      history?.push('/');
-    }
-  }, [data]);
+  const title = <AccountAuthProcess type={type} />
 
-  useEffect(() => {
-    const info = get(GetAuthGithub.data, 'data', {});
-    if (!isEmpty(info)) {
-      getGithubInfo(info);
-    }
-  }, [GetAuthGithub.data]);
+    useEffect(() => {
+      goAppList();
+    }, [JSON.stringify(data)]);
 
-  const btnClick = () => {
-    validate((errors, values) => {
-      if (!errors) {
-        request({
-          status: bindingStatus ? 'signIn' : 'login',
-          ...values,
-          providerInfo: githubInfo,
-        });
-      }
-    });
+    const goAppList = async () => {
+      if (!data) return;
+        const {
+          success,
+          data: { username },
+        } = data;
+      if (success) {
+        await userDispatchers.getUserInfo();
+        history?.push(`/${username}/application`);
+        return;
+    }
+    };
+
+  const githubLoginOrSingup = async() => {
+    const { data: { github_unionid, id } }= await GetAuthGithub.request({ code });
+    setAuth(github_unionid);
+    if (!github_unionid) {
+      history?.push(`/auth?type=${type}&github_unionid=${id}`);
+    } else {
+      request({ github_unionid: String(id) });
+    }
   };
 
+  const giteeLoginOrSingup = async() => {
+    const { data: { gitee_unionid, id } } = await GetAuthGitee.request({ code });
+    setAuth(gitee_unionid);
+    if (!gitee_unionid) {
+      history?.push(`/auth?type=${type}&gitee_unionid=${id}`);
+    } else {
+      request({ gitee_unionid: String(id) });
+    }
+  };
   return (
-    <>
-      {GetAuthGithub.loading ? (
-        <Loading tip="授权中..." fullScreen tipAlign="bottom" />
-      ) : (
-        <div className="session-container" style={{ maxWidth: 500 }}>
-          <h1>继续以完成第三方帐号绑定</h1>
-          <div className="flex-r" style={{ justifyContent: 'center' }}>
-            <Avatar
-              src={
-                'https://img.alicdn.com/imgextra/i3/O1CN01y2i5Eg1bcB4XM17SG_!!6000000003485-2-tps-320-320.png'
-              }
-            />
-            <Icon type="switch" style={{ margin: '0 20px' }} />
-            {C_REPOSITORY['github']?.svg(36)}
-          </div>
-          <p style={{ margin: '20px 0' }}>您已通过 GitHub 授权，完善以下登录信息即可完成绑定</p>
-          <AccountForm init={init} getError={getError} />
-          <Button
-            className="base-login-button"
-            type="primary"
-            style={{ margin: '20px auto', width: 320 }}
-            loading={loading}
-            disabled={!(getValue('username') && getValue('password'))}
-            onClick={btnClick}
-          >
-            {loading ? '绑定中' : bindingStatus ? '注册并绑定' : '登录并绑定已有账号'}
-          </Button>
-          <a
-            className="cursor-pointer"
-            style={{ textDecoration: 'underline' }}
-            onClick={() => setBindingStatus(!bindingStatus)}
-          >
-            {bindingStatus ? '已有帐号？ 点此绑定' : '没有帐号？ 注册一个'}
-          </a>
-          <Link to={'/login'} className="mt-10" style={{ display: 'block' }}>
-            更多登录方式
-          </Link>
-        </div>
-      )}
-    </>
+    <div className="session-container">
+      {
+        GetAuthGithub.loading || GetAuthGitee.loading ? (
+            <Loading tip="授权中..." fullScreen tipAlign="bottom" />
+          ) : (
+            <div>
+                {isAuth ? <></> : <AccountAuth title={title} search={search}  />}
+            </div>
+          )
+      }
+    </div>
   );
 };
 
-export default Login;
+export default Auth;
