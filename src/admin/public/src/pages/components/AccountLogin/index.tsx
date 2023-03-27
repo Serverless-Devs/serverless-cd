@@ -69,8 +69,8 @@ const AccountLogin = (props) => {
   };
 
   const loginThirdPartyUrl = {
-    githubUrl: !!github && getConsoleConfig('GITHUB_REDIRECT_URI', ''),
-    giteeUrl: !!gitee && getConsoleConfig('GITEE_REDIRECT_URI', ''),
+    githubUrl: github && getConsoleConfig('GITHUB_REDIRECT_URI', ''),
+    giteeUrl: gitee && getConsoleConfig('GITEE_REDIRECT_URI', ''),
   }
   return (
     <React.Fragment>

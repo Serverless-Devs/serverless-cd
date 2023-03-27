@@ -12,7 +12,7 @@ const appConfig: IAppConfig = {
   app: {
     rootId: 'ice-container',
     getInitialData: async () => {
-      const user = !code && await userInfo();
+      const user = !code ? await userInfo() : {} ;
       return {
         initialStates: {
           user: {
