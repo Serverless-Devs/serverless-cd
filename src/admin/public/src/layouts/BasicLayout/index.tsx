@@ -73,7 +73,13 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
 
   return (
     <ConfigProvider device={device}>
-      <Shell type="light" fixedHeader={false}>
+      <Shell
+        style={{
+          minHeight: '100vh',
+        }}
+        type="light"
+        fixedHeader={false}
+      >
         <Shell.Branding>
           <Home />
           <Org orgName={orgName} />

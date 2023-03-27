@@ -3,8 +3,9 @@ import { Dropdown, Menu, Avatar } from '@alicloud/console-components';
 import { logout } from '@/services/auth';
 import { history, useRequest } from 'ice';
 import store from '@/store';
-import { get } from 'lodash';
+import { get, unset } from 'lodash';
 import { stopPropagation, isAdmin } from '@/utils';
+import { ORG_NAME } from '@/constants';
 
 type Props = {
   orgName: string;
@@ -20,6 +21,7 @@ const Settings: FC<Props> = (props) => {
   const menu = () => {
     const onLogout = () => {
       request();
+      unset(window, ORG_NAME);
       userDispatchers.removeStateInfo();
       history?.push('/login');
     };

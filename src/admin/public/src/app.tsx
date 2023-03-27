@@ -2,9 +2,8 @@ import { runApp, IAppConfig, history } from 'ice';
 import React from 'react';
 import { Toast } from './components/ToastContainer';
 import { userInfo } from '@/services/user';
-import { getOrgName } from '@/utils';
-import { startsWith, get } from 'lodash';
-import { CODE } from '@/constants';
+import { get } from 'lodash';
+import { CODE, ORG_NAME } from '@/constants';
 
 const appConfig: IAppConfig = {
   app: {
@@ -26,8 +25,7 @@ const appConfig: IAppConfig = {
         onConfig: (config) => {
           // 发送请求前：可以对 RequestConfig 做一些统一处理
           if (config.url === '/api/user/info') return config;
-          if (startsWith(config.url, '/api/auth')) return config;
-          const orgName = getOrgName();
+          const orgName = get(window, ORG_NAME);
           if (orgName) {
             config.params = { ...config.params, orgName };
           }

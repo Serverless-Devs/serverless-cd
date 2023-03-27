@@ -1,13 +1,17 @@
 import React, { FC } from 'react';
-import { history } from 'ice';
+import { history, useParams } from 'ice';
 import { Balloon } from '@alicloud/console-components';
 import Icon from '@/components/Icon';
+import { ORG_NAME } from '@/constants';
+import { set } from 'lodash';
 
 const { Tooltip } = Balloon;
 
 type Props = {};
 
 const Home: FC<Props> = (props) => {
+  const { orgName } = useParams() as any;
+  set(window, ORG_NAME, orgName);
   return (
     <Tooltip
       trigger={
