@@ -7,7 +7,7 @@ import Org from './components/Org';
 import Add from './components/Add';
 import Home from './components/Home';
 import { get } from 'lodash';
-import { getLocalOrgName } from '@/utils';
+import { getOrgName } from '@/utils';
 import { menuConfig } from '@/constants/navConfig';
 import './index.less';
 
@@ -45,7 +45,7 @@ interface IBasicLayoutProps {
   location: object | any;
 }
 export function BasicLayout({ children, match, location: { pathname } }: IBasicLayoutProps) {
-  const orgName = get(match, 'params.orgName', getLocalOrgName());
+  const orgName = get(match, 'params.orgName', getOrgName());
 
   const getDevice: IGetDevice = (width) => {
     const isPhone =

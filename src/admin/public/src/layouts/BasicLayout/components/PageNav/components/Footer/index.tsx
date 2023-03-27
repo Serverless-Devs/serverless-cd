@@ -1,13 +1,13 @@
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { isAdmin, getLocalOrgName } from '@/utils';
+import { isAdmin, getOrgName } from '@/utils';
 import { Button } from '@alifd/next';
 
 type Props = {};
 
 const Footer: FC<Props> = (props) => {
   if (!isAdmin()) return null;
-  const orgName = getLocalOrgName();
+  const orgName = getOrgName();
 
   return (
     <Container>

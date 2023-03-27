@@ -185,7 +185,7 @@ export const isAdmin = (orgName?: string) => {
   return obj.role === ROLE.OWNER || obj.role === ROLE.ADMIN;
 };
 
-export const getLocalOrgName = () => {
+export const getOrgName = () => {
   const [userState] = store.useModel('user');
   if (_.isEmpty(userState)) return;
   const id = _.get(userState, 'userInfo.id');
