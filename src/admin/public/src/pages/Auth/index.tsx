@@ -22,8 +22,8 @@ const Auth = ({ location: { search } }) => {
   const type = get(getParams(search), 'type', '');
 
   useEffect(() => {
-    githubLoginOrSingup();
-    giteeLoginOrSingup();
+    !!code && type === LOGINTYPE['GITHUB'] && githubLoginOrSingup();
+    !!code && type === LOGINTYPE['GITEE'] && giteeLoginOrSingup();
   }, [code, type]);
 
   useEffect(() => {
@@ -52,7 +52,6 @@ const Auth = ({ location: { search } }) => {
     };
 
   const githubLoginOrSingup = async() => {
-    if (!code && type !== LOGINTYPE['GITHUB']) return;
     const { data: { github_unionid, id } }= await GetAuthGithub.request({ code });
     setAuth(github_unionid);
     if (!github_unionid) {
@@ -63,7 +62,6 @@ const Auth = ({ location: { search } }) => {
   };
 
   const giteeLoginOrSingup = async() => {
-    if (!code && type !== LOGINTYPE['GITEE']) return;
     const { data: { gitee_unionid, id } } = await GetAuthGitee.request({ code });
     setAuth(gitee_unionid);
     if (!gitee_unionid) {

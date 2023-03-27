@@ -33,7 +33,7 @@ const AccountSingUp = (props) => {
   };
   return (
     <React.Fragment>
-      <Auth className="account-public-content" title={title} type="REGISTER" onSignUp={btnClick}>
+      <Auth className="account-public-content" title={title} type="REGISTER" onSignUp={btnClick} loading={loading}>
         <div className="already-account-sing-in">
           <Link to={'/login'} style={{ textDecoration: 'underline' }}>
             已经有账户？前往登录
