@@ -26,6 +26,7 @@ export default {
       dispatch.user.update({
         userInfo: result,
       });
+      return result;
     },
     async getUserRepos() {
       const { data = [] } = await githubRepos();

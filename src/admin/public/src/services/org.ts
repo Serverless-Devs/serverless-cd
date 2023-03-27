@@ -9,6 +9,10 @@ export const createOrg = async (body) => {
   return await request.post('/api/org/create', body);
 };
 
+export const updateOrg = async (body) => {
+  return await request.post('/api/org/update', body);
+};
+
 export const inviteUser = async (body) => {
   return await request.post('/api/org/invite', body);
 };

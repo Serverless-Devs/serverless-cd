@@ -17,7 +17,7 @@ const Footer: FC<Props> = (props) => {
       <Button text component="a" href={`${orgName}/setting/secrets`}>
         密钥配置
       </Button>
-      <Button text component="a" href={`${orgName}/setting/members`}>
+      <Button text component="a" href={`/organizations/create?type=edit&orgName=${orgName}`}>
         团队设置
       </Button>
     </Container>
