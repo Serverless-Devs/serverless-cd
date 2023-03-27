@@ -6,9 +6,9 @@ import Settings from './components/Settings';
 import Org from './components/Org';
 import Add from './components/Add';
 import Home from './components/Home';
-import { get } from 'lodash';
+import { get, values, includes } from 'lodash';
 import { getOrgName } from '@/utils';
-import { menuConfig } from '@/constants/navConfig';
+import { getMenuPath } from '@/constants/navConfig';
 import './index.less';
 
 (function () {
@@ -44,7 +44,8 @@ interface IBasicLayoutProps {
   match: object | any;
   location: object | any;
 }
-export function BasicLayout({ children, match, location: { pathname } }: IBasicLayoutProps) {
+export function BasicLayout({ children, match, location }: IBasicLayoutProps) {
+  const { pathname } = location;
   const orgName = get(match, 'params.orgName', getOrgName());
 
   const getDevice: IGetDevice = (width) => {
@@ -62,7 +63,7 @@ export function BasicLayout({ children, match, location: { pathname } }: IBasicL
   const [device, setDevice] = useState(getDevice(NaN));
   const [isCollapse, setIsCollapse] = useState<any>(false);
 
-  const showMenu = menuConfig.includes(pathname);
+  const showMenu = includes(values(getMenuPath({ orgName })), pathname);
 
   if (typeof window !== 'undefined') {
     window.addEventListener('optimizedResize', (e) => {

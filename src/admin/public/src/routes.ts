@@ -25,6 +25,7 @@ const Secrets = lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Sec
 const NoAuth = lazy(() => import(/* webpackChunkName: 'NotAuth' */ '@/pages/NoAuth'));
 const Team = lazy(() => import(/* webpackChunkName: 'Team' */ '@/pages/Team'));
 const CreateOrg = lazy(() => import(/* webpackChunkName: 'CreateOrg' */ '@/pages/CreateOrg'));
+const UpdateOrg = lazy(() => import(/* webpackChunkName: 'CreateOrg' */ '@/pages/UpdateOrg'));
 
 const routerConfig: IRouterConfig[] = [
   {
@@ -137,6 +138,11 @@ const routerConfig: IRouterConfig[] = [
         path: '/setting/secrets',
         exact: true,
         component: Secrets,
+      },
+      {
+        path: '/setting/org',
+        exact: true,
+        component: UpdateOrg,
       },
       {
         path: '/',

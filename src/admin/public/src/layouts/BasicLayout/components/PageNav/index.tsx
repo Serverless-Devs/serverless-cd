@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { Link, withRouter, useRouteMatch } from 'ice';
 import { Nav } from '@alicloud/console-components';
 import { getMenuConfig } from '@/constants/navConfig';
-import { find } from 'lodash';
-import Footer from './components/Footer';
+import { getOrgName } from '@/utils';
+import { find, get } from 'lodash';
 
 const { SubNav } = Nav;
 const NavItem = Nav.Item;
@@ -69,14 +69,12 @@ function getSubMenuOrItem(item: IMenuItem, index?: number | string, auth?: any) 
 
 const Navigation = (props, context) => {
   const [openKeys, setOpenKeys] = useState<string[]>([]);
-  const {
-    params: { appId },
-    path,
-  }: any = useRouteMatch();
-  const asideMenuConfig: any = getMenuConfig(appId)[path];
+  const { params }: any = useRouteMatch();
   const { location } = props;
   const { pathname } = location;
   const { isCollapse } = context;
+  const orgName = get(params, 'params.orgName', getOrgName());
+  const asideMenuConfig: any = getMenuConfig({ orgName })[pathname];
 
   useEffect(() => {
     const curSubNav = find(asideMenuConfig, (menuConfig) => {
@@ -108,7 +106,6 @@ const Navigation = (props, context) => {
       onOpen={(keys) => {
         setOpenKeys(keys);
       }}
-      footer={<Footer />}
     >
       {getNavMenuItems(asideMenuConfig, 0, AUTH_CONFIG)}
     </Nav>
