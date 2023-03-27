@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { history } from 'ice';
-import { Icon, Balloon } from '@alicloud/console-components';
+import { Balloon } from '@alicloud/console-components';
+import Icon from '@/components/Icon';
 
 const { Tooltip } = Balloon;
 

@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
-import { Dropdown, Menu, Icon } from '@alicloud/console-components';
+import { Dropdown, Menu } from '@alicloud/console-components';
 import { history } from 'ice';
+import Icon from '@/components/Icon';
 
 type Props = {
   orgName: string;
@@ -29,7 +30,7 @@ const Add: FC<Props> = (props) => {
     <Dropdown
       trigger={
         <div className="layout-center mr-16 cursor-pointer">
-          <Icon type="plus-circle-fill" style={{ color: '#0070cc' }} />
+          <Icon type="add" />
         </div>
       }
       offset={[0, 0]}
