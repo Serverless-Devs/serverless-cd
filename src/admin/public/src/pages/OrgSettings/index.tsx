@@ -72,7 +72,7 @@ function Orgs() {
       title: '操作',
       cell: (value, _index, record) => (
         <Actions>
-          <LinkButton type="primary" onClick={() => handleChangeOrg(record.name)}>
+          <LinkButton type="primary" onClick={() => handleChangeOrg(record)}>
             切换
           </LinkButton>
           <TransferOrg callback={refresh} dataSource={{ name: record.name }}>
