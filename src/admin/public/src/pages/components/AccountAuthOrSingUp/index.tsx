@@ -5,7 +5,7 @@ import { get, map } from 'lodash';
 import store from '@/store';
 import './index.css';
 import { getParams } from '@/utils';
-import { accountLogin, accountSingupAuth } from '@/services/auth';
+import { accountLogin } from '@/services/auth';
 import Auth from './auth';
 import SingUp from './singup';
 
@@ -14,8 +14,7 @@ const AccountAuth = (props) => {
   const { title, search } = props;
   const [, userDispatchers] = store.useModel('user');
 
-  const { data, request } = useRequest(accountLogin);
-  const AccountSingupAuth = useRequest(accountSingupAuth);
+  const { data } = useRequest(accountLogin);
   const github_unionid = get(getParams(search), 'github_unionid', '');
   const gitee_unionid = get(getParams(search), 'gitee_unionid', '');
 
@@ -34,13 +33,6 @@ const AccountAuth = (props) => {
       history?.push(`/${username}/application`);
       return;
     }
-  };
-
-  const btnClick = async(values) => {
-    const params = { ...values, github_unionid, gitee_unionid };
-    const { success, data } = await AccountSingupAuth.request(params);
-    if (!data) return;
-    success && request(params);
   };
 
   const Tabs = [

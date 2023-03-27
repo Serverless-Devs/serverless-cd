@@ -6,13 +6,11 @@ import { getOrgName, getParams } from '@/utils';
 import { startsWith, get } from 'lodash';
 import { CODE } from '@/constants';
 
-const { search } = window.location;
-const code = get(getParams(search), 'code', '');
 const appConfig: IAppConfig = {
   app: {
     rootId: 'ice-container',
-    getInitialData: async () => {
-      const user = !code && await userInfo();
+    getInitialData: async (ctx) => {
+      const user = get(ctx, 'pathname', '') === '/auth' ? {} : await userInfo();
       return {
         initialStates: {
           user: {

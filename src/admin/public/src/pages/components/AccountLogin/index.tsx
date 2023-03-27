@@ -24,8 +24,8 @@ const AccountLogin = (props) => {
   const type = get(getParams(search), 'type', '');
 
   useEffect(() => {
-    !!code && type === LOGINTYPE['GITHUB'] && githubLoginOrSingup();
-    !!code && type === LOGINTYPE['GITEE'] && giteeLoginOrSingup();
+    githubLoginOrSingup();
+    giteeLoginOrSingup();
   }, [code, type]);
 
 
@@ -51,6 +51,7 @@ const AccountLogin = (props) => {
   };
 
   const githubLoginOrSingup = async() => {
+    if (!code && type !== LOGINTYPE['GITHUB']) return;
     const { data: { github_unionid, id } }= await GetAuthGithub.request({ code });
     if (!github_unionid) {
       history?.push(`/signUp?github_unionid=${id}`);
@@ -60,6 +61,7 @@ const AccountLogin = (props) => {
   };
 
   const giteeLoginOrSingup = async() => {
+    if (!code && type !== LOGINTYPE['GITEE']) return;
     const { data: { gitee_unionid, id } } = await GetAuthGitee.request({ code });
     if (!gitee_unionid) {
       history?.push(`/signUp?gitee_unionid=${id}`);
@@ -69,8 +71,8 @@ const AccountLogin = (props) => {
   };
 
   const loginThirdPartyUrl = {
-    githubUrl: !!github && getConsoleConfig('GITHUB_REDIRECT_URI', ''),
-    giteeUrl: !!gitee && getConsoleConfig('GITEE_REDIRECT_URI', ''),
+    githubUrl: github && getConsoleConfig('GITHUB_REDIRECT_URI', ''),
+    giteeUrl: gitee && getConsoleConfig('GITEE_REDIRECT_URI', ''),
   }
   return (
     <React.Fragment>

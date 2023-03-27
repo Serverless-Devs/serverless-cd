@@ -41,20 +41,19 @@ async function loginWithPassword({ loginname = '', password = '', github_unionid
   // 通过账户 / 邮箱 登录
   // 通过密码登录
   let data;
-  if (!!github_unionid) {
+  if (github_unionid) {
     data = await userModel.getGithubById(github_unionid);
-  } else if (!!gitee_unionid) {
+  } else if (gitee_unionid) {
     data = await userModel.getGiteeById(gitee_unionid);
+  } else if (loginname.indexOf('@') > -1) {
+    data = await userModel.getUserByEmail(loginname);
   } else {
-    if (loginname.indexOf('@') > -1) {
-      data = await userModel.getUserByEmail(loginname);
-    } else {
-      data = await userModel.getUserByName(loginname);
-    }
+    data = await userModel.getUserByName(loginname);
   }
   
-  const isTrue =  _.get(data, 'password', '') === md5Encrypt(password);
-  if ((!github_unionid && !gitee_unionid) && !isTrue) {
+  const isPasswordMatch =  _.get(data, 'password', '') === md5Encrypt(password);
+  const isThirdParty = !github_unionid && !gitee_unionid;
+  if (isThirdParty && !isPasswordMatch) {
     throw new ValidationError('用户名或密码不正确');
   }
 
@@ -76,10 +75,10 @@ async function updateUser({ loginname = '', password = '', new_password , github
   if (_.isEmpty(data)) {
     throw new ValidationError(`用户(${loginname})不存在`);
   }
-  const isTrue = _.get(data, 'password', '') === md5Encrypt(password);
-  if (!isTrue && !new_password) {
+  const isPasswordMatch = _.get(data, 'password', '') === md5Encrypt(password);
+  if (!isPasswordMatch && !new_password) {
     throw new ValidationError('用户名或密码不正确');
-  } else if (!isTrue && new_password) {
+  } else if (!isPasswordMatch && new_password) {
     throw new ValidationError('当前密码不正确');
   }
   const Data = await userModel.updateUser({ username, email, password, github_unionid, gitee_unionid, new_password });
@@ -91,42 +90,33 @@ async function updateUser({ loginname = '', password = '', new_password , github
  */
 
 async function getGithubUserInfo(access_token) {
-  try {
-    const { data } = await axios(
-      {
-        method: 'get',
-        url: 'https://api.github.com/user',
-        headers: {
-          accept: 'application/json',
-          Authorization: `token ${access_token}`
-        }
+  const { data } = await axios(
+    {
+      method: 'get',
+      url: 'https://api.github.com/user',
+      headers: {
+        accept: 'application/json',
+        Authorization: `token ${access_token}`
       }
-    )
-    return data;
-  } catch(err) {
-    throw err;
-  }
+    }
+  )
+  return data;
 }
 async function loginGithub({ code }) {
-  try {
-    const { data: { access_token } } = await axios(
-      {
-        method: 'post',
-        url: `https://github.com/login/oauth/access_token?client_id=${GITHUB_CLIENT_ID}&client_secret=${GITHUB_CLIENT_SECRET}&code=${code}`,
-        headers: {
-          accept: 'application/json'
-        }
+  const { data: { access_token } } = await axios(
+    {
+      method: 'post',
+      url: `https://github.com/login/oauth/access_token?client_id=${GITHUB_CLIENT_ID}&client_secret=${GITHUB_CLIENT_SECRET}&code=${code}`,
+      headers: {
+        accept: 'application/json'
       }
-    );
-    const info = await getGithubUserInfo(access_token);
-    const { id } = info;
-    const data = await userModel.getGithubById(id);
-    const github_unionid = String(_.get(data, 'github_unionid', ''));
-    return  { ...info, github_unionid };
-  } catch (err) {
-    // TODO: 处理
-    throw err;
-  }
+    }
+  );
+  const githubUserInfo = await getGithubUserInfo(access_token);
+  const { id } = githubUserInfo;
+  const data = await userModel.getGithubById(id);
+  const github_unionid = String(_.get(data, 'github_unionid', ''));
+  return  { ...githubUserInfo, github_unionid };
 }
 
 
@@ -135,41 +125,32 @@ async function loginGithub({ code }) {
  */
 
 async function getGiteeUserInfo(access_token) {
-  try {
-    const { data } = await axios(
-      {
-        method: 'get',
-        url: `https://gitee.com/api/v5/user?access_token=${access_token}`,
-        headers: {
-          accept: 'application/json',
-        }
+  const { data } = await axios(
+    {
+      method: 'get',
+      url: `https://gitee.com/api/v5/user?access_token=${access_token}`,
+      headers: {
+        accept: 'application/json',
       }
-    )
-    return data;
-  } catch(err) {
-    throw err;
-  }
+    }
+  )
+  return data;
 }
 async function loginGitee({ code }) {
-  try {
-    const { data: { access_token } } = await axios(
-      {
-        method: 'post',
-        url: `https://gitee.com/oauth/token?grant_type=authorization_code&code=${code}&client_id=${GITEE_CLIENT_ID}&redirect_uri=${GITEE_REDIRECT_URI}&client_secret=${GITEE_CLIENT_SECRET}`,
-        headers: {
-          accept: 'application/json'
-        }
+  const { data: { access_token } } = await axios(
+    {
+      method: 'post',
+      url: `https://gitee.com/oauth/token?grant_type=authorization_code&code=${code}&client_id=${GITEE_CLIENT_ID}&redirect_uri=${GITEE_REDIRECT_URI}&client_secret=${GITEE_CLIENT_SECRET}`,
+      headers: {
+        accept: 'application/json'
       }
-    );
-    const info = await getGiteeUserInfo(access_token);
-    const { id } = info;
-    const data = await userModel.getGiteeById(id);
-    const gitee_unionid = String(_.get(data, 'gitee_unionid', ''));
-    return  { ...info, gitee_unionid };
-  } catch (err) {
-    // TODO: 处理
-    throw err;
-  }
+    }
+  );
+  const giteeUserInfo = await getGiteeUserInfo(access_token);
+  const { id } = giteeUserInfo;
+  const data = await userModel.getGiteeById(id);
+  const gitee_unionid = String(_.get(data, 'gitee_unionid', ''));
+  return  { ...giteeUserInfo, gitee_unionid };
 }
 
 /**
