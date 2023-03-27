@@ -27,7 +27,7 @@ const Settings: FC<Props> = (props) => {
     };
 
     return (
-      <Menu>
+      <Menu className="top-bar-menu__wrapper">
         <Menu.Item className="border-bottom">
           <span onClick={stopPropagation}>{username}</span>
         </Menu.Item>
@@ -55,6 +55,7 @@ const Settings: FC<Props> = (props) => {
         </div>
       }
       offset={[0, 0]}
+      align="tr br"
     >
       {menu()}
     </Dropdown>

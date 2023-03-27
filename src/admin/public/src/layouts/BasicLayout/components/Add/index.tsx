@@ -15,7 +15,7 @@ const Add: FC<Props> = (props) => {
     };
 
     return (
-      <Menu onItemClick={onItemClick}>
+      <Menu onItemClick={onItemClick} className="top-bar-menu__wrapper">
         <Menu.Item key={`/${orgName}/create`} className="border-bottom">
           新建应用
         </Menu.Item>
@@ -33,6 +33,7 @@ const Add: FC<Props> = (props) => {
           <Icon type="add" />
         </div>
       }
+      align="tr br"
       offset={[0, 0]}
     >
       {menu()}
