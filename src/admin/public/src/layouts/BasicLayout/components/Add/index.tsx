@@ -18,12 +18,10 @@ const Add: FC<Props> = (props) => {
         <Menu.Item key={`/${orgName}/create`} className="border-bottom">
           新建应用
         </Menu.Item>
-        <Menu.Item key={`/organizations?showSlide=true&activeTab=orgs`} className="border-bottom">
+        <Menu.Item key={`/organizations/create`} className="border-bottom">
           新建团队
         </Menu.Item>
-        <Menu.Item key={`/${orgName}/settings?showSlide=true&activeTab=members`}>
-          添加成员
-        </Menu.Item>
+        <Menu.Item key={`/${orgName}/setting/members?showSlide=true`}>添加成员</Menu.Item>
       </Menu>
     );
   };

@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useRequest, history } from 'ice';
 import { Button, Icon, Table, Dialog } from '@alicloud/console-components';
 import Actions, { LinkButton } from '@alicloud/console-components-actions';
-import CreateOrg from './components/CreateOrg';
 import TransferOrg from './components/TransferOrg';
 import { listOrgs } from '@/services/user';
 import { removeOrg } from '@/services/org';
@@ -54,6 +53,12 @@ function Orgs() {
       ),
     },
     {
+      title: '团队别名',
+      key: 'alias',
+      dataIndex: 'alias',
+      cell: (value, _index, record) => value || record.name,
+    },
+    {
       title: '角色',
       key: 'role',
       dataIndex: 'role',
@@ -90,9 +95,9 @@ function Orgs() {
   return (
     <div className="mt-16">
       <div className="flex-r mb-16">
-        <CreateOrg callback={refresh}>
-          <Button type="primary">新建团队</Button>
-        </CreateOrg>
+        <Button type="primary" onClick={() => history?.push('/organizations/create')}>
+          新建团队
+        </Button>
         <Button onClick={refresh}>
           <Icon type="refresh" />
         </Button>
