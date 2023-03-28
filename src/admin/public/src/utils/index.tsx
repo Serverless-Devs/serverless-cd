@@ -1,15 +1,9 @@
 import _ from 'lodash';
-import { history } from 'ice';
+import store from '@/store';
+import { ROLE } from '@/constants';
 
 import moment from 'moment';
 const DATE_TIME_REG = /^\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d(?:\.\d+)?Z?/;
-
-export const getOrgName = () => {
-  const pathname = _.get(history, 'location.pathname');
-  if (pathname === '/organizations') return;
-  const [, orgName] = _.split(pathname, '/');
-  return orgName;
-};
 
 export const formatTime = (date, fmt = 'YYYY-MM-DD HH:mm:ss') => moment(date).format(fmt);
 
@@ -178,4 +172,22 @@ export function localStorageRemove(key) {
 export const stopPropagation = async (e) => {
   e.stopPropagation();
   e.preventDefault();
+};
+
+export const isAdmin = (orgName?: string) => {
+  const [userState] = store.useModel('user');
+  if (_.isEmpty(userState)) return false;
+  const id = _.get(userState, 'userInfo.id');
+  let newOrgName = orgName || localStorageGet(id);
+  const listOrgs = _.get(userState, 'userInfo.listOrgs.result', []);
+  const obj: any = _.find(listOrgs, (item: any) => item.name === newOrgName);
+  if (_.isEmpty(obj)) return false;
+  return obj.role === ROLE.OWNER || obj.role === ROLE.ADMIN;
+};
+
+export const getOrgName = () => {
+  const [userState] = store.useModel('user');
+  if (_.isEmpty(userState)) return;
+  const id = _.get(userState, 'userInfo.id');
+  return localStorageGet(id);
 };

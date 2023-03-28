@@ -1,28 +1,34 @@
-export enum PATH {
-  SETTINGS = '/settings',
-  APPLICATION = '/application/:appId',
-}
-
-export const getMenuConfig = (appId) => {
+export const getMenuPath = ({ orgName }) => {
   return {
-    [PATH.SETTINGS]: [
-      {
-        name: 'Tokens',
-        path: '/settings/tokens',
-        icon: 'key',
-      },
-      {
-        name: 'Secrets',
-        path: '/settings/secrets',
-        icon: 'Directory-tree',
-      },
-    ],
-    // [PATH.APPLICATION]: [
-    //   {
-    //     name: '应用详情',
-    //     path: `/application/${appId}/detail`,
-    //     icon: 'detail',
-    //   },
-    // ],
+    team: '/team',
+    members: `/${orgName}/setting/members`,
+    secrets: `/${orgName}/setting/secrets`,
+    teamSetting: `/${orgName}/setting/org`,
   };
+};
+
+export const getMenuConfig = ({ orgName }) => {
+  const menuPath = getMenuPath({ orgName });
+  const data = {};
+  for (const key in menuPath) {
+    data[menuPath[key]] = [
+      {
+        name: '应用模版',
+        path: menuPath.team,
+      },
+      {
+        name: '成员管理',
+        path: menuPath.members,
+      },
+      {
+        name: '密钥配置',
+        path: menuPath.secrets,
+      },
+      {
+        name: '团队设置',
+        path: menuPath.teamSetting,
+      },
+    ];
+  }
+  return data;
 };

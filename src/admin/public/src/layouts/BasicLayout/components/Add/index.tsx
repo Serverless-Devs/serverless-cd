@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
-import { Dropdown, Menu, Icon } from '@alicloud/console-components';
+import { Dropdown, Menu } from '@alicloud/console-components';
 import { history } from 'ice';
+import Icon from '@/components/Icon';
 
 type Props = {
   orgName: string;
@@ -14,16 +15,14 @@ const Add: FC<Props> = (props) => {
     };
 
     return (
-      <Menu onItemClick={onItemClick}>
+      <Menu onItemClick={onItemClick} className="top-bar-menu__wrapper">
         <Menu.Item key={`/${orgName}/create`} className="border-bottom">
           新建应用
         </Menu.Item>
-        <Menu.Item key={`/organizations?showSlide=true&activeTab=orgs`} className="border-bottom">
+        <Menu.Item key={`/organizations/create`} className="border-bottom">
           新建团队
         </Menu.Item>
-        <Menu.Item key={`/${orgName}/settings?showSlide=true&activeTab=members`}>
-          添加成员
-        </Menu.Item>
+        <Menu.Item key={`/${orgName}/setting/members?showSlide=true`}>添加成员</Menu.Item>
       </Menu>
     );
   };
@@ -31,9 +30,10 @@ const Add: FC<Props> = (props) => {
     <Dropdown
       trigger={
         <div className="layout-center mr-16 cursor-pointer">
-          <Icon type="plus-circle-fill" style={{ color: '#0070cc' }} />
+          <Icon type="add" />
         </div>
       }
+      align="tr br"
       offset={[0, 0]}
     >
       {menu()}

@@ -19,7 +19,7 @@ import EnvList from './components/EnvList';
 import { C_REPOSITORY } from '@/constants/repository';
 import ExternalLink from '@/components/ExternalLink';
 import { Toast } from '@/components/ToastContainer';
-import { sleep, localStorageGet, localStorageSet } from '@/utils';
+import { sleep, getOrgName, localStorageSet } from '@/utils';
 import store from '@/store';
 import Status from '@/components/DeployStatus';
 
@@ -41,9 +41,12 @@ const AppList = ({
 }) => {
   const [userState] = store.useModel('user');
   const userInfo: any = get(userState, 'userInfo', {});
-
+  /**
+   * 未请求到用户信息时，不渲染页面
+   */
+  if (isEmpty(userInfo)) return null;
   if (isEmpty(orgName)) {
-    const newOrgName = localStorageGet(userInfo.id);
+    const newOrgName = getOrgName();
     if (newOrgName) {
       return history?.push(`/${newOrgName}/application`);
     }

@@ -19,9 +19,13 @@ const Create = lazy(() => import(/* webpackChunkName: 'Create' */ '@/pages/Creat
 const EnvDetail = lazy(() => import(/* webpackChunkName: 'AppDetail' */ '@/pages/EnvDetail'));
 const TaskDetails = lazy(() => import(/* webpackChunkName: 'TaskDetails' */ '@/pages/TaskDetails'));
 const Auth = lazy(() => import(/* webpackChunkName: 'Auth' */ '@/pages/Auth'));
-const UserSettings = lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/UserSettings'));
-const OrgSettings = lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/OrgSettings'));
+const OrgSettings = lazy(() => import(/* webpackChunkName: 'OrgSettings' */ '@/pages/OrgSettings'));
+const Members = lazy(() => import(/* webpackChunkName: 'Members' */ '@/pages/Members'));
+const Secrets = lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Secrets'));
 const NoAuth = lazy(() => import(/* webpackChunkName: 'NotAuth' */ '@/pages/NoAuth'));
+const Team = lazy(() => import(/* webpackChunkName: 'Team' */ '@/pages/Team'));
+const CreateOrg = lazy(() => import(/* webpackChunkName: 'CreateOrg' */ '@/pages/CreateOrg'));
+const UpdateOrg = lazy(() => import(/* webpackChunkName: 'CreateOrg' */ '@/pages/UpdateOrg'));
 
 const routerConfig: IRouterConfig[] = [
   {
@@ -69,6 +73,33 @@ const routerConfig: IRouterConfig[] = [
     ],
   },
   {
+    path: '/organizations',
+    component: BasicLayout,
+    children: [
+      {
+        path: '/',
+        exact: true,
+        component: OrgSettings,
+      },
+      {
+        path: 'create',
+        exact: true,
+        component: CreateOrg,
+      },
+    ],
+  },
+  {
+    path: '/team',
+    component: BasicLayout,
+    children: [
+      {
+        path: '/',
+        exact: true,
+        component: Team,
+      },
+    ],
+  },
+  {
     path: '/:orgName/application/:appId',
     component: BasicLayout,
     children: [
@@ -81,17 +112,6 @@ const routerConfig: IRouterConfig[] = [
         path: '/:envName/:taskId',
         exact: true,
         component: TaskDetails,
-      },
-    ],
-  },
-  {
-    path: '/organizations',
-    component: BasicLayout,
-    children: [
-      {
-        path: '/',
-        exact: true,
-        component: UserSettings,
       },
     ],
   },
@@ -110,9 +130,19 @@ const routerConfig: IRouterConfig[] = [
         component: Create,
       },
       {
-        path: '/settings',
+        path: '/setting/members',
         exact: true,
-        component: OrgSettings,
+        component: Members,
+      },
+      {
+        path: '/setting/secrets',
+        exact: true,
+        component: Secrets,
+      },
+      {
+        path: '/setting/org',
+        exact: true,
+        component: UpdateOrg,
       },
       {
         path: '/',

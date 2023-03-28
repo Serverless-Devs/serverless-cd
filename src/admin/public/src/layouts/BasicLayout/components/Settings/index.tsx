@@ -3,12 +3,16 @@ import { Dropdown, Menu, Avatar } from '@alicloud/console-components';
 import { logout } from '@/services/auth';
 import { history, useRequest } from 'ice';
 import store from '@/store';
-import { get } from 'lodash';
-import { stopPropagation } from '@/utils';
+import { get, unset } from 'lodash';
+import { stopPropagation, isAdmin } from '@/utils';
+import { ORG_NAME } from '@/constants';
 
-type Props = {};
+type Props = {
+  orgName: string;
+};
 
 const Settings: FC<Props> = (props) => {
+  const { orgName } = props;
   const { request } = useRequest(logout);
   const [userState, userDispatchers] = store.useModel('user');
   const avatar = get(userState, 'userInfo.avatar');
@@ -17,18 +21,24 @@ const Settings: FC<Props> = (props) => {
   const menu = () => {
     const onLogout = () => {
       request();
+      unset(window, ORG_NAME);
       userDispatchers.removeStateInfo();
       history?.push('/login');
     };
 
     return (
-      <Menu>
+      <Menu className="top-bar-menu__wrapper">
         <Menu.Item className="border-bottom">
           <span onClick={stopPropagation}>{username}</span>
         </Menu.Item>
         <Menu.Item className="border-bottom" onClick={() => history?.push('/organizations')}>
           个人设置
         </Menu.Item>
+        {isAdmin(orgName) && (
+          <Menu.Item className="border-bottom" onClick={() => history?.push('/team')}>
+            团队管理
+          </Menu.Item>
+        )}
         <Menu.Item onClick={onLogout}>退出登录</Menu.Item>
       </Menu>
     );
@@ -45,6 +55,7 @@ const Settings: FC<Props> = (props) => {
         </div>
       }
       offset={[0, 0]}
+      align="tr br"
     >
       {menu()}
     </Dropdown>

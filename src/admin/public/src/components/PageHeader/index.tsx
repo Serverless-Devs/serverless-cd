@@ -8,7 +8,7 @@ const PageHeader = (props) => {
   return (
     <Box spacing={8} className={styles.pageHeader} {...others}>
       {breadcrumbs && breadcrumbs.length > 0 ? (
-        <Breadcrumb className={styles.breadcrumbs} separator=" / ">
+        <Breadcrumb className={styles.breadcrumbs} separator=" > ">
           {breadcrumbs.map((item, idx) => (
             <Breadcrumb.Item
               className="cursor-pointer"
