@@ -169,7 +169,7 @@ async function updateThirdPart(orgName, { token, provider }) {
     const providerClient = git(provider, { access_token: token });
     const { login, id, avatar } = await providerClient.user();
     _.set(data, `third_part.${provider}.access_token`, token);
-    _.set(data, `third_part.${provider}.owner`, login);
+    _.set(data, `third_part.${provider}.repo_owner`, login);
     _.set(data, `third_part.${provider}.id`, id);
     _.set(data, `third_part.${provider}.avatar`, avatar);
   }
@@ -216,7 +216,7 @@ async function transfer(orgId, orgName, transferUserName) {
 function desensitization(data) {
   const filterData = (item) => {
     item.third_part = _.mapValues(_.get(item, 'third_part', {}), (item = {}) => ({
-      owner: item.owner,
+      repo_owner: item.repo_owner,
       id: item.id,
       avatar: item.avatar,
     }));

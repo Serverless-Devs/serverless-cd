@@ -83,7 +83,7 @@ router.post('/remove', auth(OWNER_ROLE_KEYS), async (req, res) => {
   res.json(Result.ofSuccess());
 });
 
-// 转让【owner】
+// 仓库拥有者转让
 router.post('/transfer', auth(OWNER_ROLE_KEYS), async (req, res) => {
   const {
     orgId,

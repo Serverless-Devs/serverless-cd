@@ -21,7 +21,7 @@ const BasicInfoDetail = (props: Props) => {
   const provider = get(data, 'provider');
   const envInfo = get(data, `environment.${envName}`);
   const repo_name = get(data, 'repo_name');
-  const owner = get(data, 'owner');
+  const repo_owner = get(data, 'repo_owner');
   const type = get(envInfo, 'type', '_');
   const created_time = formatTime(get(envInfo, 'created_time'));
   const latest_task = get(data, `environment.${envName}.latest_task`, {});
@@ -72,7 +72,7 @@ const BasicInfoDetail = (props: Props) => {
                 {C_REPOSITORY[provider as any]?.svg(16)}
                 <CommitId
                   className="ml-4"
-                  url={`https://${provider}.com/${owner}/${repo_name}/commit/${commit}`}
+                  url={`https://${provider}.com/${repo_owner}/${repo_name}/commit/${commit}`}
                   label={get(latest_task, 'commit', '')}
                   message={get(latest_task, 'message')}
                   icon={false}

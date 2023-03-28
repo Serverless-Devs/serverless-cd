@@ -10,14 +10,15 @@ const doCreateApp = async (values, createType) => {
   const trigger_spec: any = {
     [values['gitType']]: { push: { branches: { precise: [get(values, 'trigger.branch')] } } },
   };
+
   const dataMap = {
     [createType]: {
       provider: get(values, 'gitType'),
       description: get(values, 'description'),
       repo_url: get(values, 'repo.url'),
       repo: get(values, 'repo.name'),
-      owner: get(values, 'repo.owner'),
-      provider_repo_id: String(get(values, 'repo.id')),
+      repo_owner: get(values, 'repo.repo_owner'),
+      repo_id: String(get(values, 'repo.id')),
       environment: {
         default: {
           type: ENV_TYPE.TESTING,

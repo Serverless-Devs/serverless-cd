@@ -34,7 +34,7 @@ async function getProviderRepos(orgName, provider, { org } = {}) {
   if (!_.isEmpty(applicationResult)) {
     return _.map(rows, (item) => {
       for (const applicationItem of applicationResult) {
-        if (item.id === Number(applicationItem.provider_repo_id)) {
+        if (item.id === Number(applicationItem.repo_id)) {
           item.disabled = true;
           return item;
         }
@@ -79,16 +79,16 @@ async function getUser(provider, access_token) {
  * 1. create Repo
  * 2. create Webhook
  */
-async function createRepoWithWebhook({ owner, repo, token, secret, appId, provider }) {
+async function createRepoWithWebhook({ repo_owner, repo, token, secret, appId, provider }) {
   const providerClient = git(provider, { access_token: token });
 
-  const hasRepoResult = await providerClient.hasRepo({ owner, repo });
+  const hasRepoResult = await providerClient.hasRepo({ owner: repo_owner, repo });
   let res = {
     id: _.get(hasRepoResult, 'id'),
     url: _.get(hasRepoResult, 'url'),
   };
   if (!_.get(hasRepoResult, 'isExist')) {
-    debug(`Repo not exist, create repo ${(owner, repo)}`);
+    debug(`Repo not exist, create repo ${repo_owner}/${repo}`);
     const data = await providerClient.createRepo({
       name: repo,
       private: false,
@@ -100,8 +100,8 @@ async function createRepoWithWebhook({ owner, repo, token, secret, appId, provid
     };
   }
   debug(`Repo is exist`);
-  debug(`Add webhook ${owner} ${repo} ${token} ${secret} ${appId} ${provider}`);
-  await webhookService.add({ owner, repo, token, webHookSecret: secret, appId, provider });
+  debug(`Add webhook ${repo_owner} ${repo} ${token} ${secret} ${appId} ${provider}`);
+  await webhookService.add({ repo_owner, repo, token, webHookSecret: secret, appId, provider });
   return res;
 }
 
@@ -150,7 +150,7 @@ async function initAndCommit({ provider, repoUrl, execDir, branch }) {
 /**
  * git push
  */
-async function pushFile({ execDir, branch, owner, repo, provider, token }) {
+async function pushFile({ execDir, branch, repo_owner, repo, provider, token }) {
   debug(`git push`);
   await push({
     execDir,
@@ -158,7 +158,7 @@ async function pushFile({ execDir, branch, owner, repo, provider, token }) {
   });
   const providerClient = git(provider, { access_token: token });
 
-  return await providerClient.checkRepoEmpty({ owner, repo });
+  return await providerClient.checkRepoEmpty({ owner: repo_owner, repo });
 }
 
 module.exports = {

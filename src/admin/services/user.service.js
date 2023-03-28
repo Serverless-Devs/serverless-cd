@@ -36,7 +36,7 @@ async function getOrganizationOwnerIdByOrgId(orgId) {
     ownerUserId = ownerOrgData.user_id;
   }
 
-  // 此团队拥有者的数据：一个团队只能拥有一个 owner
+  // 此团队拥有者的数据：一个团队只能拥有一个 OWNER
   return await getUserById(ownerUserId);
 }
 

@@ -18,7 +18,8 @@ const BasicInfoDetail = (props: Props) => {
   const provider = get(data, 'provider');
   const repo_url = get(data, 'repo_url');
   const repo_name = get(data, 'repo_name');
-  const owner = get(data, 'owner');
+  const repo_owner = get(data, 'repo_owner');
+  console.log('data:: ', data);
   return (
     <BasicInfo
       title={'基本信息'}
@@ -29,7 +30,7 @@ const BasicInfoDetail = (props: Props) => {
             text: '仓库名称',
             value: (
               <div>
-                <span className="fz-12">{owner}</span>
+                <span className="fz-12">{repo_owner}</span>
                 <span className="fz-14 f-w-500"> / {repo_name}</span>
               </div>
             ),
@@ -62,7 +63,7 @@ const BasicInfoDetail = (props: Props) => {
           //       {C_REPOSITORY['github']?.svg(16)}
           //       <ExternalLink
           //         className="color-link cursor-pointer ml-4"
-          //         url={`https://${provider}.com/${owner}/${repo_name}/tree/`}
+          //         url={`https://${provider}.com/${repo_owner}/${repo_name}/tree/`}
           //         // url={'https://github.com/heimanba/todolist-app-msfg/tree/master'}
           //         label={'master'}
           //       />
