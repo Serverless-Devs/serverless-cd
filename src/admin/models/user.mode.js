@@ -1,7 +1,6 @@
 const _ = require('lodash');
 const { ROLE, TABLE } = require('@serverless-cd/config');
 const { unionId, md5Encrypt, prisma } = require('../util');
-const { param } = require('../routers/auth');
 
 const userPrisma = prisma[TABLE.USER];
 
