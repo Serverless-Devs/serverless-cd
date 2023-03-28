@@ -12,7 +12,7 @@ const AccountSingUp = (props) => {
     gitee_unionid,
   } = props;
   const [, userDispatchers] = store.useModel('user');
-  const { data, request } = useRequest(accountSignUp);
+  const { data, request, loading } = useRequest(accountSignUp);
 
   useEffect(() => {
     goAppList();
@@ -36,7 +36,7 @@ const AccountSingUp = (props) => {
   };
   return (
     <React.Fragment>
-      <Auth className="account-public-content" title={title} type="REGISTER" onSignUp={btnClick} accountBtnName="注册并绑定" />
+      <Auth className="account-public-content" title={title} type="REGISTER" onSignUp={btnClick} accountBtnName="注册并绑定" loading={loading} />
     </React.Fragment>
   );
 };

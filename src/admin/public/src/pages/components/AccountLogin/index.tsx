@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Auth from '@serverless-cd/auth-ui';
 import { useRequest, Link, history } from 'ice';
 import { get } from 'lodash';
@@ -14,8 +14,9 @@ const LOGINTYPE = { GITHUB: 'github', GITEE: 'gitee' };
 const AccountLogin = (props) => {
   const { title } = props;
   const [, userDispatchers] = store.useModel('user');
+  const [thirdPartyLoading, setThirdPartyLoading] = useState({ githubLoading: false, giteeLoading: false })
 
-  const { data, request } = useRequest(accountLogin);
+  const { data, request, loading } = useRequest(accountLogin);
 
   const GetAuthGithub = useRequest(getAuthGithub);
   const GetAuthGitee = useRequest(getAuthGitee);
@@ -51,7 +52,9 @@ const AccountLogin = (props) => {
   };
 
   const githubLoginOrSingup = async() => {
+    setThirdPartyLoading({ githubLoading: true, giteeLoading: false })
     const { data: { github_unionid, id } }= await GetAuthGithub.request({ code });
+    setThirdPartyLoading({ githubLoading: false, giteeLoading: false })
     if (!github_unionid) {
       history?.push(`/signUp?github_unionid=${id}`);
     } else {
@@ -60,7 +63,9 @@ const AccountLogin = (props) => {
   };
 
   const giteeLoginOrSingup = async() => {
+    setThirdPartyLoading({ githubLoading: false, giteeLoading: true })
     const { data: { gitee_unionid, id } } = await GetAuthGitee.request({ code });
+    setThirdPartyLoading({ githubLoading: false, giteeLoading: false })
     if (!gitee_unionid) {
       history?.push(`/signUp?gitee_unionid=${id}`);
     } else {
@@ -68,13 +73,21 @@ const AccountLogin = (props) => {
     }
   };
 
-  const loginThirdPartyUrl = {
-    githubUrl: github && getConsoleConfig('GITHUB_REDIRECT_URI', ''),
-    giteeUrl: gitee && getConsoleConfig('GITEE_REDIRECT_URI', ''),
-  }
+  const ThirdPartyConfig = [
+    {
+      type: 'github',
+      url: github ? getConsoleConfig('GITHUB_REDIRECT_URI', '') : '',
+      loading: thirdPartyLoading['githubLoading'],
+    },
+    {
+      type: 'gitee',
+      url: gitee ? getConsoleConfig('GITEE_REDIRECT_URI', '') : '',
+      loading: thirdPartyLoading['gieeLoading'],
+    }
+  ];
   return (
     <React.Fragment>
-      <Auth className="account-public-content" title={title} type="LOGIN" onSingIn={btnClick} {...loginThirdPartyUrl}>
+      <Auth className="account-public-content" title={title} type="LOGIN" onSingIn={btnClick} loading={loading} thirdPartyConfig={ThirdPartyConfig}>
         <div className="singup-or-rememberme">
           <Link to="/signUp" style={{ textDecoration: 'underline' }}>
             没有账号？去注册

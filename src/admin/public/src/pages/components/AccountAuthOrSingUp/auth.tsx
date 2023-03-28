@@ -13,7 +13,7 @@ const AccountAuth = (props) => {
   const { title, search } = props;
   const [, userDispatchers] = store.useModel('user');
 
-  const { data, request } = useRequest(accountLogin);
+  const { data, request, loading } = useRequest(accountLogin);
   const AccountSingupAuth = useRequest(accountSingupAuth);
   const github_unionid = get(getParams(search), 'github_unionid', '');
   const gitee_unionid = get(getParams(search), 'gitee_unionid', '');
@@ -44,7 +44,7 @@ const AccountAuth = (props) => {
 
   return (
     <React.Fragment>
-      <Auth className="account-public-content" title={title} type="LOGIN" onSingIn={btnClick} accountBtnName="登录并绑定已有账号" />
+      <Auth className="account-public-content" title={title} type="LOGIN" onSingIn={btnClick} accountBtnName="登录并绑定已有账号" loading={loading} />
     </React.Fragment>
   );
 };
