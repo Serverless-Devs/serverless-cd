@@ -4,15 +4,12 @@ import { Toast } from './components/ToastContainer';
 import { userInfo } from '@/services/user';
 import { get } from 'lodash';
 import { CODE, ORG_NAME } from '@/constants';
-import { getParams } from '@/utils';
 
-const { search } = window.location;
-const code = get(getParams(search), 'code', '');
 const appConfig: IAppConfig = {
   app: {
     rootId: 'ice-container',
-    getInitialData: async () => {
-      const user = code ? {} : await userInfo();
+    getInitialData: async (ctx) => {
+      const user = get(ctx, 'pathname', '') === '/auth' ? {} : await userInfo();
       return {
         initialStates: {
           user: {

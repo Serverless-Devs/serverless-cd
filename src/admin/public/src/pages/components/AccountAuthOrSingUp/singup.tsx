@@ -10,7 +10,7 @@ import { accountSignUp } from '@/services/auth';
 const AccountSingUp = (props) => {
   const { title, github_unionid, gitee_unionid } = props;
   const [, userDispatchers] = store.useModel('user');
-  const { data, request } = useRequest(accountSignUp);
+  const { data, request, loading } = useRequest(accountSignUp);
 
   useEffect(() => {
     goAppList();
@@ -38,6 +38,7 @@ const AccountSingUp = (props) => {
         type="REGISTER"
         onSignUp={btnClick}
         accountBtnName="注册并绑定"
+        loading={loading}
       />
     </React.Fragment>
   );
