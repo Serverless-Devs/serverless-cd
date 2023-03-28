@@ -15,7 +15,7 @@ const RefreshButton = (props: Props) => {
 
   return (
     <Button style={styleObj} onClick={onRefresh}>
-      <Icon type="redo" />
+      <Icon type="refresh" />
     </Button>
   );
 };

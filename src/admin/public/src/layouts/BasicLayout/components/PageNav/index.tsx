@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { Link, withRouter, useRouteMatch } from 'ice';
 import { Nav } from '@alicloud/console-components';
 import { getMenuConfig } from '@/constants/navConfig';
-import { find } from 'lodash';
+import { getOrgName } from '@/utils';
+import { find, get } from 'lodash';
 
 const { SubNav } = Nav;
 const NavItem = Nav.Item;
@@ -12,7 +13,7 @@ const NavItem = Nav.Item;
 // Ref: https://ice.work/docs/guide/advance/auth#%E5%88%9D%E5%A7%8B%E5%8C%96%E6%9D%83%E9%99%90%E6%95%B0%E6%8D%AE
 const AUTH_CONFIG = {
   admin: true,
-  guest: false,
+  member: false,
 };
 
 export interface IMenuItem {
@@ -68,14 +69,12 @@ function getSubMenuOrItem(item: IMenuItem, index?: number | string, auth?: any) 
 
 const Navigation = (props, context) => {
   const [openKeys, setOpenKeys] = useState<string[]>([]);
-  const {
-    params: { appId },
-    path,
-  }: any = useRouteMatch();
-  const asideMenuConfig: any = getMenuConfig(appId)[path];
+  const { params }: any = useRouteMatch();
   const { location } = props;
   const { pathname } = location;
   const { isCollapse } = context;
+  const orgName = get(params, 'params.orgName', getOrgName());
+  const asideMenuConfig: any = getMenuConfig({ orgName })[pathname];
 
   useEffect(() => {
     const curSubNav = find(asideMenuConfig, (menuConfig) => {
@@ -105,7 +104,6 @@ const Navigation = (props, context) => {
       hasArrow={false}
       mode={isCollapse ? 'popup' : 'inline'}
       onOpen={(keys) => {
-        // @ts-ignore
         setOpenKeys(keys);
       }}
     >

@@ -78,3 +78,5 @@ export enum CODE {
   NeedLogin = 'NeedLogin',
   SystemError = 'SystemError',
 }
+
+export const ORG_NAME = 'ORG_NAME';

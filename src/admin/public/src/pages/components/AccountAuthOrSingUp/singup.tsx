@@ -1,16 +1,14 @@
 import React, { useEffect } from 'react';
 import Auth from '@serverless-cd/auth-ui';
+import { get } from 'lodash';
+import store from '@/store';
+import { localStorageSet } from '@/utils';
 import { useRequest, history } from 'ice';
 import './index.css';
-import store from '@/store';
 import { accountSignUp } from '@/services/auth';
 
 const AccountSingUp = (props) => {
-  const {
-    title,
-    github_unionid,
-    gitee_unionid,
-  } = props;
+  const { title, github_unionid, gitee_unionid } = props;
   const [, userDispatchers] = store.useModel('user');
   const { data, request, loading } = useRequest(accountSignUp);
 
@@ -20,13 +18,11 @@ const AccountSingUp = (props) => {
 
   const goAppList = async () => {
     if (!data) return;
-    const {
-      success,
-      data: { username },
-    } = data;
+    const { success } = data;
     if (success) {
-      await userDispatchers.getUserInfo();
-      history?.push(`/${username}/application`);
+      const userInfo = await userDispatchers.getUserInfo();
+      localStorageSet(userInfo?.id, userInfo?.username);
+      history?.push(`/${get(data, 'data.username')}/application`);
       return;
     }
   };
@@ -36,7 +32,14 @@ const AccountSingUp = (props) => {
   };
   return (
     <React.Fragment>
-      <Auth className="account-public-content" title={title} type="REGISTER" onSignUp={btnClick} accountBtnName="注册并绑定" loading={loading} />
+      <Auth
+        className="account-public-content"
+        title={title}
+        type="REGISTER"
+        onSignUp={btnClick}
+        accountBtnName="注册并绑定"
+        loading={loading}
+      />
     </React.Fragment>
   );
 };

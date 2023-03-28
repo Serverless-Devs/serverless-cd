@@ -21,3 +21,11 @@
   font-size: var(--font-size-body-2, 14px);
   line-height: 1.5;
 }
+
+.breadcrumbs {
+  position: fixed !important;
+  /* 16+24+16+150+32 */
+  left: 238px;
+  top: 17px;
+  z-index: 10;
+}

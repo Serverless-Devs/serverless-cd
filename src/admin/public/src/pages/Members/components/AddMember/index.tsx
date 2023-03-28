@@ -1,5 +1,5 @@
 import React, { FC, useEffect } from 'react';
-import { useRequest } from 'ice';
+import { useRequest, useLocation, history } from 'ice';
 import SlidePanel from '@alicloud/console-components-slide-panel';
 import { Form, Field, Select } from '@alicloud/console-components';
 import { FORM_ITEM_LAYOUT, ROLE } from '@/constants';
@@ -20,6 +20,7 @@ type IProps = {
 };
 
 const AddMember: FC<IProps> = (props) => {
+  const { pathname } = useLocation();
   const { children, callback, type = 'create', dataSource, existUsers } = props;
   if (getParam('showSlide') === 'true' && type !== 'create') return null;
   const { request, loading } = useRequest(type === 'create' ? inviteUser : updateAuth);
@@ -37,6 +38,9 @@ const AddMember: FC<IProps> = (props) => {
   const handleClose = () => {
     resetToDefault();
     setVisible(false);
+    if (getParam('showSlide') === 'true') {
+      history?.push(pathname);
+    }
   };
   const handleOK = async () => {
     validate(async (errors, values) => {
@@ -44,8 +48,7 @@ const AddMember: FC<IProps> = (props) => {
       const { success } = await request(values);
       if (success) {
         Toast.success(type === 'create' ? '添加成员成功' : '编辑成员成功');
-        setVisible(false);
-        resetToDefault();
+        handleClose();
         await callback();
       }
     });
