@@ -35,7 +35,7 @@ const EnvList: FC<Props> = (props) => {
           commit: get(ele, 'latest_task.commit', ''),
           message: get(ele, 'latest_task.message', ''),
           provider: get(data, 'provider'),
-          owner: get(data, 'owner'),
+          repo_owner: get(data, 'repo_owner'),
           repo_name: get(data, 'repo_name'),
           trigger_type: get(ele, 'latest_task.trigger_type'),
         },
@@ -97,7 +97,7 @@ const EnvList: FC<Props> = (props) => {
                 {C_REPOSITORY[value.provider]?.svg(16)}
                 <CommitId
                   className="ml-4"
-                  url={`https://${value.provider}.com/${value.owner}/${value.repo_name}/commit/${value.commit}`}
+                  url={`https://${value.provider}.com/${value.repo_owner}/${value.repo_name}/commit/${value.commit}`}
                   label={value.commit}
                   message={value.message}
                   icon={false}

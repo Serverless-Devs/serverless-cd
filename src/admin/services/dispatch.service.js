@@ -63,7 +63,7 @@ async function redeploy(dispatchOrgId, orgName, { taskId, appId } = {}) {
   if (_.isEmpty(applicationResult)) {
     throw new ValidationError('没有查到应用信息');
   }
-  const { owner, provider, environment, owner_org_id } = applicationResult;
+  const { repo_owner, provider, environment, owner_org_id } = applicationResult;
   // 设置新的环境信息
   if (_.isEmpty(environment[envName])) {
     throw new ValidationError(`当前不存在${envName}环境`);
@@ -87,7 +87,7 @@ async function redeploy(dispatchOrgId, orgName, { taskId, appId } = {}) {
   _.merge(trigger_payload.authorization, {
     secrets: _.merge(ownerSecrets, appSecrets),
     dispatchOrgId,
-    owner,
+    repo_owner,
     accessToken: providerToken,
   });
 
@@ -161,7 +161,7 @@ async function manualTask(dispatchOrgId, orgName, body = {}) {
     throw new ValidationError('没有查到应用信息');
   }
 
-  const { owner, provider, repo_name, repo_url, environment, owner_org_id } = applicationResult;
+  const { repo_owner, provider, repo_name, repo_url, environment, owner_org_id } = applicationResult;
 
   debug('find provider access token');
   const providerToken = await orgService.getProviderToken(orgName, provider);
@@ -177,8 +177,8 @@ async function manualTask(dispatchOrgId, orgName, body = {}) {
     try {
       const providerClient = gitProvider(provider, { access_token: providerToken });
       const commitConfig = await providerClient.getRefCommit({
-        owner,
         ref,
+        owner: repo_owner,
         repo: repo_name,
       });
       commit = commitConfig.sha;
@@ -189,10 +189,10 @@ async function manualTask(dispatchOrgId, orgName, body = {}) {
     }
   }
   debug('get commit config end');
-  debug('get org owner secrets');
+  debug('get org repo_owner secrets');
   const ownerOrgData = await orgModel.getOrgById(owner_org_id);
   const ownerSecrets = _.get(ownerOrgData, 'secrets', {});
-  debug('get org owner successfully');
+  debug('get org repo_owner successfully');
 
   const targetEnvName = envName ? envName : _.first(_.keys(environment));
   const payload = {
@@ -202,7 +202,7 @@ async function manualTask(dispatchOrgId, orgName, body = {}) {
     authorization: {
       dispatchOrgId,
       appId,
-      owner,
+      repo_owner,
       accessToken: providerToken,
       secrets: _.merge(ownerSecrets, _.get(environment, `${targetEnvName}.secrets`, {})),
     },

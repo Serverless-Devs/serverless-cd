@@ -38,13 +38,13 @@ model Application {
   org_id String
   owner_org_id String
   description String?
-  owner String
+  repo_owner String
   provider String
   environment String
-  provider_repo_id String
+  repo_id String
   repo_name String
   repo_url String
-  webhook_secret String?
+  repo_webhook_secret String?
   created_time DateTime  @default(now())
   updated_time DateTime  @updatedAt
 }

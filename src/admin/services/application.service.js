@@ -24,7 +24,7 @@ async function listByOrgName(orgName = '') {
 }
 
 async function preview(body = {}) {
-  const { provider_repo_id: providerRepoId, provider } = body;
+  const { repo_id: providerRepoId, provider } = body;
   const application = await appModel.getAppByProvider({
     provider,
     providerRepoId,
@@ -39,9 +39,9 @@ async function create(orgId, orgName, body) {
 
   const {
     repo,
-    owner,
+    repo_owner,
     repo_url,
-    provider_repo_id: providerRepoId,
+    repo_id: providerRepoId,
     description,
     provider,
     environment,
@@ -51,7 +51,7 @@ async function create(orgId, orgName, body) {
   const providerToken = await orgService.getProviderToken(orgName, provider);
   debug(`providerToken: ${providerToken}`);
   debug('start add webhook');
-  await webhookService.add({ owner, repo, token: providerToken, webHookSecret, appId, provider });
+  await webhookService.add({ repo_owner, repo, token: providerToken, webHookSecret, appId, provider });
   debug('start create app');
   const ownerOrg = await orgModel.getOwnerOrgByName(orgName);
   await appModel.createApp({
@@ -59,13 +59,13 @@ async function create(orgId, orgName, body) {
     org_id: orgId,
     owner_org_id: _.get(ownerOrg, 'id'),
     description,
-    owner,
+    repo_owner,
     provider,
     environment,
-    provider_repo_id: providerRepoId,
+    repo_id: providerRepoId,
     repo_name: repo,
     repo_url,
-    webhook_secret: webHookSecret,
+    repo_webhook_secret: webHookSecret,
   });
   debug('create app success');
   return { id: appId };
@@ -91,9 +91,9 @@ async function checkFolderEmpty(execDir) {
  * @returns
  */
 async function createByTemplate({ type, orgName }, body) {
-  const { provider, appId: oldAppId, owner, repo } = body;
+  const { provider, appId: oldAppId, repo_owner, repo } = body;
   const appId = oldAppId || unionId();
-  const execDir = path.join(os.tmpdir(), owner, repo);
+  const execDir = path.join(os.tmpdir(), repo_owner, repo);
   if (type != 'initTemplate') {
     const { isFolderEmpty } = await checkFolderEmpty(execDir);
     if (isFolderEmpty) {
@@ -121,7 +121,7 @@ async function createByTemplate({ type, orgName }, body) {
   if (type === 'initRepo') {
     const token = await orgService.getProviderToken(orgName, provider);
     const res = await gitService.createRepoWithWebhook({
-      owner,
+      repo_owner,
       repo,
       token,
       secret: unionId(),
@@ -136,7 +136,7 @@ async function createByTemplate({ type, orgName }, body) {
     await gitService.initAndCommit({
       provider,
       execDir,
-      repoUrl: `https://${token}@${provider}.com/${owner}/${repo}.git`,
+      repoUrl: `https://${token}@${provider}.com/${repo_owner}/${repo}.git`,
       branch: 'master',
     });
     return {};
@@ -145,7 +145,7 @@ async function createByTemplate({ type, orgName }, body) {
   if (type === 'push') {
     const token = await orgService.getProviderToken(orgName, provider);
     const data = await gitService.pushFile({
-      owner,
+      repo_owner,
       repo,
       execDir,
       branch: 'master',
@@ -196,7 +196,7 @@ async function remove(orgName, appId) {
     throw new ValidationError('暂无应用信息');
   }
 
-  const { owner, repo_name, provider } = appDetail;
+  const { repo_owner, repo_name, provider } = appDetail;
   const token = await orgService.getProviderToken(orgName, provider);
 
   debug('Start remove task');
@@ -207,8 +207,8 @@ async function remove(orgName, appId) {
   await appModel.deleteAppById(appId);
   debug('Removed app successfully');
 
-  debug(`Removed webhook:\nowner: ${owner}, repo_name: ${repo_name}, appId: ${appId}`);
-  await webhookService.remove({ owner, repo_name, token, appId, provider });
+  debug(`Removed webhook:\repo_owner: ${repo_owner}, repo_name: ${repo_name}, appId: ${appId}`);
+  await webhookService.remove({ repo_owner, repo_name, token, appId, provider });
   debug(`Removed webhook successfully`);
 }
 

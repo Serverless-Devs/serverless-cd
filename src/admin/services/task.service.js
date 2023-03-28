@@ -62,7 +62,7 @@ const getTaskConfig = (taskConfig) => {
   result.message = _.get(taskConfig, 'trigger_payload.message');
   result.commit = _.get(taskConfig, 'trigger_payload.commit');
   result.ref = _.get(taskConfig, 'trigger_payload.ref');
-  result.owner = _.get(taskConfig, 'trigger_payload.authorization.owner');
+  result.repo_owner = _.get(taskConfig, 'trigger_payload.authorization.repo_owner');
   result.branch = formatBranch(result.ref);
 
   return result;

@@ -27,7 +27,7 @@ async function handler(event, _context, callback) {
     provider,
     cloneUrl,
     pusher,
-    authorization: { dispatchOrgId, owner, appId, accessToken: token, secrets } = {},
+    authorization: { dispatchOrgId, repo_owner, appId, accessToken: token, secrets } = {},
     ref,
     commit,
     message,
@@ -71,7 +71,7 @@ async function handler(event, _context, callback) {
       token,
       provider,
       logger,
-      owner,
+      owner: repo_owner,
       clone_url: cloneUrl,
       execDir: cwdPath,
       ref,
@@ -129,7 +129,7 @@ async function handler(event, _context, callback) {
       secrets: _.merge(secrets, envSecrets),
       git: {
         // git 相关的内容
-        owner,
+        repo_owner,
         provider, // 托管仓库
         clone_url: cloneUrl, // git 的 url 地址
         ref,

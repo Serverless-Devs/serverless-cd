@@ -5,7 +5,7 @@ import { Box, Card } from '@alicloud/console-components';
 import moment from 'moment';
 import './index.css';
 
-const CardHeader = ({ name, owner }) => {
+const CardHeader = ({ name, repo_owner }) => {
   return (
     <div className="text-nowrap-1" style={{ minWidth: 180 }}>
       <span
@@ -14,7 +14,7 @@ const CardHeader = ({ name, owner }) => {
       >
         C D
       </span>
-      <span className="fz-12">{owner}</span>
+      <span className="fz-12">{repo_owner}</span>
       <span className="fz-14 f-w-500"> / {name}</span>
     </div>
   );
@@ -24,7 +24,7 @@ const ProjectCard = ({ item }) => {
   const history = useHistory();
   const name = get(item, 'repo_name', '');
   const id = get(item, 'id', '');
-  const owner = get(item, 'owner', '');
+  const repo_owner = get(item, 'repo_owner', '');
   const description = get(item, 'description', '');
   const updated_time = get(item, 'updated_time', '');
   const goDetails = () => {
@@ -34,7 +34,7 @@ const ProjectCard = ({ item }) => {
   return (
     <div style={{ position: 'relative' }}>
       <Card free showHeadDivider className="project-card cursor-pointer" onClick={goDetails}>
-        <Card.Header title={<CardHeader name={name} owner={owner} />} />
+        <Card.Header title={<CardHeader name={name} repo_owner={repo_owner} />} />
         <Card.Content style={{ height: 40, paddingBottom: 0 }}>
           <p className="text-nowrap-1" style={{ margin: '5px 0' }}>
             {description}

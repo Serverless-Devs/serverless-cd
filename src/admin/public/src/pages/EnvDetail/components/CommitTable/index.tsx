@@ -62,7 +62,7 @@ const CommitTable: FC<IProps> = (props) => {
       dataIndex: 'commit',
       cell: (value, index, row) => {
         const provider = get(row, 'provider', 'github');
-        const owner = get(row, 'username');
+        const repo_owner = get(row, 'username');
         const repo_name = get(row, 'repo_name');
         const branch = get(row, 'branch');
         const message = get(row, 'message');
@@ -72,7 +72,7 @@ const CommitTable: FC<IProps> = (props) => {
             <div>
               <CommitId
                 // className="ml-4"
-                url={`https://${provider}.com/${owner}/${repo_name}/commit/${value}`}
+                url={`https://${provider}.com/${repo_owner}/${repo_name}/commit/${value}`}
                 label={value}
                 icon={false}
               />

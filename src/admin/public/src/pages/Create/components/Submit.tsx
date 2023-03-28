@@ -72,7 +72,7 @@ const Submit = (props: IProps) => {
     // push 代码到新分支
     const branch = get(values, 'trigger.branch');
     const { success: putFileSuccess } = await githubPutFile({
-      owner: get(values, 'repo.owner'),
+      repo_owner: get(values, 'repo.owner'),
       repo: get(values, 'repo.value'),
       ref: `refs/heads/${branch}`,
       sha: get(values, 'trigger.commit_sha'),
@@ -96,7 +96,7 @@ const Submit = (props: IProps) => {
       clone_url: get(values, 'repo.url'),
       ref: `refs/heads/${branch}`,
       provider: get(values, 'gitType'),
-      owner: get(values, 'repo.owner'),
+      repo_owner: get(values, 'repo.owner'),
       file: CD_PIPELINE_YAML,
     });
     if (!checkFileSuccess) return;
