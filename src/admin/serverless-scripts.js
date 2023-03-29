@@ -34,17 +34,23 @@ const getYaml = () => {
 };
 
 const parseYaml = async (sPath) => {
-  const parse = new core.ParseVariable(sPath);
-  // 第一次解析
-  let parsedObj = await parse.init();
-  // 第二次解析 兼容vars下的魔法变量，需再次解析
-  parsedObj = await parse.init(parsedObj.realVariables);
-  const env = _.get(
-    parsedObj,
-    'realVariables.services.admin.props.function.environmentVariables',
-    {},
-  );
-  _.merge(process.env, env);
+  let parsedObj;
+  try {
+    const parse = new core.ParseVariable(sPath);
+    // 第一次解析
+    parsedObj = await parse.init();
+    // 第二次解析 兼容vars下的魔法变量，需再次解析
+    parsedObj = await parse.init(parsedObj.realVariables);
+    const env = _.get(
+      parsedObj,
+      'realVariables.services.admin.props.function.environmentVariables',
+      {},
+    );
+    _.merge(process.env, env);
+  } catch (_e) {
+    console.log('\n');
+    throw new Error(`解析文件${sPath}失败`);
+  }
   const region = _.get(parsedObj, 'realVariables.services.admin.props.region', '');
   const serviceName = _.get(parsedObj, 'realVariables.services.admin.props.service.name', '');
   _.set(process.env, 'REGION', region);
@@ -77,7 +83,7 @@ const parseYaml = async (sPath) => {
 };
 
 (async function () {
-  const sPath = getYaml();
+  const sPath = process.env.RUN_YAML_PATH || getYaml();
   console.debug(`获取到 s yaml 路径: ${sPath}`);
   if (sPath) {
     const parsedObj = await parseYaml(sPath);
