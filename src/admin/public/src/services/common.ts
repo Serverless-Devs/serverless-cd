@@ -17,7 +17,7 @@ const doCreateApp = async (values, createType) => {
       description: get(values, 'description'),
       repo_url: get(values, 'repo.url'),
       repo: get(values, 'repo.name'),
-      repo_owner: get(values, 'repo.repo_owner'),
+      repo_owner: get(values, 'repo.repo_owner') || get(values, 'repo.owner'),
       repo_id: String(get(values, 'repo.id')),
       environment: {
         default: {
