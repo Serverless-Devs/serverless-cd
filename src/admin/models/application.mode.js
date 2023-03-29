@@ -26,7 +26,7 @@ module.exports = {
     const application = await applicationPrisma.findFirst({
       where: {
         provider,
-        provider_repo_id: providerRepoId,
+        repo_id: providerRepoId,
       },
     });
     return getAppInfo(application);

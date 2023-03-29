@@ -64,22 +64,22 @@ router.post('/create', auth(ADMIN_ROLE_KEYS), async function (req, res) {
  *  - appId
  *  - webHookSecret
  *  - provider
- *  - owner
+ *  - repo_owner
  *  - repo
  * /createByTemplate?type=initCommit # 初始化commit 信息
  *  - appId
  *  - provider
- *  - owner
+ *  - repo_owner
  *  - repo
  * /createByTemplate?type=push # 提交代码
  *  - appId
  */
 router.post('/createByTemplate', auth(ADMIN_ROLE_KEYS), async function (req, res) {
   const { userId, orgId, orgName } = req;
-  const { type, provider, appId, owner, repo, template, content } = req.body.params;
+  const { type, provider, appId, repo_owner, repo, template, content } = req.body.params;
   const result = await appService.createByTemplate(
     { type, userId, orgId, orgName },
-    { provider, appId, owner, repo, template, content },
+    { provider, appId, repo_owner, repo, template, content },
   );
   return res.json(Result.ofSuccess(result));
 });

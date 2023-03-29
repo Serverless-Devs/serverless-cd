@@ -15,16 +15,16 @@ const ignoreRunFunctionError = async (fn, ...args) => {
   } catch (ex) {}
 };
 
-async function add({ owner, repo, token: access_token, webHookSecret: secret, appId, provider }) {
+async function add({ repo_owner, repo, token: access_token, webHookSecret: secret, appId, provider }) {
   const providerClient = git(provider, { access_token });
-  const webhooks = await providerClient.listWebhook({ owner, repo });
+  const webhooks = await providerClient.listWebhook({ owner: repo_owner, repo });
   const url = Webhook.getUrl(appId);
   debug(`webhook url is ${url}`);
   debug(`webhooks is ${JSON.stringify(webhooks)}`);
   for (const row of webhooks) {
     if (row.url === url) {
       await providerClient.updateWebhook({
-        owner,
+        owner: repo_owner,
         repo,
         url,
         secret,
@@ -34,19 +34,19 @@ async function add({ owner, repo, token: access_token, webHookSecret: secret, ap
       return;
     }
   }
-  return await providerClient.createWebhook({ owner, repo, url, secret, events: WEBHOOK_EVENTS });
+  return await providerClient.createWebhook({ owner: repo_owner, repo, url, secret, events: WEBHOOK_EVENTS });
 }
 
-async function remove({ owner, repo_name: repo, token: access_token, appId, provider }) {
+async function remove({ repo_owner, repo_name: repo, token: access_token, appId, provider }) {
   try {
     const providerClient = git(provider, { access_token });
-    const webhooks = await providerClient.listWebhook({ owner, repo });
+    const webhooks = await providerClient.listWebhook({ owner: repo_owner, repo });
     const url = Webhook.getUrl(appId);
     debug(`webhook url is ${url}`);
     for (const row of webhooks) {
       if (row.url === url) {
-        debug(`remove webhook: ${JSON.stringify({ owner, repo, hook_id: row.id })}`);
-        await providerClient.deleteWebhook({ owner, repo, hook_id: row.id });
+        debug(`remove webhook: ${JSON.stringify({ owner: repo_owner, repo, hook_id: row.id })}`);
+        await providerClient.deleteWebhook({ owner: repo_owner, repo, hook_id: row.id });
         return;
       }
     }
@@ -70,8 +70,8 @@ async function triggered(appId, headers, body) {
   const {
     owner_org_id: ownerOrgId,
     environment = {},
-    webhook_secret,
-    owner = '',
+    repo_webhook_secret,
+    repo_owner = '',
     secrets = {},
   } = applicationResult;
   const orgResult = await orgModel.getOrgById(ownerOrgId);
@@ -85,7 +85,7 @@ async function triggered(appId, headers, body) {
   for (const key in environment) {
     const ele = environment[key];
     const eventConfig = _.get(ele, 'trigger_spec');
-    eventConfig[provider].secret = webhook_secret;
+    eventConfig[provider].secret = repo_webhook_secret;
     debug(`${key} eventConfig: ${JSON.stringify(eventConfig)}`);
     // 验证是否被触发
     const triggerConfig = await ignoreRunFunctionError(
@@ -115,8 +115,8 @@ async function triggered(appId, headers, body) {
         accessToken,
         dispatchOrgId: ownerOrgId, // 如果是 webhook 触发则传递ownerOrgId
         secrets,
-        owner,
-        webhook_secret,
+        repo_owner,
+        repo_webhook_secret,
       },
       envName: key,
       environment,

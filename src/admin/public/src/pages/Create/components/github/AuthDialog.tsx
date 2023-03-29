@@ -18,7 +18,7 @@ interface IUserInfo {
   value: string;
   third_part: {
     github: {
-      owner: string;
+      repo_owner: string;
       avatar: string;
       id: number;
     };
@@ -40,7 +40,7 @@ const AuthDialog = (props: IProps) => {
   const [userState] = store.useModel('user');
   const field = Field.useField();
   const { init, validate, setValue, getValue } = field;
-  const isAuth = Boolean(get(orgDetailRequest.data, 'data.third_part.github.owner'));
+  const isAuth = Boolean(get(orgDetailRequest.data, 'data.third_part.github.repo_owner'));
   const isOwner = get(orgDetailRequest.data, 'data.user_id') === get(userState, 'userInfo.id');
   useEffect(() => {
     orgDetailRequest.request();
@@ -63,7 +63,7 @@ const AuthDialog = (props: IProps) => {
     }
     const userInfo = get(orgDetailRequest.data, 'data', {}) as IUserInfo;
     const avatar = get(userInfo, 'third_part.github.avatar', '');
-    const value = get(userInfo, 'third_part.github.owner', '');
+    const value = get(userInfo, 'third_part.github.repo_owner', '');
     userInfo.value = value;
     userInfo.label = (
       <div className="flex-r">

@@ -29,7 +29,7 @@ declare type Repo = {
   url?: string;
   id?: number;
   name?: string;
-  owner?: string;
+  repo_owner?: string;
 };
 
 const TemplateDialog = (props: IProps) => {
@@ -39,18 +39,18 @@ const TemplateDialog = (props: IProps) => {
   const provider = 'github';
   const branch = get(value, 'trigger.branch') || 'master';
   const appId = get(getParams(location?.search), 'template');
-  const owner = get(value, 'gitUser.value');
+  const repo_owner = get(value, 'gitUser.value');
   const body = {
     provider: provider,
     appId: appId,
-    owner: owner,
+    repo_owner: repo_owner,
     repo: repoName,
     template: `devsapp/${appId}`,
   };
   let repo: Repo = {
     name: repoName,
-    owner: owner,
-    url: `https://${provider}.com/${owner}/${repoName}`,
+    repo_owner: repo_owner,
+    url: `https://${provider}.com/${repo_owner}/${repoName}`,
   };
 
   const setRepo = (data) => {

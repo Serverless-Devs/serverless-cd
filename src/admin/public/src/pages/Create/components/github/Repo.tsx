@@ -66,7 +66,7 @@ const Repos = (props: IProps) => {
   const [inputValue, setInputValue] = useState('');
   const { getValue, setValue, init, getError } = field;
   // owner是否授权
-  const isAuth = Boolean(get(orgDetailRequest.data, 'data.third_part.github.owner'));
+  const isAuth = Boolean(get(orgDetailRequest.data, 'data.third_part.github.repo_owner'));
 
   useEffect(() => {
     orgDetailRequest.request();

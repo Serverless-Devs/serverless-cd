@@ -25,7 +25,7 @@ model Org {
   id    String     @id    // 生成格式变更为：user_id:name
   third_part String?  @db.Text
   user_id String
-  secrets String?
+  secrets String?  @db.Text
   name String
   role String
   description String?
@@ -38,13 +38,13 @@ model Application {
   org_id String
   owner_org_id String
   description String?
-  owner String
-  provider String
   environment String @db.Text
-  provider_repo_id String
+  provider String
+  repo_owner String
+  repo_id String
   repo_name String
   repo_url String
-  webhook_secret String?
+  repo_webhook_secret String?
   created_time DateTime  @default(now())
   updated_time DateTime  @updatedAt
 }

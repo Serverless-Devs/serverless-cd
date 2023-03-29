@@ -18,6 +18,7 @@ model User {
   avatar String?
   password String?
   github_unionid String?
+  gitee_unionid String?
 }
 
 model Org {
@@ -38,13 +39,13 @@ model Application {
   org_id String
   owner_org_id String
   description String?
-  owner String
-  provider String
   environment String
-  provider_repo_id String
+  provider String
+  repo_owner String
+  repo_id String
   repo_name String
   repo_url String
-  webhook_secret String?
+  repo_webhook_secret String?
   created_time DateTime  @default(now())
   updated_time DateTime  @updatedAt
 }
