@@ -14,10 +14,9 @@ vars:
   workerFunctionName: worker
   adminFunctionName: admin
   workerDeliverFunctionName: workerDeliver
-  domain: '{{domain}}' # - domain 如果过期或者生成查看 s.domain.yaml
+  domain: '{{domain}}' # domain 生成仿照此文件然后运行 s get 命令 https://gitee.com/devsapp/domain/blob/master/examples/fc/s.yml
   logLocalPathPrefix: /mnt/auto/logs
   databaseUrl: '{{databaseUrl}}'
-  prisma: '{{prisma}}'
 
 services:
   worker:
@@ -26,7 +25,7 @@ services:
       pre-deploy:
         - run: npm install --registry=https://registry.npmmirror.com
           path: './worker'
-        - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
+        - run: npx prisma generate --schema=./prisma/{{prisma}}.prisma
           path: './worker'
       post-deploy:
         - component: fc api UpdateFunction --region ${vars.region} --header '{"x-fc-disable-container-reuse":"True"}' --path '{"serviceName":"${vars.service.name}","functionName":"${vars.workerFunctionName}"}'
@@ -89,12 +88,8 @@ services:
         #   path: './src/admin/public'
         - run: npm install --registry=https://registry.npmmirror.com
           path: './admin'
-        - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
+        - run: npx serverless-script deploy --file-path $(pwd)/../
           path: './admin'
-      {{if prisma === 'mysql'}}
-        - run: export RUN_TYPE='deploy' && node serverless-scripts
-          path: './admin'
-      {{/if}}
     props:
       region: ${vars.region}
       service: ${vars.service}
@@ -118,7 +113,7 @@ services:
           - acs:fc:${vars.region}:official:layers/Nodejs16/versions/2
           - acs:fc:${vars.region}:official:layers/SQLite3/versions/1
         environmentVariables:
-          PATH: /opt:/opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
+          PATH: /opt:/opt/bin:/opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
           DATABASE_URL: ${vars.databaseUrl} # 用于链接数据库
           LOG_LOCAL_PATH_PREFIX: ${vars.logLocalPathPrefix}
           JWT_SECRET: ${env.JWT_SECRET}

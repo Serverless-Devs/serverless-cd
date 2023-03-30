@@ -13,3 +13,4 @@ public/package.json
 public/package-lock.json
 public/.npmrc
 public/tsconfig.json
+db.prisma.art

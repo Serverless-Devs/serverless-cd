@@ -78,13 +78,6 @@ async function postInit(inputObj) {
     _.set(parameters, 'databaseUrl', '${env.DATABASE_URL}');
   } else {
     _.set(parameters, 'databaseUrl', 'file:/mnt/auto/dev.db');
-    try {
-      // const dbPath = path.join(targetPath, 'local.db');
-      // _.set(parameters, '_custom_secret_list.DATABASE_URL', dbPath);
-      // TODO: 通过 inputObj.fse 写一个 db 文件
-    } catch (e) {
-      /** */
-    }
   }
   logger.debug('数据库连接地址处理结束');
 
