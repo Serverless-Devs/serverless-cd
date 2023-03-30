@@ -6,7 +6,7 @@ install:
 	cd src/admin && npm install --registry=https://registry.npmmirror.com
 	cd src/admin/public && npm install --registry=https://registry.npmmirror.com
 
-# 前后端一起启动示例：make sqlite-start ui-start -j2
+# 前后端一起启动示例：make start ui-start -j2
 # 启动 ui
 ui-start:
 	cd src/admin/public && npm run start
