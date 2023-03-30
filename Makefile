@@ -1,29 +1,24 @@
 clear:
-	cd src/admin && rm -rf ./prisma/dev.db-journal ./prisma/migrations node_modules public/.ice
+	cd src/admin && rm -rf ./prisma/dev.db-journal ./prisma/migrations node_modules public/.ice ./.tmp
 
 # 安装依赖
-install: clear
+install:
 	cd src/admin && npm install --registry=https://registry.npmmirror.com
 	cd src/admin/public && npm install --registry=https://registry.npmmirror.com
 
+# 前后端一起启动示例：make sqlite-start ui-start -j2
 # 启动 ui
 ui-start:
 	cd src/admin/public && npm run start
-	
-# 默认启动 sqlite
-start: sqlite-start
-
-# 启动 admin sqlite
+# 启动 admin(sqlite)
 sqlite-start:
-	cd src/admin && npm run sqlite-start
-
-# 启动 admin mysql
+	cd src/admin && npx serverless-script start --file-path ../ --yaml s.local-run.sqlite.yaml
+# 启动 admin(mysql)
 mysql-start:
-	cd src/admin && npm run mysql-start
-
-# 启动 admin mysql
+	cd src/admin && npx serverless-script start --file-path ../ --yaml s.local-run.mysql.yaml
+# 启动 admin(mongodb)
 mongodb-start:
-	cd src/admin && npm run mongodb-start
+	cd src/admin && npx serverless-script start --file-path ../ --yaml s.local-run.mongodb.yaml
 
 # 发布版本步骤：
 #  先安装依赖
@@ -35,11 +30,5 @@ publish: install
 	cd src/admin && rm -rf ./prisma/dev.db && export DATABASE_URL="file:dev.db" && npx prisma migrate dev --name init --schema=./prisma/sqlite.prisma && rm -rf ./prisma/migrations
 	s cli registry publish
 
-# 测试启动，防止产生线上脏数据
-test-start:
-	cd src/admin && \
-	DATABASE_URL="$(PWD)/src/admin/dev.db" \
-	RUN_TYPE="s.local-run.sqlite.yaml" \
-	node serverless-scripts
 test:
 	cd src/admin && npx jest __tests__/auth.test.js --watch

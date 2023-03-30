@@ -4,6 +4,8 @@
 ./public/.ice
 ./node_modules/@prisma/engines
 ./node_modules/.prisma/client/libquery_engine-darwin.dylib.node
+./node_modules/@serverless-devs/core
+./.tmp
 __tests__
 public/abc.json
 public/build.json

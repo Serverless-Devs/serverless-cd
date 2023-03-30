@@ -1,5 +1,4 @@
 const _ = require('lodash');
-const core = require('@serverless-devs/core');
 const debug = require('debug')('serverless-cd:application');
 const path = require('path');
 const fs = require('fs-extra');
