@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { Icon } from '@alicloud/console-components';
+import { ReloadOutlined, LoadingOutlined } from '@ant-design/icons';
 
 interface Props {
   refreshCallback?: Function;
@@ -17,9 +17,9 @@ const RefreshButton = (props: Props) => {
   return (
     <div className="refresh-icon" style={style}>
       {loading ? (
-        <Icon type="loading" size="xs" />
+        <LoadingOutlined />
       ) : (
-        <Icon type="redo" size="xs" className="cursor-pointer" onClick={onRefresh} />
+        <ReloadOutlined className="cursor-pointer" onClick={onRefresh}/>
       )}
     </div>
   );

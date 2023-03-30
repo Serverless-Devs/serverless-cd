@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useRequest, history } from 'ice';
 import { Loading, Collapse, Icon } from '@alicloud/console-components';
 import { get, map, filter, isEmpty } from 'lodash';
 import { getTask, getTaskLog } from '@/services/task';
-import { DEPLOY_STATUS } from '@/constants/index';
+import { DEPLOY_STATUS, DEPLOY } from '@/constants';
+import { MinusCircleOutlined } from '@ant-design/icons';
 import PageLayout from '@/layouts/PageLayout';
 import Redeploy from '@/components/Redeploy';
 import CancelDeploy from '@/components/CancelDeploy';
@@ -21,6 +22,13 @@ const PanelTitle = ({ step, isRequest }) => {
   const type = get(DEPLOY_STATUS[status], 'icon');
   const iconColor = get(DEPLOY_STATUS[status], 'color');
 
+  const icon = useMemo(() => {
+    if (status === DEPLOY.SKIP) {
+      return <MinusCircleOutlined className={`mr-4`} />
+    }
+    return <Icon type={type} className={`${iconColor}`} size="small" />;
+  }, []);
+
   return (
     <div className="flex-r pr-16" style={{ width: '100%' }}>
       <span>
@@ -28,7 +36,7 @@ const PanelTitle = ({ step, isRequest }) => {
           {isRequest && (
             <Icon type="loading" size="small" style={{ position: 'absolute', left: 16 }} />
           )}
-          <Icon type={type} className={`${iconColor}`} size="small" />
+          {icon}
         </span>
         {run}
       </span>

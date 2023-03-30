@@ -2,6 +2,7 @@ import * as React from 'react';
 import { history } from 'ice';
 import { Breadcrumb, Box, Typography } from '@alicloud/console-components';
 import styles from './index.module.css';
+import { CopyOutlined } from '@ant-design/icons';
 
 const PageHeader = (props) => {
   const { breadcrumbs, title, description, breadcrumbExtra, subhead, ...others } = props;
@@ -34,6 +35,7 @@ const PageHeader = (props) => {
       {description && (
         <Typography.Text className={styles.description}>{description}</Typography.Text>
       )}
+      <CopyOutlined className="cursor-pointer copy-icon" style={{ cursor: 'pointer' }}/>
     </Box>
   );
 };

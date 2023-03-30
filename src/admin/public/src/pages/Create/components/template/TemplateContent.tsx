@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Field, Icon } from '@alicloud/console-components';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import { noop, find, get } from 'lodash';
 import { setSearchParams } from '@/utils/index';
 import Github from '../github/index';
@@ -41,7 +42,7 @@ const TemplateContent = (props: IProps) => {
   return (
     <>
       <h1 style={{ marginTop: 0 }}>
-        <Icon type="wind-arrow-left" className="mr-16 cursor-pointer" onClick={goTemplateList} />
+        <ArrowLeftOutlined className="mr-16 cursor-pointer" style={{ cursor: 'pointer' }} onClick={goTemplateList}/>
         模版列表
       </h1>
       <Github field={field} createType="template" orgName={orgName} />
