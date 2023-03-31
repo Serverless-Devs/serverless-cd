@@ -2,9 +2,10 @@ const { lodash: _ } = require('@serverless-cd/core');
 const { NotFoundError, unionToken } = require('../util');
 
 const applicationMode = require('../models/application.mode');
+const orgMode = require('../models/org.mode');
 const taskMode = require('../models/task.mode');
 
-function mergeFcResources(source, remote, action) {
+function mergeFcResources(source, remote) {
   if (_.isEmpty(source)) {
     return remote;
   }
@@ -12,89 +13,60 @@ function mergeFcResources(source, remote, action) {
     return source;
   }
 
-  const { uid, region, functions = [] } = source || {};
-  const sourceFunctions = _.map(functions, (item) => ({
-    uid, region, ...item,
-  }));
-
-  const { uid: remoteUid, region: remoteRegion } = remote || {};
-  const remoteFunctions = _.map(remote.functions, item => ({
-    uid: remoteUid,
-    region: remoteRegion,
-    ...item,
-  }));
-
-
-  let targetFunctions = [];
-  if (action === 0) {
-    targetFunctions = _.pullAllWith(remoteFunctions, sourceFunctions, _.isEqual);
-  } else {
-    targetFunctions = _.unionWith(remoteFunctions, sourceFunctions, _.isEqual);
-  }
-
-  return {
-    uid,
-    region,
-    functions: _.map(targetFunctions, item => {
-      if (item.uid === uid) {
-        _.unset(item, 'uid');
-      }
-      if (item.region === region) {
-        _.unset(item, 'region');
-      }
-      return item;
-    }),
-  };
+  return _.unionWith(remote, source, _.isEqual);
 }
 
-async function tracker(payload = {}) {
+async function tracker(orgName, payload = {}) {
   const {
-    source = 'aliyunAppCenter',
-    resource = {},
-    action = 1, // 0 删除，1 新增
+    // platform, // 暂时没有用到
+    source = 'app_center',
     status, // 成功 ｜ 失败
-    appId = '',
-    envName = '',
-    time = new Date().getTime(),
+    name,
+    envName = 'default',
+    resource = {},
+    time: updated_time = new Date().getTime(),
   } = payload;
-
-  if (!(appId || envName)) {
-    throw new ValidationError(`必填项参数异常。appId: ${appId}, envName: ${envName}`);
+  if (_.isEmpty(name)) {
+    throw new ValidationError('必填项应用名称为空参数异常');
   }
-
-  const appInfo = await applicationMode.getAppById(appId);
+  const { id: owner_org_id } = await orgMode.getOwnerOrgByName(orgName);
+  const appInfo = await applicationMode.getAppByAppName({ owner_org_id, name });
   if (_.isEmpty(appInfo)) {
-    throw new NotFoundError(`没有找到此应用：${appId}`);
+    throw new NotFoundError(`没有找到此应用：${name}`);
+  }
+  const environment = _.get(appInfo, 'environment', {});
+  if (_.isEmpty(_.get(environment, envName))) {
+    throw new NotFoundError(`没有找到应用${name}对应的环境${envName}`);
   }
 
-  const needCreateTask = !_.includes(['aliyunAppCenter', 'serverless-cd'], source);
+  // task 数据处理
+  const needCreateTask = !_.includes(['app_center', 'serverless_cd'], source);
   const taskId = needCreateTask ? unionToken() : '';
-  // 写 task 数据
   if (needCreateTask) {
     await taskMode.create({
       id: taskId,
       env_name: envName,
-      app_id: appId,
+      app_id: appInfo.id,
       status,
     });
   }
 
   // 修改 app 表
-  const environment = _.get(appInfo, 'environment', {});
-  const targetFcResource = _.get(environment, `${envName}.resource['aliyun.fc']`, {});
+  const targetFcResource = _.get(environment, `${envName}.resource.fc`, {});
   // 将fc相关数据写进app表
   _.set(
     environment,
-    `${envName}.resource['aliyun.fc']`,
+    `${envName}.resource.fc`,
     mergeFcResources(
-      resource['aliyun.fc'],
+      resource.fc,
       targetFcResource,
-      action,
     )
   );
   // 将上报相关数据写进app表latest_task
-  _.set(environment, `${envName}.latest_task`, { time, taskId, status, completed: true });
-  await applicationMode.updateAppById(appId, { environment });
+  _.set(environment, `${envName}.latest_task`, { updated_time, taskId, status, completed: true });
+  await applicationMode.updateAppById(appInfo.id, { environment });
+
+  return { taskId };
 }
 
 module.exports = { tracker };

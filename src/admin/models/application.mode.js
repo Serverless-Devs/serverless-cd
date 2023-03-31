@@ -26,6 +26,12 @@ module.exports = {
     const application = await applicationPrisma.findFirst({ where });
     return getAppInfo(application);
   },
+  async getAppByAppName({ owner_org_id, name }) {
+    const application = await applicationPrisma.findFirst({
+      where: { owner_org_id, name },
+    });
+    return getAppInfo(application);
+  },
   async getAppByProvider({ provider, providerRepoId }) {
     const application = await applicationPrisma.findFirst({
       where: {

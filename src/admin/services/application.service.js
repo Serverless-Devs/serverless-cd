@@ -36,7 +36,7 @@ async function preview(orgName, body = {}) {
     throw new ValidationError('代码仓库已绑定，请勿重新绑定');
   }
   const { id: owner_org_id } = await orgModel.getOwnerOrgByName(orgName);
-  application = await appModel.findFirstApp({
+  application = await appModel.getAppByAppName({
     owner_org_id,
     name,
   });
