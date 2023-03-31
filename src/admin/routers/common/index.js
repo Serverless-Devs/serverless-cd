@@ -33,7 +33,7 @@ router.post(`/${Webhook.ROUTE}`, async function (req, res) {
 });
 
 router.post('/tracker', auth(MEMBER_ROLE_KEYS), async function (req, res) {
-  await tracker(req.body);
+  await tracker(req.orgId, req.body);
   return res.json(Result.ofSuccess());
 });
 

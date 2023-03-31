@@ -1,17 +1,18 @@
-const _ = require('lodash');
-const debug = require('debug')('serverless-cd:application');
 const path = require('path');
-const fs = require('fs-extra');
-const { ValidationError, unionId } = require('../util');
+const debug = require('debug')('serverless-cd:application');
+const { default: loadApplication } = require('@serverless-devs/load-application');
+const { fs, lodash: _ } = require('@serverless-cd/core');
+const os = require('os');
+
 const appModel = require('../models/application.mode');
 const taskModel = require('../models/task.mode');
 const orgModel = require('../models/org.mode');
-const gitService = require('./git.service');
-const os = require('os');
-const { default: loadApplication } = require('@serverless-devs/load-application');
 
 const webhookService = require('./webhook.service');
 const orgService = require('./org.service');
+const gitService = require('./git.service');
+
+const { ValidationError, unionId, checkNameAvailable } = require('../util');
 
 async function listByOrgName(orgName = '') {
   const { id: orgId } = await orgModel.getOwnerOrgByName(orgName);
@@ -22,19 +23,30 @@ async function listByOrgName(orgName = '') {
   return data;
 }
 
-async function preview(body = {}) {
-  const { repo_id: providerRepoId, provider } = body;
-  const application = await appModel.getAppByProvider({
+async function preview(orgName, body = {}) {
+  const { repo_id: providerRepoId, provider, name } = body;
+
+  checkNameAvailable(name);
+
+  let application = await appModel.getAppByProvider({
     provider,
     providerRepoId,
   });
   if (!_.isEmpty(application)) {
     throw new ValidationError('代码仓库已绑定，请勿重新绑定');
   }
+  const { id: owner_org_id } = await orgModel.getOwnerOrgByName(orgName);
+  application = await appModel.findFirstApp({
+    owner_org_id,
+    name,
+  });
+  if (!_.isEmpty(application)) {
+    throw new ValidationError('应用 name 已存在，请换一个名称');
+  }
 }
 
 async function create(orgId, orgName, body) {
-  await preview(body);
+  await preview(orgName, body);
 
   const {
     repo,
@@ -44,6 +56,7 @@ async function create(orgId, orgName, body) {
     description,
     provider,
     environment,
+    name,
   } = body;
   const appId = unionId();
   const webHookSecret = unionId();
@@ -54,6 +67,7 @@ async function create(orgId, orgName, body) {
   debug('start create app');
   const ownerOrg = await orgModel.getOwnerOrgByName(orgName);
   await appModel.createApp({
+    name,
     id: appId,
     org_id: orgId,
     owner_org_id: _.get(ownerOrg, 'id'),

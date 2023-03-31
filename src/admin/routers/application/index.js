@@ -12,7 +12,7 @@ const { ADMIN_ROLE_KEYS, MEMBER_ROLE_KEYS, ROLE_KEYS } = require('@serverless-cd
  * 创建应用预检测
  */
 router.post('/preview', auth(ADMIN_ROLE_KEYS), async function (req, res) {
-  await appService.preview(req.body);
+  await appService.preview(req.orgName, req.body);
   return res.json(Result.ofSuccess());
 });
 
