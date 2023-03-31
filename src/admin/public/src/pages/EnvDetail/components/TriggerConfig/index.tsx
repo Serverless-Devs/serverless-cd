@@ -1,19 +1,20 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useRequest } from 'ice';
-import { Button, Drawer, Field, Form, Input } from '@alicloud/console-components';
+import { Button, Field, Form, Input } from '@alicloud/console-components';
 import PageInfo from '@/components/PageInfo';
 import { Toast } from '@/components/ToastContainer';
 import { updateApp } from '@/services/applist';
 import { githubBranches } from '@/services/git';
-import { get, isEmpty, uniqueId, map } from 'lodash';
+import { get, isEmpty, map } from 'lodash';
 import Trigger, { valuesFormat } from '@serverless-cd/trigger-ui';
 import { FORM_ITEM_LAYOUT } from '@/constants';
+import SlidePanel from '@alicloud/console-components-slide-panel';
+
 
 const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, envName }) => {
   const { request, loading } = useRequest(updateApp);
   const branchReq = useRequest(githubBranches);
   const [visible, setVisible] = useState(false);
-  const [triggerKey, setTriggerKey] = useState(uniqueId());
   const field = Field.useField();
   const { init, resetToDefault, validate } = field;
   const triggerRef: any = useRef(null);
@@ -47,10 +48,6 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, en
   };
 
   useEffect(() => {
-    setTriggerKey(uniqueId());
-  }, [triggerSpec]);
-
-  useEffect(() => {
     if (visible) {
       const { owner, repo_name } = data;
       if (owner && repo_name) branchReq.request({ owner, repo: repo_name });
@@ -75,17 +72,15 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, en
         </Button>
       }
     >
-      <div key={triggerKey}>
-        {triggerSpec[provider] && <Trigger.Preview dataSource={triggerSpec[provider]} />}
-      </div>
-      <Drawer
+      <SlidePanel
         title="编辑触发配置"
-        placement="right"
-        width="60%"
-        style={{ margin: 0 }}
-        visible={visible}
+        width="large"
+        isShowing={visible}
         onClose={onClose}
+        onCancel={onClose}
         className="dialog-drawer"
+        isProcessing={loading}
+        onOk={onSubmit}
       >
         <div className="dialog-body">
           <Form field={field} {...FORM_ITEM_LAYOUT}>
@@ -115,15 +110,7 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, en
             </Form.Item>
           </Form>
         </div>
-        <div className="dialog-footer">
-          <Button className="mr-10" type="primary" loading={loading} onClick={onSubmit}>
-            确定
-          </Button>
-          <Button type="normal" onClick={onClose}>
-            取消
-          </Button>
-        </div>
-      </Drawer>
+      </SlidePanel>
     </PageInfo>
   );
 };

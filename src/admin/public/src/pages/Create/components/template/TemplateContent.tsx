@@ -41,7 +41,7 @@ const TemplateContent = (props: IProps) => {
   return (
     <>
       <h1 style={{ marginTop: 0 }}>
-        <Icon type="wind-arrow-left" className="mr-16 cursor-pointer" onClick={goTemplateList} />
+        <Icon type="arrow-left" className="mr-16 cursor-pointer" size={'xl'} onClick={goTemplateList} />
         模版列表
       </h1>
       <Github field={field} createType="template" orgName={orgName} />

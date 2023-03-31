@@ -13,6 +13,8 @@ import CreateEnv from './components/CreateEnv';
 import { Toast } from '@/components/ToastContainer';
 import BasicInfo from '@/components/BasicInfo';
 import { getParam } from '@/utils';
+import { strictValuesParse } from '@serverless-cd/trigger-ui';
+
 
 const { Tooltip } = Balloon;
 
@@ -41,6 +43,8 @@ const Details = ({
   const trigger_spec = get(detailInfo, `data.environment.${envName}.trigger_spec`, {});
   const taskId = get(detailInfo, `data.environment.${envName}.latest_task.taskId`, '');
   const secrets = get(detailInfo, `data.environment.${envName}.secrets`, {});
+  const triggetInfo = strictValuesParse(get(trigger_spec, provider, {}));
+  const triggerType = triggetInfo['triggerType'];
 
   const fetchData = async () => {
     setLoading(true);
@@ -182,6 +186,19 @@ const Details = ({
             />
             <BasicInfo
               items={[
+                {
+                  text: '触发类型',
+                  value: triggerType
+                },
+                {
+                  text: '触发分支',
+                  value: triggerType === 'pull_request' ? get(triggetInfo, `${triggerType}Target`) : get(triggetInfo, `${triggerType}Value`),
+                },
+                {
+                  text: '目标分支',
+                  value: get(triggetInfo, `pull_requestSource`, '-'),
+                  hidden: triggerType !== 'pull_request'
+                },
                 {
                   text: '指定yaml',
                   value: get(detailInfo, `data.environment.${envName}.cd_pipeline_yaml`),
