@@ -66,7 +66,7 @@ services:
           path: './admin/public'
         - run: npm install --registry=https://registry.npmmirror.com
           path: './admin'
-        - run: npx serverless-script deploy --file-path $(pwd)/../ --yaml s.local.yaml
+        - run: npx serverless-script setup --file-path $(pwd)/../ --yaml s.local.yaml
           path: './admin'
     props:
       region: ${vars.region}
