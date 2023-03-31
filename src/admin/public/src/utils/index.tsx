@@ -37,6 +37,8 @@ export function replaceAll(string, search, replace) {
 export function getConsoleConfig(key: string, defaultValue?: any) {
   return _.get(window, `CONFIG.${key}`, defaultValue);
 }
+// 生成随机数
+export const generateRandom = () => Math.random().toString(36).substring(2, 6);
 
 /**
  * 日志关键字高亮处理
@@ -153,20 +155,20 @@ export function localStorageGet(key) {
       return JSON.parse(value);
     }
     return value;
-  } catch (error) {}
+  } catch (error) { }
 }
 
 export function localStorageSet(key, value) {
   try {
     const newValue = typeof value === 'object' ? JSON.stringify(value) : value;
     localStorage.setItem(key, newValue);
-  } catch (error) {}
+  } catch (error) { }
 }
 
 export function localStorageRemove(key) {
   try {
     localStorage.removeItem(key);
-  } catch (error) {}
+  } catch (error) { }
 }
 
 export const stopPropagation = async (e) => {
