@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = <%= provider %>
+  provider = "<%= provider %>"
   url      = env("DATABASE_URL")
 }
 
@@ -16,4 +16,45 @@ model User {
   password String?
   github_unionid String?
   gitee_unionid String?
+}
+
+model Org {
+  // 生成格式为：user_id:name
+  id    String @id   {{if provider === 'mongodb'}} @map("_id") {{/if}}
+  user_id String
+  secrets String?      {{if provider === 'mysql'}} @db.Text {{/if}}
+  name String
+  role String
+  logo String?
+  description String?
+  third_part String?    {{if provider === 'mysql'}} @db.Text {{/if}}
+  alias String?
+}
+
+model Application {
+  id String @id   {{if provider === 'mongodb'}} @map("_id") {{/if}}
+  org_id String
+  owner_org_id String
+  description String?
+  environment String   {{if provider === 'mysql'}} @db.Text {{/if}}
+  provider String
+  repo_owner String
+  repo_id String
+  repo_name String
+  repo_url String
+  repo_webhook_secret String?
+  created_time DateTime  @default(now())
+  updated_time DateTime  @updatedAt
+}
+
+model Task {
+  id String @id   {{if provider === 'mongodb'}} @map("_id") {{/if}}
+  env_name String
+  app_id String
+  status String?
+  steps String?      {{if provider === 'mysql'}} @db.Text {{/if}}
+  dispatch_org_id String?       // 记录谁操作的
+  trigger_payload  String?     {{if provider === 'mysql'}} @db.Text {{/if}}
+  created_time DateTime  @default(now())
+  updated_time DateTime  @updatedAt
 }

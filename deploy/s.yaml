@@ -89,9 +89,7 @@ services:
           path: '../src/admin/public'
         - run: npm install --registry=https://registry.npmmirror.com
           path: '../src/admin'
-        - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
-          path: '../src/admin'
-        - run: export RUN_TYPE='deploy' && node serverless-scripts
+        - run: npx serverless-script setup --file-path $(pwd)/../ --generate
           path: '../src/admin'
 
     props:

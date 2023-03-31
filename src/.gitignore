@@ -4,3 +4,4 @@ admin/public/build
 migrations
 admin/__tests__/tmp**
 .env
+.tmp

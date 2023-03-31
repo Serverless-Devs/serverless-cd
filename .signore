@@ -5,14 +5,13 @@ src/example
 .env
 .s
 /s.yaml
-/src/s.dev.yaml
-/src/s.local-run.*.yaml
-/src/serverless-cd.yaml
+/src/s.local.yaml
 /src/***/prisma/migrations
 /Makefile
 /package.json
 /package-lock.json
 /deploy
+/src/admin/prisma/schema.prisma
 
 /README.md
 _mock

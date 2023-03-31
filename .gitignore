@@ -10,8 +10,7 @@ _routes
 
 .ice
 **.log
-/s.yaml
-s.dev.yaml
 dev.db
 dev.db-journal
+src/admin/prisma/schema.prisma
 !/src/admin/prisma/dev.db
