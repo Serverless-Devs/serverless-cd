@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Button, Dialog, Icon } from '@alicloud/console-components';
+import { Button, Dialog } from '@alicloud/console-components';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { cancelDeployTask } from '@/services/task';
 import { useRequest } from 'ice';
 import { Toast } from '@/components/ToastContainer';
@@ -41,7 +42,7 @@ const CancelDeploy = (props: Props) => {
       <Dialog
         title={
           <div>
-            <Icon size="small" type="warning" style={{ color: '#ffc440', marginRight: 8 }} />
+            <ExclamationCircleOutlined style={{ color: '#ffc440', marginRight: 8 }} />
             取消部署 {repoName} 应用
           </div>
         }

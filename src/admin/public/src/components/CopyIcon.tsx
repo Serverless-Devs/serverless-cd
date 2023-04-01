@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
-import { Icon, Button } from '@alicloud/console-components';
+import { Button } from '@alicloud/console-components';
+import { CopyOutlined } from '@ant-design/icons';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Toast } from '@/components/ToastContainer';
 
@@ -23,7 +24,9 @@ const CopyIcon = ({ content, size = 'medium', type = 'icon', text, children }: P
       <span className={children ? 'copy-trigger' : ''}>
         {children}
         {type === 'icon' ? (
-          <Icon type="copy" className="cursor-pointer copy-icon" size={size} />
+          <span className="mr-4 copy-icon cursor-pointer">
+            <CopyOutlined/>
+          </span>
         ) : (
           <Button className="mr-8" type="primary" text>
             {text}

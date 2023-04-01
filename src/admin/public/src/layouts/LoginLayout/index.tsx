@@ -37,7 +37,7 @@ interface IBasicLayoutProps {
   showMenu: boolean;
   match: object | any;
 }
-export function LoginLayout({ children }: IBasicLayoutProps) {
+export function LoginLayout({ children, match: { path } }: IBasicLayoutProps) {
   const getDevice: IGetDevice = (width) => {
     const isPhone =
       typeof navigator !== 'undefined' && navigator && navigator.userAgent.match(/phone/gi);
@@ -70,12 +70,16 @@ export function LoginLayout({ children }: IBasicLayoutProps) {
         fixedHeader={false}
         className="layout-content-bg"
       >
-        <Shell.Branding>
-          <Logo
-            image={LOGO_URL}
-            // text="Serverless CD"
-          />
-        </Shell.Branding>
+        {
+          path !== '/noAuth' && (
+            <Shell.Branding>
+              <Logo
+              image={LOGO_URL}
+              // text="Serverless CD"
+              />
+            </Shell.Branding>
+          )
+        }
         <Shell.Content>
           {children}
           <ToastContainer />

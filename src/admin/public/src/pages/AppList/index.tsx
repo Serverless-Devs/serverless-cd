@@ -22,6 +22,7 @@ import { Toast } from '@/components/ToastContainer';
 import { sleep, getOrgName, localStorageSet } from '@/utils';
 import store from '@/store';
 import Status from '@/components/DeployStatus';
+import Copy from '@/components/CopyIcon';
 
 const { Tooltip } = Balloon;
 
@@ -155,6 +156,15 @@ const AppList = ({
       title: '应用名称',
       dataIndex: 'repo_name',
       cell: repoNameRender,
+    },
+    {
+      title: 'ID',
+      dataIndex: 'id',
+      cell: (val) => (
+        <div className="cursor-pointer">
+          <Copy content={val} >{val}</Copy>
+        </div>
+      ),
     },
     {
       key: 'created_time',

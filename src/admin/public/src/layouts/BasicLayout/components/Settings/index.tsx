@@ -1,11 +1,12 @@
 import React, { FC } from 'react';
 import { Dropdown, Menu, Avatar } from '@alicloud/console-components';
+import Icon, { UserOutlined, FormOutlined, TeamOutlined } from '@ant-design/icons';
 import { logout } from '@/services/auth';
 import { history, useRequest } from 'ice';
 import store from '@/store';
 import { get, unset } from 'lodash';
 import { stopPropagation, isAdmin } from '@/utils';
-import { ORG_NAME } from '@/constants';
+import { ORG_NAME, CUSTOMICON } from '@/constants';
 
 type Props = {
   orgName: string;
@@ -26,20 +27,32 @@ const Settings: FC<Props> = (props) => {
       history?.push('/login');
     };
 
+    const LogOutIcon = (props) => (
+      <Icon component={CUSTOMICON['LOGOUT']} {...props} />
+    );
+    const MENUICON = {
+      USERNAME: <UserOutlined style={{ marginRight: '6px' }} />,
+      PERSONALSET: <FormOutlined style={{ marginRight: '6px' }} />,
+      TEAMMANAGEMENT: <TeamOutlined style={{ marginRight: '6px' }} />,
+      LOGOUT: <LogOutIcon style={{ marginRight: '6px' }} />,
+    }
+
     return (
       <Menu className="top-bar-menu__wrapper">
         <Menu.Item className="border-bottom">
-          <span onClick={stopPropagation}>{username}</span>
+          {MENUICON.USERNAME}<span onClick={stopPropagation}>{username}</span>
         </Menu.Item>
         <Menu.Item className="border-bottom" onClick={() => history?.push('/organizations')}>
-          个人设置
+          {MENUICON.PERSONALSET}个人设置
         </Menu.Item>
         {isAdmin(orgName) && (
           <Menu.Item className="border-bottom" onClick={() => history?.push('/team')}>
-            团队管理
+            {MENUICON.TEAMMANAGEMENT}团队管理
           </Menu.Item>
         )}
-        <Menu.Item onClick={onLogout}>退出登录</Menu.Item>
+        <Menu.Item onClick={onLogout}>
+           {MENUICON.LOGOUT}退出登录
+        </Menu.Item>
       </Menu>
     );
   };

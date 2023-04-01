@@ -1,4 +1,3 @@
-import { Icon } from '@alicloud/console-components';
 import React, { memo } from 'react';
 
 const ExternalLink = ({
