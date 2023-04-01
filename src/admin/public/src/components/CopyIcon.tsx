@@ -24,7 +24,9 @@ const CopyIcon = ({ content, size = 'medium', type = 'icon', text, children }: P
       <span className={children ? 'copy-trigger' : ''}>
         {children}
         {type === 'icon' ? (
-          <CopyOutlined className="cursor-pointer copy-icon" style={{ cursor: 'pointer' }} size={size}/>
+          <span className="mr-4 copy-icon cursor-pointer">
+            <CopyOutlined/>
+          </span>
         ) : (
           <Button className="mr-8" type="primary" text>
             {text}

@@ -41,6 +41,7 @@ const Details = ({
   const trigger_spec = get(detailInfo, `data.environment.${envName}.trigger_spec`, {});
   const taskId = get(detailInfo, `data.environment.${envName}.latest_task.taskId`, '');
   const secrets = get(detailInfo, `data.environment.${envName}.secrets`, {});
+  const appName = get(detailInfo, 'data.repo_name', '')
 
   const fetchData = async () => {
     setLoading(true);
@@ -50,7 +51,7 @@ const Details = ({
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [envName]);
 
   const handleRefresh = async () => {
     setLoading(true);
@@ -124,7 +125,7 @@ const Details = ({
           path: `/${orgName}/application`,
         },
         {
-          name: `${appId}(${envName})`,
+          name: appName,
         },
       ]}
       breadcrumbExtra={
@@ -159,7 +160,7 @@ const Details = ({
         </>
       }
     >
-      <Tab shape="wrapped" activeKey={tabKey} onChange={(value: string) => setTabKey(value)}>
+      <Tab shape="pure" activeKey={tabKey} onChange={(value: string) => setTabKey(value)}>
         <Tab.Item key={TAB.OVERVIEW} title="应用概览">
           <Loading visible={loading} inline={false} className="mt-16">
             <BasicInfoDetail
