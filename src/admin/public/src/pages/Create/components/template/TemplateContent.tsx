@@ -36,7 +36,9 @@ const TemplateContent = (props: IProps) => {
   }, [get(templateContent, 'description')]);
 
   const setInitValue = () => {
-    setValue('repoName', `${template}-${generateRandom()}`);
+    const repoName = `${template}-${generateRandom()}`;
+    setValue('repoName', repoName);
+    setValue('name', repoName);
   };
 
   return (

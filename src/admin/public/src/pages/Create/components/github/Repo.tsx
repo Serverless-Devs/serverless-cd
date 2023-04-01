@@ -8,8 +8,10 @@ import RefreshIcon from '@/components/RefreshIcon';
 import { githubOrgs, githubOrgRepos } from '@/services/git';
 import { orgDetail } from '@/services/org';
 import { CREATE_TYPE } from '../constant';
+import { generateRandom } from '@/utils';
 
 const FormItem = Form.Item;
+
 export interface IRepoItem {
   name: string;
   owner: string;
@@ -71,7 +73,7 @@ const Repos = (props: IProps) => {
 
   useEffect(() => {
     orgDetailRequest.request();
-  },[])
+  }, [])
 
   useEffect(() => {
     setInputValue(getValue('repoName'));
@@ -239,6 +241,7 @@ const Repos = (props: IProps) => {
 
   const handleChange = (value: string) => {
     const item = find(getValue('userRepos'), (obj: IRepoItem) => obj.value === value);
+    setValue('name', `${value}-${generateRandom()}`);
     onChange(item);
   };
   const onRepoTypeChange = (value) => {
@@ -299,11 +302,11 @@ const Repos = (props: IProps) => {
             dataSource={
               createTemplate
                 ? [
-                    {
-                      value: 'personal',
-                      label: '个人仓库',
-                    },
-                  ]
+                  {
+                    value: 'personal',
+                    label: '个人仓库',
+                  },
+                ]
                 : getValue('repoTypeList')
             }
             {...init('repoTypeValue', {

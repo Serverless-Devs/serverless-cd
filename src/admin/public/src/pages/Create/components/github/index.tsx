@@ -88,6 +88,15 @@ const Github = (props: IProps) => {
             }) as any)}
           />
         </FormItem>
+        <FormItem label="应用名称" required extra={<div className='color-gray mt-4'>必须以字母开头，可含数字、字母（大小写敏感）、连字符，长度小于64个字符。</div>}>
+          <Input
+            {
+            ...init('name')
+            }
+            placeholder="请输入应用名称"
+            className="full-width"
+          />
+        </FormItem>
         <FormItem label="描述">
           <Input {...init('description')} placeholder="请输入描述" />
         </FormItem>
