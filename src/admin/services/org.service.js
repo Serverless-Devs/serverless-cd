@@ -5,7 +5,7 @@ const git = require('@serverless-cd/git-provider');
 const orgModel = require('../models/org.mode');
 const applicationModel = require('../models/application.mode');
 const userModel = require('../models/user.mode');
-const { ValidationError, NoPermissionError, generateOrgIdByUserIdAndOrgName } = require('../util');
+const { ValidationError, NoPermissionError, checkNameAvailable, generateOrgIdByUserIdAndOrgName } = require('../util');
 
 async function getProviderToken(orgName, provider) {
   const result = await orgModel.getOwnerOrgByName(orgName);
@@ -72,9 +72,8 @@ async function createOrg(userId, body) {
   if (_.isEmpty(name)) {
     throw new ValidationError('创建团队 name 是必填项');
   }
-
-  const orgId = generateOrgIdByUserIdAndOrgName(userId, name);
-  const userData = await orgModel.getOrgById(orgId);
+  checkNameAvailable(name);
+  const userData = await orgModel.getOwnerOrgByName(name);
   if (!_.isEmpty(userData)) {
     throw new ValidationError('团队已存在');
   }
