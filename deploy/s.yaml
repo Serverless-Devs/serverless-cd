@@ -89,7 +89,7 @@ services:
           path: '../src/admin/public'
         - run: npm install --registry=https://registry.npmmirror.com
           path: '../src/admin'
-        - run: npx serverless-script setup --file-path $(pwd)/../ --generate
+        - run: npx serverless-script setup --file-path ../../deploy --generate
           path: '../src/admin'
 
     props:
