@@ -29,10 +29,12 @@ interface IProps {
   value?: IUserInfo | undefined;
   onChange?: (value: IUserInfo) => void;
   reset?: () => void;
+  setRepoKey?: (key: number) => void;
+  repoKey?: number;
 }
 
 const AuthDialog = (props: IProps) => {
-  const { value, onChange = noop, reset = noop } = props;
+  const { value, onChange = noop, reset = noop, setRepoKey, repoKey = 0 } = props;
   const [visible, setVisible] = useState(false);
   const [refreshLoading, setRefreshLoading] = useState(false);
   const { loading, request } = useRequest(updateUserProviderToken);
@@ -139,6 +141,7 @@ const AuthDialog = (props: IProps) => {
   const refresh = async () => {
     setRefreshLoading(true);
     await orgDetailRequest.refresh();
+    setRepoKey && setRepoKey(repoKey + 1);
     setRefreshLoading(false);
   };
 

@@ -29,6 +29,10 @@ export const removeEnv = async (body) => {
   return await request.post('/api/application/removeEnv', body);
 };
 
+export const templatePreview = async (body) => {
+  return await request.post('/api/application/preview', body);
+};
+
 export const createByTemplate = async (params) => {
   return await request.post(
     '/api/application/createByTemplate',
