@@ -23,6 +23,7 @@ const Github = (props: IProps) => {
   const { field, createType, orgName } = props;
   const { init, getValue, resetToDefault } = field;
   const [dialogVisible, setVisible] = useState(false);
+  const [repoKey, setRepoKey] = useState(0);
   const secretsRef: any = useRef(null);
   const specify = get(getValue('trigger'), 'push') === PUSH.SPECIFY;
   const template = createType === 'template';
@@ -62,6 +63,8 @@ const Github = (props: IProps) => {
         <FormItem label="仓库用户/组织" required>
           <AuthDialog
             reset={resetToDefault}
+            setRepoKey={setRepoKey}
+            repoKey={repoKey}
             {...init('gitUser', {
               rules: [
                 {
@@ -77,6 +80,7 @@ const Github = (props: IProps) => {
             field={field}
             createType={createType}
             createTemplate={template}
+            key={`repo-${repoKey}`}
             setCreateDisabled={setCreateDisabled}
             {...(init('repo', {
               rules: [
@@ -91,7 +95,7 @@ const Github = (props: IProps) => {
         <FormItem label="应用名称" required extra={<div className='color-gray mt-4'>必须以字母开头，可含数字、字母（大小写敏感）、连字符，长度小于64个字符。</div>}>
           <Input
             {
-            ...init('name')
+            ...init('name', { rules: { required: true } })
             }
             placeholder="请输入应用名称"
             className="full-width"
