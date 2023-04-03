@@ -5,10 +5,7 @@
   "main": "index.js",
   "scripts": {
     "prettier": "cd ../.. && npm run prettier",
-    "start": "npm run sqlite-start",
-    "sqlite-start": "export RUN_TYPE=\"s.local-run.sqlite.yaml\" && node serverless-scripts",
-    "mysql-start": "export RUN_TYPE=\"s.local-run.mysql.yaml\" && node serverless-scripts",
-    "mongodb-start": "export RUN_TYPE=\"s.local-run.mongodb.yaml\" && node serverless-scripts",
+    "start": "DEBUG=serverless-cd:* serverless-script start --file-path $(pwd)/../",
     "test": "jest __tests__/auth.test.js --watch"
   },
   "jest": {
@@ -20,14 +17,14 @@
   "author": "mamba",
   "license": "ISC",
   "dependencies": {
-    "@serverless-cd/serverless-script":"latest",
     "@prisma/client": "^4.10.1",
     "@serverless-cd/config": "latest",
     "@serverless-cd/core": "^0.0.15",
     "@serverless-cd/git": "^0.0.6",
     "@serverless-cd/git-provider": "^0.1.2",
+    "@serverless-cd/serverless-script": "^0.0.3",
     "@serverless-cd/srm-aliyun-fc2": "^0.0.5",
-    "@serverless-cd/trigger": "^0.0.12",
+    "@serverless-cd/trigger": "^0.0.14",
     "@serverless-devs/load-application": "^0.0.1",
     "ali-oss": "^6.17.1",
     "axios": "^0.27.2",

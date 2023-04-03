@@ -1,6 +1,7 @@
 import React, { useEffect, ReactNode, useState, useRef } from 'react';
 import { useRequest } from 'ice';
 import { Select, Icon, Field, Form, Input } from '@alicloud/console-components';
+import { ProfileOutlined } from '@ant-design/icons';
 import store from '@/store';
 import { noop, map, find, isEmpty, cloneDeep, get, debounce } from 'lodash';
 import RefreshIcon from '@/components/RefreshIcon';
@@ -177,7 +178,7 @@ const Repos = (props: IProps) => {
               onClick={(e) => goDetail(e, item)}
             >
               <span>详情</span>
-              <Icon className="ml-4" type="external-link" size={12} />
+              <ProfileOutlined className="ml-4" style={{ fontSize: '12px' }} />
             </div>
           </div>
         ),
@@ -217,7 +218,7 @@ const Repos = (props: IProps) => {
               onClick={(e) => goDetail(e, item)}
             >
               <span>详情</span>
-              <Icon className="ml-4" type="external-link" size={12} />
+              <ProfileOutlined className="ml-4" style={{ fontSize: '12px' }} />
             </div>
           </div>
         ),

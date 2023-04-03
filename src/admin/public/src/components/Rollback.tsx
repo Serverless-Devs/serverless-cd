@@ -1,6 +1,7 @@
 import React, { useEffect, useState, FC } from 'react';
-import { Button, Dialog, Icon, Select } from '@alicloud/console-components';
+import { Button, Dialog, Select } from '@alicloud/console-components';
 import { redeployTask, getTaskList } from '@/services/task';
+import { ExclamationCircleFilled } from '@ant-design/icons';
 import { useRequest } from 'ice';
 import { Toast } from '@/components/ToastContainer';
 import { sleep } from '@/utils/index';
@@ -64,7 +65,7 @@ const Rollback: FC<IProps> = (props) => {
       <Dialog
         title={
           <div>
-            <Icon size="small" type="warning" style={{ color: '#ffc440', marginRight: 8 }} />
+            <ExclamationCircleFilled  style={{ color: '#ffc440', marginRight: 8 }}/>
             回滚
           </div>
         }
