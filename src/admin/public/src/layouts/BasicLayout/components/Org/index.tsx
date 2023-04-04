@@ -3,9 +3,9 @@ import { Select } from '@alicloud/console-components';
 import { history, useRequest } from 'ice';
 import style from 'styled-components';
 import { ORG_LOGO } from '@/constants/public';
-import { localStorageSet } from '@/utils';
+import { getParam, localStorageSet } from '@/utils';
 import { listOrgs } from '@/services/user';
-import { get, map, find } from 'lodash';
+import { get, map, find, isEmpty } from 'lodash';
 import './index.less';
 
 const StyledWrapper = style.div`
@@ -24,7 +24,7 @@ const Org: FC<Props> = (props) => {
 
   useEffect(() => {
     orgName && orgRequest.request();
-  }, [orgName]);
+  }, [orgName, getParam('orgrefresh')]);
 
   const handleChangeOrg = async (value) => {
     const obj = find(dataSource, (item) => item.value === value);
@@ -51,7 +51,7 @@ const Org: FC<Props> = (props) => {
   return (
     <StyledWrapper>
       <Select
-        value={orgName}
+        value={isEmpty(dataSource) ? '' : orgName}
         style={{ width: 150 }}
         dataSource={dataSource}
         onChange={handleChangeOrg}

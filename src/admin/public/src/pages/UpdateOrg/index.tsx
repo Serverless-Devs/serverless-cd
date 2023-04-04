@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { useRequest } from 'ice';
+import { useRequest, history } from 'ice';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import { Toast } from '@/components/ToastContainer';
 import { updateOrg } from '@/services/org';
@@ -17,39 +17,68 @@ const UpdateOrg: FC<Props> = ({ match }) => {
   const orgName = get(match, 'params.orgName');
   const [userState] = store.useModel('user');
   const listOrgs = get(userState, 'userInfo.listOrgs.result', []);
-
-  const { request, loading } = useRequest(updateOrg);
+  const { pathname } = window.location;
+  const { request, refresh, loading } = useRequest(updateOrg);
   const field = Field.useField({
     values: find(listOrgs, (item: any) => item.name === orgName),
   });
   const { init, validate } = field;
 
   const onSubmit = async () => {
-    validate(async (errors, values) => {
+    validate(async (errors, values: any) => {
       if (errors) return;
-      const { success } = await request({ ...values, orgName: orgName });
+      const params = {
+        name: values.name,
+        alias: values.alias,
+        logo: values.Logo,
+        description: values.description,
+      };
+      const { success } = await request({ ...params, orgName: orgName });
       if (success) {
         Toast.success('保存成功');
+        refresh();
+        history?.push(`/${orgName}/setting/org?orgRefresh=${new Date().getTime()}`);
       }
     });
   };
   return (
     <Form field={field} {...FORM_ITEM_LAYOUT} className="page-content">
-      <FormItem label="团队名称" required>
-        <Input
-          disabled
+       <FormItem label="团队地址" required>
+        <Input disabled
+          {...init('host', {
+            initValue: window.location.host,
+          })
+          }
+          style={{ width: '20%' }}
+        />
+        <Input disabled
           {...init('name', {
             rules: [
               {
                 required: true,
-                message: '请输入团队名称',
+                message: '请输入团队地址',
               },
             ],
           })}
+          style={{ width: '55%' }}
+        />
+        <Input disabled
+          {...init('pathname', {
+            initValue: `/${pathname.split('/').slice(2).join('/')}`,
+          })
+          }
+          style={{ width: '25%' }}
         />
       </FormItem>
-      <FormItem label="团队别名">
-        <Input {...init('alias')} />
+      <FormItem label="团队名称" required>
+        <Input {...init('alias', {
+          rules: [
+            {
+              required: true,
+              message: '请输入团队名称',
+            },
+          ],
+        })} />
       </FormItem>
       <FormItem label="Logo">
         <Input {...init('logo')} />

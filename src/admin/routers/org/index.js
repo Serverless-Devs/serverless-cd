@@ -50,9 +50,10 @@ router.post('/updateAuth', auth(ADMIN_ROLE_KEYS), async (req, res) => {
 router.post('/update', auth(ADMIN_ROLE_KEYS), async (req, res) => {
   const {
     orgName,
-    body: { secrets },
+    body,
   } = req;
-  await orgService.updateOwnerByName(orgName, { secrets });
+  delete body.orgName;
+  await orgService.updateOwnerByName(orgName, body);
   res.json(Result.ofSuccess());
 });
 

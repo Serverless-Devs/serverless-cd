@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRequest, history } from 'ice';
 import { Button, Icon, Table, Dialog } from '@alicloud/console-components';
 import Actions, { LinkButton } from '@alicloud/console-components-actions';
@@ -10,11 +10,13 @@ import { get } from 'lodash';
 import { ROLE } from '@/constants';
 import store from '@/store';
 import { localStorageSet, localStorageRemove } from '@/utils';
+import CreateOrg from '@/pages/CreateOrg';
 
 function Orgs() {
   const { data, request, refresh, loading } = useRequest(listOrgs);
   const [userState] = store.useModel('user');
   const username = get(userState, 'userInfo.username');
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     request();
@@ -43,7 +45,7 @@ function Orgs() {
 
   const columns = [
     {
-      title: '团队名称',
+      title: '团队地址',
       key: 'name',
       dataIndex: 'name',
       cell: (value, _index, record) => (
@@ -53,7 +55,7 @@ function Orgs() {
       ),
     },
     {
-      title: '团队别名',
+      title: '团队名称',
       key: 'alias',
       dataIndex: 'alias',
       cell: (value, _index, record) => value || record.name,
@@ -95,7 +97,7 @@ function Orgs() {
   return (
     <div className="mt-16">
       <div className="flex-r mb-16">
-        <Button type="primary" onClick={() => history?.push('/organizations/create')}>
+        <Button type="primary" onClick={() => setVisible(true)}>
           新建团队
         </Button>
         <Button onClick={refresh}>
@@ -108,6 +110,7 @@ function Orgs() {
         dataSource={get(data, 'result')}
         columns={columns}
       />
+    <CreateOrg callback={refresh} active={visible}/>
     </div>
   );
 }
