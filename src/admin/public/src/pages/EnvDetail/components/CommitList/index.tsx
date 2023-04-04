@@ -111,7 +111,7 @@ const CommitList: FC<IProps> = (props) => {
               return (
                 <Col span="6">
                   <div className="deploy-item mb-8">
-                    <div className="flex-r">
+                    <div className="flex-r" style={{ height: 24 }}>
                       <div className="copy-trigger flex-r" style={{ justifyContent: 'flex-start' }}>
                         <Link
                           className="commit-description text-nowrap-1 mr-8"
