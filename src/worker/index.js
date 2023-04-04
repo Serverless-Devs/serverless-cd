@@ -55,7 +55,7 @@ async function handler(event, _context, callback) {
     console.log(`get task url: ${url}, target org name: ${orgName}`);
   }
 
-  const appTaskConfig = { taskId, commit, message, ref, trigger_type };
+  const appTaskConfig = { taskId, commit, message, ref };
 
   const getEnvData = (context) => ({
     ...appTaskConfig,
@@ -171,6 +171,7 @@ async function handler(event, _context, callback) {
 
   console.log('init task');
   await makeTask(taskId, {
+    trigger_type,
     env_name: envName,
     dispatch_org_id: dispatchOrgId,
     app_id: appId,

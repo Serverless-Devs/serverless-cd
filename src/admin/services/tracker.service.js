@@ -5,21 +5,20 @@ const applicationMode = require('../models/application.mode');
 const orgMode = require('../models/org.mode');
 const taskMode = require('../models/task.mode');
 
-function mergeFcResources(source, remote) {
-  if (_.isEmpty(source)) {
+function mergeFcResources(platform, remote) {
+  if (_.isEmpty(platform)) {
     return remote;
   }
   if (_.isEmpty(remote)) {
-    return source;
+    return platform;
   }
 
-  return _.unionWith(remote, source, _.isEqual);
+  return _.unionWith(remote, platform, _.isEqual);
 }
 
 async function tracker(orgName, payload = {}) {
   const {
-    // platform, // 暂时没有用到
-    source = 'app_center',
+    platform = 'app_center',
     status, // 成功 ｜ 失败
     name,
     envName = 'default',
@@ -40,13 +39,14 @@ async function tracker(orgName, payload = {}) {
   }
 
   // task 数据处理
-  const needCreateTask = !_.includes(['app_center', 'serverless_cd'], source);
+  const needCreateTask = !_.includes(['app_center', 'serverless_cd'], platform);
   const taskId = needCreateTask ? unionToken() : '';
   if (needCreateTask) {
     await taskMode.create({
       id: taskId,
       env_name: envName,
       app_id: appInfo.id,
+      trigger_type: `tracker:${platform}`,
       status,
     });
   }
