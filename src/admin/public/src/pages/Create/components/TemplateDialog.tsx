@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import CreateTemplateDialog from '@serverless-cd/creating-ui';
-import { createByTemplate } from '@/services/applist';
+import { createByTemplate, templatePreview } from '@/services/applist';
 import { doManualDeployApp, doCreateApp } from '@/services/common';
 import { getParams } from '@/utils';
 import { get } from 'lodash';
@@ -40,11 +40,13 @@ const TemplateDialog = (props: IProps) => {
   const branch = get(value, 'trigger.branch') || 'master';
   const appId = get(getParams(location?.search), 'template');
   const repo_owner = get(value, 'gitUser.value');
+  const name = get(value, 'name', '');
   const body = {
     provider: provider,
     appId: appId,
     repo_owner: repo_owner,
     repo: repoName,
+    name,
     template: `devsapp/${appId}`,
   };
   let repo: Repo = {
@@ -67,6 +69,23 @@ const TemplateDialog = (props: IProps) => {
       successMsg: '同步仓库成功',
       errorMsg: '同步仓库失败',
       tasks: [
+        {
+          key: 'initPreview',
+          title: '校验初始化模版',
+          runningMsg: '初始化模版校验中...',
+          successMsg: '初始化模版校验成功',
+          errorMsg: '初始化模版校验失败',
+          run: async () => {
+            const res = await templatePreview({
+              ...body,
+            });
+            if (!res.success) {
+              throw new Error(res.message);
+            } else {
+              return res.data;
+            }
+          },
+        },
         {
           key: 'initTemplate',
           title: '初始化模版',

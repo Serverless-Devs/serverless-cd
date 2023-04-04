@@ -12,7 +12,7 @@ import TriggerConfig from './components/TriggerConfig';
 import CreateEnv from './components/CreateEnv';
 import { Toast } from '@/components/ToastContainer';
 import BasicInfo from '@/components/BasicInfo';
-import { getParam } from '@/utils';
+import { getParam, setSearchParams } from '@/utils';
 import { strictValuesParse } from '@serverless-cd/trigger-ui';
 
 
@@ -52,6 +52,12 @@ const Details = ({
     await request({ id: appId });
     setLoading(false);
   };
+
+  useEffect(() => {
+    setSearchParams({
+      tab: tabKey,
+    });
+  }, [tabKey]);
 
   useEffect(() => {
     fetchData();
@@ -112,6 +118,10 @@ const Details = ({
     forceUpdate(Date.now());
   };
 
+  const onTabChange = (value: string) => {
+    setTabKey(value);
+  }
+
   return (
     <PageLayout
       title="环境切换"
@@ -164,7 +174,7 @@ const Details = ({
         </>
       }
     >
-      <Tab shape="pure" activeKey={tabKey} onChange={(value: string) => setTabKey(value)}>
+      <Tab shape="pure" activeKey={tabKey} onChange={onTabChange}>
         <Tab.Item key={TAB.OVERVIEW} title="应用概览">
           <Loading visible={loading} inline={false} className="mt-16">
             <BasicInfoDetail
