@@ -1,7 +1,7 @@
 import React, { FC, useEffect } from 'react';
 import { useRequest, useLocation, history } from 'ice';
 import SlidePanel from '@alicloud/console-components-slide-panel';
-import { Form, Field, Select } from '@alicloud/console-components';
+import { Form, Field, Select, Dialog, Loading } from '@alicloud/console-components';
 import { FORM_ITEM_LAYOUT, ROLE } from '@/constants';
 import { Toast } from '@/components/ToastContainer';
 import { inviteUser, updateAuth } from '@/services/org';
@@ -17,20 +17,23 @@ type IProps = {
   callback: () => Promise<any>;
   dataSource?: { inviteUserName: string; role: `${ROLE}` };
   existUsers?: string[];
+  active?: boolean;
+  orgName?: string;
+  changeVisible?: any;
 };
 
 const AddMember: FC<IProps> = (props) => {
   const { pathname } = useLocation();
-  const { children, callback, type = 'create', dataSource, existUsers } = props;
+  const { children, callback, type = 'create', dataSource, existUsers, active = false, orgName, changeVisible } = props;
   if (getParam('showSlide') === 'true' && type !== 'create') return null;
   const { request, loading } = useRequest(type === 'create' ? inviteUser : updateAuth);
   const [visible, setVisible] = React.useState(false);
 
   useEffect(() => {
-    if (getParam('showSlide') === 'true') {
-      setVisible(true);
+    if (active) {
+      setVisible(active);
     }
-  }, [getParam('showSlide')]);
+  }, [active]);
   const field = Field.useField({
     values: dataSource,
   });
@@ -38,6 +41,7 @@ const AddMember: FC<IProps> = (props) => {
   const handleClose = () => {
     resetToDefault();
     setVisible(false);
+    changeVisible(false);
     if (getParam('showSlide') === 'true') {
       history?.push(pathname);
     }
@@ -48,6 +52,7 @@ const AddMember: FC<IProps> = (props) => {
       const { success } = await request(values);
       if (success) {
         Toast.success(type === 'create' ? '添加成员成功' : '编辑成员成功');
+        active && history?.push(`/${orgName}/setting/members?orgRefresh=${new Date().getTime()}`);
         handleClose();
         await callback();
       }
@@ -66,63 +71,63 @@ const AddMember: FC<IProps> = (props) => {
   return (
     <>
       <span onClick={() => setVisible(true)}>{children}</span>
-      <SlidePanel
+      <Dialog
         title={type === 'create' ? '添加成员' : '编辑成员'}
-        width="large"
-        isShowing={visible}
+        visible={visible}
         onClose={handleClose}
         onOk={handleOK}
         onCancel={handleClose}
-        isProcessing={loading}
       >
-        <Form field={field} {...FORM_ITEM_LAYOUT}>
-          <FormItem label="用户名称" required>
-            <Select
-              disabled={type === 'edit'}
-              showSearch
-              hasClear
-              placeholder="请输入用户名称（模糊搜索）"
-              filterLocal={false}
-              className="full-width"
-              {...init('inviteUserName', {
-                rules: [
-                  {
-                    required: true,
-                    message: '用户名称不能为空',
+        <Loading visible={loading}>
+          <Form field={field} {...FORM_ITEM_LAYOUT} className="add-member">
+            <FormItem label="用户名称" required>
+              <Select
+                disabled={type === 'edit'}
+                showSearch
+                hasClear
+                placeholder="请输入用户名称（模糊搜索）"
+                filterLocal={false}
+                className="full-width"
+                {...init('inviteUserName', {
+                  rules: [
+                    {
+                      required: true,
+                      message: '用户名称不能为空',
+                    },
+                  ],
+                  props: {
+                    onSearch: debounce(onChangeUserName, 250, { maxWait: 1000 }),
                   },
-                ],
-                props: {
-                  onSearch: debounce(onChangeUserName, 250, { maxWait: 1000 }),
-                },
-              })}
-              dataSource={getValue('users')}
-            />
-          </FormItem>
-          <FormItem label="角色" required>
-            <Select
-              className="full-width"
-              dataSource={[
-                {
-                  label: '管理员',
-                  value: ROLE.ADMIN,
-                },
-                {
-                  label: '开发者',
-                  value: ROLE.MEMBER,
-                },
-              ]}
-              {...init('role', {
-                rules: [
+                })}
+                dataSource={getValue('users')}
+              />
+            </FormItem>
+            <FormItem label="角色" required>
+              <Select
+                className="full-width"
+                dataSource={[
                   {
-                    required: true,
-                    message: '请选择角色',
+                    label: '管理员',
+                    value: ROLE.ADMIN,
                   },
-                ],
-              })}
-            />
-          </FormItem>
-        </Form>
-      </SlidePanel>
+                  {
+                    label: '开发者',
+                    value: ROLE.MEMBER,
+                  },
+                ]}
+                {...init('role', {
+                  rules: [
+                    {
+                      required: true,
+                      message: '请选择角色',
+                    },
+                  ],
+                })}
+              />
+            </FormItem>
+          </Form>
+        </Loading>
+      </Dialog>
     </>
   );
 };

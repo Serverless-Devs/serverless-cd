@@ -91,9 +91,9 @@ export const TEMPLATE_TABS = [
     name: '其他模版',
     templateList: [],
   },
-  {
-    key: 'collection',
-    name: '收藏模版',
-    templateList: [],
-  },
+  // { // 暂时下掉收藏模版
+  //   key: 'collection',
+  //   name: '收藏模版',
+  //   templateList: [],
+  // },
 ];

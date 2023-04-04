@@ -151,7 +151,11 @@ body {
   line-height: 28px;
   font-size: 20px;
   font-weight: bold;
-  background-image: linear-gradient(135deg, #20dbfa 20%, #209BFA 100%); // #3600e6 10%
+  background: #209BFA; // #3600e6 10%
+}
+
+.avatar-content:hover {
+  background: #1274E7;
 }
 
 .avatar-default-img {
@@ -329,6 +333,35 @@ body {
   content: "\E655";
 }
 
-.add-icon:hover {
-  color: #209BFA;
+.header-add-icon {
+  .add-icon {
+    display: inline-block;
+    visibility: visible;
+  }
+  &:hover .add-icon {
+    display: none;
+    visibility: hidden;
+  }
+  .add-icon-hover {
+    display: none;
+    visibility: hidden;
+  }
+  &:hover .add-icon-hover {
+    display: inline-block;
+    visibility: visible;
+  }
+}
+
+.next-shell .next-aside-navigation, .next-shell .next-aside-tooldock {
+  min-width: 200px;
+  background-color: #fff;
+}
+.next-nav-embeddable.next-primary, .next-nav-embeddable.next-secondary, .next-nav-embeddable.next-normal {
+  min-width: 200px;
+  background-color: #fff;
+}
+
+.add-member, .add-org {
+  width: 800px;
+  padding: 32px;
 }

@@ -1,19 +1,30 @@
-import React, { FC } from 'react';
+import React, { FC, useState, useEffect } from 'react';
 import { useRequest, history } from 'ice';
+import SlidePanel from '@alicloud/console-components-slide-panel';
 import PageLayout from '@/layouts/PageLayout';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import { Toast } from '@/components/ToastContainer';
 import { createOrg } from '@/services/org';
-import { Form, Field, Input, Button } from '@alicloud/console-components';
+import { Form, Field, Input, Button, Dialog } from '@alicloud/console-components';
 
 const FormItem = Form.Item;
 
-type Props = {};
+type Props = {
+  active?: boolean;
+  callback?: any;
+  changeVisible?: any;
+};
 
 const CreateOrg: FC<Props> = (props) => {
+  const { active, callback, changeVisible } = props;
   const { request, loading } = useRequest(createOrg);
   const field = Field.useField();
   const { init, validate } = field;
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    active && setVisible(active);
+  }, [active]);
 
   const onSubmit = async () => {
     validate(async (errors, values) => {
@@ -21,26 +32,40 @@ const CreateOrg: FC<Props> = (props) => {
       const { success } = await request(values);
       if (success) {
         Toast.success('创建团队成功');
-        history?.push('/organizations');
+        setVisible(false);
+        callback();
+        history?.push(`/organizations?orgRefresh=${new Date().getTime()}`)
       }
     });
   };
+  const handleClose = () => {
+    setVisible(false);
+    changeVisible(false);
+  };
   return (
-    <PageLayout
-      breadcrumbs={[
-        {
-          name: '团队列表',
-          path: '/organizations',
-        },
-        {
-          name: '新建团队',
-        },
-      ]}
+    <Dialog
+      title={'新建团队'}
+      visible={visible}
+      onClose={handleClose}
+      onOk={onSubmit}
+      onCancel={handleClose}
     >
-      <Form field={field} {...FORM_ITEM_LAYOUT}>
-        <FormItem label="团队名称" required>
+      <Form field={field} {...FORM_ITEM_LAYOUT} className="add-org">
+        <FormItem label="团队地址" required>
           <Input
             {...init('name', {
+              rules: [
+                {
+                  required: true,
+                  message: '请输入团队地址',
+                },
+              ],
+            })}
+          />
+        </FormItem>
+        <FormItem label="团队名称" required>
+          <Input
+            {...init('alias', {
               rules: [
                 {
                   required: true,
@@ -50,25 +75,14 @@ const CreateOrg: FC<Props> = (props) => {
             })}
           />
         </FormItem>
-        <FormItem label="团队别名">
-          <Input {...init('alias')} />
-        </FormItem>
         <FormItem label="Logo">
           <Input {...init('logo')} />
         </FormItem>
         <FormItem label="描述">
           <Input {...init('description')} />
         </FormItem>
-        <FormItem className="mt-32">
-          <Button type="primary" onClick={onSubmit} loading={loading}>
-            创建
-          </Button>
-          <Button className="ml-16" onClick={() => history?.goBack()}>
-            取消
-          </Button>
-        </FormItem>
       </Form>
-    </PageLayout>
+    </Dialog>
   );
 };
 
