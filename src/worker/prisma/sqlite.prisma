@@ -54,6 +54,7 @@ model Task {
   steps String?
   dispatch_org_id String?       // 记录谁操作的
   trigger_payload  String
+  trigger_type   String? // 记录怎么触发的： "manual" / "redeploy" (admin) | "github" / "gitee" / "codeup" / "gitlab" (provider) | 'app_center' / 'serverless_cd' / 'cloud_shell' / 'yunxiao' / 'github' / 'gitlab' / 'jenkins' (local)
   created_time DateTime  @default(now())
   updated_time DateTime  @updatedAt
 }

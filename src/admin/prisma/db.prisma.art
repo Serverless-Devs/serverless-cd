@@ -55,6 +55,7 @@ model Task {
   steps String?      {{if provider === 'mysql'}} @db.Text {{/if}}   // 运行步骤 
   dispatch_org_id String?       // 记录谁操作的
   trigger_payload  String?     {{if provider === 'mysql'}} @db.Text {{/if}}  // 被触发的请求信息
+  trigger_type   String? // 记录怎么触发的
   created_time DateTime  @default(now())
   updated_time DateTime  @updatedAt
 }

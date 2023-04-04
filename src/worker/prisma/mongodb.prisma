@@ -52,6 +52,7 @@ model Application {
 model Task {
   id String @id @map("_id")
   env_name String
+  trigger_type   String? // 记录怎么触发的： "manual" / "redeploy" (admin) | "github" / "gitee" / "codeup" / "gitlab" (provider) | 'app_center' / 'serverless_cd' / 'cloud_shell' / 'yunxiao' / 'github' / 'gitlab' / 'jenkins' (local)
   app_id String
   status String?
   steps String?

@@ -23,6 +23,7 @@ import { sleep, getOrgName, localStorageSet } from '@/utils';
 import store from '@/store';
 import Status from '@/components/DeployStatus';
 import Copy from '@/components/CopyIcon';
+import CodeSource from '@/components/CodeSource';
 
 const { Tooltip } = Balloon;
 
@@ -133,59 +134,46 @@ const AppList = ({
 
   const repoNameRender = (value, _index, record) => {
     return (
-      <Tooltip
-        trigger={<Link to={`/${orgName}/application/${record.id}/default`}>{value}</Link>}
-        align="t"
-      >
-        <div className="text-bold">环境名称</div>
-        {map(record.environment, (ele, envName) => {
-          return (
-            <div className="align-center mt-8">
-              <Link to={`/${orgName}/application/${record.id}/${envName}`}>{envName}</Link>
-              <span className="ml-2 mr-8">:</span>
-              <Status status={get(ele, 'latest_task.status', 'init')} />
-            </div>
-          );
-        })}
-      </Tooltip>
+      <>
+        <Tooltip
+          trigger={<Link to={`/${orgName}/application/${record.id}/default`}>{value}</Link>}
+          align="t"
+        >
+          <div className="text-bold">环境名称</div>
+          {map(record.environment, (ele, envName) => {
+            return (
+              <div className="align-center mt-8">
+                <Link to={`/${orgName}/application/${record.id}/${envName}`}>{envName}</Link>
+                <span className="ml-2 mr-8">:</span>
+                <Status status={get(ele, 'latest_task.status', 'init')} />
+              </div>
+            );
+          })}
+        </Tooltip>
+        <div className="cursor-pointer pt-8">
+          <Copy content={record.id} >{record.id}</Copy>
+        </div>
+      </>
     );
   };
 
   const columns = [
     {
       title: '应用名称',
-      dataIndex: 'repo_name',
+      dataIndex: 'name',
       cell: repoNameRender,
     },
     {
-      title: 'ID',
-      dataIndex: 'id',
-      cell: (val) => (
-        <div className="cursor-pointer">
-          <Copy content={val} >{val}</Copy>
-        </div>
-      ),
-    },
-    {
       key: 'created_time',
-      title: '创建时间',
-      dataIndex: 'created_time',
-      cell: (value, _index, record) => formatTime(value),
+      title: ' 最后操作时间',
+      dataIndex: 'updated_time',
+      cell: (value, _index, record) => formatTime(value || record.created_time),
     },
     {
-      key: 'description',
+      key: 'provider',
       title: '代码源',
-      dataIndex: 'description',
-      cell: (value, _index, record) => (
-        <div className="align-center">
-          {C_REPOSITORY[record.provider as any]?.svg(16)}
-          <ExternalLink
-            className="color-link cursor-pointer ml-4"
-            url={record.repo_url}
-            label={record.repo_name}
-          />
-        </div>
-      ),
+      dataIndex: 'provider',
+      cell: (value, _index, record) => <CodeSource provider={value} repo_url={record.repo_url} repo_name={record.name} />,
     },
     {
       key: 'description',

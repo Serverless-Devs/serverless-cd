@@ -17,6 +17,7 @@ const {
   TASK_STATUS: { CANCEL, RUNNING, PENDING },
 } = require('@serverless-cd/config');
 const MANUAL = 'manual';
+const REDEPLOY = 'redeploy';
 
 async function retryOnce(fnName, ...args) {
   try {
@@ -40,7 +41,7 @@ async function invokeFunction(trigger_payload) {
   );
 }
 
-async function redeploy(dispatchOrgId, orgName, { taskId, appId } = {}) {
+async function redeploy(dispatchOrgId, orgName, { taskId, appId, triggerType = REDEPLOY } = {}) {
   if (_.isEmpty(taskId)) {
     throw new ValidationError('taskId 必填');
   }
@@ -70,7 +71,7 @@ async function redeploy(dispatchOrgId, orgName, { taskId, appId } = {}) {
   }
   _.unset(environment, 'latest_task');
   _.set(trigger_payload, 'environment', environment);
-  _.set(trigger_payload, 'trigger_type', MANUAL);
+  _.set(trigger_payload, 'trigger_type', triggerType);
 
   // 重新设置新的 task id
   const newTaskId = unionToken();
@@ -109,7 +110,7 @@ async function cancelTask({ taskId } = {}) {
     throw new ValidationError('没有查到部署信息');
   }
 
-  const { steps = [], app_id, trigger_payload, status } = taskResult;
+  const { steps = [], app_id, trigger_payload, status, trigger_type } = taskResult;
   try {
     const path = `/services/${serviceName}/functions/${functionName}/stateful-async-invocations/${taskId}`;
     await retryOnce('put', path);
@@ -142,6 +143,7 @@ async function cancelTask({ taskId } = {}) {
     ref,
     completed: true,
     status: CANCEL,
+    trigger_type,
     time: new Date().getTime(),
   };
   await applicationModel.updateAppById(app_id, { environment });

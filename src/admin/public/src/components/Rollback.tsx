@@ -26,7 +26,7 @@ const Rollback: FC<IProps> = (props) => {
 
   useEffect(() => {
     if (visible) {
-      task.request({ appId, envName, currentPage: 1 });
+      task.request({ appId, envName, currentPage: 1, triggerType: 'remote' });
     }
   }, [visible]);
 
@@ -36,7 +36,7 @@ const Rollback: FC<IProps> = (props) => {
 
   const submit = async () => {
     setLoading(true);
-    const { success, data } = await request({ taskId: rollBackId, appId });
+    const { success, data } = await request({ taskId: rollBackId, appId, triggerType: 'rollback' });
     if (success) {
       await sleep(2800);
       Toast.success('部署成功');

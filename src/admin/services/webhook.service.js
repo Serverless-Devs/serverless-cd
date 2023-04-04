@@ -120,6 +120,7 @@ async function triggered(appId, headers, body) {
       },
       envName: key,
       environment,
+      trigger_type: provider,
     };
     debug(`workerPayload:\n${JSON.stringify(workerPayload, null, 2)}`);
     // 调用 worker

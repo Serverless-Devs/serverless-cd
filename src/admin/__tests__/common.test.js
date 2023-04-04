@@ -15,10 +15,10 @@ describe("Test tracker", () => {
 
   test(`POST ${trackerPath}`, async () => {
     const resource1 = {
-      uid: '1111111111',
-      region: 'cn-hangzhou',
-      service: 'hello-world-service',
-      function: 'custom-cpp-event-function',
+      uid: '1740298130743624',
+      region: 'cn-hongkong',
+      service: 'serverless-cd',
+      function: 'test2',
     };
     const resource2 = {
       uid: '222222222',
@@ -27,15 +27,14 @@ describe("Test tracker", () => {
       function: 'custom-cpp-event-function',
     };
     const resource3 = {
-      uid: '3333333',
-      region: 'cn-hangzhou',
-      service: 'hello-world-service',
-      function: 'custom-cpp-event-function',
+      uid: '1740298130743624',
+      region: 'cn-hongkong',
+      service: 'serverless-cd',
+      function: 'test',
     };
     const payload = {
-      platform: 'darwin',
-      name: 'xxxxx', // app name
-      source: 'window', // 'app_center',
+      platform: 'darwin', // 'app_center',
+      name: 'git-action-test-1tpc', // app name
       orgName: username,
       status: 'success',
       // env: 'pre', // 默认是default
