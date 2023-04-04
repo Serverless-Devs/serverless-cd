@@ -8,6 +8,7 @@ import CommitId from '@/components/CommitId';
 import { formatTime } from '@/utils';
 import EnvType from '@/components/EnvType';
 import { C_REPOSITORY } from '@/constants/repository';
+import CodeSource from '@/components/CodeSource';
 
 interface Props {
   data: object;
@@ -18,12 +19,14 @@ interface Props {
 
 const BasicInfoDetail = (props: Props) => {
   const { data, refreshCallback, envName, orgName } = props;
-  const provider = get(data, 'provider');
+  const provider = get(data, 'provider', '');
   const envInfo = get(data, `environment.${envName}`);
-  const repo_name = get(data, 'repo_name');
+  const repo_name = get(data, 'repo_name', '');
   const repo_owner = get(data, 'repo_owner');
+  const repo_url = get(data, 'repo_url');
   const type = get(envInfo, 'type', '_');
   const created_time = formatTime(get(envInfo, 'created_time'));
+  const update_time = formatTime(get(envInfo, 'update_time', created_time));
   const latest_task = get(data, `environment.${envName}.latest_task`, {});
   const status = get(latest_task, 'status', 'init');
   const taskId = get(latest_task, 'taskId');
@@ -40,7 +43,6 @@ const BasicInfoDetail = (props: Props) => {
             text: '环境名称',
             value: envName,
           },
-
           {
             text: '环境类型',
             value: <EnvType type={type} />,
@@ -48,6 +50,10 @@ const BasicInfoDetail = (props: Props) => {
           {
             text: '创建时间',
             value: created_time,
+          },
+          {
+            text: '最后操作时间',
+            value: update_time,
           },
           {
             text: '部署状态',
@@ -64,6 +70,10 @@ const BasicInfoDetail = (props: Props) => {
                 )}
               </div>
             ),
+          },
+          repo_url && !commit && {
+            text: '仓库地址',
+            value: <CodeSource provider={provider} repo_url={repo_url} repo_name={repo_name} />,
           },
           commit && {
             text: 'Commit',

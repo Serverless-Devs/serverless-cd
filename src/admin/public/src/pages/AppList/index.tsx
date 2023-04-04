@@ -23,6 +23,7 @@ import { sleep, getOrgName, localStorageSet } from '@/utils';
 import store from '@/store';
 import Status from '@/components/DeployStatus';
 import Copy from '@/components/CopyIcon';
+import CodeSource from '@/components/CodeSource';
 
 const { Tooltip } = Balloon;
 
@@ -169,19 +170,10 @@ const AppList = ({
       cell: (value, _index, record) => formatTime(value || record.created_time),
     },
     {
-      key: 'description',
+      key: 'provider',
       title: '代码源',
-      dataIndex: 'description',
-      cell: (value, _index, record) => (
-        <div className="align-center">
-          {C_REPOSITORY[record.provider as any]?.svg(16)}
-          <ExternalLink
-            className="color-link cursor-pointer ml-4"
-            url={record.repo_url}
-            label={record.repo_name}
-          />
-        </div>
-      ),
+      dataIndex: 'provider',
+      cell: (value, _index, record) => <CodeSource provider={value} repo_url={record.repo_url} repo_name={record.name} />,
     },
     {
       key: 'description',

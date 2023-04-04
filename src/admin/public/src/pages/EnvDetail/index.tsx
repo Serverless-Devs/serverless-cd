@@ -43,7 +43,7 @@ const Details = ({
   const trigger_spec = get(detailInfo, `data.environment.${envName}.trigger_spec`, {});
   const taskId = get(detailInfo, `data.environment.${envName}.latest_task.taskId`, '');
   const secrets = get(detailInfo, `data.environment.${envName}.secrets`, {});
-  const appName = get(detailInfo, 'data.repo_name', '')
+  const appName = get(detailInfo, 'data.name') || get(detailInfo, 'data.repo_name', '');
   const triggetInfo = strictValuesParse(get(trigger_spec, provider, {}));
   const triggerType = triggetInfo['triggerType'];
 
@@ -239,6 +239,7 @@ const Details = ({
             </PageInfo>
           </Loading>
         </Tab.Item>
+        
       </Tab>
     </PageLayout>
   );
