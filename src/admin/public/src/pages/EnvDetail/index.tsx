@@ -21,6 +21,7 @@ const { Tooltip } = Balloon;
 enum TAB {
   OVERVIEW = 'overview',
   CICD = 'cicd',
+  RESOURCE = 'resource',
 }
 
 const Details = ({
@@ -39,6 +40,8 @@ const Details = ({
   const defaultTab = getParam('tab') || TAB.OVERVIEW;
   const [tabKey, setTabKey] = useState(defaultTab);
 
+  const data = get(detailInfo, 'data', {});
+  const resource = get(data, `environment.${envName}.resource`, {});
   const provider = get(detailInfo, 'data.provider');
   const trigger_spec = get(detailInfo, `data.environment.${envName}.trigger_spec`, {});
   const taskId = get(detailInfo, `data.environment.${envName}.latest_task.taskId`, '');
@@ -178,7 +181,7 @@ const Details = ({
         <Tab.Item key={TAB.OVERVIEW} title="应用概览">
           <Loading visible={loading} inline={false} className="mt-16">
             <BasicInfoDetail
-              data={get(detailInfo, 'data', {})}
+              data={data}
               refreshCallback={handleRefresh}
               envName={envName}
               orgName={orgName}
@@ -239,7 +242,12 @@ const Details = ({
             </PageInfo>
           </Loading>
         </Tab.Item>
-        
+        <Tab.Item key={TAB.RESOURCE} title="运维管理">
+            <Loading visible={loading} inline={false} className="mt-16">
+              TODO:
+              {get(resource, 'fc', []).map((item) => <div>{`${item.uid}/${item.region}/${item.service}/${item.function}`}</div>)}
+            </Loading>
+          </Tab.Item>
       </Tab>
     </PageLayout>
   );

@@ -4,18 +4,16 @@ interface Props {
   triggerType: string
 }
 
+// TODO: rollback 需要区分
 export default ({ triggerType }: Props) => {
   if (triggerType.startsWith('tracker:')) {
-    return <>上报数据</>;
+    return <>本地部署</>;
   }
   if (triggerType === 'manual') {
     return <>手动触发</>;
   }
   if (triggerType === 'redeploy') {
     return <>重新部署</>;
-  }
-  if (triggerType === 'rollback') {
-    return <>回滚</>;
   }
   if (triggerType === 'rollback') {
     return <>回滚</>;
