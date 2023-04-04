@@ -4,7 +4,6 @@ interface Props {
   triggerType: string
 }
 
-// TODO: rollback 需要区分
 export default ({ triggerType }: Props) => {
   if (triggerType.startsWith('tracker:')) {
     return <>本地部署</>;

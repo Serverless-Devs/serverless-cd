@@ -23,12 +23,16 @@ async function list({ appId, envName, pageSize, currentPage, taskId, triggerType
     _.set(where, 'id', { equals: taskId });
   }
   if (triggerType) {
-    if (triggerType === 'tracker') {
+    const consoleKeys = ['manual', 'redeploy', 'rollback'];
+    const webhookKeys = ['github', 'gitee', 'codeup', 'gitlab'];
+    if (triggerType === 'local') {
       _.set(where, 'trigger_type', { startsWith: 'tracker:' });
     } else if (triggerType === 'console') {
-      _.set(where, 'trigger_type', { in: ['manual', 'redeploy', 'rollback'] });
+      _.set(where, 'trigger_type', { in: consoleKeys });
     } else if (triggerType === 'webhook') {
-      _.set(where, 'trigger_type', { in: ['github', 'gitee', 'codeup', 'gitlab'] });
+      _.set(where, 'trigger_type', { in: webhookKeys });
+    } else {
+      _.set(where, 'trigger_type', { in: [...webhookKeys, ...consoleKeys ] });
     }
   }
 

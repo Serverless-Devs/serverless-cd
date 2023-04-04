@@ -26,7 +26,7 @@ const Rollback: FC<IProps> = (props) => {
 
   useEffect(() => {
     if (visible) {
-      task.request({ appId, envName, currentPage: 1 });
+      task.request({ appId, envName, currentPage: 1, triggerType: 'remote' });
     }
   }, [visible]);
 

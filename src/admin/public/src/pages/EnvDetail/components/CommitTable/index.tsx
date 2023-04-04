@@ -26,7 +26,7 @@ const CommitTable: FC<IProps> = (props) => {
   const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
-    request({ appId, envName, pageSize: PAGE_SIZE, currentPage: 1 });
+    request({ appId, envName, pageSize: PAGE_SIZE, currentPage: 1, triggerType: 'remote' });
   }, [appId]);
 
   useEffect(() => {
