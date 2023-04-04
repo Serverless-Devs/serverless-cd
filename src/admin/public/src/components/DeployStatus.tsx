@@ -15,10 +15,10 @@ const Status = (props: Props) => {
 
   const icon = useMemo(() => {
     if (status === DEPLOY.SKIP) {
-      return <MinusCircleOutlined className={`mr-4 ${found.color}`}/>
+      return <MinusCircleOutlined className={`mr-4 ${found.color}`} />
     }
     return <Icon type={found.icon} className={`mr-4 ${found.color}`} size="small" />
-  }, []);
+  }, [status]);
   return (
     <>
       {!isEmpty(found) && (
