@@ -5,6 +5,7 @@ import { Button, Table, Dialog } from '@alicloud/console-components';
 import EnvType from '@/components/EnvType';
 import Status from '@/components/DeployStatus';
 import CommitId from '@/components/CommitId';
+import TriggerType from '@/components/TriggerType';
 import { C_REPOSITORY } from '@/constants/repository';
 import { Toast } from '@/components/ToastContainer';
 import { formatTime } from '@/utils';
@@ -88,10 +89,12 @@ const EnvList: FC<Props> = (props) => {
       title: '触发方式',
       dataIndex: 'trigger_info',
       cell: (value, _index, record) => {
-        if (isEmpty(value.trigger_type)) return '--';
+        const triggerType = get(value, 'trigger_type', '');
+        if (isEmpty(triggerType)) return '--';
+
         return (
           <div className="align-center">
-            {value.trigger_type === 'manual' ? '手动触发' : `${value.trigger_type}触发`}
+            <TriggerType triggerType={triggerType} />
             {value.commit && (
               <div className="align-center ml-8">
                 {C_REPOSITORY[value.provider]?.svg(16)}

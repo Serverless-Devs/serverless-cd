@@ -110,7 +110,7 @@ async function cancelTask({ taskId } = {}) {
     throw new ValidationError('没有查到部署信息');
   }
 
-  const { steps = [], app_id, trigger_payload, status } = taskResult;
+  const { steps = [], app_id, trigger_payload, status, trigger_type } = taskResult;
   try {
     const path = `/services/${serviceName}/functions/${functionName}/stateful-async-invocations/${taskId}`;
     await retryOnce('put', path);
@@ -143,6 +143,7 @@ async function cancelTask({ taskId } = {}) {
     ref,
     completed: true,
     status: CANCEL,
+    trigger_type,
     time: new Date().getTime(),
   };
   await applicationModel.updateAppById(app_id, { environment });

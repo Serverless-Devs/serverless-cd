@@ -41,12 +41,13 @@ async function tracker(orgName, payload = {}) {
   // task 数据处理
   const needCreateTask = !_.includes(['app_center', 'serverless_cd'], platform);
   const taskId = needCreateTask ? unionToken() : '';
+  const triggerType = `tracker:${platform}`;
   if (needCreateTask) {
     await taskMode.create({
       id: taskId,
       env_name: envName,
       app_id: appInfo.id,
-      trigger_type: `tracker:${platform}`,
+      trigger_type: triggerType,
       status,
     });
   }
@@ -63,7 +64,7 @@ async function tracker(orgName, payload = {}) {
     )
   );
   // 将上报相关数据写进app表latest_task
-  _.set(environment, `${envName}.latest_task`, { updated_time, taskId, status, completed: true });
+  _.set(environment, `${envName}.latest_task`, { updated_time, taskId, status, trigger_type: triggerType, completed: true });
   await applicationMode.updateAppById(appInfo.id, { environment });
 
   return { taskId };

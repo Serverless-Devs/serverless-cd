@@ -133,44 +133,40 @@ const AppList = ({
 
   const repoNameRender = (value, _index, record) => {
     return (
-      <Tooltip
-        trigger={<Link to={`/${orgName}/application/${record.id}/default`}>{value}</Link>}
-        align="t"
-      >
-        <div className="text-bold">环境名称</div>
-        {map(record.environment, (ele, envName) => {
-          return (
-            <div className="align-center mt-8">
-              <Link to={`/${orgName}/application/${record.id}/${envName}`}>{envName}</Link>
-              <span className="ml-2 mr-8">:</span>
-              <Status status={get(ele, 'latest_task.status', 'init')} />
-            </div>
-          );
-        })}
-      </Tooltip>
+      <>
+        <Tooltip
+          trigger={<Link to={`/${orgName}/application/${record.id}/default`}>{value}</Link>}
+          align="t"
+        >
+          <div className="text-bold">环境名称</div>
+          {map(record.environment, (ele, envName) => {
+            return (
+              <div className="align-center mt-8">
+                <Link to={`/${orgName}/application/${record.id}/${envName}`}>{envName}</Link>
+                <span className="ml-2 mr-8">:</span>
+                <Status status={get(ele, 'latest_task.status', 'init')} />
+              </div>
+            );
+          })}
+        </Tooltip>
+        <div className="cursor-pointer pt-8">
+          <Copy content={record.id} >{record.id}</Copy>
+        </div>
+      </>
     );
   };
 
   const columns = [
     {
       title: '应用名称',
-      dataIndex: 'repo_name',
+      dataIndex: 'name',
       cell: repoNameRender,
     },
     {
-      title: 'ID',
-      dataIndex: 'id',
-      cell: (val) => (
-        <div className="cursor-pointer">
-          <Copy content={val} >{val}</Copy>
-        </div>
-      ),
-    },
-    {
       key: 'created_time',
-      title: '创建时间',
-      dataIndex: 'created_time',
-      cell: (value, _index, record) => formatTime(value),
+      title: ' 最后操作时间',
+      dataIndex: 'updated_time',
+      cell: (value, _index, record) => formatTime(value || record.created_time),
     },
     {
       key: 'description',

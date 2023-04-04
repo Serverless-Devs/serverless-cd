@@ -55,7 +55,7 @@ async function handler(event, _context, callback) {
     console.log(`get task url: ${url}, target org name: ${orgName}`);
   }
 
-  const appTaskConfig = { taskId, commit, message, ref };
+  const appTaskConfig = { taskId, commit, message, ref, trigger_type };
 
   const getEnvData = (context) => ({
     ...appTaskConfig,
