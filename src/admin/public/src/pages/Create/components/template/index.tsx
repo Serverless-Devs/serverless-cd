@@ -4,7 +4,6 @@ import { TEMPLATE_TABS, REGISTRY_URL, SERVERLESS_DEVS_LIST_PACKAGE } from '../co
 import TemplateList from './TemplateList';
 import { getParam } from '@/utils';
 import { noop, get } from 'lodash';
-import fetch from 'node-fetch';
 
 interface version {
   body?: string;
