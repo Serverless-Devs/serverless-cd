@@ -1,10 +1,14 @@
 import React from 'react';
+import { upperFirst } from 'lodash';
 
 interface Props {
   triggerType: string
 }
 
 export default ({ triggerType }: Props) => {
+  if (!triggerType) {
+    return <></>;
+  }
   if (triggerType.startsWith('tracker:')) {
     return <>本地部署</>;
   }
@@ -17,5 +21,5 @@ export default ({ triggerType }: Props) => {
   if (triggerType === 'rollback') {
     return <>回滚</>;
   }
-  return <>{`${triggerType} 触发`}</>;
+  return <>{`${upperFirst(triggerType)} 触发`}</>;
 }
