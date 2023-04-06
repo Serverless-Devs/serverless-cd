@@ -25,7 +25,7 @@ const Redeploy = (props: Props) => {
 
   const submit = async () => {
     setLoading(true);
-    const { success, data } = await request({ taskId, appId });
+    const { success, data } = await request({ taskId, appId, triggerType: 'redeploy' });
     if (success) {
       await sleep(3000);
       Toast.success('部署成功');

@@ -171,6 +171,7 @@ async function handler(event, _context, callback) {
 
   console.log('init task');
   await makeTask(taskId, {
+    trigger_type,
     env_name: envName,
     dispatch_org_id: dispatchOrgId,
     app_id: appId,

@@ -6,11 +6,11 @@ const { ValidationError, formatBranch } = require('../util');
 
 /**
  * 获取 task 列表
- * @param {{ appId: 应用ID; envName?: 环境名称; }} param0
+ * @param {{ appId: 应用ID; envName?: 环境名称; triggerType?: 'tracker' | 'console' | 'webhook' }} param0
  * currentPage  pageSize
  * @returns
  */
-async function list({ appId, envName, pageSize, currentPage, taskId } = {}) {
+async function list({ appId, envName, pageSize, currentPage, taskId, triggerType } = {}) {
   if (_.isEmpty(appId)) {
     throw new ValidationError('appId is required');
   }
@@ -21,6 +21,19 @@ async function list({ appId, envName, pageSize, currentPage, taskId } = {}) {
   }
   if (!_.isEmpty(taskId)) {
     _.set(where, 'id', { equals: taskId });
+  }
+  if (triggerType) {
+    const consoleKeys = ['manual', 'redeploy', 'rollback'];
+    const webhookKeys = ['github', 'gitee', 'codeup', 'gitlab'];
+    if (triggerType === 'local') {
+      _.set(where, 'trigger_type', { startsWith: 'tracker:' });
+    } else if (triggerType === 'console') {
+      _.set(where, 'trigger_type', { in: consoleKeys });
+    } else if (triggerType === 'webhook') {
+      _.set(where, 'trigger_type', { in: webhookKeys });
+    } else {
+      _.set(where, 'trigger_type', { in: [...webhookKeys, ...consoleKeys ] });
+    }
   }
 
   const option = {};
@@ -41,6 +54,7 @@ async function list({ appId, envName, pageSize, currentPage, taskId } = {}) {
   // }
 
   debug(`list task db option: ${JSON.stringify(option)}`);
+  debug(`list task db where: ${JSON.stringify(where)}`);
 
   return await taskModel.list(where, option);
 }

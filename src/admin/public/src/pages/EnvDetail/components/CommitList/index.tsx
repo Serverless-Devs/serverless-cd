@@ -38,7 +38,7 @@ const CommitList: FC<IProps> = (props) => {
 
   const fetchData = async (appId: string) => {
     setLoading(true);
-    request({ appId, envName, pageSize: 4 });
+    request({ appId, envName, pageSize: 4, triggerType: 'remote' });
     setLoading(false);
   };
 

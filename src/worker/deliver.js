@@ -76,6 +76,7 @@ async function handler(event, context, callback) {
     userId,
     authorization: { appId } = {},
     environment = {},
+    trigger_type,
   } = payload || {};
 
   if (!(taskId || appId || envName)) {
@@ -89,7 +90,7 @@ async function handler(event, context, callback) {
   */
   const statefulAsyncInvocationStatus = await getStatefulAsyncInvocationStatus(taskId);
   if (statefulAsyncInvocationStatus === 'Failed') {
-    const appTaskConfig = { taskId, commit, message, ref };
+    const appTaskConfig = { taskId, commit, message, ref, trigger_type };
 
     const latestTask = {
       ...appTaskConfig,
