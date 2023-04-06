@@ -28,20 +28,24 @@ async function preview(orgName, body = {}) {
 
   checkNameAvailable(name);
 
-  let application = await appModel.getAppByProvider({
-    provider,
-    providerRepoId,
-  });
-  if (!_.isEmpty(application)) {
-    throw new ValidationError('代码仓库已绑定，请勿重新绑定');
-  }
   const { id: owner_org_id } = await orgModel.getOwnerOrgByName(orgName);
-  application = await appModel.getAppByAppName({
+  const checkByName = await appModel.getAppByAppName({
     owner_org_id,
     name,
   });
-  if (!_.isEmpty(application)) {
+  if (!_.isEmpty(checkByName)) {
     throw new ValidationError('应用 name 已存在，请换一个名称');
+  }
+
+  if (provider && providerRepoId) {
+    const checkByRepoId = await appModel.getAppByProvider({
+      provider,
+      providerRepoId,
+    });
+ 
+    if (!_.isEmpty(checkByRepoId)) {
+      throw new ValidationError('代码仓库已绑定，请勿重新绑定');
+    }
   }
 }
 

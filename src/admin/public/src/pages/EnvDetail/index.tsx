@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useRequest, history } from 'ice';
 import { Button, Dialog, Loading, Select, Tab, Balloon } from '@alicloud/console-components';
 import PageLayout from '@/layouts/PageLayout';
-import CommitList from './components/CommitList';
 import BasicInfoDetail from './components/BasicInfoDetail';
 import { applicationDetail, removeEnv } from '@/services/applist';
+import TaskList from '@/components/TaskList';
 import PageInfo from '@/components/PageInfo';
 import { get, isEmpty, isBoolean, keys } from 'lodash';
 import SecretConfig from './components/SecretCofing';
@@ -231,23 +231,24 @@ const Details = ({
             />
             <hr className="mb-20 mt-20" />
             <PageInfo title="部署历史">
-              <CommitList
+              <TaskList
                 appId={appId}
-                application={get(detailInfo, 'data', {})}
                 latestTaskId={taskId}
-                refreshCallback={handleRefresh}
                 envName={envName}
                 orgName={orgName}
+                repoOwner={get(data, 'repo_owner')}
+                repoName={get(data, 'repo_name')}
+                triggerTypes={['console', 'webhook']}
               />
             </PageInfo>
           </Loading>
         </Tab.Item>
         <Tab.Item key={TAB.RESOURCE} title="运维管理">
-            <Loading visible={loading} inline={false} className="mt-16">
-              TODO:
-              {get(resource, 'fc', []).map((item) => <div>{`${item.uid}/${item.region}/${item.service}/${item.function}`}</div>)}
-            </Loading>
-          </Tab.Item>
+          <Loading visible={loading} inline={false} className="mt-16">
+            TODO:
+            {get(resource, 'fc', []).map((item) => <div>{`${item.uid}/${item.region}/${item.service}/${item.function}`}</div>)}
+          </Loading>
+        </Tab.Item>
       </Tab>
     </PageLayout>
   );
