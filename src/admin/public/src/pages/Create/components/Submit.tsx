@@ -72,7 +72,7 @@ const Submit = (props: IProps) => {
     // push 代码到新分支
     const branch = get(values, 'trigger.branch');
     const { success: putFileSuccess } = await githubPutFile({
-      repo_owner: get(values, 'repo.owner'),
+      owner: get(values, 'repo.owner'),
       repo: get(values, 'repo.value'),
       ref: `refs/heads/${branch}`,
       sha: get(values, 'trigger.commit_sha'),

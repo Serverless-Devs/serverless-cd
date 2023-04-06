@@ -62,11 +62,15 @@ async function putFile(orgName, provider, body) {
   try {
     // TODO: 如果分支存在，创建会报错
     await providerClient.octokit.request('POST /repos/{owner}/{repo}/git/refs', body);
-  } catch (error) {}
+  } catch (error) {
+    console.log('create git branch: ' + error);
+  }
   try {
     // TODO: 如果文件存在，putFile会报错
     return await providerClient.putFile(body);
-  } catch (error) {}
+  } catch (error) {
+    console.log('git push failed: ' + error);
+  }
 }
 
 async function getUser(provider, access_token) {
