@@ -47,15 +47,12 @@ const Trigger = (props: IProps) => {
   const [info, setInfo] = useState<IInfo>(newVal);
 
   const doRepoChange = async () => {
-    if (createTemplate) {
-      setInfo(defaultValueTemplate);
-    } else {
-      setInfo(defaultValue);
-    }
+    const newInfo = createTemplate ? defaultValueTemplate : defaultValue;
+    setInfo(newInfo);
     if (!isEmpty(repo)) {
       const res = await request({ owner: repo.owner, repo: repo.name });
       const commitObj = find(res, (obj) => obj.name === repo.default_branch);
-      onChange({ ...info, commit_sha: commitObj?.commit_sha });
+      onChange({ ...newInfo, commit_sha: commitObj?.commit_sha });
     }
   };
 
