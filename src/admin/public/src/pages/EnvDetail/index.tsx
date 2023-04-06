@@ -167,7 +167,7 @@ const Details = ({
                 </Button>
               }
             >
-              不允许删除默认环境
+              默认环境不允许删除
             </Tooltip>
           ) : (
             <Button className="ml-8" type="primary" warning onClick={handleDelete}>
