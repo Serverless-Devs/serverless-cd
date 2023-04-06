@@ -13,7 +13,7 @@ interface Props {
 export default ({ url, label, icon = false, className, threshold = 20 }: Props) => {
   return (
     <ExternalLink
-      className={`color-gray cursor-pointer ${className}`}
+      className={`.cursor-pointer-color ${className}`}
       url={url}
       label={<Truncate threshold={threshold} align="t">{label}</Truncate>}
       icon={icon}

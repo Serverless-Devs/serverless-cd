@@ -4,7 +4,7 @@ import Truncate from '@alicloud/console-components-truncate';
 import Actions from '@alicloud/console-components-actions';
 import { Link, useRequest } from 'ice';
 import { getTaskList } from '@/services/task';
-import { find, get, isEmpty, merge } from 'lodash';
+import { get, isEmpty, merge } from 'lodash';
 import moment from 'moment';
 
 import Status from '@/components/DeployStatus';
