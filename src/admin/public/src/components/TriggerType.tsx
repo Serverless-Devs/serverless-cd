@@ -1,25 +1,34 @@
 import React from 'react';
 import { upperFirst } from 'lodash';
 
-interface Props {
-  triggerType: string
+
+export type ITriggerType = 'local' | 'console' | 'webhook';
+
+export enum TriggerTypeLable {
+  local = '本地上报',
+  console = '手动触发',
+  webhook = 'Webhook 触发',
 }
 
-export default ({ triggerType }: Props) => {
-  if (!triggerType) {
+interface Props {
+  trigger: string
+}
+
+export default ({ trigger }: Props) => {
+  if (!trigger) {
     return <></>;
   }
-  if (triggerType.startsWith('tracker:')) {
+  if (trigger.startsWith('tracker:')) {
     return <>本地部署</>;
   }
-  if (triggerType === 'manual') {
+  if (trigger === 'manual') {
     return <>手动触发</>;
   }
-  if (triggerType === 'redeploy') {
+  if (trigger === 'redeploy') {
     return <>重新部署</>;
   }
-  if (triggerType === 'rollback') {
+  if (trigger === 'rollback') {
     return <>回滚</>;
   }
-  return <>{`${upperFirst(triggerType)} 触发`}</>;
+  return <>{`${upperFirst(trigger)} 触发`}</>;
 }

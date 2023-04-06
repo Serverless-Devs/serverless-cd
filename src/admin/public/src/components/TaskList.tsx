@@ -1,5 +1,5 @@
 import React, { memo, useEffect, FC, useState } from 'react';
-import { Search, Tag, Table, Pagination } from '@alicloud/console-components';
+import { Search, Tag, Table, Pagination, Select } from '@alicloud/console-components';
 import Truncate from '@alicloud/console-components-truncate';
 import Actions from '@alicloud/console-components-actions';
 import { Link, useRequest } from 'ice';
@@ -13,21 +13,22 @@ import RefreshButton from '@/components/RefreshButton';
 import { pollingStatus } from '@/constants';
 import CommitId from '@/components/CommitId';
 import ShowBranch from '@/components/ShowBranch';
-import TriggerType from './TriggerType';
 import DeleteCommit from '@/pages/EnvDetail/components/DeleteCommit';
+import TriggerType, { ITriggerType, TriggerTypeLable } from './TriggerType';
 import Rollback from './Rollback';
 import CancelDeploy from './CancelDeploy';
 
 
-type ITriggerType = 'local' | 'console' | 'webhook';
+const DEFAULT_TYPES = ['console', 'local', 'webhook'];
+
 interface IProps {
   appId: string;
   envName: string;
   orgName: string;
   latestTaskId?: string;
+  triggerTypes?: ITriggerType[];
   repoName?: string;
   repoOwner?: string;
-  triggerTypes?: ITriggerType[];
 }
 
 const TaskList: FC<IProps> = ({
@@ -37,20 +38,23 @@ const TaskList: FC<IProps> = ({
   orgName,
   repoName,
   repoOwner,
-  triggerTypes = []
+  triggerTypes = DEFAULT_TYPES,
 }) => {
+  const [types, setTypes] = useState(triggerTypes);
   const [pageSize, setPageSize] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
 
   const initFetchRequest = {
-    appId, envName, pageSize, currentPage, triggerType: triggerTypes.join(','),
+    appId, envName, pageSize, currentPage, triggerTypes: types,
   }
   const { loading, data, request } = useRequest(getTaskList, {
     initialData: { totalCount: 0, result: [] }
   });
 
   useEffect(() => {
-    request(initFetchRequest);
+    if (appId) {
+      request(initFetchRequest);
+    }
   }, [appId]);
 
   const onSearch = (taskId: string) => {
@@ -66,6 +70,13 @@ const TaskList: FC<IProps> = ({
     setPageSize(currentPageSize);
     setCurrentPage(1);
     request(merge(initFetchRequest, { currentPage: 1, pageSize: currentPageSize }));
+  }
+
+  const onTriggerChange = (currentTypes: ITriggerType[]) => {
+    const t = isEmpty(currentTypes) ? triggerTypes : currentTypes;
+    setTypes(t);
+    setCurrentPage(1);
+    request(merge(initFetchRequest, { currentPage: 1, triggerTypes: t }));
   }
 
   const refreshCallback = () => {
@@ -132,7 +143,7 @@ const TaskList: FC<IProps> = ({
     {
       title: '触发方式',
       dataIndex: 'trigger_type',
-      cell: (value) => <TriggerType triggerType={value} />
+      cell: (value) => <TriggerType trigger={value} />
     },
     {
       title: '部署状态',
@@ -190,6 +201,17 @@ const TaskList: FC<IProps> = ({
 
   return <>
     <div className="flex-r" style={{ justifyContent: 'space-between' }}>
+      <div>
+      <Select
+        disabled={loading}
+        label={"触发过滤"}
+        mode="multiple"
+        showSearch
+        value={types}
+        onChange={onTriggerChange}
+        dataSource={triggerTypes.map(value => ({ value, label: TriggerTypeLable[value] }))}
+        className='mr-16'
+      />
       <Search
         key="2"
         shape="simple"
@@ -198,6 +220,7 @@ const TaskList: FC<IProps> = ({
         hasClear
         style={{ width: '400px' }}
       />
+      </div>
       <RefreshButton styleObj={{ marginLeft: 8 }} refreshCallback={refreshCallback} />
     </div>
 

@@ -6,11 +6,11 @@ const { ValidationError, formatBranch } = require('../util');
 
 /**
  * 获取 task 列表
- * @param {{ appId: 应用ID; envName?: 环境名称; triggerType?: 'tracker' | 'console' | 'webhook' }} param0
+ * @param {{ appId: 应用ID; envName?: 环境名称; triggerTypes?: Array<'tracker' | 'console' | 'webhook'> }} param0
  * currentPage  pageSize
  * @returns
  */
-async function list({ appId, envName, pageSize, currentPage, taskId, triggerType } = {}) {
+async function list({ appId, envName, pageSize, currentPage, taskId, triggerTypes } = {}) {
   if (_.isEmpty(appId)) {
     throw new ValidationError('appId is required');
   }
@@ -22,10 +22,12 @@ async function list({ appId, envName, pageSize, currentPage, taskId, triggerType
   if (!_.isEmpty(taskId)) {
     _.set(where, 'id', { equals: taskId });
   }
-  if (triggerType) {
-    const triggerTypes = _.split(triggerType, ',');
+  const setOr = [];
+  if (!_.isEmpty(triggerTypes)) {
     if (triggerTypes.includes('local')) {
-      _.set(where, 'trigger_type.startsWith', 'tracker:');
+      setOr.push({
+        trigger_type: { startsWith: 'tracker:' },
+      });
     }
 
     const consoleKeys = ['manual', 'redeploy', 'rollback'];
@@ -40,8 +42,11 @@ async function list({ appId, envName, pageSize, currentPage, taskId, triggerType
       }
     });
     if (!_.isEmpty(setIn)) {
-      _.set(where, 'trigger_type.in', setIn);
+      setOr.push({ trigger_type: { in: setIn } });
     }
+  }
+  if (!_.isEmpty(setOr)) {
+    _.set(where, 'OR', setOr);
   }
 
   const option = {};
