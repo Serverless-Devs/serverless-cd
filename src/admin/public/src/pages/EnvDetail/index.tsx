@@ -5,6 +5,7 @@ import PageLayout from '@/layouts/PageLayout';
 import BasicInfoDetail from './components/BasicInfoDetail';
 import { applicationDetail, removeEnv } from '@/services/applist';
 import TaskList from '@/components/TaskList';
+import ShowBranch from '@/components/ShowBranch';
 import PageInfo from '@/components/PageInfo';
 import { get, isEmpty, isBoolean, keys } from 'lodash';
 import SecretConfig from './components/SecretCofing';
@@ -49,6 +50,9 @@ const Details = ({
   const appName = get(detailInfo, 'data.name') || get(detailInfo, 'data.repo_name', '');
   const triggetInfo = strictValuesParse(get(trigger_spec, provider, {}));
   const triggerType = triggetInfo['triggerType'];
+  const triggerRef = triggerType === 'pull_request' ? get(triggetInfo, `${triggerType}Target`) : get(triggetInfo, `${triggerType}Value`);
+  const repoOwner = get(data, 'repo_owner', '');
+  const repoName = get(data, 'repo_name', '');
 
   const fetchData = async () => {
     setLoading(true);
@@ -167,7 +171,7 @@ const Details = ({
                 </Button>
               }
             >
-              不允许删除默认环境
+              默认环境不允许删除
             </Tooltip>
           ) : (
             <Button className="ml-8" type="primary" warning onClick={handleDelete}>
@@ -206,7 +210,7 @@ const Details = ({
                 },
                 {
                   text: '触发分支',
-                  value: triggerType === 'pull_request' ? get(triggetInfo, `${triggerType}Target`) : get(triggetInfo, `${triggerType}Value`),
+                  value: <ShowBranch threshold={50} url={`https://${provider}.com/${repoOwner}/${repoName}/tree/${triggerRef}`} label={triggerRef}/>,
                 },
                 {
                   text: '目标分支',
@@ -236,8 +240,8 @@ const Details = ({
                 latestTaskId={taskId}
                 envName={envName}
                 orgName={orgName}
-                repoOwner={get(data, 'repo_owner')}
-                repoName={get(data, 'repo_name')}
+                repoOwner={repoOwner}
+                repoName={repoName}
                 triggerTypes={['console', 'webhook']}
               />
             </PageInfo>
