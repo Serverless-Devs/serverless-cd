@@ -1,11 +1,11 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import { useRequest, history } from 'ice';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import { Toast } from '@/components/ToastContainer';
 import { updateOrg } from '@/services/org';
 import { Form, Field, Input, Button } from '@alicloud/console-components';
 import store from '@/store';
-import { find, get } from 'lodash';
+import { find, get, map } from 'lodash';
 
 const FormItem = Form.Item;
 
@@ -15,13 +15,13 @@ type Props = {
 
 const UpdateOrg: FC<Props> = ({ match }) => {
   const orgName = get(match, 'params.orgName');
-  const [userState] = store.useModel('user');
+  const [userState, userDispatchers] = store.useModel('user');
   const listOrgs = get(userState, 'userInfo.listOrgs.result', []);
-  const { pathname } = window.location;
-  const { request, refresh, loading } = useRequest(updateOrg);
+  const { request, loading } = useRequest(updateOrg);
   const field = Field.useField({
     values: find(listOrgs, (item: any) => item.name === orgName),
   });
+  
   const { init, validate } = field;
 
   const onSubmit = async () => {
@@ -30,14 +30,21 @@ const UpdateOrg: FC<Props> = ({ match }) => {
       const params = {
         name: values.name,
         alias: values.alias,
-        logo: values.Logo,
+        logo: values.logo,
         description: values.description,
       };
       const { success } = await request({ ...params, orgName: orgName });
       if (success) {
         Toast.success('保存成功');
-        refresh();
-        history?.push(`/${orgName}/setting/org?orgRefresh=${new Date().getTime()}`);
+        const userInfo = get(userState, 'userInfo', {});
+        const newListOrgs = map(listOrgs, (item: any) => {
+          if (item.name === orgName) {
+            return { ...item, ...params }
+          }
+          return item;
+        })
+        userDispatchers.update({ userInfo: { ...userInfo, listOrgs: { ...userInfo['listOrgs'], result: newListOrgs } } })
+        history?.push(`/${orgName}/setting/org?orgRefresh=${Date.now()}`);
       }
     });
   };
@@ -49,9 +56,9 @@ const UpdateOrg: FC<Props> = ({ match }) => {
             initValue: window.location.host,
           })
           }
-          style={{ width: '20%' }}
+          style={{ width: '30%' }}
         />
-        <Input disabled
+        <Input readOnly
           {...init('name', {
             rules: [
               {
@@ -60,14 +67,7 @@ const UpdateOrg: FC<Props> = ({ match }) => {
               },
             ],
           })}
-          style={{ width: '55%' }}
-        />
-        <Input disabled
-          {...init('pathname', {
-            initValue: `/${pathname.split('/').slice(2).join('/')}`,
-          })
-          }
-          style={{ width: '25%' }}
+          style={{ width: '70%' }}
         />
       </FormItem>
       <FormItem label="团队名称" required>
