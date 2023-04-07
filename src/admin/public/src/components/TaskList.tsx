@@ -114,7 +114,12 @@ const TaskList: FC<IProps> = ({
       width: 200,
     },
     {
-      title: '最新提交',
+      title: '触发方式',
+      dataIndex: 'trigger_type',
+      cell: (value) => <TriggerType trigger={value} />
+    },
+    {
+      title: '触发内容',
       dataIndex: 'commit',
       cell: (value, index, row) => {
         const provider = get(row, 'provider', 'github');
@@ -139,11 +144,6 @@ const TaskList: FC<IProps> = ({
         );
       },
       width: 250,
-    },
-    {
-      title: '触发方式',
-      dataIndex: 'trigger_type',
-      cell: (value) => <TriggerType trigger={value} />
     },
     {
       title: '部署状态',
