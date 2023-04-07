@@ -134,7 +134,6 @@ const Details = ({
             disabled={isLoops}
             taskId={taskId}
             appId={appId}
-            repoName={get(task.data, 'repo_name', '') as string}
             refreshCallback={redeployCallback}
           />
         )
