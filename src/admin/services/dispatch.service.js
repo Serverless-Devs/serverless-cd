@@ -41,7 +41,7 @@ async function invokeFunction(trigger_payload) {
   );
 }
 
-async function redeploy(dispatchOrgId, orgName, { taskId, appId, triggerType = REDEPLOY } = {}) {
+async function redeploy(dispatchOrgId, orgName, { useDebug, taskId, appId, triggerType = REDEPLOY } = {}) {
   if (_.isEmpty(taskId)) {
     throw new ValidationError('taskId 必填');
   }
@@ -77,6 +77,7 @@ async function redeploy(dispatchOrgId, orgName, { taskId, appId, triggerType = R
   const newTaskId = unionToken();
   _.set(trigger_payload, 'redelivery', taskId);
   _.set(trigger_payload, 'taskId', newTaskId);
+  _.set(trigger_payload, 'logLevel', useDebug ? 'debug' : 'info');
 
   // 设置新的auth信息
   const ownerOrgData = await orgModel.getOrgById(owner_org_id);
@@ -150,7 +151,7 @@ async function cancelTask({ taskId } = {}) {
 }
 
 async function manualTask(dispatchOrgId, orgName, body = {}) {
-  const { appId, commitId, ref, message, inputs, envName } = body;
+  const { appId, commitId, ref, message, inputs, envName, useDebug } = body;
   if (_.isEmpty(appId)) {
     throw new ValidationError('appId 必填');
   }
@@ -199,6 +200,7 @@ async function manualTask(dispatchOrgId, orgName, body = {}) {
   const targetEnvName = envName ? envName : _.first(_.keys(environment));
   const payload = {
     taskId: unionToken(),
+    logLevel: useDebug ? 'debug' : 'info',
     provider,
     cloneUrl: repo_url,
     authorization: {
