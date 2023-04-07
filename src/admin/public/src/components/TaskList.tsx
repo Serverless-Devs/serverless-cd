@@ -4,7 +4,7 @@ import Truncate from '@alicloud/console-components-truncate';
 import Actions from '@alicloud/console-components-actions';
 import { Link, useRequest } from 'ice';
 import { getTaskList } from '@/services/task';
-import { get, isEmpty, merge } from 'lodash';
+import { get, isEmpty, merge, startsWith } from 'lodash';
 import moment from 'moment';
 
 import Status from '@/components/DeployStatus';
@@ -168,7 +168,7 @@ const TaskList: FC<IProps> = ({
       dataIndex: 'id',
       cell: (value, i, item) => {
         const updatedTime = moment(get(item, 'updated_time')).format('YYYY-MM-DD HH:mm:ss');
-        const disabled = item.status !== 'success' || value === latestTaskId;
+        const disabled = item.status !== 'success' || value === latestTaskId || startsWith(item.trigger_type, 'tracker:');
 
         return (
           <Actions>
