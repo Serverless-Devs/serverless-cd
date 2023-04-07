@@ -1,5 +1,5 @@
 import React, { useState, FC } from 'react';
-import { Button, Dialog } from '@alicloud/console-components';
+import { Button, Dialog, Checkbox } from '@alicloud/console-components';
 import { redeployTask } from '@/services/task';
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import { useRequest } from 'ice';
@@ -14,6 +14,7 @@ interface IProps {
 }
 
 const Rollback: FC<IProps> = ({ disabled, refreshCallback, appId, taskId }) => {
+  const [useDebug, setDebug] = useState<boolean | undefined>(false);
   const [visible, setVisible] = useState<Boolean>(false);
   const [loading, setLoading] = useState<Boolean>(false);
   const { request } = useRequest(redeployTask);
@@ -24,7 +25,7 @@ const Rollback: FC<IProps> = ({ disabled, refreshCallback, appId, taskId }) => {
 
   const submit = async () => {
     setLoading(true);
-    const { success, data } = await request({ taskId, appId, triggerType: 'rollback' });
+    const { success, data } = await request({ useDebug, taskId, appId, triggerType: 'rollback' });
     if (success) {
       await sleep(2800);
       Toast.success('回滚请求成功');
@@ -52,14 +53,21 @@ const Rollback: FC<IProps> = ({ disabled, refreshCallback, appId, taskId }) => {
         onClose={onClose}
         style={{ width: 600 }}
         className="rollback-dialog"
-        footer={[
-          <Button className='mr-16' type="primary" onClick={submit} loading={loading as boolean}>
-            确定
-          </Button>,
-          <Button type="normal" onClick={onClose} disabled={loading as boolean}>
-            取消
-          </Button>,
-        ]}
+        footer={
+          <div className='flex-r'>
+            <div>
+              <Checkbox checked={useDebug} onChange={setDebug} label="开启 Debug 日志" />
+            </div>
+            <div>
+              <Button type="primary" className='mr-16' onClick={submit} loading={loading as boolean}>
+                确定
+              </Button>
+              <Button type="normal" onClick={onClose} disabled={loading as boolean}>
+                取消
+              </Button>
+            </div>
+          </div>
+        }
       >
         {`确定基于 ${taskId} 创建一个新的部署版本吗？`}
       </Dialog>
