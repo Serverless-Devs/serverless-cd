@@ -9,11 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^4.8.1",
     "@alicloud/fc-open20210406": "^1.1.13",
+    "@prisma/client": "^4.8.1",
     "@serverless-cd/config": "latest",
     "@serverless-cd/core": "^0.0.15",
-    "@serverless-cd/engine": "^0.0.22",
+    "@serverless-cd/engine": "^0.0.28",
     "@serverless-cd/git": "^0.0.2",
     "@serverless-cd/setup-runtime": "^0.0.1-alpha.1",
     "koa": "^2.14.1",
