@@ -12,7 +12,7 @@ import store from '@/store';
 import { localStorageSet, localStorageRemove } from '@/utils';
 import CreateOrg from '@/pages/CreateOrg';
 
-function Orgs() {
+function Orgs({match: { params: { orgName } }}) {
   const { data, request, refresh, loading } = useRequest(listOrgs);
   const [userState] = store.useModel('user');
   const username = get(userState, 'userInfo.username');
@@ -32,6 +32,7 @@ function Orgs() {
           Toast.success('团队删除成功');
           localStorageRemove(record.user_id);
           refresh();
+          history?.push(`/${orgName}/profile/organizations?orgRefresh=${new Date().getTime()}`)
         }
         dialog.hide();
       },
@@ -94,6 +95,11 @@ function Orgs() {
     },
   ];
 
+  const handleCreateOrgCallback = () => {
+    setVisible(false);
+    return refresh();
+ };
+
   return (
     <div className="mt-16">
       <div className="flex-r mb-16">
@@ -110,7 +116,7 @@ function Orgs() {
         dataSource={get(data, 'result')}
         columns={columns}
       />
-    <CreateOrg callback={refresh} active={visible}/>
+    <CreateOrg callback={handleCreateOrgCallback} active={visible} orgName={orgName} />
     </div>
   );
 }

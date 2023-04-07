@@ -42,11 +42,11 @@ const Settings: FC<Props> = (props) => {
         <Menu.Item className="border-bottom">
           {MENUICON.USERNAME}<span onClick={stopPropagation}>{username}</span>
         </Menu.Item>
-        <Menu.Item className="border-bottom" onClick={() => history?.push('/organizations')}>
+        <Menu.Item className="border-bottom" onClick={() => history?.push(`/${orgName}/profile/organizations`)}>
           {MENUICON.PERSONALSET}个人设置
         </Menu.Item>
         {isAdmin(orgName) && (
-          <Menu.Item className="border-bottom" onClick={() => history?.push('/team')}>
+          <Menu.Item className="border-bottom" onClick={() => history?.push(`/${orgName}/team`)}>
             {MENUICON.TEAMMANAGEMENT}团队管理
           </Menu.Item>
         )}

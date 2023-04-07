@@ -63,7 +63,7 @@ const Add: FC<Props> = (props) => {
   )
 
   const handleCreateOrgCallback = () => {
-     history?.push(`/${orgName}/setting/orgrefresh=${new Date().getTime()}`);
+     history?.push(`/${orgName}/profile/organizations=${Date.now}`);
   };
 
   const changeVisible = {
@@ -86,7 +86,7 @@ const Add: FC<Props> = (props) => {
         {menu()}
       </Dropdown>
       <AddMember callback={refresh} existUsers={map(data, (item) => item.username)} active={memberVisible} orgName={orgName} changeVisible={changeVisible.memberVisible} />
-      <CreateOrg callback={handleCreateOrgCallback} active={orgVisible} changeVisible={changeVisible.orgVisible}/>
+      <CreateOrg callback={handleCreateOrgCallback} active={orgVisible} changeVisible={changeVisible.orgVisible} orgName={orgName} />
     </React.Fragment>
   );
 };
