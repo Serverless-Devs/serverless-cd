@@ -118,7 +118,7 @@ const AppList = ({
 
   const deleteApplication = (record) => {
     const dialog = Dialog.alert({
-      title: `删除应用：${record.repo_name}`,
+      title: `删除应用：${record.name || record.repo_name}`,
       content: '您确定删除当前应用吗?',
       onOk: async () => {
         const { success } = await deleteApp({ appId: record.id });
