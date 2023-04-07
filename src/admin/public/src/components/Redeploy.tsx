@@ -53,7 +53,7 @@ const Redeploy = (props: Props) => {
         onClose={onClose}
         style={{ width: 600 }}
         footer={[
-          <Button type="primary" onClick={submit} loading={loading as boolean}>
+          <Button type="primary" className='mr-16' onClick={submit} loading={loading as boolean}>
             确定
           </Button>,
           <Button type="normal" onClick={onClose} disabled={loading as boolean}>

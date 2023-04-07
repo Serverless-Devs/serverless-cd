@@ -49,8 +49,8 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, en
 
   useEffect(() => {
     if (visible) {
-      const { owner, repo_name } = data;
-      if (owner && repo_name) branchReq.request({ owner, repo: repo_name });
+      const { repo_owner, repo_name } = data;
+      if (repo_owner && repo_name) branchReq.request({ owner: repo_owner, repo: repo_name });
     }
   }, [visible]);
   const getBranchList = () => {

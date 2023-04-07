@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useRequest, history } from 'ice';
 import { Button, Dialog, Loading, Select, Tab, Balloon } from '@alicloud/console-components';
 import PageLayout from '@/layouts/PageLayout';
-import CommitList from './components/CommitList';
 import BasicInfoDetail from './components/BasicInfoDetail';
 import { applicationDetail, removeEnv } from '@/services/applist';
+import TaskList from '@/components/TaskList';
+import ShowBranch from '@/components/ShowBranch';
 import PageInfo from '@/components/PageInfo';
 import { get, isEmpty, isBoolean, keys } from 'lodash';
 import SecretConfig from './components/SecretCofing';
@@ -49,6 +50,9 @@ const Details = ({
   const appName = get(detailInfo, 'data.name') || get(detailInfo, 'data.repo_name', '');
   const triggetInfo = strictValuesParse(get(trigger_spec, provider, {}));
   const triggerType = triggetInfo['triggerType'];
+  const triggerRef = triggerType === 'pull_request' ? get(triggetInfo, `${triggerType}Target`) : get(triggetInfo, `${triggerType}Value`);
+  const repoOwner = get(data, 'repo_owner', '');
+  const repoName = get(data, 'repo_name', '');
 
   const fetchData = async () => {
     setLoading(true);
@@ -167,7 +171,7 @@ const Details = ({
                 </Button>
               }
             >
-              不允许删除默认环境
+              默认环境不允许删除
             </Tooltip>
           ) : (
             <Button className="ml-8" type="primary" warning onClick={handleDelete}>
@@ -206,7 +210,7 @@ const Details = ({
                 },
                 {
                   text: '触发分支',
-                  value: triggerType === 'pull_request' ? get(triggetInfo, `${triggerType}Target`) : get(triggetInfo, `${triggerType}Value`),
+                  value: <ShowBranch threshold={50} url={`https://${provider}.com/${repoOwner}/${repoName}/tree/${triggerRef}`} label={triggerRef}/>,
                 },
                 {
                   text: '目标分支',
@@ -231,23 +235,24 @@ const Details = ({
             />
             <hr className="mb-20 mt-20" />
             <PageInfo title="部署历史">
-              <CommitList
+              <TaskList
                 appId={appId}
-                application={get(detailInfo, 'data', {})}
                 latestTaskId={taskId}
-                refreshCallback={handleRefresh}
                 envName={envName}
                 orgName={orgName}
+                repoOwner={repoOwner}
+                repoName={repoName}
+                triggerTypes={['console', 'webhook']}
               />
             </PageInfo>
           </Loading>
         </Tab.Item>
         <Tab.Item key={TAB.RESOURCE} title="运维管理">
-            <Loading visible={loading} inline={false} className="mt-16">
-              TODO:
-              {get(resource, 'fc', []).map((item) => <div>{`${item.uid}/${item.region}/${item.service}/${item.function}`}</div>)}
-            </Loading>
-          </Tab.Item>
+          <Loading visible={loading} inline={false} className="mt-16">
+            TODO:
+            {get(resource, 'fc', []).map((item) => <div>{`${item.uid}/${item.region}/${item.service}/${item.function}`}</div>)}
+          </Loading>
+        </Tab.Item>
       </Tab>
     </PageLayout>
   );
