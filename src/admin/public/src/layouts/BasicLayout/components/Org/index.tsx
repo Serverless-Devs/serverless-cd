@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Select } from '@alicloud/console-components';
 import { history, useRequest } from 'ice';
 import style from 'styled-components';
@@ -21,32 +21,38 @@ type Props = {
 const Org: FC<Props> = (props) => {
   const { orgName } = props;
   const orgRequest = useRequest(listOrgs);
+  const [dataSource, setDataSource] = useState<any>([]);
 
   useEffect(() => {
-    orgName && orgRequest.request();
-  }, [orgName, getParam('orgrefresh')]);
+    fetchData();
+  }, [orgName, getParam('orgRefresh')]);
 
+  const fetchData = async () => {
+    const data = await orgRequest.request();
+    const dataList = map(get(data, 'result'), (item) => {
+      return {
+        ...item,
+        label: (
+          <div className="align-center">
+            <img
+              src={item.logo || ORG_LOGO}
+              style={{ width: 20, height: 20, margin: '0 8', overflow: 'hidden' }}
+            />
+            <span className="ml-8 ellipsis">{item.alias || item.name}</span>
+          </div>
+        ),
+        value: item.name,
+      };
+    });
+    setDataSource(dataList);
+  }
   const handleChangeOrg = async (value) => {
     const obj = find(dataSource, (item) => item.value === value);
     localStorageSet(obj.user_id, value);
     history?.push('/');
   };
 
-  const dataSource = map(get(orgRequest, 'data.result'), (item) => {
-    return {
-      ...item,
-      label: (
-        <div className="align-center">
-          <img
-            src={item.logo || ORG_LOGO}
-            style={{ width: 20, height: 20, margin: '0 8', overflow: 'hidden' }}
-          />
-          <span className="ml-8 ellipsis">{item.alias || item.name}</span>
-        </div>
-      ),
-      value: item.name,
-    };
-  });
+  
 
   return (
     <StyledWrapper>

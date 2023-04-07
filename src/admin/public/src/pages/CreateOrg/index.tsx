@@ -1,7 +1,5 @@
 import React, { FC, useState, useEffect } from 'react';
 import { useRequest, history } from 'ice';
-import SlidePanel from '@alicloud/console-components-slide-panel';
-import PageLayout from '@/layouts/PageLayout';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import { Toast } from '@/components/ToastContainer';
 import { createOrg } from '@/services/org';
@@ -13,10 +11,11 @@ type Props = {
   active?: boolean;
   callback?: any;
   changeVisible?: any;
+  orgName?: string;
 };
 
 const CreateOrg: FC<Props> = (props) => {
-  const { active, callback, changeVisible } = props;
+  const { active, callback, changeVisible, orgName } = props;
   const { request, loading } = useRequest(createOrg);
   const field = Field.useField();
   const { init, validate } = field;
@@ -34,7 +33,7 @@ const CreateOrg: FC<Props> = (props) => {
         Toast.success('创建团队成功');
         setVisible(false);
         callback();
-        history?.push(`/organizations?orgRefresh=${new Date().getTime()}`)
+        history?.push(`/${orgName}/profile/organizations?orgRefresh=${new Date().getTime()}`)
       }
     });
   };

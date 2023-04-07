@@ -22,6 +22,7 @@ const Auth = lazy(() => import(/* webpackChunkName: 'Auth' */ '@/pages/Auth'));
 const OrgSettings = lazy(() => import(/* webpackChunkName: 'OrgSettings' */ '@/pages/OrgSettings'));
 const Members = lazy(() => import(/* webpackChunkName: 'Members' */ '@/pages/Members'));
 const Secrets = lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Secrets'));
+// const Bind = lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Bind'));
 const NoAuth = lazy(() => import(/* webpackChunkName: 'NotAuth' */ '@/pages/NoAuth'));
 const Team = lazy(() => import(/* webpackChunkName: 'Team' */ '@/pages/Team'));
 const CreateOrg = lazy(() => import(/* webpackChunkName: 'CreateOrg' */ '@/pages/CreateOrg'));
@@ -89,17 +90,6 @@ const routerConfig: IRouterConfig[] = [
     ],
   },
   {
-    path: '/team',
-    component: BasicLayout,
-    children: [
-      {
-        path: '/',
-        exact: true,
-        component: Team,
-      },
-    ],
-  },
-  {
     path: '/:orgName/application/:appId',
     component: BasicLayout,
     children: [
@@ -139,10 +129,30 @@ const routerConfig: IRouterConfig[] = [
         exact: true,
         component: Secrets,
       },
+      // {
+      //   path: '/setting/bind',
+      //   exact: true,
+      //   component: Bind,
+      // },
       {
         path: '/setting/org',
         exact: true,
         component: UpdateOrg,
+      },
+      {
+        path: '/team',
+        exact: true,
+        component: Team,
+      },
+      {
+        path: '/profile/organizations',
+        exact: true,
+        component: OrgSettings,
+      },
+      {
+        path: '/profile/account_information',
+        exact: true,
+        component: Team,
       },
       {
         path: '/',
