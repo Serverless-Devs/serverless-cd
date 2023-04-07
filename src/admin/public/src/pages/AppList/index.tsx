@@ -173,7 +173,7 @@ const AppList = ({
       key: 'provider',
       title: '代码源',
       dataIndex: 'provider',
-      cell: (value, _index, record) => <CodeSource provider={value} repo_url={record.repo_url} repo_name={record.name} />,
+      cell: (value, _index, record) => <CodeSource provider={value} repo_url={record.repo_url} repo_name={record.repo_name || record.name} />,
     },
     {
       key: 'description',
