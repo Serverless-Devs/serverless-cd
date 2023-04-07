@@ -22,7 +22,7 @@ const AccountSingUp = (props) => {
     if (success) {
       const userInfo = await userDispatchers.getUserInfo();
       localStorageSet(userInfo?.id, userInfo?.username);
-      history?.push(`/${get(data, 'data.username')}/application`);
+      history?.push('/');
       return;
     }
   };

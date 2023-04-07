@@ -22,7 +22,7 @@ const Auth = lazy(() => import(/* webpackChunkName: 'Auth' */ '@/pages/Auth'));
 const OrgSettings = lazy(() => import(/* webpackChunkName: 'OrgSettings' */ '@/pages/OrgSettings'));
 const Members = lazy(() => import(/* webpackChunkName: 'Members' */ '@/pages/Members'));
 const Secrets = lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Secrets'));
-// const Bind = lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Bind'));
+const Bind = lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Bind'));
 const NoAuth = lazy(() => import(/* webpackChunkName: 'NotAuth' */ '@/pages/NoAuth'));
 const Team = lazy(() => import(/* webpackChunkName: 'Team' */ '@/pages/Team'));
 const CreateOrg = lazy(() => import(/* webpackChunkName: 'CreateOrg' */ '@/pages/CreateOrg'));
@@ -129,11 +129,11 @@ const routerConfig: IRouterConfig[] = [
         exact: true,
         component: Secrets,
       },
-      // {
-      //   path: '/setting/bind',
-      //   exact: true,
-      //   component: Bind,
-      // },
+      {
+        path: '/setting/bind',
+        exact: true,
+        component: Bind,
+      },
       {
         path: '/setting/org',
         exact: true,

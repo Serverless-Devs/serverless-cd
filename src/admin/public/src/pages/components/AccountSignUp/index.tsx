@@ -19,11 +19,10 @@ const AccountSingUp = (props) => {
     if (!data) return;
     const {
       success,
-      data: { username },
     } = data;
     if (success) {
       await userDispatchers.getUserInfo();
-      history?.push(`/${username}/application`);
+      history?.push('/');
       return;
     }
   };
