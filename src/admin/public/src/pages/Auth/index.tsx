@@ -42,11 +42,10 @@ const Auth = ({ location: { search } }) => {
       if (!data) return;
         const {
           success,
-          data: { username },
         } = data;
       if (success) {
         await userDispatchers.getUserInfo();
-        history?.push(`/${username}/application`);
+        history?.push('/');
         return;
     }
     };

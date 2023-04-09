@@ -42,7 +42,7 @@ const AccountLogin = (props) => {
     } = data;
     if (success) {
       await userDispatchers.getUserInfo();
-      history?.push(`/${username}/application`);
+      history?.push('/');
       return;
     }
   };

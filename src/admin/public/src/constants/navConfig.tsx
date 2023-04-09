@@ -7,13 +7,17 @@ export const getMenuPath = ({ orgName }) => {
     team: `/${orgName}/team`,
     members: `/${orgName}/setting/members`,
     secrets: `/${orgName}/setting/secrets`,
-    // bind: `/${orgName}/setting/bind`,
+    bind: `/${orgName}/setting/bind`,
     teamSetting: `/${orgName}/setting/org`,
   };
 };
 
 const TEAMSETICON = (props) => (
   <Icon component={CUSTOMICON.TEAMSET} {...props} />
+);
+
+const BINDICON = (props) => (
+  <Icon component={CUSTOMICON.BIND} {...props} />
 );
 
 export const getMenuConfig = ({ orgName }) => {
@@ -31,11 +35,11 @@ export const getMenuConfig = ({ orgName }) => {
         path: menuPath.members,
         icon: <TeamOutlined style={{ marginRight: 6 }} />,
       },
-      // {
-      //   name: 'Git源绑定',
-      //   path: menuPath.bind,
-      //   icon: <TeamOutlined style={{ marginRight: 6 }} />,
-      // },
+      {
+        name: 'Git源绑定',
+        path: menuPath.bind,
+        icon: <BINDICON style={{ marginRight: 6 }} />,
+      },
       {
         name: '密钥配置',
         path: menuPath.secrets,
