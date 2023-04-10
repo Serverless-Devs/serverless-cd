@@ -38,7 +38,7 @@ const Org: FC<Props> = (props) => {
               src={item.logo || ORG_LOGO}
               style={{ width: 20, height: 20, margin: '0 8', overflow: 'hidden' }}
             />
-            <span className="ml-8 ellipsis">{item.alias || item.name}</span>
+            <span className="ml-8 ellipsis" style={{ width: 86 }}>{item.alias || item.name}</span>
           </div>
         ),
         value: item.name,
