@@ -10,7 +10,7 @@ import Add from './components/Add';
 import Home from './components/Home';
 import { get, values, includes } from 'lodash';
 import { getOrgName } from '@/utils';
-import { getMenuPath, getUserSettingMenuPath, getEnvironmentMenuPath } from '@/constants/navConfig';
+import { getMenuPath, getUserSettingMenuPath, getEnvironmentMenuPath, loginLayoutPathName } from '@/constants/navConfig';
 import './index.less';
 
 (function () {
@@ -67,6 +67,8 @@ function BasicLayout({ children, match, location }: IBasicLayoutProps) {
   const showMenu = includes(values(getMenuPath({ orgName })), pathname);
   const userSettingShowMenu = includes(values(getUserSettingMenuPath({ orgName })), pathname);
   const envShowMenu = includes(values(getEnvironmentMenuPath({ orgName, pathname })), pathname);
+  const loginLayoutShow = includes(loginLayoutPathName, pathname);
+  console.log(loginLayoutShow, 'loginLayoutShow');
 
   if (typeof window !== 'undefined') {
     window.addEventListener('optimizedResize', (e) => {
@@ -84,28 +86,33 @@ function BasicLayout({ children, match, location }: IBasicLayoutProps) {
         type="light"
         fixedHeader={false}
       >
-        <Shell.Branding>
-          <Home orgName={orgName} />
-          <Org orgName={orgName} />
-        </Shell.Branding>
-        <Shell.Action>
-          {match?.path !== '/login' && (
-            <>
-              <Add orgName={orgName} />
-              <Button
-                type="primary"
-                className="mr-16"
-                text
-                component="a"
-                href="http://serverless-cd.cn"
-                target="_blank"
-              >
-                帮助文档
-              </Button>
-              <Settings orgName={orgName} />
-            </>
-          )}
-        </Shell.Action>
+        {
+          !loginLayoutShow && <Shell.Branding>
+            <Home orgName={orgName} />
+            <Org orgName={orgName} />
+          </Shell.Branding>
+
+        }
+        {
+          !loginLayoutShow && <Shell.Action>
+            {match?.path !== '/login' && (
+              <>
+                <Add orgName={orgName} />
+                <Button
+                  type="primary"
+                  className="mr-16"
+                  text
+                  component="a"
+                  href="http://serverless-cd.cn"
+                  target="_blank"
+                >
+                  帮助文档
+                </Button>
+                <Settings orgName={orgName} />
+              </>
+            )}
+          </Shell.Action>
+        }
         {showMenu && (
           <Shell.Navigation
             direction={'ver'}

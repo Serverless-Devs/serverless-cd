@@ -119,3 +119,13 @@ export const getEnvironmentMenuConfig = ({ orgName, pathname }) => {
   }
   return data;
 };
+
+
+// 使用loginLayout 布局路径
+
+export const loginLayoutPathName = [
+  '/auth',
+  '/signUp',
+  '/login',
+  '/noAuth'
+]
