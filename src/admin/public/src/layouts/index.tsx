@@ -38,7 +38,7 @@ const OrgVerify = ({
   if (isEmpty(orgName)) {
     const newOrgName = getOrgName();
     if (newOrgName) {
-      return history?.push(`/fengchen/application`);
+      return history?.push(`/${newOrgName}/application`);
     }
     localStorageSet(userInfo.id, userInfo.username);
     return history?.push(`/${userInfo.username}/application`);
