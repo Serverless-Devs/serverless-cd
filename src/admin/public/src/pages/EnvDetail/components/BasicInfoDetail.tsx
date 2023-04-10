@@ -22,7 +22,7 @@ const BasicInfoDetail = (props: Props) => {
   const { data, refreshCallback, envName, orgName } = props;
   const provider = get(data, 'provider', '');
   const envInfo = get(data, `environment.${envName}`);
-  const cloudAlias = get(envInfo, 'envInfo');
+  const cloudAlias = get(envInfo, 'cloud_alias');
   const repo_name = get(data, 'repo_name', '');
   const repo_owner = get(data, 'repo_owner');
   const repo_url = get(data, 'repo_url');
