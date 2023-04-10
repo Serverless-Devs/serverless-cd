@@ -16,8 +16,6 @@ import NotAppliaction from './components/NotAppliaction';
 import { CreateAppLication } from '../Create';
 import { formatTime } from '@/utils';
 import EnvList from './components/EnvList';
-import { C_REPOSITORY } from '@/constants/repository';
-import ExternalLink from '@/components/ExternalLink';
 import { Toast } from '@/components/ToastContainer';
 import { sleep, getOrgName, localStorageSet } from '@/utils';
 import store from '@/store';
@@ -136,14 +134,14 @@ const AppList = ({
     return (
       <>
         <Tooltip
-          trigger={<Link to={`/${orgName}/application/${record.id}/default`}>{value}</Link>}
+          trigger={<Link to={`/${orgName}/application/${record.id}/default/overview`}>{value}</Link>}
           align="t"
         >
           <div className="text-bold">环境名称</div>
           {map(record.environment, (ele, envName) => {
             return (
               <div className="align-center mt-8">
-                <Link to={`/${orgName}/application/${record.id}/${envName}`}>{envName}</Link>
+                <Link to={`/${orgName}/application/${record.id}/${envName}/overview`}>{envName}</Link>
                 <span className="ml-2 mr-8">:</span>
                 <Status status={get(ele, 'latest_task.status', 'init')} />
               </div>
