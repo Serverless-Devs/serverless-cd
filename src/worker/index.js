@@ -38,6 +38,7 @@ async function handler(event, _context, callback) {
     environment = {},
     envName,
     trigger_type = provider,
+    logLevel = 'info',
   } = inputs;
   const envSecrets = _.get(environment, `${envName}.secrets`) || {};
 
@@ -113,7 +114,7 @@ async function handler(event, _context, callback) {
     logConfig: {
       logPrefix,
       ossConfig: getOssConfig(),
-      // logLevel: 'debug',
+      logLevel,
     },
     inputs: {
       ...customInputs,

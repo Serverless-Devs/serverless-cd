@@ -27,6 +27,7 @@ module.exports = class Client {
       securityToken,
       region,
       timeout: 60 * 1000,
+      internal: !!process.env.FC_QUALIFIER, // TODO: 区分环境
     });
   }
 };
