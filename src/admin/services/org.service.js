@@ -158,18 +158,18 @@ async function remove(orgId, orgName) {
 /**
  * 
  * @param {*} orgName 
- * @param { cloudSecret, secrets, third_part, name, alias, logo, description } data
+ * @param { cloud_secret, secrets, third_part, name, alias, logo, description } data
  */
 async function updateOwnerByName(orgName, data) {
-  const { cloudSecret, secrets, third_part } = data;
+  const { cloud_secret, secrets, third_part } = data;
   if (!_.isEmpty(secrets) && !_.isPlainObject(secrets)) {
     throw new ValidationError('secrets 传入的格式不符合预期');
   }
   if (!_.isEmpty(third_part) && !_.isPlainObject(third_part)) {
     throw new ValidationError('third_part 传入的格式不符合预期');
   }
-  if (!_.isEmpty(cloudSecret) && !_.isPlainObject(cloudSecret)) {
-    throw new ValidationError('cloudSecret 传入的格式不符合预期');
+  if (!_.isEmpty(cloud_secret) && !_.isPlainObject(cloud_secret)) {
+    throw new ValidationError('cloud_secret 传入的格式不符合预期');
   }
 
   const { id: orgId } = await orgModel.getOwnerOrgByName(orgName);
@@ -235,9 +235,9 @@ function desensitization(data) {
       id: item.id,
       avatar: item.avatar,
     }));
-    if (!_.isEmpty(item.cloudSecret)) {
-      const cloudSecret = _.get(item, 'cloudSecret', {});
-      item.cloudSecret = _.mapValues(cloudSecret, (item) => ({
+    if (!_.isEmpty(item.cloud_secret)) {
+      const cloud_secret = _.get(item, 'cloud_secret', {});
+      item.cloud_secret = _.mapValues(cloud_secret, (item) => ({
         ..._.mapValues(item, secretFieldOutput),
         provider: item.provider,
       }));

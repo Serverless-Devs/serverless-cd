@@ -11,8 +11,8 @@ import RefreshButton from '@/components/RefreshButton';
 const Cloud: FC<{}> = (props) => {
   const orgName = get(props, 'match.params.orgName', '');
   const orgRequestDetail = useRequest(orgDetail);
-  const cloudSecret = get(orgRequestDetail, 'data.data.cloudSecret', {});
-  const existAlias = keys(cloudSecret);
+  const cloudSecret = get(orgRequestDetail, 'data.data.cloud_secret') || {};
+  const existAlias = keys(cloudSecret) || [];
 
   useEffect(() => {
     orgRequestDetail.request();
@@ -22,7 +22,7 @@ const Cloud: FC<{}> = (props) => {
     const { alias } = data;
     unset(data, 'alias');
     set(cloudSecret, alias, data);
-    await orgUpdate({ cloudSecret });
+    await orgUpdate({ cloud_secret: cloudSecret });
     await orgRequestDetail.refresh();
   }
 

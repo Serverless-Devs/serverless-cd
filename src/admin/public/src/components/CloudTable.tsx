@@ -22,7 +22,7 @@ export default ({ data, loading = false, refresh }: Props) => {
       content: `确定移除 ${key} 吗？`,
       onOk: async () => {
         unset(data, key);
-        await orgUpdate({ cloudSecret: data });
+        await orgUpdate({ cloud_secret: data });
         refresh();
       },
       onCancel: () => {}

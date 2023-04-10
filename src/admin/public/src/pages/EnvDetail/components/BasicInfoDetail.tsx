@@ -22,6 +22,7 @@ const BasicInfoDetail = (props: Props) => {
   const { data, refreshCallback, envName, orgName } = props;
   const provider = get(data, 'provider', '');
   const envInfo = get(data, `environment.${envName}`);
+  const cloudAlias = get(envInfo, 'envInfo');
   const repo_name = get(data, 'repo_name', '');
   const repo_owner = get(data, 'repo_owner');
   const repo_url = get(data, 'repo_url');
@@ -73,6 +74,10 @@ const BasicInfoDetail = (props: Props) => {
                   )}
                 </div>
               ),
+            },
+            {
+              text: '关联云别名',
+              value: cloudAlias,
             },
             repo_url && !commit && {
               text: '仓库地址',
