@@ -15,6 +15,9 @@ const getOrgInfo = (result) => {
   if (result.third_part) {
     result.third_part = JSON.parse(result.third_part);
   }
+  if (result.cloudSecret) {
+    result.cloudSecret = JSON.parse(result.cloudSecret);
+  }
   return result;
 };
 
@@ -24,6 +27,9 @@ const saveOrg = (data) => {
   }
   if (data.third_part) {
     data.third_part = JSON.stringify(data.third_part);
+  }
+  if (data.cloudSecret) {
+    data.cloudSecret = JSON.stringify(data.cloudSecret);
   }
   _.unset(data, 'id');
   return data;

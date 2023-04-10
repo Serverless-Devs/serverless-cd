@@ -64,12 +64,14 @@ export enum ROLE {
   OWNER = 'owner',
   ADMIN = 'admin',
   MEMBER = 'member',
+  VIEWER = 'viewer',
 }
 
 export const ROLE_LABEL = {
   [ROLE.OWNER]: 'Owner',
   [ROLE.ADMIN]: '管理者',
   [ROLE.MEMBER]: '开发者',
+  [ROLE.VIEWER]: '浏览者',
 };
 
 export enum CODE {

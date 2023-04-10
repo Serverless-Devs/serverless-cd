@@ -25,6 +25,7 @@ model Org {
   name String     // 团队名称
   role String     // 用户在团队中的角色
   logo String?    // 团队logo
+  cloudSecret String?  {{if provider === 'mysql'}} @db.Text {{/if}}  // 云账号管理
   description String?  // 团队描述信息
   third_part String?    {{if provider === 'mysql'}} @db.Text {{/if}}  // 三方绑定(github等)登录的信息
   alias String?        // 团队别名

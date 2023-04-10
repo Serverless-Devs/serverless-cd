@@ -5,7 +5,7 @@ const git = require('@serverless-cd/git-provider');
 const orgModel = require('../models/org.mode');
 const applicationModel = require('../models/application.mode');
 const userModel = require('../models/user.mode');
-const { ValidationError, NoPermissionError, checkNameAvailable, generateOrgIdByUserIdAndOrgName } = require('../util');
+const { ValidationError, NoPermissionError, secretFieldOutput, checkNameAvailable, generateOrgIdByUserIdAndOrgName } = require('../util');
 
 async function getProviderToken(orgName, provider) {
   const result = await orgModel.getOwnerOrgByName(orgName);
@@ -155,7 +155,23 @@ async function remove(orgId, orgName) {
   // TODO: 删除webhook
 }
 
+/**
+ * 
+ * @param {*} orgName 
+ * @param { cloudSecret, secrets, third_part, name, alias, logo, description } data
+ */
 async function updateOwnerByName(orgName, data) {
+  const { cloudSecret, secrets, third_part } = data;
+  if (!_.isEmpty(secrets) && !_.isPlainObject(secrets)) {
+    throw new ValidationError('secrets 传入的格式不符合预期');
+  }
+  if (!_.isEmpty(third_part) && !_.isPlainObject(third_part)) {
+    throw new ValidationError('third_part 传入的格式不符合预期');
+  }
+  if (!_.isEmpty(cloudSecret) && !_.isPlainObject(cloudSecret)) {
+    throw new ValidationError('cloudSecret 传入的格式不符合预期');
+  }
+
   const { id: orgId } = await orgModel.getOwnerOrgByName(orgName);
   await orgModel.updateOrg(orgId, data);
 }
@@ -219,6 +235,13 @@ function desensitization(data) {
       id: item.id,
       avatar: item.avatar,
     }));
+    if (!_.isEmpty(item.cloudSecret)) {
+      const cloudSecret = _.get(item, 'cloudSecret', {});
+      item.cloudSecret = _.mapValues(cloudSecret, (item) => ({
+        ..._.mapValues(item, secretFieldOutput),
+        provider: item.provider,
+      }));
+    }
     return item;
   };
 
