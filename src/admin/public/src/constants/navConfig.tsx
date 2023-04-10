@@ -1,6 +1,15 @@
-import Icon, { TeamOutlined, ProfileOutlined, KeyOutlined } from '@ant-design/icons';
+import Icon, { TeamOutlined, ProfileOutlined, KeyOutlined, ClusterOutlined, ControlOutlined, AppstoreOutlined } from '@ant-design/icons';
 import React from 'react';
-import { CUSTOMICON } from '@/constants'; 
+import { CUSTOMICON } from '@/constants';
+import { split, size } from 'lodash';
+
+const TEAMSETICON = (props) => (
+  <Icon component={CUSTOMICON.TEAMSET} {...props} />
+);
+
+const BINDICON = (props) => (
+  <Icon component={CUSTOMICON.BIND} {...props} />
+);
 
 export const getMenuPath = ({ orgName }) => {
   return {
@@ -11,14 +20,6 @@ export const getMenuPath = ({ orgName }) => {
     teamSetting: `/${orgName}/setting/org`,
   };
 };
-
-const TEAMSETICON = (props) => (
-  <Icon component={CUSTOMICON.TEAMSET} {...props} />
-);
-
-const BINDICON = (props) => (
-  <Icon component={CUSTOMICON.BIND} {...props} />
-);
 
 export const getMenuConfig = ({ orgName }) => {
   const menuPath = getMenuPath({ orgName });
@@ -77,6 +78,43 @@ export const getUserSettingMenuConfig = ({ orgName }) => {
         path: menuPath.accountInformation,
         icon: <TeamOutlined style={{ marginRight: 6 }} />,
       },
+    ];
+  }
+  return data;
+};
+
+// 环境侧边栏
+export const getEnvironmentMenuPath = ({ orgName, pathname }) => {
+  if (!orgName) return
+  const pathNames = split(pathname, '/');
+  if (size(pathNames) !== 6) return
+  return {
+    overview: `/${orgName}/application/${pathNames[3]}/${pathNames[4]}/overview`,
+    cicd: `/${orgName}/application/${pathNames[3]}/${pathNames[4]}/cicd`,
+    operation: `/${orgName}/application/${pathNames[3]}/${pathNames[4]}/operation`
+  };
+};
+
+export const getEnvironmentMenuConfig = ({ orgName, pathname }) => {
+  const menuPath = getEnvironmentMenuPath({ orgName, pathname });
+  const data = {};
+  for (const key in menuPath) {
+    data[menuPath[key]] = [
+      {
+        name: '应用概览',
+        path: menuPath.overview,
+        icon: <AppstoreOutlined style={{ marginRight: 6 }} />,
+      },
+      {
+        name: 'CI/CD',
+        path: menuPath.cicd,
+        icon: <ClusterOutlined style={{ marginRight: 6 }} />,
+      },
+      {
+        name: '运维管理',
+        path: menuPath.operation,
+        icon: <ControlOutlined style={{ marginRight: 6 }} />,
+      }
     ];
   }
   return data;

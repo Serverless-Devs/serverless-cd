@@ -2,14 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useRequest, history } from 'ice';
 import { Button, Dialog, Loading, Select, Balloon } from '@alicloud/console-components';
 import PageLayout from '@/layouts/PageLayout';
-import BasicInfoDetail from './components/BasicInfoDetail';
 import { applicationDetail, removeEnv } from '@/services/applist';
 import { get, isEmpty, isBoolean, keys } from 'lodash';
-import CreateEnv from './components/CreateEnv';
+import CreateEnv from '../EnvDetail/components/CreateEnv';
 import { Toast } from '@/components/ToastContainer';
-
 const { Tooltip } = Balloon;
-
 
 const Details = ({
   match: {
@@ -19,13 +16,13 @@ const Details = ({
   const {
     data: detailInfo,
     request,
-    refresh,
     cancel,
   } = useRequest(applicationDetail, { pollingInterval: 5000 });
   const [loading, setLoading] = useState(false);
   const [pageKey, forceUpdate] = useState(0);
 
   const data = get(detailInfo, 'data', {});
+  const resource = get(data, `environment.${envName}.resource`, {});
   const appName = get(detailInfo, 'data.name') || get(detailInfo, 'data.repo_name', '');
 
   const fetchData = async () => {
@@ -39,11 +36,6 @@ const Details = ({
     fetchData();
   }, [envName]);
 
-  const handleRefresh = async () => {
-    setLoading(true);
-    await refresh();
-    setLoading(false);
-  };
 
   useEffect(() => {
     if (isEmpty(detailInfo)) return;
@@ -90,9 +82,10 @@ const Details = ({
   };
 
   const handleChangeEnv = async (value: string) => {
-    history?.push(`/${orgName}/application/${appId}/${value}/overview`);
+    history?.push(`/${orgName}/application/${appId}/${value}/operation`);
     forceUpdate(Date.now());
   };
+
 
   return (
     <PageLayout
@@ -147,12 +140,8 @@ const Details = ({
       }
     >
       <Loading visible={loading} inline={false} className="mt-16">
-        <BasicInfoDetail
-          data={data}
-          refreshCallback={handleRefresh}
-          envName={envName}
-          orgName={orgName}
-        />
+        TODO:
+        {get(resource, 'fc', []).map((item) => <div>{`${item.uid}/${item.region}/${item.service}/${item.function}`}</div>)}
       </Loading>
     </PageLayout>
   );

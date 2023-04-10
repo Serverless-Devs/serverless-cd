@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { Shell, ConfigProvider, Button } from '@alicloud/console-components';
 import PageNav from './components/PageNav';
 import UserSettingNav from './components/UserSettingNav';
+import EnvNav from './components/EnvNav';
 import ToastContainer from '@/components/ToastContainer';
 import Settings from './components/Settings';
 import Org from './components/Org';
@@ -9,7 +10,7 @@ import Add from './components/Add';
 import Home from './components/Home';
 import { get, values, includes } from 'lodash';
 import { getOrgName } from '@/utils';
-import { getMenuPath, getUserSettingMenuPath } from '@/constants/navConfig';
+import { getMenuPath, getUserSettingMenuPath, getEnvironmentMenuPath } from '@/constants/navConfig';
 import './index.less';
 
 (function () {
@@ -45,10 +46,9 @@ interface IBasicLayoutProps {
   match: object | any;
   location: object | any;
 }
-export function BasicLayout({ children, match, location }: IBasicLayoutProps) {
+function BasicLayout({ children, match, location }: IBasicLayoutProps) {
   const { pathname } = location;
   const orgName = get(match, 'params.orgName', getOrgName());
-  
   const getDevice: IGetDevice = (width) => {
     const isPhone =
       typeof navigator !== 'undefined' && navigator && navigator.userAgent.match(/phone/gi);
@@ -66,6 +66,7 @@ export function BasicLayout({ children, match, location }: IBasicLayoutProps) {
 
   const showMenu = includes(values(getMenuPath({ orgName })), pathname);
   const userSettingShowMenu = includes(values(getUserSettingMenuPath({ orgName })), pathname);
+  const envShowMenu = includes(values(getEnvironmentMenuPath({ orgName, pathname })), pathname);
 
   if (typeof window !== 'undefined') {
     window.addEventListener('optimizedResize', (e) => {
@@ -125,6 +126,17 @@ export function BasicLayout({ children, match, location }: IBasicLayoutProps) {
             </Shell.Navigation>
           )
         }
+        {
+          envShowMenu && (
+            <Shell.Navigation
+              direction={'ver'}
+              onCollapseChange={(collapse) => setIsCollapse(collapse)}
+              collapse={isCollapse}
+            >
+              <EnvNav />
+            </Shell.Navigation>
+          )
+        }
         <Shell.Content>
           {children}
           <ToastContainer />
@@ -133,3 +145,5 @@ export function BasicLayout({ children, match, location }: IBasicLayoutProps) {
     </ConfigProvider>
   );
 }
+
+export default memo(BasicLayout)
