@@ -16,6 +16,7 @@ const TaskDetails = React.lazy(() => import(/* webpackChunkName: 'TaskDetails' *
 const Auth = React.lazy(() => import(/* webpackChunkName: 'Auth' */ '@/pages/Auth'));
 const OrgSettings = React.lazy(() => import(/* webpackChunkName: 'OrgSettings' */ '@/pages/OrgSettings'));
 const Members = React.lazy(() => import(/* webpackChunkName: 'Members' */ '@/pages/Members'));
+const Cloud = React.lazy(() => import(/* webpackChunkName: 'Cloud' */ '@/pages/Cloud'));
 const Secrets = React.lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Secrets'));
 const Bind = React.lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Bind'));
 const NoAuth = React.lazy(() => import(/* webpackChunkName: 'NotAuth' */ '@/pages/NoAuth'));
@@ -65,6 +66,7 @@ const App = (props) => {
           <Route path={'/:orgName/application'} exact component={AppList} />
           <Route path={'/:orgName/create'} component={Create} />
           <Route path={'/:orgName/setting/members'} exact component={Members} />
+          <Route path={'/:orgName/setting/cloud'} exact component={Cloud} />
           <Route path={'/:orgName/setting/secrets'} exact component={Secrets} />
           <Route path={'/:orgName/setting/bind'} exact component={Bind} />
           <Route path={'/:orgName/setting/org'} exact component={UpdateOrg} />

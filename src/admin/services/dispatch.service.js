@@ -84,6 +84,8 @@ async function redeploy(dispatchOrgId, orgName, { useDebug, taskId, appId, trigg
 
   const ownerSecrets = _.get(ownerOrgData, 'secrets') || {};
   const appSecrets = _.get(environment, `${envName}.secrets`) || {};
+  const cloudAlias = _.get(environment, `${envName}.cloud_alias`, '');
+  const cloud_secret = _.get(ownerOrgData, `cloud_secret.${cloudAlias}`, {});
 
   const providerToken = await orgService.getProviderToken(orgName, provider);
   _.merge(trigger_payload.authorization, {
@@ -91,6 +93,7 @@ async function redeploy(dispatchOrgId, orgName, { useDebug, taskId, appId, trigg
     dispatchOrgId,
     repo_owner,
     accessToken: providerToken,
+    cloud_secret,
   });
 
   // 调用函数
@@ -197,6 +200,9 @@ async function manualTask(dispatchOrgId, orgName, body = {}) {
   const ownerSecrets = _.get(ownerOrgData, 'secrets', {});
   debug('get org repo_owner successfully');
 
+  const cloudAlias = _.get(environment, `${envName}.cloud_alias`, '');
+  const cloud_secret = _.get(ownerOrgData, `cloud_secret.${cloudAlias}`, {});
+
   const targetEnvName = envName ? envName : _.first(_.keys(environment));
   const payload = {
     taskId: unionToken(),
@@ -209,6 +215,7 @@ async function manualTask(dispatchOrgId, orgName, body = {}) {
       repo_owner,
       accessToken: providerToken,
       secrets: _.merge(ownerSecrets, _.get(environment, `${targetEnvName}.secrets`, {})),
+      cloud_secret,
     },
     ref,
     message: msg,

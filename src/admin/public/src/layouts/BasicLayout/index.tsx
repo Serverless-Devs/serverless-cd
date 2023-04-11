@@ -68,7 +68,6 @@ function BasicLayout({ children, match, location }: IBasicLayoutProps) {
   const userSettingShowMenu = includes(values(getUserSettingMenuPath({ orgName })), pathname);
   const envShowMenu = includes(values(getEnvironmentMenuPath({ orgName, pathname })), pathname);
   const loginLayoutShow = includes(loginLayoutPathName, pathname);
-  console.log(loginLayoutShow, 'loginLayoutShow');
 
   if (typeof window !== 'undefined') {
     window.addEventListener('optimizedResize', (e) => {

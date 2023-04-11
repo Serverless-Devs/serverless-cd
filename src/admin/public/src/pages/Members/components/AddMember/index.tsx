@@ -2,7 +2,7 @@ import React, { FC, useEffect } from 'react';
 import { useRequest, useLocation, history } from 'ice';
 import SlidePanel from '@alicloud/console-components-slide-panel';
 import { Form, Field, Select, Dialog, Loading } from '@alicloud/console-components';
-import { FORM_ITEM_LAYOUT, ROLE } from '@/constants';
+import { FORM_ITEM_LAYOUT, ROLE, ROLE_LABEL } from '@/constants';
 import { Toast } from '@/components/ToastContainer';
 import { inviteUser, updateAuth } from '@/services/org';
 import { debounce, map, filter, includes } from 'lodash';
@@ -105,16 +105,10 @@ const AddMember: FC<IProps> = (props) => {
             <FormItem label="角色" required>
               <Select
                 className="full-width"
-                dataSource={[
-                  {
-                    label: '管理员',
-                    value: ROLE.ADMIN,
-                  },
-                  {
-                    label: '开发者',
-                    value: ROLE.MEMBER,
-                  },
-                ]}
+                dataSource={Object.values(ROLE).map(value => ({
+                  value,
+                  label: ROLE_LABEL[value]
+                }))}
                 {...init('role', {
                   rules: [
                     {
