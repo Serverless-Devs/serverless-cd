@@ -31,6 +31,7 @@ interface IProps {
   createType?: `${CREATE_TYPE}`;
   createTemplate: boolean;
   setCreateDisabled: (value: any) => void;
+  orgDetailData: any;
 }
 
 const initRepoTypeList = [
@@ -57,9 +58,10 @@ const Repos = (props: IProps) => {
     createType = CREATE_TYPE.Repository,
     createTemplate = false,
     setCreateDisabled,
+    orgDetailData = {}
   } = props;
   const { data, loading, request } = useRequest(githubOrgs);
-  const orgDetailRequest = useRequest(orgDetail);
+  // const orgDetailRequest = useRequest(orgDetail);
   const orgRepos = useRequest(githubOrgRepos);
   const [, userDispatchers] = store.useModel('user');
   const effectsState = store.useModelEffectsState('user');
@@ -69,11 +71,11 @@ const Repos = (props: IProps) => {
   const [inputValue, setInputValue] = useState('');
   const { getValue, setValue, init, getError } = field;
   // owner是否授权
-  const isAuth = Boolean(get(orgDetailRequest.data, 'data.third_part.github.repo_owner'));
+  const isAuth = Boolean(get(orgDetailData, 'data.third_part.github.repo_owner'));
 
-  useEffect(() => {
-    orgDetailRequest.request();
-  }, [])
+  // useEffect(() => {
+  //   orgDetailRequest.request();
+  // }, [])
 
   useEffect(() => {
     setInputValue(getValue('repoName'));

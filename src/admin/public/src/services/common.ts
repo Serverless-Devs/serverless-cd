@@ -23,6 +23,7 @@ const doCreateApp = async (values, createType) => {
       environment: {
         default: {
           type: ENV_TYPE.TESTING,
+          cloud_secret: get(values, 'cloud_secret', ''),
           trigger_spec,
           secrets: get(values, 'secrets', {}),
           cd_pipeline_yaml: CD_PIPELINE_YAML,
