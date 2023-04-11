@@ -159,25 +159,27 @@ const Github = (props: IProps) => {
             dataSource={map(keys(cloudData), (item) => ({ label: item, value: item }))}
           />
         </FormItem>
-        {(specify || template) && (
-          <>
-            {!template && (
-              <FormItem label="立即部署">
-                <Switch {...init('deployEnable', { valueName: 'checked', initValue: true })} />
+        {
+          (specify || template) && (
+            <>
+              {!template && (
+                <FormItem label="立即部署">
+                  <Switch {...init('deployEnable', { valueName: 'checked', initValue: true })} />
+                </FormItem>
+              )}
+              <FormItem label="Secrets" help="">
+                <ConfigEdit
+                  {...init('secrets', {
+                    initValue: { ALIYUN_AK: '', ALIYUN_SK: '' },
+                    rules: [{ validator: secretsValidator }],
+                  })}
+                  ref={secretsRef}
+                />
               </FormItem>
-            )}
-            <FormItem label="Secrets" help="">
-              <ConfigEdit
-                {...init('secrets', {
-                  initValue: { ALIYUN_AK: '', ALIYUN_SK: '' },
-                  rules: [{ validator: secretsValidator }],
-                })}
-                ref={secretsRef}
-              />
-            </FormItem>
-          </>
-        )}
-      </Form>
+            </>
+          )
+        }
+      </Form >
       <Submit
         field={field}
         orgName={orgName}
