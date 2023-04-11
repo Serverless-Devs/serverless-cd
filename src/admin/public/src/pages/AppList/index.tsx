@@ -56,6 +56,7 @@ const AppList = ({
 
   const { data, request, refresh, cancel } = useRequest(listApp, {
     pollingInterval: 5000,
+    pollingWhenHidden: false
   });
   const [applist, setApplist] = useState<Array<IItem>>([]);
   const [queryKey, setQueryKey] = useState<string>('');
@@ -69,6 +70,7 @@ const AppList = ({
 
   useEffect(() => {
     fetchData();
+    return () => cancel();
   }, []);
 
   useEffect(() => {

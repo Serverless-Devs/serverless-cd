@@ -47,7 +47,8 @@ const appConfig: IAppConfig = {
             return response;
           }
           if (!response.data.success && response.data.message) {
-            Toast.error(response.data.message);
+            const tokenInvalid = response.data.code === CODE.Invalid && response.data.message === 'token 无效，请重新配置';
+            !tokenInvalid && Toast.error(response.data.message);
           }
           return response;
         },
