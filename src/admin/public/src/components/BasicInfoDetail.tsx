@@ -19,7 +19,6 @@ const BasicInfoDetail = (props: Props) => {
   const repo_url = get(data, 'repo_url');
   const repo_name = get(data, 'repo_name');
   const repo_owner = get(data, 'repo_owner');
-  console.log('data:: ', data);
   return (
     <BasicInfo
       title={'基本信息'}

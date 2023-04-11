@@ -24,12 +24,13 @@ interface IProps {
 
 const Github = (props: IProps) => {
   const { field, createType, orgName } = props;
-  const { init, getValue, resetToDefault } = field;
+  const { init, getValue, resetToDefault, validate } = field;
   const [dialogVisible, setVisible] = useState(false);
   const [templateCreateStatus, setTemplateCreateStatus] = useState('');
   const [repoKey, setRepoKey] = useState(0);
   const [closeMode, setCloseMode] = useState([]) as any;
   const [footerActions, setFooterActions] = useState([]) as any;
+  const [repoErrorMessage, setRepoErrorMessage] = useState('');
 
   const secretsRef: any = useRef(null);
   const specify = get(getValue('trigger'), 'push') === PUSH.SPECIFY;
@@ -60,6 +61,13 @@ const Github = (props: IProps) => {
     setVisible(false);
     setCloseMode([]);
     setFooterActions([]);
+  }
+
+  const validateRepo = (message = '') => {
+    setRepoErrorMessage(message);
+    setTimeout(() => {
+      validate('repo');
+    }, 300)
   }
 
   return (
@@ -109,12 +117,20 @@ const Github = (props: IProps) => {
             key={`repo-${repoKey}`}
             orgDetailData={orgDetailRequest.data}
             setCreateDisabled={setCreateDisabled}
+            validateRepo={validateRepo}
             {...(init('repo', {
               rules: [
                 {
                   required: true,
                   message: '请选择仓库名称',
                 },
+                {
+                  trigger: 'onChange',
+                  validator: (rule, value, callback) => {
+                    if (repoErrorMessage) callback(repoErrorMessage)
+                    else callback()
+                  }
+                }
               ],
             }) as any)}
           />

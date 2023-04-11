@@ -84,13 +84,11 @@ const AppList = ({
       for (const key in environment) {
         const ele = environment[key];
         const completed = get(ele, 'latest_task.completed');
-        console.log(completed, 'completed');
         if (isBoolean(completed) && !completed) {
           completedList.push(completed);
         }
       }
     }
-    console.log(completedList, 'completedList')
     if (completedList.length === 0) {
       cancel();
     }
