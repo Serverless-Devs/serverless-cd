@@ -56,6 +56,7 @@ const AppList = ({
 
   const { data, request, refresh, cancel } = useRequest(listApp, {
     pollingInterval: 5000,
+    pollingWhenHidden: false
   });
   const [applist, setApplist] = useState<Array<IItem>>([]);
   const [queryKey, setQueryKey] = useState<string>('');
@@ -69,6 +70,7 @@ const AppList = ({
 
   useEffect(() => {
     fetchData();
+    return () => cancel();
   }, []);
 
   useEffect(() => {
@@ -82,11 +84,13 @@ const AppList = ({
       for (const key in environment) {
         const ele = environment[key];
         const completed = get(ele, 'latest_task.completed');
+        console.log(completed, 'completed');
         if (isBoolean(completed) && !completed) {
           completedList.push(completed);
         }
       }
     }
+    console.log(completedList, 'completedList')
     if (completedList.length === 0) {
       cancel();
     }
