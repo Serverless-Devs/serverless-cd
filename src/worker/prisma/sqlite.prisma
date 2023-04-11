@@ -24,6 +24,7 @@ model Org {
   id    String     @id    // 生成格式变更为：user_id:name
   user_id String
   secrets String?
+  cloud_secret String?   // 云账号管理
   name String             // 
   role String             // owner / admin / member
   description String?

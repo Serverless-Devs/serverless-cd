@@ -27,7 +27,7 @@ async function handler(event, _context, callback) {
     provider,
     cloneUrl,
     pusher,
-    authorization: { dispatchOrgId, repo_owner, appId, accessToken: token, secrets } = {},
+    authorization: { cloud_secret, dispatchOrgId, repo_owner, appId, accessToken: token, secrets } = {},
     ref,
     commit,
     message,
@@ -127,6 +127,7 @@ async function handler(event, _context, callback) {
         dispatch_org_id: dispatchOrgId,
         id: appId,
       },
+      cloudSecrets: cloud_secret,
       secrets: _.merge(secrets, envSecrets),
       git: {
         // git 相关的内容

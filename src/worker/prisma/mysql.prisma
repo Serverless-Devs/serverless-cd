@@ -23,6 +23,7 @@ model Org {
   user_id String    // 关联的用户ID
   secrets String?       @db.Text   // 配置的密钥信息，标准JSON格式
   name String     // 团队名称
+  cloud_secret String?  @db.Text  // 云账号管理
   role String     // 用户在团队中的角色
   logo String?    // 团队logo
   description String?  // 团队描述信息
