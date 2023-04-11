@@ -221,7 +221,7 @@ const TemplateDialog = (props: IProps) => {
         return await new Promise((resolve, reject) => {
           const { id } = params.content.createApp.result;
           setTimeout(() => {
-            history?.push(`/${orgName}/application/${id}/default`);
+            history?.push(`/${orgName}/application/${id}/default/overview`);
             resolve();
           }, 3000);
         });

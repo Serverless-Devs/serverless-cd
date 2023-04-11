@@ -76,7 +76,7 @@ const BasicInfoDetail = (props: Props) => {
               ),
             },
             {
-              text: '关联云别名',
+              text: '关联云账号',
               value: cloudAlias,
             },
             repo_url && !commit && {

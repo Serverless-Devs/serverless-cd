@@ -34,7 +34,7 @@ const Cloud: FC<{}> = (props) => {
           existAlias={existAlias}
           onConfirm={onConfirm}
         >
-          <Button type="primary">添加密钥</Button>
+          <Button type="primary">添加账号</Button>
         </CredentialUi>
       }
       endExtra={<RefreshButton refreshCallback={orgRequestDetail.refresh} />}

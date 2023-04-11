@@ -120,7 +120,7 @@ const Details = ({
             data={get(detailInfo, 'data', {})}
             appId={appId}
             callback={async (value) => {
-              history?.push(`/${orgName}/application/${appId}/${value}`);
+              history?.push(`/${orgName}/application/${appId}/${value}/overview`);
               forceUpdate(Date.now());
             }}
           >

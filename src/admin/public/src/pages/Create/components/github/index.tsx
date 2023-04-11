@@ -151,9 +151,9 @@ const Github = (props: IProps) => {
 
         <div className="text-bold mt-16 mb-16">环境配置</div>
         <Trigger repo={getValue('repo')} {...(init('trigger') as any)} createTemplate={template} />
-        <FormItem label="云账号">
+        <FormItem label="关联云账号">
           <Select
-            {...(init('cloud_secret') as any)}
+            {...(init('cloud_alias') as any)}
             className="full-width"
             placeholder="请选择"
             dataSource={map(keys(cloudData), (item) => ({ label: item, value: item }))}
