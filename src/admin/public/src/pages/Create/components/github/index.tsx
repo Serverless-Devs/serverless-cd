@@ -1,14 +1,17 @@
-import React, { useRef, useState } from 'react';
-import { Form, Radio, Field, Input, Divider, Switch, Dialog } from '@alicloud/console-components';
+import React, { useRef, useState, useEffect } from 'react';
+import { Form, Radio, Field, Input, Divider, Switch, Dialog, Select } from '@alicloud/console-components';
 import { FORM_ITEM_LAYOUT } from '@/constants';
+import { useRequest } from 'ice';
 import AuthDialog from './AuthDialog';
 import Repo from './Repo';
 import Trigger from './Trigger';
 import ConfigEdit from '@/components/ConfigEdit';
 import { PUSH } from '../constant';
-import { get } from 'lodash';
+import { get, keys, map } from 'lodash';
 import Submit from '../Submit';
 import TemplateDialog from '../TemplateDialog';
+import { orgDetail } from '@/services/org';
+
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -28,6 +31,12 @@ const Github = (props: IProps) => {
   const specify = get(getValue('trigger'), 'push') === PUSH.SPECIFY;
   const template = createType === 'template';
   const [createDisabled, setCreateDisabled] = useState(false);
+  const orgDetailRequest = useRequest(orgDetail);
+  const cloudData = get(orgDetailRequest.data, 'data.cloud_secret', {});
+
+  useEffect(() => {
+    orgDetailRequest.request();
+  }, [])
 
   const secretsValidator = async (_, value, callback) => {
     if (get(getValue('trigger'), 'push') === PUSH.NEW) return callback();
@@ -81,6 +90,7 @@ const Github = (props: IProps) => {
             createType={createType}
             createTemplate={template}
             key={`repo-${repoKey}`}
+            orgDetailData={orgDetailRequest.data}
             setCreateDisabled={setCreateDisabled}
             {...(init('repo', {
               rules: [
@@ -108,6 +118,14 @@ const Github = (props: IProps) => {
 
         <div className="text-bold mt-16 mb-16">环境配置</div>
         <Trigger repo={getValue('repo')} {...(init('trigger') as any)} createTemplate={template} />
+        <FormItem label="云账号">
+          <Select
+            {...(init('cloud_secret') as any)}
+            className="full-width"
+            placeholder="请选择"
+            dataSource={map(keys(cloudData), (item) => ({ label: item, value: item }))}
+          />
+        </FormItem>
         {(specify || template) && (
           <>
             {!template && (

@@ -30,6 +30,7 @@ const Cloud: FC<{}> = (props) => {
     <PageInfo
       extra={
         <CredentialUi
+          showAccountID
           existAlias={existAlias}
           onConfirm={onConfirm}
         >
