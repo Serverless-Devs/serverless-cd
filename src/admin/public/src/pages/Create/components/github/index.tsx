@@ -26,7 +26,11 @@ const Github = (props: IProps) => {
   const { field, createType, orgName } = props;
   const { init, getValue, resetToDefault } = field;
   const [dialogVisible, setVisible] = useState(false);
+  const [templateCreateStatus, setTemplateCreateStatus] = useState('');
   const [repoKey, setRepoKey] = useState(0);
+  const [closeMode, setCloseMode] = useState([]) as any;
+  const [footerActions, setFooterActions] = useState([]) as any;
+
   const secretsRef: any = useRef(null);
   const specify = get(getValue('trigger'), 'push') === PUSH.SPECIFY;
   const template = createType === 'template';
@@ -38,12 +42,25 @@ const Github = (props: IProps) => {
     orgDetailRequest.request();
   }, [])
 
+  useEffect(() => {
+    const newCloseMode = templateCreateStatus === 'error' ? ['close', 'esc'] : []
+    const newFooterActions = templateCreateStatus === 'error' ? ['cancel'] : []
+    setCloseMode(newCloseMode)
+    setFooterActions(newFooterActions)
+  }, [templateCreateStatus])
+
   const secretsValidator = async (_, value, callback) => {
     if (get(getValue('trigger'), 'push') === PUSH.NEW) return callback();
     let res = await secretsRef.current.validate();
     if (!res) return callback('error');
     callback();
   };
+
+  const onClose = () => {
+    setVisible(false);
+    setCloseMode([]);
+    setFooterActions([]);
+  }
 
   return (
     <>
@@ -153,9 +170,10 @@ const Github = (props: IProps) => {
         createType={createType as any}
         createDisabled={createDisabled}
       />
-      <Dialog visible={dialogVisible} footer={false} title="创建应用" closeMode={[]}>
+      <Dialog visible={dialogVisible} footerActions={footerActions} title="创建应用" closeMode={closeMode} onClose={onClose} onCancel={onClose}>
         <TemplateDialog
           value={field.getValues()}
+          setTemplateCreateStatus={setTemplateCreateStatus}
           createType={createType as any}
           orgName={orgName}
         ></TemplateDialog>
