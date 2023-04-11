@@ -53,7 +53,7 @@ const UpdateOrg: FC<Props> = ({ match }) => {
        <FormItem label="团队地址" required>
         <Input disabled
           {...init('host', {
-            initValue: window.location.host,
+            initValue: window.location.origin,
           })
           }
           style={{ width: '30%' }}

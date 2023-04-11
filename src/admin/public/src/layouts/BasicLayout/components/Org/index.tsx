@@ -34,10 +34,12 @@ const Org: FC<Props> = (props) => {
         ...item,
         label: (
           <div className="align-center">
-            <img
-              src={item.logo || ORG_LOGO}
-              style={{ width: 20, height: 20, margin: '0 8', overflow: 'hidden' }}
-            />
+            <div className='org-image'>
+              <img
+                src={item.logo || ORG_LOGO}
+                style={{ width: 20, height: 20, margin: '0 8', overflow: 'hidden' }}
+              />
+            </div>
             <span className="ml-8 ellipsis">{item.alias || item.name}</span>
           </div>
         ),

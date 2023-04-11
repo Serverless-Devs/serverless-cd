@@ -98,6 +98,10 @@ async function triggered(appId, headers, body) {
       continue;
     }
     debug(`env ${key} validate trigger success`);
+
+    const cloudAlias = _.get(ele, 'cloud_alias', '');
+    const cloud_secret = _.get(orgResult, `cloud_secret.${cloudAlias}`, {});
+
     debug(`triggerConfig:\n${JSON.stringify(triggerConfig)}`);
     const workerPayload = {
       taskId,
@@ -117,6 +121,7 @@ async function triggered(appId, headers, body) {
         secrets,
         repo_owner,
         repo_webhook_secret,
+        cloud_secret,
       },
       envName: key,
       environment,
@@ -130,6 +135,8 @@ async function triggered(appId, headers, body) {
       taskId: workerPayload.taskId,
     };
   }
+
+  throw new ValidationError('没有被触发');
 }
 
 module.exports = {

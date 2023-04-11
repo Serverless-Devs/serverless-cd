@@ -6,6 +6,16 @@ const { ValidationError } = require('./custom-errors');
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const secretFieldOutput = (val) => {
+  if (!_.isString(val)) {
+    return val;
+  }
+  if (val.length > 6) {
+    return val.slice(0, 3) + '*'.repeat(val.length - 6) + val.slice(val.length - 3);
+  }
+  return val;
+}
+
 /**
  * unless middleware
  * @param pred
@@ -92,6 +102,7 @@ module.exports = {
   retryOnce,
   formatBranch,
   md5Encrypt,
+  secretFieldOutput,
   unionId: customAlphabet(UID_TOKEN, 16),
   unionToken: customAlphabet(UID_TOKEN_UPPERCASE, 16),
 };
