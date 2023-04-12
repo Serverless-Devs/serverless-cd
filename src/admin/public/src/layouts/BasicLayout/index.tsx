@@ -86,16 +86,13 @@ function BasicLayout({ children, match, location }: IBasicLayoutProps) {
         fixedHeader={false}
       >
         {
-          !loginLayoutShow && <Shell.Branding>
-            <Home orgName={orgName} />
-            <Org orgName={orgName} />
-          </Shell.Branding>
-
-        }
-        {
-          !loginLayoutShow && <Shell.Action>
+          !loginLayoutShow && <Shell.Action style={{ width: '100%', justifyContent: 'space-between' }}>
+            <div className='flex-r'>
+              <Home orgName={orgName} />
+              <Org orgName={orgName} />
+            </div>
             {match?.path !== '/login' && (
-              <>
+              <div className='flex-r'>
                 <Add orgName={orgName} />
                 <Button
                   type="primary"
@@ -108,7 +105,7 @@ function BasicLayout({ children, match, location }: IBasicLayoutProps) {
                   帮助文档
                 </Button>
                 <Settings orgName={orgName} />
-              </>
+              </div>
             )}
           </Shell.Action>
         }

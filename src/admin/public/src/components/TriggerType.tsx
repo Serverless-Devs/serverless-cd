@@ -10,6 +10,12 @@ export enum TriggerTypeLable {
   webhook = 'Webhook 触发',
 }
 
+export const triggerIcons = {
+  manual: "https://img.alicdn.com/imgextra/i3/O1CN01QEtrEF1ErzdKCIU02_!!6000000000406-55-tps-16-16.svg",
+  tracker: "https://img.alicdn.com/imgextra/i2/O1CN016suUeV1ILiBAilAYZ_!!6000000000877-55-tps-16-16.svg",
+  redeploy: 'https://img.alicdn.com/imgextra/i1/O1CN017SFO9D1fIikoMrPDb_!!6000000003984-55-tps-16-16.svg'
+}
+
 interface Props {
   trigger: string
 }
@@ -19,16 +25,16 @@ export default ({ trigger }: Props) => {
     return <></>;
   }
   if (trigger.startsWith('tracker:')) {
-    return <>本地部署</>;
+    return <><span className='mr-4'>{triggerIcons['tracker']}</span>本地部署</>;
   }
   if (trigger === 'manual') {
-    return <>手动触发</>;
+    return <><span className='mr-4'>{triggerIcons['manual']}</span>手动触发</>;
   }
   if (trigger === 'redeploy') {
-    return <>重新部署</>;
+    return <><span className='mr-4'>{triggerIcons['redeploy']}</span>重新部署</>;
   }
   if (trigger === 'rollback') {
-    return <>回滚</>;
+    return <><span className='mr-4'>{triggerIcons['redeploy']}</span>回滚</>;
   }
   return <>{`${upperFirst(trigger)} 触发`}</>;
 }

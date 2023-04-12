@@ -6,7 +6,6 @@ import store from '@/store';
 import { noop, map, find, isEmpty, cloneDeep, get, debounce } from 'lodash';
 import RefreshIcon from '@/components/RefreshIcon';
 import { githubOrgs, githubOrgRepos } from '@/services/git';
-import { orgDetail } from '@/services/org';
 import { CREATE_TYPE } from '../constant';
 import { generateRandom } from '@/utils';
 
@@ -31,6 +30,8 @@ interface IProps {
   createType?: `${CREATE_TYPE}`;
   createTemplate: boolean;
   setCreateDisabled: (value: any) => void;
+  orgDetailData: any;
+  validateRepo?: any;
 }
 
 const initRepoTypeList = [
@@ -57,9 +58,10 @@ const Repos = (props: IProps) => {
     createType = CREATE_TYPE.Repository,
     createTemplate = false,
     setCreateDisabled,
+    orgDetailData = {},
+    validateRepo
   } = props;
   const { data, loading, request } = useRequest(githubOrgs);
-  const orgDetailRequest = useRequest(orgDetail);
   const orgRepos = useRequest(githubOrgRepos);
   const [, userDispatchers] = store.useModel('user');
   const effectsState = store.useModelEffectsState('user');
@@ -69,11 +71,7 @@ const Repos = (props: IProps) => {
   const [inputValue, setInputValue] = useState('');
   const { getValue, setValue, init, getError } = field;
   // owner是否授权
-  const isAuth = Boolean(get(orgDetailRequest.data, 'data.third_part.github.repo_owner'));
-
-  useEffect(() => {
-    orgDetailRequest.request();
-  }, [])
+  const isAuth = Boolean(get(orgDetailData, 'data.third_part.github.repo_owner'));
 
   useEffect(() => {
     setInputValue(getValue('repoName'));
@@ -89,12 +87,16 @@ const Repos = (props: IProps) => {
   }, [isAuth]);
 
   useEffect(() => {
-    if (!isEmpty(data)) {
+    if (isEmpty(data)) return;
+    if (data.success) {
       const { data: orgs } = data;
       const newRepoTypeList = cloneDeep(initRepoTypeList);
       const orgList = map(orgs, ({ org, id }) => ({ label: org, value: org, id }));
       newRepoTypeList[1].children = orgList as any;
       setValue('repoTypeList', newRepoTypeList);
+      validateRepo()
+    } else {
+      validateRepo(data.message)
     }
   }, [data]);
 

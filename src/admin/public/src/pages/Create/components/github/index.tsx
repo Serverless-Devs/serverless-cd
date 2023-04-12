@@ -1,14 +1,17 @@
-import React, { useRef, useState } from 'react';
-import { Form, Radio, Field, Input, Divider, Switch, Dialog } from '@alicloud/console-components';
+import React, { useRef, useState, useEffect } from 'react';
+import { Form, Radio, Field, Input, Divider, Switch, Dialog, Select } from '@alicloud/console-components';
 import { FORM_ITEM_LAYOUT } from '@/constants';
+import { useRequest } from 'ice';
 import AuthDialog from './AuthDialog';
 import Repo from './Repo';
 import Trigger from './Trigger';
 import ConfigEdit from '@/components/ConfigEdit';
 import { PUSH } from '../constant';
-import { get } from 'lodash';
+import { get, keys, map } from 'lodash';
 import Submit from '../Submit';
 import TemplateDialog from '../TemplateDialog';
+import { orgDetail } from '@/services/org';
+
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -21,13 +24,31 @@ interface IProps {
 
 const Github = (props: IProps) => {
   const { field, createType, orgName } = props;
-  const { init, getValue, resetToDefault } = field;
+  const { init, getValue, resetToDefault, validate } = field;
   const [dialogVisible, setVisible] = useState(false);
+  const [templateCreateStatus, setTemplateCreateStatus] = useState('');
   const [repoKey, setRepoKey] = useState(0);
+  const [closeMode, setCloseMode] = useState([]) as any;
+  const [footerActions, setFooterActions] = useState([]) as any;
+  const [repoErrorMessage, setRepoErrorMessage] = useState('');
+
   const secretsRef: any = useRef(null);
   const specify = get(getValue('trigger'), 'push') === PUSH.SPECIFY;
   const template = createType === 'template';
   const [createDisabled, setCreateDisabled] = useState(false);
+  const orgDetailRequest = useRequest(orgDetail);
+  const cloudData = get(orgDetailRequest.data, 'data.cloud_secret', {});
+
+  useEffect(() => {
+    orgDetailRequest.request();
+  }, [])
+
+  useEffect(() => {
+    const newCloseMode = templateCreateStatus === 'error' ? ['close', 'esc'] : []
+    const newFooterActions = templateCreateStatus === 'error' ? ['cancel'] : []
+    setCloseMode(newCloseMode)
+    setFooterActions(newFooterActions)
+  }, [templateCreateStatus])
 
   const secretsValidator = async (_, value, callback) => {
     if (get(getValue('trigger'), 'push') === PUSH.NEW) return callback();
@@ -35,6 +56,19 @@ const Github = (props: IProps) => {
     if (!res) return callback('error');
     callback();
   };
+
+  const onClose = () => {
+    setVisible(false);
+    setCloseMode([]);
+    setFooterActions([]);
+  }
+
+  const validateRepo = (message = '') => {
+    setRepoErrorMessage(message);
+    setTimeout(() => {
+      validate('repo');
+    }, 300)
+  }
 
   return (
     <>
@@ -81,13 +115,22 @@ const Github = (props: IProps) => {
             createType={createType}
             createTemplate={template}
             key={`repo-${repoKey}`}
+            orgDetailData={orgDetailRequest.data}
             setCreateDisabled={setCreateDisabled}
+            validateRepo={validateRepo}
             {...(init('repo', {
               rules: [
                 {
                   required: true,
                   message: '请选择仓库名称',
                 },
+                {
+                  trigger: 'onChange',
+                  validator: (rule, value, callback) => {
+                    if (repoErrorMessage) callback(repoErrorMessage)
+                    else callback()
+                  }
+                }
               ],
             }) as any)}
           />
@@ -108,25 +151,35 @@ const Github = (props: IProps) => {
 
         <div className="text-bold mt-16 mb-16">环境配置</div>
         <Trigger repo={getValue('repo')} {...(init('trigger') as any)} createTemplate={template} />
-        {(specify || template) && (
-          <>
-            {!template && (
-              <FormItem label="立即部署">
-                <Switch {...init('deployEnable', { valueName: 'checked', initValue: true })} />
+        <FormItem label="关联云账号">
+          <Select
+            {...(init('cloud_alias') as any)}
+            className="full-width"
+            placeholder="请选择"
+            dataSource={map(keys(cloudData), (item) => ({ label: item, value: item }))}
+          />
+        </FormItem>
+        {
+          (specify || template) && (
+            <>
+              {!template && (
+                <FormItem label="立即部署">
+                  <Switch {...init('deployEnable', { valueName: 'checked', initValue: true })} />
+                </FormItem>
+              )}
+              <FormItem label="Secrets" help="">
+                <ConfigEdit
+                  {...init('secrets', {
+                    initValue: { ALIYUN_AK: '', ALIYUN_SK: '' },
+                    rules: [{ validator: secretsValidator }],
+                  })}
+                  ref={secretsRef}
+                />
               </FormItem>
-            )}
-            <FormItem label="Secrets" help="">
-              <ConfigEdit
-                {...init('secrets', {
-                  initValue: { ALIYUN_AK: '', ALIYUN_SK: '' },
-                  rules: [{ validator: secretsValidator }],
-                })}
-                ref={secretsRef}
-              />
-            </FormItem>
-          </>
-        )}
-      </Form>
+            </>
+          )
+        }
+      </Form >
       <Submit
         field={field}
         orgName={orgName}
@@ -135,9 +188,10 @@ const Github = (props: IProps) => {
         createType={createType as any}
         createDisabled={createDisabled}
       />
-      <Dialog visible={dialogVisible} footer={false} title="创建应用" closeMode={[]}>
+      <Dialog visible={dialogVisible} footerActions={footerActions} title="创建应用" closeMode={closeMode} onClose={onClose} onCancel={onClose}>
         <TemplateDialog
           value={field.getValues()}
+          setTemplateCreateStatus={setTemplateCreateStatus}
           createType={createType as any}
           orgName={orgName}
         ></TemplateDialog>
