@@ -1,8 +1,8 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC } from 'react';
 import { useRequest, history } from 'ice';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import { Toast } from '@/components/ToastContainer';
-import { updateOrg } from '@/services/org';
+import { orgUpdate } from '@/services/org';
 import { Form, Field, Input, Button } from '@alicloud/console-components';
 import store from '@/store';
 import { find, get, map } from 'lodash';
@@ -17,7 +17,7 @@ const UpdateOrg: FC<Props> = ({ match }) => {
   const orgName = get(match, 'params.orgName');
   const [userState, userDispatchers] = store.useModel('user');
   const listOrgs = get(userState, 'userInfo.listOrgs.result', []);
-  const { request, loading } = useRequest(updateOrg);
+  const { request, loading } = useRequest(orgUpdate);
   const field = Field.useField({
     values: find(listOrgs, (item: any) => item.name === orgName),
   });

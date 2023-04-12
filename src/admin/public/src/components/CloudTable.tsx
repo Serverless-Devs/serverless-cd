@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Table, Dialog } from '@alicloud/console-components';
-import { orgUpdate } from '@/services/org';
-import { map, get, keys, startsWith, unset } from 'lodash';
+import { removeCloudSecret } from '@/services/org';
+import { map, get, keys, startsWith } from 'lodash';
 
 interface Props {
   data: Record<string, any>[];
@@ -21,8 +21,7 @@ export default ({ data, loading = false, refresh }: Props) => {
       title: 'Delete',
       content: `确定移除 ${key} 吗？`,
       onOk: async () => {
-        unset(data, key);
-        await orgUpdate({ cloud_secret: data });
+        await removeCloudSecret({ deleteKey: key });
         refresh();
       },
       onCancel: () => {}

@@ -9,8 +9,12 @@ export const createOrg = async (body) => {
   return await request.post('/api/org/create', body);
 };
 
-export const updateOrg = async (body) => {
-  return await request.post('/api/org/update', body);
+export const updateCloudSecret = async (body) => {
+  return await request.post('/api/org/updateCloudSecret', body);
+};
+
+export const removeCloudSecret = async (body) => {
+  return await request.post('/api/org/removeCloudSecret', body);
 };
 
 export const inviteUser = async (body) => {

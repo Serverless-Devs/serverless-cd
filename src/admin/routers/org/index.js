@@ -57,6 +57,24 @@ router.post('/update', auth(ADMIN_ROLE_KEYS), async (req, res) => {
   res.json(Result.ofSuccess());
 });
 
+router.post('/updateCloudSecret', auth(ADMIN_ROLE_KEYS), async (req, res) => {
+  const {
+    orgName,
+    body,
+  } = req;
+  await orgService.updateCloudSecret(orgName, { cloudSecret: body });
+  res.json(Result.ofSuccess());
+});
+
+router.post('/removeCloudSecret', auth(ADMIN_ROLE_KEYS), async (req, res) => {
+  const {
+    orgName,
+    body,
+  } = req;
+  await orgService.updateCloudSecret(orgName, { deleteKey: body.deleteKey });
+  res.json(Result.ofSuccess());
+});
+
 /**
  * 绑定 github token
  */
