@@ -40,4 +40,8 @@ defaultRoutes.forEach((route) => {
   router.use(route.path, route.route);
 });
 
+router.all('*', (req, res) => {
+  throw new Error(`不支持此接口 /api${req.path}`);
+})
+
 module.exports = router;
