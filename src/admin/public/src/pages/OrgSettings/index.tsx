@@ -12,7 +12,7 @@ import store from '@/store';
 import { localStorageSet, localStorageRemove } from '@/utils';
 import CreateOrg from '@/pages/CreateOrg';
 
-function Orgs({match: { params: { orgName } }}) {
+function Orgs({ match: { params: { orgName } } }) {
   const { data, request, refresh, loading } = useRequest(listOrgs);
   const [userState] = store.useModel('user');
   const username = get(userState, 'userInfo.username');
@@ -98,7 +98,7 @@ function Orgs({match: { params: { orgName } }}) {
   const handleCreateOrgCallback = () => {
     setVisible(false);
     return refresh();
- };
+  };
 
   return (
     <div className="mt-16">
@@ -116,7 +116,7 @@ function Orgs({match: { params: { orgName } }}) {
         dataSource={get(data, 'result')}
         columns={columns}
       />
-    <CreateOrg callback={handleCreateOrgCallback} active={visible} orgName={orgName} />
+      <CreateOrg callback={handleCreateOrgCallback} active={visible} orgName={orgName} changeVisible={(val) => setVisible(val)} />
     </div>
   );
 }

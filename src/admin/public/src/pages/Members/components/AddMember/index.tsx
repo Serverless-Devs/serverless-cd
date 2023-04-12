@@ -1,6 +1,5 @@
 import React, { FC, useEffect } from 'react';
 import { useRequest, useLocation, history } from 'ice';
-import SlidePanel from '@alicloud/console-components-slide-panel';
 import { Form, Field, Select, Dialog, Loading } from '@alicloud/console-components';
 import { FORM_ITEM_LAYOUT, ROLE, ROLE_LABEL } from '@/constants';
 import { Toast } from '@/components/ToastContainer';
@@ -34,14 +33,13 @@ const AddMember: FC<IProps> = (props) => {
       setVisible(active);
     }
   }, [active]);
-  const field = Field.useField({
-    values: dataSource,
-  });
-  const { init, resetToDefault, validate, getValue, setValue } = field;
+
+  const field = Field.useField();
+  const { init, resetToDefault, validate, getValue, setValue, setValues } = field;
   const handleClose = () => {
     resetToDefault();
     setVisible(false);
-    changeVisible(false);
+    changeVisible && changeVisible(false);
     if (getParam('showSlide') === 'true') {
       history?.push(pathname);
     }
@@ -53,8 +51,8 @@ const AddMember: FC<IProps> = (props) => {
       if (success) {
         Toast.success(type === 'create' ? '添加成员成功' : '编辑成员成功');
         active && history?.push(`/${orgName}/setting/members?orgRefresh=${new Date().getTime()}`);
-        handleClose();
         await callback();
+        handleClose();
       }
     });
   };
@@ -68,9 +66,22 @@ const AddMember: FC<IProps> = (props) => {
     );
   };
 
+  const initValue = () => {
+    setValues(dataSource)
+  }
+
   return (
     <>
-      <span onClick={() => setVisible(true)}>{children}</span>
+      <span
+        onClick={
+          () => {
+            initValue()
+            setVisible(true)
+          }
+        }
+      >
+        {children}
+      </span>
       <Dialog
         title={type === 'create' ? '添加成员' : '编辑成员'}
         visible={visible}

@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { Dropdown, Menu } from '@alicloud/console-components';
 import { history, useRequest } from 'ice';
 import { listUsers } from '@/services/org';
@@ -63,17 +63,17 @@ const Add: FC<Props> = (props) => {
   )
 
   const handleCreateOrgCallback = () => {
-     history?.push(`/${orgName}/profile/organizations=${Date.now}`);
+    history?.push(`/${orgName}/profile/organizations=${Date.now}`);
   };
 
   const changeVisible = {
     orgVisible: (bol: boolean) => setOrgVisible(bol),
     memberVisible: (bol: boolean) => setMemberVisible(bol),
-  } 
+  }
 
   return (
     <React.Fragment>
-       <Dropdown
+      <Dropdown
         trigger={
           <div className="layout-center mr-16 cursor-pointer header-add-icon" style={{ fontSize: '32px' }}>
             <Icons type="add" className="add-icon" />

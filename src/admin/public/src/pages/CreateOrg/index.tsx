@@ -3,7 +3,7 @@ import { useRequest, history } from 'ice';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import { Toast } from '@/components/ToastContainer';
 import { createOrg } from '@/services/org';
-import { Form, Field, Input, Button, Dialog } from '@alicloud/console-components';
+import { Form, Field, Input, Dialog } from '@alicloud/console-components';
 
 const FormItem = Form.Item;
 
@@ -16,7 +16,7 @@ type Props = {
 
 const CreateOrg: FC<Props> = (props) => {
   const { active, callback, changeVisible, orgName } = props;
-  const { request, loading } = useRequest(createOrg);
+  const { request } = useRequest(createOrg);
   const field = Field.useField();
   const { init, validate } = field;
   const [visible, setVisible] = useState(false);
@@ -39,7 +39,7 @@ const CreateOrg: FC<Props> = (props) => {
   };
   const handleClose = () => {
     setVisible(false);
-    changeVisible(false);
+    changeVisible && changeVisible(false);
   };
   return (
     <Dialog
