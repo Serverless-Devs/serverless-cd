@@ -133,5 +133,5 @@ export const loginLayoutPathName = [
   '/auth',
   '/signUp',
   '/login',
-  '/noAuth'
+  // '/noAuth'
 ]

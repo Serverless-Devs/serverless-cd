@@ -97,6 +97,10 @@ const Details = ({
         panelItem.initialize = false;
         setTaskSteps([...taskSteps]);
         changeExpandedKeys(panelItemIndex);
+      }).catch(() => {
+        panelItem.loading = false;
+        panelItem.initialize = false;
+        setTaskSteps([...taskSteps]);
       });
     } else {
       changeExpandedKeys(panelItemIndex);
