@@ -68,7 +68,7 @@ const EnvList: FC<Props> = (props) => {
       dataIndex: 'name',
       cell: (value, _index, record) => (
         <>
-          <Link to={`/${orgName}/application/${appId}/${value}`}>{value}</Link>
+          <Link to={`/${orgName}/application/${appId}/${value}/overview`}>{value}</Link>
         </>
       ),
     },
@@ -94,7 +94,7 @@ const EnvList: FC<Props> = (props) => {
 
         return (
           <div className="align-center">
-            <TriggerType triggerType={triggerType} />
+            <TriggerType trigger={triggerType} />
             {value.commit && (
               <div className="align-center ml-8">
                 {C_REPOSITORY[value.provider]?.svg(16)}

@@ -11,9 +11,10 @@ interface IProps {
   disabled: boolean;
   taskId: string;
   refreshCallback?: Function;
+  btnText?: string;
 }
 
-const Rollback: FC<IProps> = ({ disabled, refreshCallback, appId, taskId }) => {
+const Rollback: FC<IProps> = ({ disabled, refreshCallback, appId, taskId, btnText }) => {
   const [useDebug, setDebug] = useState<boolean | undefined>(false);
   const [visible, setVisible] = useState<Boolean>(false);
   const [loading, setLoading] = useState<Boolean>(false);
@@ -43,7 +44,7 @@ const Rollback: FC<IProps> = ({ disabled, refreshCallback, appId, taskId }) => {
         type="primary"
         text
       >
-        回滚
+        {btnText || '回滚'}
       </Button>
       <Dialog
         title={<><ExclamationCircleFilled style={{ color: '#ffc440', marginRight: 8 }} />回滚</>}

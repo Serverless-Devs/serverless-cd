@@ -11,9 +11,9 @@ export enum TriggerTypeLable {
 }
 
 export const triggerIcons = {
-  manual: "https://img.alicdn.com/imgextra/i3/O1CN01QEtrEF1ErzdKCIU02_!!6000000000406-55-tps-16-16.svg",
-  tracker: "https://img.alicdn.com/imgextra/i2/O1CN016suUeV1ILiBAilAYZ_!!6000000000877-55-tps-16-16.svg",
-  redeploy: 'https://img.alicdn.com/imgextra/i1/O1CN017SFO9D1fIikoMrPDb_!!6000000003984-55-tps-16-16.svg'
+  manual: <img className='mr-4' src="https://img.alicdn.com/imgextra/i3/O1CN01QEtrEF1ErzdKCIU02_!!6000000000406-55-tps-16-16.svg" alt="logo" style={{ width: 16, height: 16 }} />,
+  tracker: <img className='mr-4' src="https://img.alicdn.com/imgextra/i2/O1CN016suUeV1ILiBAilAYZ_!!6000000000877-55-tps-16-16.svg" alt="logo" style={{ width: 16, height: 16 }} />,
+  redeploy: <img className='mr-4' src="https://img.alicdn.com/imgextra/i1/O1CN017SFO9D1fIikoMrPDb_!!6000000003984-55-tps-16-16.svg" alt="logo" style={{ width: 16, height: 16 }} />
 }
 
 interface Props {
@@ -25,16 +25,16 @@ export default ({ trigger }: Props) => {
     return <></>;
   }
   if (trigger.startsWith('tracker:')) {
-    return <><span className='mr-4'>{triggerIcons['tracker']}</span>本地部署</>;
+    return <div className='align-center'>{triggerIcons['tracker']}本地部署</div>;
   }
   if (trigger === 'manual') {
-    return <><span className='mr-4'>{triggerIcons['manual']}</span>手动触发</>;
+    return <div className='align-center'>{triggerIcons['manual']}手动触发</div>;
   }
   if (trigger === 'redeploy') {
-    return <><span className='mr-4'>{triggerIcons['redeploy']}</span>重新部署</>;
+    return <>{triggerIcons['redeploy']}重新部署</>;
   }
   if (trigger === 'rollback') {
-    return <><span className='mr-4'>{triggerIcons['redeploy']}</span>回滚</>;
+    return <>{triggerIcons['redeploy']}回滚</>;
   }
   return <>{`${upperFirst(trigger)} 触发`}</>;
 }

@@ -169,7 +169,7 @@ const TaskList: FC<IProps> = ({
       cell: (value, i, item) => {
         const updatedTime = moment(get(item, 'updated_time')).format('YYYY-MM-DD HH:mm:ss');
         const disabled = item.status !== 'success' || value === latestTaskId || startsWith(item.trigger_type, 'tracker:');
-
+        const showLatest = !pollingStatus.includes(item.status) && latestTaskId === value;
         return (
           <Actions>
             <DeleteCommit
@@ -192,6 +192,7 @@ const TaskList: FC<IProps> = ({
               appId={appId}
               refreshCallback={refreshCallback}
               taskId={value}
+              btnText={showLatest ? '重新部署' : '回滚'}
             />
           </Actions>
         );
@@ -202,24 +203,24 @@ const TaskList: FC<IProps> = ({
   return <>
     <div className="flex-r" style={{ justifyContent: 'space-between' }}>
       <div>
-      <Select
-        disabled={loading}
-        label={"触发过滤"}
-        mode="multiple"
-        showSearch
-        value={types}
-        onChange={onTriggerChange}
-        dataSource={triggerTypes.map(value => ({ value, label: TriggerTypeLable[value] }))}
-        className='mr-16'
-      />
-      <Search
-        key="2"
-        shape="simple"
-        placeholder="通过部署版本进行搜索"
-        onSearch={onSearch}
-        hasClear
-        style={{ width: '400px' }}
-      />
+        <Select
+          disabled={loading}
+          label={"触发过滤"}
+          mode="multiple"
+          showSearch
+          value={types}
+          onChange={onTriggerChange}
+          dataSource={triggerTypes.map(value => ({ value, label: TriggerTypeLable[value] }))}
+          className='mr-16'
+        />
+        <Search
+          key="2"
+          shape="simple"
+          placeholder="通过部署版本进行搜索"
+          onSearch={onSearch}
+          hasClear
+          style={{ width: '400px' }}
+        />
       </div>
       <RefreshButton styleObj={{ marginLeft: 8 }} refreshCallback={refreshCallback} />
     </div>
