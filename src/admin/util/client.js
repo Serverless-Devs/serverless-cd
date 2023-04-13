@@ -30,4 +30,14 @@ module.exports = class Client {
       internal: !!process.env.FC_QUALIFIER, // TODO: 区分环境
     });
   }
+
+  static generateFc(region, accountId, accessKeyId, accessKeySecret, securityToken) {
+    return new Fc(accountId, {
+      accessKeyID: accessKeyId,
+      accessKeySecret,
+      securityToken,
+      region,
+      timeout: 60 * 1000,
+    });
+  }
 };
