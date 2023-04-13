@@ -149,7 +149,7 @@ const Details = ({
         },
         {
           name: `${appId}(${envName})`,
-          path: `/${orgName}/application/${appId}/${envName}`,
+          path: `/${orgName}/application/${appId}/${envName}/overview`,
         },
         {
           name: taskId,
