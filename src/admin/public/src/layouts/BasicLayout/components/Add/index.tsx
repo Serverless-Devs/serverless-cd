@@ -61,7 +61,7 @@ const Add: FC<Props> = (props) => {
   const changeVisible = {
     orgVisible: (bol: boolean) => setOrgVisible(bol),
     memberVisible: (bol: boolean) => setMemberVisible(bol),
-  };
+  }
 
   return (
     <React.Fragment>

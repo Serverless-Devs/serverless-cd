@@ -39,10 +39,7 @@ const Details = ({
   const appName = get(detailInfo, 'data.name') || get(detailInfo, 'data.repo_name', '');
   const triggerInfo = strictValuesParse(filterTriggerInfo(get(trigger_spec, provider, {})));
   const triggerType = triggerInfo['triggerType'];
-  const triggerRef =
-    triggerType === 'pull_request'
-      ? get(triggerInfo, `${triggerType}Target`)
-      : get(triggerInfo, `${triggerType}Value`);
+  const triggerRef = triggerType === 'pull_request' ? get(triggerInfo, `${triggerType}Target`) : get(triggerInfo, `${triggerType}Value`);
   const repoOwner = get(data, 'repo_owner', '');
   const repoName = get(data, 'repo_name', '');
 
@@ -110,6 +107,7 @@ const Details = ({
     history?.push(`/${orgName}/application/${appId}/${value}/cicd`);
     forceUpdate(Date.now());
   };
+
 
   return (
     <PageLayout
@@ -197,7 +195,7 @@ const Details = ({
             {
               text: '目标分支',
               value: get(triggerInfo, `pull_requestSource`, '-'),
-              hidden: triggerType !== 'pull_request',
+              hidden: triggerType !== 'pull_request'
             },
             {
               text: '指定yaml',

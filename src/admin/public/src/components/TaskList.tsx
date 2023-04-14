@@ -183,10 +183,7 @@ const TaskList: FC<IProps> = ({
       dataIndex: 'id',
       cell: (value, i, item) => {
         const updatedTime = moment(get(item, 'updated_time')).format('YYYY-MM-DD HH:mm:ss');
-        const disabled =
-          item.status !== 'success' ||
-          value === latestTaskId ||
-          startsWith(item.trigger_type, 'tracker:');
+        const disabled = item.status !== 'success' || value === latestTaskId || startsWith(item.trigger_type, 'tracker:');
         const showLatest = !pollingStatus.includes(item.status) && latestTaskId === value;
         return (
           <Actions>

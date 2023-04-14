@@ -137,4 +137,4 @@ export const loginLayoutPathName = [
   '/signUp',
   '/login',
   // '/noAuth'
-];
+]
