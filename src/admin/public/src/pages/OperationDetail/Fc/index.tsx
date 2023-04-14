@@ -49,6 +49,7 @@ const Fc: FC<IProps> = ({ resource, cloudAlias }) => {
         if (item.notFount) {
           return <div>{id}: <span style={{ color: 'red' }}>{item.message}</span><div><br /></div></div>
         }
+        const { instances = [] } = item || {};
 
         if (item.isHttp) {
           return (
@@ -61,6 +62,7 @@ const Fc: FC<IProps> = ({ resource, cloudAlias }) => {
                 }} placeholder="TextArea" />
                 <Button onClick={() => onHttpInvoke(id, item)}>http调用</Button>
               </div>
+              <span>实例列表：{JSON.stringify(instances, null, 2)} </span>
               <br />
             </div>
           );
@@ -76,6 +78,7 @@ const Fc: FC<IProps> = ({ resource, cloudAlias }) => {
               }} placeholder="TextArea" />
               <Button onClick={() => onEventInvoke(id, item)}>event调用</Button>
             </div>
+            <span>实例列表：{JSON.stringify(instances, null, 2)} </span>
             <br />
           </div>
         );

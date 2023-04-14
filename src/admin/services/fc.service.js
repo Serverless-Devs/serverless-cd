@@ -40,41 +40,14 @@ async function getHttpTrigger(fcClient, serviceName, functionName) {
   return assignQualifierHttpTrigger;
 }
 
-async function detail(orgName, cloudAlias, payload) {
-  if (!_.isArray(payload)) {
-    return payload;
+async function listInstances(fcClient, serviceName, functionName) {
+  try {
+    const { data } = await fcClient.listInstances(serviceName, functionName);
+    return _.get(data, 'instances', []);
+  } catch (ex) {
+    console.error(`获取${serviceName}/${functionName}函数实例列表失败: `, ex);
   }
-  const { AccountID, AccessKeyID, AccessKeySecret } = await getCloudSecret(orgName, cloudAlias);
-
-  const result = [];
-
-  for (const resource of payload) {
-    const { uid, region, service: serviceName, function: functionName } = resource;
-    // uid 不一致，即便处理也是失败的，所以提前处理
-    if (uid !== AccountID) {
-      debug(`uid 不一致: ${uid} !== ${AccountID}`);
-      result.push({ ...resource, notFount: true, message: 'AccountId 和 关联云账号对应不上' });
-      continue;
-    }
-    // 每个资源的 region 可能不一致，所以提前准备
-    const fcClient = Client.generateFc(region, AccountID, AccessKeyID, AccessKeySecret);
-    try {
-      await getFunction(fcClient, serviceName, functionName);
-    } catch (ex) {
-      result.push({ ...resource, notFount: true, message: ex.message });
-      continue;
-    }
-    const httpTrigger = await getHttpTrigger(fcClient, serviceName, functionName);
-    debug(`httpTrigger : ${JSON.stringify(httpTrigger)}`);
-    result.push({
-      ...resource,
-      isHttp: !_.isEmpty(httpTrigger),
-      urlInternet: httpTrigger.urlInternet,
-      authType: _.get(httpTrigger, 'triggerConfig.authType'),
-    });
-  }
-
-  return result;
+  return [];
 }
 
 async function getSignature (
@@ -123,6 +96,44 @@ async function getSignature (
     token: securityToken,
   };
 };
+
+async function detail(orgName, cloudAlias, payload) {
+  if (!_.isArray(payload)) {
+    return payload;
+  }
+  const { AccountID, AccessKeyID, AccessKeySecret } = await getCloudSecret(orgName, cloudAlias);
+
+  const result = [];
+
+  for (const resource of payload) {
+    const { uid, region, service: serviceName, function: functionName } = resource;
+    // uid 不一致，即便处理也是失败的，所以提前处理
+    if (uid !== AccountID) {
+      debug(`uid 不一致: ${uid} !== ${AccountID}`);
+      result.push({ ...resource, notFount: true, message: 'AccountId 和 关联云账号对应不上' });
+      continue;
+    }
+    // 每个资源的 region 可能不一致，所以提前准备
+    const fcClient = Client.generateFc(region, AccountID, AccessKeyID, AccessKeySecret);
+    try {
+      await getFunction(fcClient, serviceName, functionName);
+    } catch (ex) {
+      result.push({ ...resource, notFount: true, message: ex.message });
+      continue;
+    }
+    const httpTrigger = await getHttpTrigger(fcClient, serviceName, functionName);
+    debug(`httpTrigger : ${JSON.stringify(httpTrigger)}`);
+    result.push({
+      ...resource,
+      isHttp: !_.isEmpty(httpTrigger),
+      urlInternet: httpTrigger.urlInternet,
+      authType: _.get(httpTrigger, 'triggerConfig.authType'),
+      instances: await listInstances(fcClient, serviceName, functionName),
+    });
+  }
+
+  return result;
+}
 
 async function httpInvoke(orgName, cloudAlias, resource, payload = {}) {
   const { uid, region, service: serviceName, function: functionName, urlInternet, authType = '' } = resource;
