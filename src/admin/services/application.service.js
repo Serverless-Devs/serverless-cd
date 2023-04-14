@@ -42,7 +42,7 @@ async function preview(orgName, body = {}) {
       provider,
       providerRepoId,
     });
- 
+
     if (!_.isEmpty(checkByRepoId)) {
       throw new ValidationError('代码仓库已绑定，请勿重新绑定');
     }
@@ -67,7 +67,14 @@ async function create(orgId, orgName, body) {
   const providerToken = await orgService.getProviderToken(orgName, provider);
   debug(`providerToken: ${providerToken}`);
   debug('start add webhook');
-  await webhookService.add({ repo_owner, repo, token: providerToken, webHookSecret, appId, provider });
+  await webhookService.add({
+    repo_owner,
+    repo,
+    token: providerToken,
+    webHookSecret,
+    appId,
+    provider,
+  });
   debug('start create app');
   const ownerOrg = await orgModel.getOwnerOrgByName(orgName);
   await appModel.createApp({

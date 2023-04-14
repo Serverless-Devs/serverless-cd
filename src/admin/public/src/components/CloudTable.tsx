@@ -11,7 +11,7 @@ interface Props {
 
 export default ({ data, loading = false, refresh }: Props) => {
   const existAlias = keys(data);
-  const dataSource = map(existAlias, alias => ({
+  const dataSource = map(existAlias, (alias) => ({
     ...get(data, alias, {}),
     alias,
   }));
@@ -24,9 +24,9 @@ export default ({ data, loading = false, refresh }: Props) => {
         await removeCloudSecret({ deleteKey: key });
         refresh();
       },
-      onCancel: () => {}
+      onCancel: () => {},
     });
-  }
+  };
 
   return (
     <Table
@@ -54,21 +54,17 @@ export default ({ data, loading = false, refresh }: Props) => {
                 </div>
               );
             });
-          }
+          },
         },
         {
           dataIndex: 'alias',
           title: '操作',
           cell: (value) => (
-            <Button
-              type="primary"
-              onClick={() => onDelete(value)}
-              text
-            >
+            <Button type="primary" onClick={() => onDelete(value)} text>
               删除
             </Button>
-          )
-        }
+          ),
+        },
       ]}
     />
   );

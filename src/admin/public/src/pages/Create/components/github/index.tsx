@@ -1,5 +1,14 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Form, Radio, Field, Input, Divider, Switch, Dialog, Select } from '@alicloud/console-components';
+import {
+  Form,
+  Radio,
+  Field,
+  Input,
+  Divider,
+  Switch,
+  Dialog,
+  Select,
+} from '@alicloud/console-components';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import { useRequest } from 'ice';
 import AuthDialog from './AuthDialog';
@@ -11,7 +20,6 @@ import { get, keys, map } from 'lodash';
 import Submit from '../Submit';
 import TemplateDialog from '../TemplateDialog';
 import { orgDetail } from '@/services/org';
-
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -41,14 +49,14 @@ const Github = (props: IProps) => {
 
   useEffect(() => {
     orgDetailRequest.request();
-  }, [])
+  }, []);
 
   useEffect(() => {
-    const newCloseMode = templateCreateStatus === 'error' ? ['close', 'esc'] : []
-    const newFooterActions = templateCreateStatus === 'error' ? ['cancel'] : []
-    setCloseMode(newCloseMode)
-    setFooterActions(newFooterActions)
-  }, [templateCreateStatus])
+    const newCloseMode = templateCreateStatus === 'error' ? ['close', 'esc'] : [];
+    const newFooterActions = templateCreateStatus === 'error' ? ['cancel'] : [];
+    setCloseMode(newCloseMode);
+    setFooterActions(newFooterActions);
+  }, [templateCreateStatus]);
 
   const secretsValidator = async (_, value, callback) => {
     if (get(getValue('trigger'), 'push') === PUSH.NEW) return callback();
@@ -61,14 +69,14 @@ const Github = (props: IProps) => {
     setVisible(false);
     setCloseMode([]);
     setFooterActions([]);
-  }
+  };
 
   const validateRepo = (message = '') => {
     setRepoErrorMessage(message);
     setTimeout(() => {
       validate('repo');
-    }, 300)
-  }
+    }, 300);
+  };
 
   return (
     <>
@@ -127,19 +135,25 @@ const Github = (props: IProps) => {
                 {
                   trigger: 'onChange',
                   validator: (rule, value, callback) => {
-                    if (repoErrorMessage) callback(repoErrorMessage)
-                    else callback()
-                  }
-                }
+                    if (repoErrorMessage) callback(repoErrorMessage);
+                    else callback();
+                  },
+                },
               ],
             }) as any)}
           />
         </FormItem>
-        <FormItem label="应用名称" required extra={<div className='color-gray mt-4'>必须以字母开头，可含数字、字母（大小写敏感）、连字符，长度小于64个字符。</div>}>
+        <FormItem
+          label="应用名称"
+          required
+          extra={
+            <div className="color-gray mt-4">
+              必须以字母开头，可含数字、字母（大小写敏感）、连字符，长度小于64个字符。
+            </div>
+          }
+        >
           <Input
-            {
-            ...init('name', { rules: { required: true, message: '请输入应用名称' } })
-            }
+            {...init('name', { rules: { required: true, message: '请输入应用名称' } })}
             placeholder="请输入应用名称"
             className="full-width"
           />
@@ -159,27 +173,25 @@ const Github = (props: IProps) => {
             dataSource={map(keys(cloudData), (item) => ({ label: item, value: item }))}
           />
         </FormItem>
-        {
-          (specify || template) && (
-            <>
-              {!template && (
-                <FormItem label="立即部署">
-                  <Switch {...init('deployEnable', { valueName: 'checked', initValue: true })} />
-                </FormItem>
-              )}
-              <FormItem label="Secrets" help="">
-                <ConfigEdit
-                  {...init('secrets', {
-                    initValue: { ALIYUN_AK: '', ALIYUN_SK: '' },
-                    rules: [{ validator: secretsValidator }],
-                  })}
-                  ref={secretsRef}
-                />
+        {(specify || template) && (
+          <>
+            {!template && (
+              <FormItem label="立即部署">
+                <Switch {...init('deployEnable', { valueName: 'checked', initValue: true })} />
               </FormItem>
-            </>
-          )
-        }
-      </Form >
+            )}
+            <FormItem label="Secrets" help="">
+              <ConfigEdit
+                {...init('secrets', {
+                  initValue: { ALIYUN_AK: '', ALIYUN_SK: '' },
+                  rules: [{ validator: secretsValidator }],
+                })}
+                ref={secretsRef}
+              />
+            </FormItem>
+          </>
+        )}
+      </Form>
       <Submit
         field={field}
         orgName={orgName}
@@ -188,7 +200,14 @@ const Github = (props: IProps) => {
         createType={createType as any}
         createDisabled={createDisabled}
       />
-      <Dialog visible={dialogVisible} footerActions={footerActions} title="创建应用" closeMode={closeMode} onClose={onClose} onCancel={onClose}>
+      <Dialog
+        visible={dialogVisible}
+        footerActions={footerActions}
+        title="创建应用"
+        closeMode={closeMode}
+        onClose={onClose}
+        onCancel={onClose}
+      >
         <TemplateDialog
           value={field.getValues()}
           setTemplateCreateStatus={setTemplateCreateStatus}

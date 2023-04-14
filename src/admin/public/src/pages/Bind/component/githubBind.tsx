@@ -35,7 +35,7 @@ const GitHubBind: FC<Props> = (props) => {
   };
 
   const onClose = () => {
-    setVisible(false)
+    setVisible(false);
     callback();
   };
 

@@ -4,7 +4,7 @@ import App from '@/layouts/index';
 const routerConfig: IRouterConfig[] = [
   {
     path: '/',
-    component: App
-  }
+    component: App,
+  },
 ];
 export default routerConfig;

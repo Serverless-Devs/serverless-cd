@@ -8,7 +8,13 @@ const userServices = require('../../services/user.service');
  */
 router.post('/signUp', async function (req, res) {
   const { username, password, email, github_unionid, gitee_unionid } = req.body;
-  const { userId } = await authServices.initUser({ username, password, email, github_unionid, gitee_unionid });
+  const { userId } = await authServices.initUser({
+    username,
+    password,
+    email,
+    github_unionid,
+    gitee_unionid,
+  });
   const { expires } = await authServices.setJwt({ userId }, res);
   return res.json(Result.ofSuccess({ username, userId, expires }));
 });
@@ -18,7 +24,12 @@ router.post('/signUp', async function (req, res) {
  */
 router.post('/login', async function (req, res) {
   const { loginname, password, github_unionid, gitee_unionid } = req.body;
-  const data = await authServices.loginWithPassword({ loginname, password, github_unionid, gitee_unionid });
+  const data = await authServices.loginWithPassword({
+    loginname,
+    password,
+    github_unionid,
+    gitee_unionid,
+  });
   const { expires } = await authServices.setJwt({ userId: data.id }, res);
   data.expires = expires;
   return res.json(Result.ofSuccess(userServices.desensitization(data)));
@@ -32,7 +43,6 @@ router.post('/logout', async function (req, res) {
   res.cookie('jwt', '', { httpOnly: true });
   return res.json(Result.ofSuccess());
 });
-
 
 /**
  * github登录
@@ -60,7 +70,12 @@ router.post('/callback/gitee', async function (req, res) {
 
 router.post('/callback/auth', async function (req, res) {
   const { loginname, password, github_unionid, gitee_unionid } = req.body;
-  const data = await authServices.updateUser({ loginname, password, github_unionid, gitee_unionid });
+  const data = await authServices.updateUser({
+    loginname,
+    password,
+    github_unionid,
+    gitee_unionid,
+  });
   return res.json(Result.ofSuccess(data));
 });
 
@@ -73,6 +88,5 @@ router.post('/updata', async function (req, res) {
   const data = await authServices.updateUser({ loginname, password, new_password });
   return res.json(Result.ofSuccess(data));
 });
-
 
 module.exports = router;

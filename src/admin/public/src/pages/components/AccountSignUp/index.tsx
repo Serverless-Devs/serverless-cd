@@ -17,9 +17,7 @@ const AccountSingUp = (props) => {
 
   const goAppList = async () => {
     if (!data) return;
-    const {
-      success,
-    } = data;
+    const { success } = data;
     if (success) {
       await userDispatchers.getUserInfo();
       history?.push('/');
@@ -32,7 +30,13 @@ const AccountSingUp = (props) => {
   };
   return (
     <React.Fragment>
-      <Auth className="account-public-content" title={title} type="REGISTER" onSignUp={btnClick} loading={loading}>
+      <Auth
+        className="account-public-content"
+        title={title}
+        type="REGISTER"
+        onSignUp={btnClick}
+        loading={loading}
+      >
         <div className="already-account-sing-in">
           <Link to={'/login'} style={{ textDecoration: 'underline' }}>
             已经有账户？前往登录

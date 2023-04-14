@@ -4,7 +4,6 @@ import store from '@/store';
 import { Form, Field, Input, Button, Dialog, Message } from '@alicloud/console-components';
 import ModifyPassword from './component/ModifyPassword';
 
-
 const FormItem = Form.Item;
 const AccountInfo = () => {
   const [, userDispatchers] = store.useModel('user');
@@ -17,11 +16,11 @@ const AccountInfo = () => {
     getUserInfo();
   }, []);
 
-  const getUserInfo = async() => {
+  const getUserInfo = async () => {
     const data = await userDispatchers.getUserInfo();
     setValues(data);
     setAccount(data);
-  }
+  };
 
   const handleModifyPassword = () => {
     Dialog.show({
@@ -30,40 +29,22 @@ const AccountInfo = () => {
       onOk: () => {
         const success = mpRef.current.handleSubmitModifyPassword();
         if (success) {
-          Message.success({title: '修改密码成功，请使用新密码登录', duration: 3000,})
+          Message.success({ title: '修改密码成功，请使用新密码登录', duration: 3000 });
           history?.push('/login');
         }
       },
-    })
+    });
   };
   return (
     <div>
-      <Form
-        field={field}
-      >
-        <FormItem
-          label={<h3>登录账号</h3>}
-         >
-          <Input
-            {...init('username', {
-            })}
-            className={'account-info-public-width'}
-            disabled
-          />
+      <Form field={field}>
+        <FormItem label={<h3>登录账号</h3>}>
+          <Input {...init('username', {})} className={'account-info-public-width'} disabled />
         </FormItem>
-        <FormItem
-          label={<h3>登录邮箱</h3>}
-         >
-          <Input
-            {...init('email', {
-            })}
-            style={{ width: '240px' }}
-            disabled
-          />
+        <FormItem label={<h3>登录邮箱</h3>}>
+          <Input {...init('email', {})} style={{ width: '240px' }} disabled />
         </FormItem>
-        <FormItem
-          label={<h3>登录密码</h3>}
-         >
+        <FormItem label={<h3>登录密码</h3>}>
           <Input
             {...init('password', {
               initValue: '*******',
@@ -72,15 +53,18 @@ const AccountInfo = () => {
             style={{ width: '240px' }}
             disabled
           />
-          <Button style={{ background: '#e0e0e0', marginLeft: '16px', color: '#40485b' }} onClick={handleModifyPassword}>修改密码</Button>
+          <Button
+            style={{ background: '#e0e0e0', marginLeft: '16px', color: '#40485b' }}
+            onClick={handleModifyPassword}
+          >
+            修改密码
+          </Button>
         </FormItem>
       </Form>
-      <div>
-      </div>
+      <div></div>
       <div></div>
     </div>
   );
-
 };
 
 export default AccountInfo;

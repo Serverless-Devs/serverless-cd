@@ -15,7 +15,11 @@ export default ({ url, label, icon = false, className, threshold = 20 }: Props) 
     <ExternalLink
       className={`.cursor-pointer-color ${className}`}
       url={url}
-      label={<Truncate threshold={threshold} align="t">{label}</Truncate>}
+      label={
+        <Truncate threshold={threshold} align="t">
+          {label}
+        </Truncate>
+      }
       icon={icon}
     />
   );

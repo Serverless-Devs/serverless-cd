@@ -59,7 +59,7 @@ const Repos = (props: IProps) => {
     createTemplate = false,
     setCreateDisabled,
     orgDetailData = {},
-    validateRepo
+    validateRepo,
   } = props;
   const { data, loading, request } = useRequest(githubOrgs);
   const orgRepos = useRequest(githubOrgRepos);
@@ -94,9 +94,9 @@ const Repos = (props: IProps) => {
       const orgList = map(orgs, ({ org, id }) => ({ label: org, value: org, id }));
       newRepoTypeList[1].children = orgList as any;
       setValue('repoTypeList', newRepoTypeList);
-      validateRepo()
+      validateRepo();
     } else {
-      validateRepo(data.message)
+      validateRepo(data.message);
     }
   }, [data]);
 
@@ -304,11 +304,11 @@ const Repos = (props: IProps) => {
             dataSource={
               createTemplate
                 ? [
-                  {
-                    value: 'personal',
-                    label: '个人仓库',
-                  },
-                ]
+                    {
+                      value: 'personal',
+                      label: '个人仓库',
+                    },
+                  ]
                 : getValue('repoTypeList')
             }
             {...init('repoTypeValue', {

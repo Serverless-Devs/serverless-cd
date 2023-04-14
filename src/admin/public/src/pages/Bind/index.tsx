@@ -107,8 +107,10 @@ const GitBind = (props) => {
     setRefresh(Date.now());
   };
   return (
-    <Loading visible={orgDetailRequest.loading} className='thirdp-party-loading'>
-      {orgDetailRequest.loading ? <></> : (
+    <Loading visible={orgDetailRequest.loading} className="thirdp-party-loading">
+      {orgDetailRequest.loading ? (
+        <></>
+      ) : (
         <React.Fragment>
           <Table loading={orgDetailRequest.loading} dataSource={dataSource} columns={columns} />
           <div>

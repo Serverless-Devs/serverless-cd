@@ -34,7 +34,7 @@ const Org: FC<Props> = (props) => {
         ...item,
         label: (
           <div className="align-center">
-            <div className='org-image'>
+            <div className="org-image">
               <img
                 src={item.logo || ORG_LOGO}
                 style={{ width: 20, height: 20, margin: '0 8', overflow: 'hidden' }}
@@ -47,14 +47,12 @@ const Org: FC<Props> = (props) => {
       };
     });
     setDataSource(dataList);
-  }
+  };
   const handleChangeOrg = async (value) => {
     const obj = find(dataSource, (item) => item.value === value);
     localStorageSet(obj.user_id, value);
     history?.push('/');
   };
-
-  
 
   return (
     <StyledWrapper>

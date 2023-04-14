@@ -25,7 +25,7 @@ const Redeploy = (props: Props) => {
 
   const submit = async () => {
     setLoading(true);
-    const { success, data } = await request({ useDebug , taskId, appId, triggerType: 'redeploy' });
+    const { success, data } = await request({ useDebug, taskId, appId, triggerType: 'redeploy' });
     if (success) {
       await sleep(3000);
       Toast.success('部署成功');
@@ -53,12 +53,17 @@ const Redeploy = (props: Props) => {
         onClose={onClose}
         style={{ width: 600 }}
         footer={
-          <div className='flex-r'>
+          <div className="flex-r">
             <div>
               <Checkbox checked={useDebug} onChange={setDebug} label="开启 Debug 日志" />
             </div>
             <div>
-              <Button type="primary" className='mr-16' onClick={submit} loading={loading as boolean}>
+              <Button
+                type="primary"
+                className="mr-16"
+                onClick={submit}
+                loading={loading as boolean}
+              >
                 确定
               </Button>
               <Button type="normal" onClick={onClose} disabled={loading as boolean}>
@@ -68,12 +73,12 @@ const Redeploy = (props: Props) => {
           </div>
         }
       >
-      <p style={{ margin: 0 }}>
-        当前操作将基于版本
-        <span className="color-link ml-5 mr-5">{taskId}</span>
-        创建一个新的部署版本，您确认要重新部署吗？
-      </p>
-    </Dialog >
+        <p style={{ margin: 0 }}>
+          当前操作将基于版本
+          <span className="color-link ml-5 mr-5">{taskId}</span>
+          创建一个新的部署版本，您确认要重新部署吗？
+        </p>
+      </Dialog>
     </>
   );
 };

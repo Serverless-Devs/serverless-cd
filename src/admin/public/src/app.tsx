@@ -24,7 +24,7 @@ const appConfig: IAppConfig = {
       request: {
         onConfig: (config) => {
           // 发送请求前：可以对 RequestConfig 做一些统一处理
-          const { url } = config
+          const { url } = config;
           if (url === '/api/user/info' || url?.startsWith('http')) return config;
           const orgName = get(window, ORG_NAME);
           if (orgName) {
@@ -48,7 +48,9 @@ const appConfig: IAppConfig = {
             return response;
           }
           if (!response.data.success && response.data.message) {
-            const tokenInvalid = response.data.code === CODE.Invalid && response.data.message === 'token 无效，请重新配置';
+            const tokenInvalid =
+              response.data.code === CODE.Invalid &&
+              response.data.message === 'token 无效，请重新配置';
             !tokenInvalid && Toast.error(response.data.message);
           }
           return response;

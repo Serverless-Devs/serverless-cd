@@ -14,7 +14,7 @@ const secretFieldOutput = (val) => {
     return val.slice(0, 3) + '*'.repeat(val.length - 6) + val.slice(val.length - 3);
   }
   return val;
-}
+};
 
 /**
  * unless middleware

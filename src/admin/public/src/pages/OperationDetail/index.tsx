@@ -34,11 +34,9 @@ const Details = ({
     setLoading(false);
   };
 
-
   useEffect(() => {
     fetchData();
   }, [envName]);
-
 
   useEffect(() => {
     if (isEmpty(detailInfo)) return;
@@ -88,7 +86,6 @@ const Details = ({
     history?.push(`/${orgName}/application/${appId}/${value}/operation`);
     forceUpdate(Date.now());
   };
-
 
   return (
     <PageLayout
@@ -141,11 +138,11 @@ const Details = ({
           )}
         </>
       }
-      children={(
+      children={
         <Loading visible={loading} inline={false} className="mt-16">
-        <Fc resource={get(resource, 'fc', [])} cloudAlias={cloudAlias}/>
-      </Loading>
-      )}
+          <Fc resource={get(resource, 'fc', [])} cloudAlias={cloudAlias} />
+        </Loading>
+      }
     />
   );
 };

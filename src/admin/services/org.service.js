@@ -5,7 +5,13 @@ const git = require('@serverless-cd/git-provider');
 const orgModel = require('../models/org.mode');
 const applicationModel = require('../models/application.mode');
 const userModel = require('../models/user.mode');
-const { ValidationError, NoPermissionError, secretFieldOutput, checkNameAvailable, generateOrgIdByUserIdAndOrgName } = require('../util');
+const {
+  ValidationError,
+  NoPermissionError,
+  secretFieldOutput,
+  checkNameAvailable,
+  generateOrgIdByUserIdAndOrgName,
+} = require('../util');
 
 async function getProviderToken(orgName, provider) {
   const result = await orgModel.getOwnerOrgByName(orgName);
@@ -156,8 +162,8 @@ async function remove(orgId, orgName) {
 }
 
 /**
- * 
- * @param {*} orgName 
+ *
+ * @param {*} orgName
  * @param { secrets, third_part, name, alias, logo, description } data
  */
 async function updateOwnerByName(orgName, data) {
@@ -271,7 +277,7 @@ function desensitization(data) {
     return {
       totalCount: data.totalCount,
       result: _.map(data.result, filterData),
-    }
+    };
   }
   return filterData(data);
 }

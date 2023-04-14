@@ -3,7 +3,6 @@ import { Avatar, Icon } from '@alicloud/console-components';
 import { C_REPOSITORY } from '@/constants/repository';
 import { upperFirst } from 'lodash';
 
-
 const AccountAuthProcess = ({ type }) => {
   return (
     <div style={{ width: '100%', textAlign: 'center', marginBottom: -12 }}>
@@ -17,10 +16,11 @@ const AccountAuthProcess = ({ type }) => {
         <Icon type="switch" style={{ margin: '0 20px' }} />
         {C_REPOSITORY[type]?.svg(36)}
       </div>
-      <p style={{ margin: '20px 0' }}>您已通过 {upperFirst(type)} 授权，完善以下登录信息即可完成绑定</p>
+      <p style={{ margin: '20px 0' }}>
+        您已通过 {upperFirst(type)} 授权，完善以下登录信息即可完成绑定
+      </p>
     </div>
   );
 };
-
 
 export default AccountAuthProcess;

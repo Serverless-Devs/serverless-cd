@@ -18,11 +18,10 @@ const ModifyPassword = ({ value, onRef }: IModifyPassword) => {
   }));
   const handleSubmitModifyPassword = async () => {
     validate(async (err, values) => {
-      if (err)  return err;
+      if (err) return err;
       return await UpdateInfo.request({ ...values, username: value.username });
-      
-    })
-  }
+    });
+  };
 
   const validatePassword = (rule, value, tag) => {
     const regex = new RegExp('(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).{6,18}');
@@ -47,22 +46,14 @@ const ModifyPassword = ({ value, onRef }: IModifyPassword) => {
   };
 
   return (
-    <Form
-      field={field}
-      style={{ width: '540px' }}
-    >
-      <FormItem
-        label="当前密码"
-      >
+    <Form field={field} style={{ width: '540px' }}>
+      <FormItem label="当前密码">
         <Input
-          {...init('password', {
-          })}
+          {...init('password', {})}
           placeholder="密码中必须包含字母、数字、特称字符，至少6个字符，最多18个字符"
         />
       </FormItem>
-      <FormItem
-        label="新密码"
-      >
+      <FormItem label="新密码">
         <Input
           {...init('new_password', {
             rules: [
@@ -74,9 +65,7 @@ const ModifyPassword = ({ value, onRef }: IModifyPassword) => {
           placeholder="新密码和当前密码不能相同"
         />
       </FormItem>
-      <FormItem
-        label="确认密码"
-      >
+      <FormItem label="确认密码">
         <Input
           {...init('confirm_password', {
             rules: [
@@ -90,8 +79,7 @@ const ModifyPassword = ({ value, onRef }: IModifyPassword) => {
       </FormItem>
       <button onClick={handleSubmitModifyPassword}>asd</button>
     </Form>
-    );
+  );
 };
-
 
 export default ModifyPassword;

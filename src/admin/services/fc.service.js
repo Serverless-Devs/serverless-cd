@@ -28,11 +28,16 @@ async function getFunction(fcClient, serviceName, functionName) {
 async function getHttpTrigger(fcClient, serviceName, functionName) {
   const { data } = await fcClient.listTriggers(serviceName, functionName);
   debug(`get ${serviceName}/${functionName} listTriggers: ${JSON.stringify(data)}`);
-  const httpTrigger = data.triggers.filter((t) => t.triggerType === 'http' || t.triggerType === 'https');
+  const httpTrigger = data.triggers.filter(
+    (t) => t.triggerType === 'http' || t.triggerType === 'https',
+  );
   if (_.isEmpty(httpTrigger)) {
     return {};
   }
-  const assignQualifierHttpTrigger = _.find(httpTrigger, h => !h.qualifier || h.qualifier?.toLocaleLowerCase() === 'latest');
+  const assignQualifierHttpTrigger = _.find(
+    httpTrigger,
+    (h) => !h.qualifier || h.qualifier?.toLocaleLowerCase() === 'latest',
+  );
   if (_.isEmpty(assignQualifierHttpTrigger)) {
     debug(`Your function has an HTTP trigger, but no trigger is configured for the 'LATEST'.`);
     return {};
@@ -50,27 +55,14 @@ async function listInstances(fcClient, serviceName, functionName) {
   return [];
 }
 
-async function getSignature (
-  client,
-  fcContext,
-  method,
-  path,
-  headers,
-  nowTime,
-  queries,
-) {
-  const {
-    accessKeyId,
-    accessKeySecret,
-    accountId,
-    regionId,
-    sts,
-    securityToken,
-  } = fcContext;
+async function getSignature(client, fcContext, method, path, headers, nowTime, queries) {
+  const { accessKeyId, accessKeySecret, accountId, regionId, sts, securityToken } = fcContext;
   const buildHeaders = Object.assign(client.headers, headers);
-  const endpoint = _.includes(path, 'fcapp.run') ? path : `https://${accountId}.${regionId}.fc.aliyuncs.com${path}`;
+  const endpoint = _.includes(path, 'fcapp.run')
+    ? path
+    : `https://${accountId}.${regionId}.fc.aliyuncs.com${path}`;
   if (sts) {
-    buildHeaders["x-fc-security-token"] = securityToken;
+    buildHeaders['x-fc-security-token'] = securityToken;
   }
 
   debug(`method ========= ${method}`);
@@ -84,7 +76,7 @@ async function getSignature (
     method,
     path,
     buildHeaders,
-    queries
+    queries,
   );
 
   return {
@@ -95,7 +87,7 @@ async function getSignature (
     xFcDate: nowTime,
     token: securityToken,
   };
-};
+}
 
 async function detail(orgName, cloudAlias, payload) {
   if (!_.isArray(payload)) {
@@ -136,7 +128,14 @@ async function detail(orgName, cloudAlias, payload) {
 }
 
 async function httpInvoke(orgName, cloudAlias, resource, payload = {}) {
-  const { uid, region, service: serviceName, function: functionName, urlInternet, authType = '' } = resource;
+  const {
+    uid,
+    region,
+    service: serviceName,
+    function: functionName,
+    urlInternet,
+    authType = '',
+  } = resource;
   if (_.isEmpty(urlInternet)) {
     throw new ValidationError('缺少参数 urlInternet');
   }
@@ -152,20 +151,22 @@ async function httpInvoke(orgName, cloudAlias, resource, payload = {}) {
   const _path = path && path[0] === '/' ? path : `/${path}`;
   let pathUrl = '';
   if (host) {
-    pathUrl = `${host}${_path}`
+    pathUrl = `${host}${_path}`;
   } else {
-    pathUrl = `/2016-08-15/proxy/${serviceName}.${qualifier ? qualifier : 'LATEST'}/${functionName}${_path}`
+    pathUrl = `/2016-08-15/proxy/${serviceName}.${
+      qualifier ? qualifier : 'LATEST'
+    }/${functionName}${_path}`;
   }
 
   const signaHeaders = {
     ...headers,
     date: nowTime,
     host: host ? host.replace(/https?:\/\//, '') : `${uid}.${region}.fc.aliyuncs.com`,
-    "x-fc-date": nowTime,
-    "x-fc-account-id": uid,
-    "X-Fc-Invocation-Code-Version": "Latest",
-    "X-Fc-Log-Type": asyncMode ? 'None' : 'Tail',
-  }
+    'x-fc-date': nowTime,
+    'x-fc-account-id': uid,
+    'X-Fc-Invocation-Code-Version': 'Latest',
+    'X-Fc-Log-Type': asyncMode ? 'None' : 'Tail',
+  };
 
   if (asyncMode) {
     signaHeaders['X-Fc-Invocation-Type'] = 'Async';
@@ -174,8 +175,8 @@ async function httpInvoke(orgName, cloudAlias, resource, payload = {}) {
   let queries = {};
 
   if (_.includes(path, '?')) {
-    const queriesStr = path.substring(path.indexOf('?'), path.length)
-    queries = qs.parse(queriesStr, { ignoreQueryPrefix: true })
+    const queriesStr = path.substring(path.indexOf('?'), path.length);
+    queries = qs.parse(queriesStr, { ignoreQueryPrefix: true });
   }
 
   const fcClient = Client.generateFc(region, AccountID, AccessKeyID, AccessKeySecret);
@@ -199,18 +200,19 @@ async function eventInvoke(orgName, cloudAlias, resource, payload = {}) {
   const fcClient = Client.generateFc(region, AccountID, AccessKeyID, AccessKeySecret);
 
   const { qualifier } = payload;
-  const path = `/2016-08-15/services/${serviceName}.${qualifier ? qualifier : "LATEST"
-    }/functions/${functionName}/invocations`;
+  const path = `/2016-08-15/services/${serviceName}.${
+    qualifier ? qualifier : 'LATEST'
+  }/functions/${functionName}/invocations`;
   const nowTime = new Date().toUTCString();
 
   const headers = {
     date: nowTime,
     host: `${uid}.${region}.fc.aliyuncs.com`,
-    "x-fc-date": nowTime,
-    "x-fc-account-id": uid,
-    "X-Fc-Invocation-Code-Version": "Latest",
-    "X-Fc-Log-Type": "Tail",
-    "content-type": "application/octet-stream",
+    'x-fc-date': nowTime,
+    'x-fc-account-id': uid,
+    'X-Fc-Invocation-Code-Version': 'Latest',
+    'X-Fc-Log-Type': 'Tail',
+    'content-type': 'application/octet-stream',
   };
 
   const fcContext = {
@@ -219,7 +221,7 @@ async function eventInvoke(orgName, cloudAlias, resource, payload = {}) {
     accountId: uid,
     regionId: region,
   };
-  return getSignature(fcClient, fcContext, "POST", path, headers, nowTime, null);
+  return getSignature(fcClient, fcContext, 'POST', path, headers, nowTime, null);
 }
 
 module.exports = { detail, eventInvoke, httpInvoke };
