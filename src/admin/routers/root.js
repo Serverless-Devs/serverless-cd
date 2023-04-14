@@ -3,7 +3,7 @@ const { CD_PIPELINE_YAML, SUPPORT_LOGIN, GITHUB_REDIRECT_URI } = require('@serve
 const debug = require('debug')('serverless-cd:root');
 
 // 首页
-router.get('/', async function (req, res, _next) {
+router.get('/*', async function (req, res, _next) {
   const config = {
     CD_PIPELINE_YAML,
     SUPPORT_LOGIN,

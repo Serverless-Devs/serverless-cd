@@ -6,6 +6,8 @@ import { applicationDetail, removeEnv } from '@/services/applist';
 import { get, isEmpty, isBoolean, keys } from 'lodash';
 import CreateEnv from '../EnvDetail/components/CreateEnv';
 import { Toast } from '@/components/ToastContainer';
+import Fc from './Fc';
+
 const { Tooltip } = Balloon;
 
 const Details = ({
@@ -23,6 +25,7 @@ const Details = ({
 
   const data = get(detailInfo, 'data', {});
   const resource = get(data, `environment.${envName}.resource`, {});
+  const cloudAlias = get(data, `environment.${envName}.cloud_alias`, '');
   const appName = get(detailInfo, 'data.name') || get(detailInfo, 'data.repo_name', '');
 
   const fetchData = async () => {
@@ -138,12 +141,12 @@ const Details = ({
           )}
         </>
       }
-    >
-      <Loading visible={loading} inline={false} className="mt-16">
-        TODO:
-        {get(resource, 'fc', []).map((item) => <div>{`${item.uid}/${item.region}/${item.service}/${item.function}`}</div>)}
+      children={(
+        <Loading visible={loading} inline={false} className="mt-16">
+        <Fc resource={get(resource, 'fc', [])} cloudAlias={cloudAlias}/>
       </Loading>
-    </PageLayout>
+      )}
+    />
   );
 };
 

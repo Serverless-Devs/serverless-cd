@@ -24,7 +24,8 @@ const appConfig: IAppConfig = {
       request: {
         onConfig: (config) => {
           // 发送请求前：可以对 RequestConfig 做一些统一处理
-          if (config.url === '/api/user/info') return config;
+          const { url } = config
+          if (url === '/api/user/info' || url?.startsWith('http')) return config;
           const orgName = get(window, ORG_NAME);
           if (orgName) {
             config.params = { ...config.params, orgName };

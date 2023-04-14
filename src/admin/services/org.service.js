@@ -158,22 +158,42 @@ async function remove(orgId, orgName) {
 /**
  * 
  * @param {*} orgName 
- * @param { cloud_secret, secrets, third_part, name, alias, logo, description } data
+ * @param { secrets, third_part, name, alias, logo, description } data
  */
 async function updateOwnerByName(orgName, data) {
-  const { cloud_secret, secrets, third_part } = data;
+  const { secrets, third_part } = data;
   if (!_.isEmpty(secrets) && !_.isPlainObject(secrets)) {
     throw new ValidationError('secrets 传入的格式不符合预期');
   }
   if (!_.isEmpty(third_part) && !_.isPlainObject(third_part)) {
     throw new ValidationError('third_part 传入的格式不符合预期');
   }
-  if (!_.isEmpty(cloud_secret) && !_.isPlainObject(cloud_secret)) {
-    throw new ValidationError('cloud_secret 传入的格式不符合预期');
-  }
+  _.unset(data, 'cloud_secret');
 
   const { id: orgId } = await orgModel.getOwnerOrgByName(orgName);
   await orgModel.updateOrg(orgId, data);
+}
+
+async function updateCloudSecret(orgName, { deleteKey, cloudSecret } = {}) {
+  const orgData = await orgModel.getOwnerOrgByName(orgName);
+  if (_.isEmpty(orgData)) {
+    throw new ValidationError(`没有找到 ${orgName} 团队`);
+  }
+
+  let cloud_secret = _.get(orgData, 'cloud_secret', {});
+  if (deleteKey) {
+    if (!_.isString(deleteKey)) {
+      throw new ValidationError('参数格式不符合预期');
+    }
+    _.unset(cloud_secret, deleteKey);
+  }
+  if (!_.isEmpty(cloudSecret)) {
+    if (!_.isPlainObject(cloudSecret)) {
+      throw new ValidationError('cloud_secret 传入的格式不符合预期');
+    }
+    cloud_secret = { ...cloud_secret, ...cloudSecret };
+  }
+  await orgModel.updateOrg(orgData.id, { cloud_secret });
 }
 
 async function updateThirdPart(orgName, { token, provider }) {
@@ -262,6 +282,7 @@ async function getOwnerUserByName(orgName) {
 }
 
 module.exports = {
+  updateCloudSecret,
   updateThirdPart,
   getOwnerUserByName,
   updateOwnerByName,
