@@ -174,11 +174,23 @@ const Details = ({
           items={[
             {
               text: '触发类型',
-              value: triggerType
+              value: triggerType,
             },
             {
               text: '触发分支',
-              value: <>{triggerRef ? <ShowBranch threshold={50} url={`https://${provider}.com/${repoOwner}/${repoName}/tree/${triggerRef}`} label={triggerRef} /> : '-'}</>,
+              value: (
+                <>
+                  {triggerRef ? (
+                    <ShowBranch
+                      threshold={50}
+                      url={`https://${provider}.com/${repoOwner}/${repoName}/tree/${triggerRef}`}
+                      label={triggerRef}
+                    />
+                  ) : (
+                    '-'
+                  )}
+                </>
+              ),
             },
             {
               text: '目标分支',

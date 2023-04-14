@@ -2,9 +2,9 @@ import React, { useEffect, FC } from 'react';
 import { useRequest } from 'ice';
 import CredentialUi from '@serverless-cd/credential-ui';
 import { Button } from '@alicloud/console-components';
-import { orgDetail, orgUpdate } from '@/services/org';
+import { orgDetail, updateCloudSecret } from '@/services/org';
 import CloudTable from '@/components/CloudTable';
-import { get, keys, set, unset } from 'lodash';
+import { get, keys, unset } from 'lodash';
 import PageInfo from '@/components/PageInfo';
 import RefreshButton from '@/components/RefreshButton';
 
@@ -21,19 +21,14 @@ const Cloud: FC<{}> = (props) => {
   const onConfirm = async (data: Record<string, any>) => {
     const { alias } = data;
     unset(data, 'alias');
-    set(cloudSecret, alias, data);
-    await orgUpdate({ cloud_secret: cloudSecret });
+    await updateCloudSecret({ [alias]: data });
     await orgRequestDetail.refresh();
-  }
+  };
 
   return (
     <PageInfo
       extra={
-        <CredentialUi
-          showAccountID
-          existAlias={existAlias}
-          onConfirm={onConfirm}
-        >
+        <CredentialUi title="添加账号" showAccountID existAlias={existAlias} onConfirm={onConfirm}>
           <Button type="primary">添加账号</Button>
         </CredentialUi>
       }
@@ -46,6 +41,6 @@ const Cloud: FC<{}> = (props) => {
       />
     </PageInfo>
   );
-}
+};
 
 export default Cloud;

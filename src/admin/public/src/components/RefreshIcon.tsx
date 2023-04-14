@@ -19,7 +19,7 @@ const RefreshButton = (props: Props) => {
       {loading ? (
         <LoadingOutlined />
       ) : (
-        <ReloadOutlined className="cursor-pointer" onClick={onRefresh}/>
+        <ReloadOutlined className="cursor-pointer" onClick={onRefresh} />
       )}
     </div>
   );

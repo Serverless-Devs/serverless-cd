@@ -5,16 +5,26 @@ import store from '@/store';
 import { get, isEmpty } from 'lodash';
 import { getOrgName, localStorageSet } from '@/utils';
 
-const AppList = React.lazy(() => import(/* webpackChunkName: 'user-login1' */ '@/pages/AppList') as any);
+const AppList = React.lazy(
+  () => import(/* webpackChunkName: 'user-login1' */ '@/pages/AppList') as any,
+);
 const Login = React.lazy(() => import(/* webpackChunkName: 'Login' */ '@/pages/Login'));
 const Signup = React.lazy(() => import(/* webpackChunkName: 'Signup' */ '@/pages/Signup'));
 const Create = React.lazy(() => import(/* webpackChunkName: 'Create' */ '@/pages/Create'));
 const EnvDetail = React.lazy(() => import(/* webpackChunkName: 'AppDetail' */ '@/pages/EnvDetail'));
-const CicdDetail = React.lazy(() => import(/* webpackChunkName: 'AppDetail' */ '@/pages/CicdDetail'));
-const OperationDetail = React.lazy(() => import(/* webpackChunkName: 'AppDetail' */ '@/pages/OperationDetail'));
-const TaskDetails = React.lazy(() => import(/* webpackChunkName: 'TaskDetails' */ '@/pages/TaskDetails'));
+const CicdDetail = React.lazy(
+  () => import(/* webpackChunkName: 'AppDetail' */ '@/pages/CicdDetail'),
+);
+const OperationDetail = React.lazy(
+  () => import(/* webpackChunkName: 'AppDetail' */ '@/pages/OperationDetail'),
+);
+const TaskDetails = React.lazy(
+  () => import(/* webpackChunkName: 'TaskDetails' */ '@/pages/TaskDetails'),
+);
 const Auth = React.lazy(() => import(/* webpackChunkName: 'Auth' */ '@/pages/Auth'));
-const OrgSettings = React.lazy(() => import(/* webpackChunkName: 'OrgSettings' */ '@/pages/OrgSettings'));
+const OrgSettings = React.lazy(
+  () => import(/* webpackChunkName: 'OrgSettings' */ '@/pages/OrgSettings'),
+);
 const Members = React.lazy(() => import(/* webpackChunkName: 'Members' */ '@/pages/Members'));
 const Cloud = React.lazy(() => import(/* webpackChunkName: 'Cloud' */ '@/pages/Cloud'));
 const Secrets = React.lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/Secrets'));
@@ -27,8 +37,8 @@ const OrgVerify = ({
   history,
   match: {
     params: { orgName },
-  } }
-) => {
+  },
+}) => {
   const [userState] = store.useModel('user');
   const userInfo: any = get(userState, 'userInfo', {});
   /**
@@ -45,11 +55,11 @@ const OrgVerify = ({
   }
 
   return null;
-}
+};
 
 const App = (props) => {
   return (
-    <BasicLayout {...props} >
+    <BasicLayout {...props}>
       <Suspense fallback={<div>Loading...</div>}>
         <Switch>
           <Route path={'/noAuth'} exact component={NoAuth} />
@@ -58,8 +68,16 @@ const App = (props) => {
           <Route path={'/auth'} exact component={Auth} />
           <Route path={'/:orgName/application/:appId/:envName/overview'} exact component={EnvDetail} />
           <Route path={'/:orgName/application/:appId/:envName/cicd'} exact component={CicdDetail} />
-          <Route path={'/:orgName/application/:appId/:envName/operation'} exact component={OperationDetail} />
-          <Route path={'/:orgName/application/:appId/:envName/:taskId'} exact component={TaskDetails} />
+          <Route
+            path={'/:orgName/application/:appId/:envName/operation'}
+            exact
+            component={OperationDetail}
+          />
+          <Route
+            path={'/:orgName/application/:appId/:envName/:taskId'}
+            exact
+            component={TaskDetails}
+          />
           <Route path={'/:orgName/application'} exact component={AppList} />
           <Route path={'/:orgName/create'} component={Create} />
           <Route path={'/:orgName/setting/members'} exact component={Members} />
@@ -75,7 +93,6 @@ const App = (props) => {
       </Suspense>
     </BasicLayout>
   );
-}
+};
 
-
-export default App
+export default App;

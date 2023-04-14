@@ -14,7 +14,6 @@ import { get, keys, isEmpty, map } from 'lodash';
 import { getConsoleConfig } from '@/utils';
 import { orgDetail } from '@/services/org';
 
-
 const FormItem = Form.Item;
 
 type IProps = {
@@ -38,7 +37,7 @@ const CreateEnv: FC<IProps> = (props) => {
 
   useEffect(() => {
     orgDetailRequest.request();
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (visible) {

@@ -78,7 +78,7 @@ const TemplateDialog = (props: IProps) => {
           errorMsg: '初始化模版校验失败',
           run: async () => {
             const res = await templatePreview({
-              ...body
+              ...body,
             });
             if (!res.success) {
               throw new Error(res.message);
@@ -230,7 +230,12 @@ const TemplateDialog = (props: IProps) => {
   ];
 
   return (
-    <CreateTemplateDialog dataSource={dataSource} retryType={retryType} onError={() => setTemplateCreateStatus('error')} onRetry={() => setTemplateCreateStatus('')}></CreateTemplateDialog>
+    <CreateTemplateDialog
+      dataSource={dataSource}
+      retryType={retryType}
+      onError={() => setTemplateCreateStatus('error')}
+      onRetry={() => setTemplateCreateStatus('')}
+    ></CreateTemplateDialog>
   );
 };
 

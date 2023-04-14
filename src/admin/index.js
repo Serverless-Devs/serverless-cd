@@ -22,22 +22,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.post('/initialize', async (_req, res) => {
-  console.log('Starting initialize');
-  // 为了不引入 @serverless-devs/core 包；如果引入可以这样写
-  // const { Initialize } = require('@serverless-cd/serverless-script');
-  const Initialize = require('@serverless-cd/serverless-script/src/initialize');
-  const initialize = new Initialize();
-  await initialize.init();
-  console.log('Initialize ends');
-  res.send('');
-});
+app.use(require('./routers/initialize'));
 
 // 接口
 app.use('/api', jwtAuth, logger, require('./routers'));
 
 // 需要写在最后，为了兼容前端指定非 api 的路由
-app.use('/*', require('./routers/root'));
+app.use(require('./routers/root'));
 
 app.use(errorHandler);
 

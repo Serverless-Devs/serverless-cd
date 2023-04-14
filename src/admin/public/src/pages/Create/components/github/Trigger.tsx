@@ -40,9 +40,9 @@ const Trigger = (props: IProps) => {
 
   const newVal = isEmpty(value)
     ? {
-      push: PUSH.NEW,
-      branch: DEFAULT_NEW_BRANCH,
-    }
+        push: PUSH.NEW,
+        branch: DEFAULT_NEW_BRANCH,
+      }
     : value;
   const [info, setInfo] = useState<IInfo>(newVal);
 
@@ -108,7 +108,7 @@ const Trigger = (props: IProps) => {
           <>
             <Input value={info.branch} disabled className="full-width" />
             {createTemplate && (
-              <div className='color-gray mt-6'>
+              <div className="color-gray mt-6">
                 当前代码仓库还未创建，系统将会在完成代码仓库创建之后，自动为您创建master分支作为默认分支
               </div>
             )}

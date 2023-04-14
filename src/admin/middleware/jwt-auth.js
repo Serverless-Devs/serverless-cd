@@ -40,7 +40,6 @@ async function checkJwt(req, _res, next) {
   } else {
     next();
   }
-};
-
+}
 
 module.exports = checkJwt;

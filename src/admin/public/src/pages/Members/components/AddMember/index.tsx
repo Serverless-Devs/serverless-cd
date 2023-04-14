@@ -23,7 +23,16 @@ type IProps = {
 
 const AddMember: FC<IProps> = (props) => {
   const { pathname } = useLocation();
-  const { children, callback, type = 'create', dataSource, existUsers, active = false, orgName, changeVisible } = props;
+  const {
+    children,
+    callback,
+    type = 'create',
+    dataSource,
+    existUsers,
+    active = false,
+    orgName,
+    changeVisible,
+  } = props;
   if (getParam('showSlide') === 'true' && type !== 'create') return null;
   const { request, loading } = useRequest(type === 'create' ? inviteUser : updateAuth);
   const [visible, setVisible] = React.useState(false);
@@ -75,8 +84,8 @@ const AddMember: FC<IProps> = (props) => {
       <span
         onClick={
           () => {
-            initValue()
-            setVisible(true)
+            initValue();
+            setVisible(true);
           }
         }
       >
@@ -116,9 +125,9 @@ const AddMember: FC<IProps> = (props) => {
             <FormItem label="角色" required>
               <Select
                 className="full-width"
-                dataSource={Object.values(ROLE).map(value => ({
+                dataSource={Object.values(ROLE).map((value) => ({
                   value,
-                  label: ROLE_LABEL[value]
+                  label: ROLE_LABEL[value],
                 }))}
                 {...init('role', {
                   rules: [

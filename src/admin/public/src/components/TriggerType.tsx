@@ -1,7 +1,6 @@
 import React from 'react';
 import { upperFirst } from 'lodash';
 
-
 export type ITriggerType = 'local' | 'console' | 'webhook';
 
 export enum TriggerTypeLable {
@@ -17,7 +16,7 @@ export const triggerIcons = {
 }
 
 interface Props {
-  trigger: string
+  trigger: string;
 }
 
 export default ({ trigger }: Props) => {
@@ -37,4 +36,4 @@ export default ({ trigger }: Props) => {
     return <>{triggerIcons['redeploy']}回滚</>;
   }
   return <>{`${upperFirst(trigger)} 触发`}</>;
-}
+};

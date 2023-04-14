@@ -13,7 +13,7 @@ import store from '@/store';
 const LOGINTYPE = { GITHUB: 'github', GITEE: 'gitee' };
 const Auth = ({ location: { search } }) => {
   const [isAuth, setAuth] = useState<string>('');
- 
+
   const [, userDispatchers] = store.useModel('user');
   const { data, request } = useRequest(accountLogin);
   const GetAuthGithub = useRequest(getAuthGithub);
@@ -29,29 +29,29 @@ const Auth = ({ location: { search } }) => {
   useEffect(() => {
     return () => {
       setAuth('');
-    }
+    };
   }, []);
 
-  const title = <AccountAuthProcess type={type} />
+  const title = <AccountAuthProcess type={type} />;
 
-    useEffect(() => {
-      goAppList();
-    }, [JSON.stringify(data)]);
+  useEffect(() => {
+    goAppList();
+  }, [JSON.stringify(data)]);
 
-    const goAppList = async () => {
-      if (!data) return;
-        const {
-          success,
-        } = data;
-      if (success) {
-        await userDispatchers.getUserInfo();
-        history?.push('/');
-        return;
+  const goAppList = async () => {
+    if (!data) return;
+    const { success } = data;
+    if (success) {
+      await userDispatchers.getUserInfo();
+      history?.push('/');
+      return;
     }
-    };
+  };
 
-  const githubLoginOrSingup = async() => {
-    const { data: { github_unionid, id } }= await GetAuthGithub.request({ code });
+  const githubLoginOrSingup = async () => {
+    const {
+      data: { github_unionid, id },
+    } = await GetAuthGithub.request({ code });
     setAuth(github_unionid);
     if (!github_unionid) {
       history?.push(`/auth?type=${type}&github_unionid=${id}`);
@@ -60,8 +60,10 @@ const Auth = ({ location: { search } }) => {
     }
   };
 
-  const giteeLoginOrSingup = async() => {
-    const { data: { gitee_unionid, id } } = await GetAuthGitee.request({ code });
+  const giteeLoginOrSingup = async () => {
+    const {
+      data: { gitee_unionid, id },
+    } = await GetAuthGitee.request({ code });
     setAuth(gitee_unionid);
     if (!gitee_unionid) {
       history?.push(`/auth?type=${type}&gitee_unionid=${id}`);
@@ -71,15 +73,11 @@ const Auth = ({ location: { search } }) => {
   };
   return (
     <div className="session-container">
-      {
-        GetAuthGithub.loading || GetAuthGitee.loading ? (
-            <Loading tip="授权中..." fullScreen tipAlign="bottom" />
-          ) : (
-            <div>
-                {isAuth ? <></> : <AccountAuth title={title} search={search}  />}
-            </div>
-          )
-      }
+      {GetAuthGithub.loading || GetAuthGitee.loading ? (
+        <Loading tip="授权中..." fullScreen tipAlign="bottom" />
+      ) : (
+        <div>{isAuth ? <></> : <AccountAuth title={title} search={search} />}</div>
+      )}
     </div>
   );
 };

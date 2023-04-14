@@ -18,7 +18,6 @@ import TriggerType, { ITriggerType, TriggerTypeLable } from './TriggerType';
 import Rollback from './Rollback';
 import CancelDeploy from './CancelDeploy';
 
-
 const DEFAULT_TYPES = ['console', 'local', 'webhook'];
 
 interface IProps {
@@ -45,10 +44,14 @@ const TaskList: FC<IProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
 
   const initFetchRequest = {
-    appId, envName, pageSize, currentPage, triggerTypes: types,
-  }
+    appId,
+    envName,
+    pageSize,
+    currentPage,
+    triggerTypes: types,
+  };
   const { loading, data, request } = useRequest(getTaskList, {
-    initialData: { totalCount: 0, result: [] }
+    initialData: { totalCount: 0, result: [] },
   });
 
   useEffect(() => {
@@ -70,26 +73,28 @@ const TaskList: FC<IProps> = ({
     setPageSize(currentPageSize);
     setCurrentPage(1);
     request(merge(initFetchRequest, { currentPage: 1, pageSize: currentPageSize }));
-  }
+  };
 
   const onTriggerChange = (currentTypes: ITriggerType[]) => {
     const t = isEmpty(currentTypes) ? triggerTypes : currentTypes;
     setTypes(t);
     setCurrentPage(1);
     request(merge(initFetchRequest, { currentPage: 1, triggerTypes: t }));
-  }
+  };
 
   const refreshCallback = () => {
     setCurrentPage(1);
     request(merge(initFetchRequest, { currentPage: 1 }));
-  }
+  };
 
   const columns = [
     {
       title: '部署版本',
       dataIndex: 'id',
       cell: (value, index, record) => {
-        const showLinkNode = isEmpty(record.steps) ? value : (
+        const showLinkNode = isEmpty(record.steps) ? (
+          value
+        ) : (
           <Link
             className="commit-description"
             to={`/${orgName}/application/${appId}/${envName}/${value}`}
@@ -116,7 +121,7 @@ const TaskList: FC<IProps> = ({
     {
       title: '触发方式',
       dataIndex: 'trigger_type',
-      cell: (value) => <TriggerType trigger={value} />
+      cell: (value) => <TriggerType trigger={value} />,
     },
     {
       title: '触发内容',
@@ -127,18 +132,28 @@ const TaskList: FC<IProps> = ({
         const message = get(row, 'message');
         return (
           <div>
-            {branch && <ShowBranch threshold={50} label={branch} url={`https://${provider}.com/${repoOwner}/${repoName}/tree/${branch}`} />}
+            {branch && (
+              <ShowBranch
+                threshold={50}
+                label={branch}
+                url={`https://${provider}.com/${repoOwner}/${repoName}/tree/${branch}`}
+              />
+            )}
             <div>
-              {value && <CommitId
-                url={`https://${provider}.com/${repoOwner}/${repoName}/commit/${value}`}
-                label={value}
-                icon={false}
-              />}
+              {value && (
+                <CommitId
+                  url={`https://${provider}.com/${repoOwner}/${repoName}/commit/${value}`}
+                  label={value}
+                  icon={false}
+                />
+              )}
               <Truncate
                 style={{ fontSize: 12, color: '#888', marginLeft: 8 }}
                 threshold={40}
                 align="t"
-              >{message}</Truncate>
+              >
+                {message}
+              </Truncate>
             </div>
           </div>
         );
@@ -200,50 +215,52 @@ const TaskList: FC<IProps> = ({
     },
   ];
 
-  return <>
-    <div className="flex-r" style={{ justifyContent: 'space-between' }}>
-      <div>
-        <Select
-          disabled={loading}
-          label={"触发过滤"}
-          mode="multiple"
-          showSearch
-          value={types}
-          onChange={onTriggerChange}
-          dataSource={triggerTypes.map(value => ({ value, label: TriggerTypeLable[value] }))}
-          className='mr-16'
-        />
-        <Search
-          key="2"
-          shape="simple"
-          placeholder="通过部署版本进行搜索"
-          onSearch={onSearch}
-          hasClear
-          style={{ width: '400px' }}
-        />
+  return (
+    <>
+      <div className="flex-r" style={{ justifyContent: 'space-between' }}>
+        <div>
+          <Select
+            disabled={loading}
+            label={'触发过滤'}
+            mode="multiple"
+            showSearch
+            value={types}
+            onChange={onTriggerChange}
+            dataSource={triggerTypes.map((value) => ({ value, label: TriggerTypeLable[value] }))}
+            className="mr-16"
+          />
+          <Search
+            key="2"
+            shape="simple"
+            placeholder="通过部署版本进行搜索"
+            onSearch={onSearch}
+            hasClear
+            style={{ width: '400px' }}
+          />
+        </div>
+        <RefreshButton styleObj={{ marginLeft: 8 }} refreshCallback={refreshCallback} />
       </div>
-      <RefreshButton styleObj={{ marginLeft: 8 }} refreshCallback={refreshCallback} />
-    </div>
 
-    <Table
-      columns={columns}
-      hasBorder={false}
-      dataSource={data.result}
-      loading={loading}
-      style={{ margin: '10px 0 15px' }}
-    />
-    <Pagination
-      current={currentPage}
-      pageSize={pageSize}
-      showJump={false}
-      total={data.totalCount}
-      onChange={onChangePage}
-      pageSizeSelector="filter"
-      pageSizeList={[5, 10, 20, 50]}
-      onPageSizeChange={onPageSizeChange}
-      style={{ textAlign: 'right' }}
-    />
-  </>
-}
+      <Table
+        columns={columns}
+        hasBorder={false}
+        dataSource={data.result}
+        loading={loading}
+        style={{ margin: '10px 0 15px' }}
+      />
+      <Pagination
+        current={currentPage}
+        pageSize={pageSize}
+        showJump={false}
+        total={data.totalCount}
+        onChange={onChangePage}
+        pageSizeSelector="filter"
+        pageSizeList={[5, 10, 20, 50]}
+        onPageSizeChange={onPageSizeChange}
+        style={{ textAlign: 'right' }}
+      />
+    </>
+  );
+};
 
 export default memo(TaskList);

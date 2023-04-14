@@ -10,7 +10,6 @@ import { Toast } from '@/components/ToastContainer';
 
 const { Tooltip } = Balloon;
 
-
 const Details = ({
   match: {
     params: { appId, envName, orgName },
@@ -33,7 +32,6 @@ const Details = ({
     await request({ id: appId });
     setLoading(false);
   };
-
 
   useEffect(() => {
     fetchData();

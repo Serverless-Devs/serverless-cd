@@ -8,7 +8,6 @@ import './index.css';
 import { getParams } from '@/utils';
 import { accountLogin, accountSingupAuth } from '@/services/auth';
 
-
 const AccountAuth = (props) => {
   const { title, search } = props;
   const [, userDispatchers] = store.useModel('user');
@@ -24,9 +23,7 @@ const AccountAuth = (props) => {
 
   const goAppList = async () => {
     if (!data) return;
-    const {
-      success,
-    } = data;
+    const { success } = data;
     if (success) {
       await userDispatchers.getUserInfo();
       history?.push('/');
@@ -34,7 +31,7 @@ const AccountAuth = (props) => {
     }
   };
 
-  const btnClick = async(values) => {
+  const btnClick = async (values) => {
     const params = { ...values, github_unionid, gitee_unionid };
     const { success, data } = await AccountSingupAuth.request(params);
     if (!data) return;
@@ -43,7 +40,14 @@ const AccountAuth = (props) => {
 
   return (
     <React.Fragment>
-      <Auth className="account-public-content" title={title} type="LOGIN" onSingIn={btnClick} accountBtnName="登录并绑定已有账号" loading={loading} />
+      <Auth
+        className="account-public-content"
+        title={title}
+        type="LOGIN"
+        onSingIn={btnClick}
+        accountBtnName="登录并绑定已有账号"
+        loading={loading}
+      />
     </React.Fragment>
   );
 };

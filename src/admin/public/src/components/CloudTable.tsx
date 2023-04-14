@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Table, Dialog } from '@alicloud/console-components';
-import { orgUpdate } from '@/services/org';
-import { map, get, keys, startsWith, unset } from 'lodash';
+import { removeCloudSecret } from '@/services/org';
+import { map, get, keys, startsWith } from 'lodash';
 
 interface Props {
   data: Record<string, any>[];
@@ -11,7 +11,7 @@ interface Props {
 
 export default ({ data, loading = false, refresh }: Props) => {
   const existAlias = keys(data);
-  const dataSource = map(existAlias, alias => ({
+  const dataSource = map(existAlias, (alias) => ({
     ...get(data, alias, {}),
     alias,
   }));
@@ -21,13 +21,12 @@ export default ({ data, loading = false, refresh }: Props) => {
       title: 'Delete',
       content: `确定移除 ${key} 吗？`,
       onOk: async () => {
-        unset(data, key);
-        await orgUpdate({ cloud_secret: data });
+        await removeCloudSecret({ deleteKey: key });
         refresh();
       },
-      onCancel: () => {}
+      onCancel: () => {},
     });
-  }
+  };
 
   return (
     <Table
@@ -55,21 +54,17 @@ export default ({ data, loading = false, refresh }: Props) => {
                 </div>
               );
             });
-          }
+          },
         },
         {
           dataIndex: 'alias',
           title: '操作',
           cell: (value) => (
-            <Button
-              type="primary"
-              onClick={() => onDelete(value)}
-              text
-            >
+            <Button type="primary" onClick={() => onDelete(value)} text>
               删除
             </Button>
-          )
-        }
+          ),
+        },
       ]}
     />
   );
