@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const qs = require('qs');
 const debug = require('debug')('serverless-cd:resource');
 const Fc = require('@serverless-cd/srm-aliyun-fc2');
 const orgModel = require('../models/org.mode');
@@ -69,15 +70,62 @@ async function detail(orgName, cloudAlias, payload) {
       ...resource,
       isHttp: !_.isEmpty(httpTrigger),
       urlInternet: httpTrigger.urlInternet,
+      authType: _.get(httpTrigger, 'triggerConfig.authType'),
     });
   }
 
   return result;
 }
 
-async function httpInvoke(orgName, cloudAlias, resource, parames, payload = {}) {
-  const { uid, region, urlInternet } = resource;
-  const method = _.get(payload, 'method', 'get');
+async function getSignature (
+  client,
+  fcContext,
+  method,
+  path,
+  headers,
+  nowTime,
+  queries,
+) {
+  const {
+    accessKeyId,
+    accessKeySecret,
+    accountId,
+    regionId,
+    sts,
+    securityToken,
+  } = fcContext;
+  const buildHeaders = Object.assign(client.headers, headers);
+  const endpoint = _.includes(path, 'fcapp.run') ? path : `https://${accountId}.${regionId}.fc.aliyuncs.com${path}`;
+  if (sts) {
+    buildHeaders["x-fc-security-token"] = securityToken;
+  }
+
+  debug(`method ========= ${method}`);
+  debug(`path ========= ${path}`);
+  debug(`buildHeaders ========= ${JSON.stringify(buildHeaders)}`);
+  debug(`queries ========= ${JSON.stringify(queries)}`);
+
+  const signal = await Fc.getSignature(
+    accessKeyId,
+    accessKeySecret,
+    method,
+    path,
+    buildHeaders,
+    queries
+  );
+
+  return {
+    authoration: signal,
+    // accessKeyId,
+    accountId,
+    endpoint,
+    xFcDate: nowTime,
+    token: securityToken,
+  };
+};
+
+async function httpInvoke(orgName, cloudAlias, resource, payload = {}) {
+  const { uid, region, service: serviceName, function: functionName, urlInternet, authType = '' } = resource;
   if (_.isEmpty(urlInternet)) {
     throw new ValidationError('缺少参数 urlInternet');
   }
@@ -87,43 +135,49 @@ async function httpInvoke(orgName, cloudAlias, resource, parames, payload = {}) 
     throw new ValidationError('AccountId 和 关联云账号对应不上');
   }
 
+  const { qualifier, headers = {}, method = 'GET', path = '', host, asyncMode = false } = payload;
+  const nowTime = new Date().toUTCString();
+
+  const _path = path && path[0] === '/' ? path : `/${path}`;
+  let pathUrl = '';
+  if (host) {
+    pathUrl = `${host}${_path}`
+  } else {
+    pathUrl = `/2016-08-15/proxy/${serviceName}.${qualifier ? qualifier : 'LATEST'}/${functionName}${_path}`
+  }
+
+  const signaHeaders = {
+    ...headers,
+    date: nowTime,
+    host: host ? host.replace(/https?:\/\//, '') : `${uid}.${region}.fc.aliyuncs.com`,
+    "x-fc-date": nowTime,
+    "x-fc-account-id": uid,
+    "X-Fc-Invocation-Code-Version": "Latest",
+    "X-Fc-Log-Type": asyncMode ? 'None' : 'Tail',
+  }
+
+  if (asyncMode) {
+    signaHeaders['X-Fc-Invocation-Type'] = 'Async';
+  }
+
+  let queries = {};
+
+  if (_.includes(path, '?')) {
+    const queriesStr = path.substring(path.indexOf('?'), path.length)
+    queries = qs.parse(queriesStr, { ignoreQueryPrefix: true })
+  }
+
   const fcClient = Client.generateFc(region, AccountID, AccessKeyID, AccessKeySecret);
-
-  let customPath = _.get(payload, 'path', '/');
-  if (!_.startsWith(customPath, '/')) {
-    customPath = `/${customPath}`
-  }
-  _.unset(payload, 'path'); 
-
-  const headers = Object.assign(fcClient.buildHeaders(), fcClient.headers, _.get(payload, 'headers', {}));
-  const statefulAsyncInvocationId = _.get(parames, 'statefulAsyncInvocationId', '');
-  if (!_.get(headers, 'X-Fc-Stateful-Async-Invocation-Id')) {
-    _.set(headers, 'X-Fc-Stateful-Async-Invocation-Id', statefulAsyncInvocationId);
-  }
-  _.set(headers, 'X-Fc-Invocation-Type', _.get(parames, 'invocationType', 'sync'));
-  _.unset(headers, 'host'); // 携带 host 会导致请求失败
-
-  const isAsync = _.get(payload, 'headers[X-Fc-Invocation-Type]', '').toLocaleLowerCase() === 'async';
-  _.set(payload, 'headers[X-Fc-Log-Type]', isAsync ? 'None' : 'Tail');
-
-  if (_.get(httpTrigger, '0.triggerConfig.authType')?.toLocaleLowerCase() !== 'anonymous') {
-    debug('invoke http function');
-    headers['authorization'] = Fc.getSignature(AccessKeyID, AccessKeySecret, method, customPath, headers, {});
-  }
-  
-  const axiosPayload = {
-    ..._.mergeWith(jsonEvent, { headers }),
-    url: `${urlInternet}${customPath}`,
-    method,
+  const fcContext = {
+    accessKeyId: AccessKeyID,
+    accessKeySecret: AccessKeySecret,
+    accountId: uid,
+    regionId: region,
   };
-  debug(` ${JSON.stringify(axiosPayload)}`);
-  const result = await axios(axiosPayload);
-  console.log(result);
-
-  return result;
+  return getSignature(fcClient, fcContext, method, pathUrl, signaHeaders, nowTime, queries);
 }
 
-async function eventInvoke(orgName, cloudAlias, resource, event) {
+async function eventInvoke(orgName, cloudAlias, resource, payload = {}) {
   const { uid, region, service: serviceName, function: functionName } = resource;
   const { AccountID, AccessKeyID, AccessKeySecret } = await getCloudSecret(orgName, cloudAlias);
   if (uid !== AccountID) {
@@ -133,22 +187,28 @@ async function eventInvoke(orgName, cloudAlias, resource, event) {
 
   const fcClient = Client.generateFc(region, AccountID, AccessKeyID, AccessKeySecret);
 
-  let rs;
-  try {
-    rs = await fcClient.invokeFunction(
-      serviceName,
-      functionName,
-      event,
-      {
-        'X-Fc-Log-Type': 'Tail',
-        'X-Fc-Invocation-Code-Version': 'Latest',
-      },
-    )
-  } catch (ex) {
-    debug(`调用失败：${ex}`);
-    rs = { error: ex };
-  }
-  return rs;
+  const { qualifier } = payload;
+  const path = `/2016-08-15/services/${serviceName}.${qualifier ? qualifier : "LATEST"
+    }/functions/${functionName}/invocations`;
+  const nowTime = new Date().toUTCString();
+
+  const headers = {
+    date: nowTime,
+    host: `${uid}.${region}.fc.aliyuncs.com`,
+    "x-fc-date": nowTime,
+    "x-fc-account-id": uid,
+    "X-Fc-Invocation-Code-Version": "Latest",
+    "X-Fc-Log-Type": "Tail",
+    "content-type": "application/octet-stream",
+  };
+
+  const fcContext = {
+    accessKeyId: AccessKeyID,
+    accessKeySecret: AccessKeySecret,
+    accountId: uid,
+    regionId: region,
+  };
+  return getSignature(fcClient, fcContext, "POST", path, headers, nowTime, null);
 }
 
 module.exports = { detail, eventInvoke, httpInvoke };

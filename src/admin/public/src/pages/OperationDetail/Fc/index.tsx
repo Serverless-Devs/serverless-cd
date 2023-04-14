@@ -32,6 +32,7 @@ const Fc: FC<IProps> = ({ resource, cloudAlias }) => {
   const result = get(detailRequest, 'data.data', []);
 
   const onHttpInvoke = async (id, item) => {
+    // data[id]: { qualifier, headers, method, path, host, asyncMode = false }
     await httpInvokeRequest.request({ cloudAlias, resource: item, payload: data[id] });
     setShowData('http');
   }
@@ -80,9 +81,9 @@ const Fc: FC<IProps> = ({ resource, cloudAlias }) => {
         );
       })}
 
-      <div style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}>
+      <div key={showType} style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}>
         调用结果:
-        {JSON.stringify(get(showType === 'event' ? eventInvokeRequest : '', 'data.data', {}), null, 2)}
+        {JSON.stringify(get(showType === 'event' ? eventInvokeRequest : httpInvokeRequest, 'data', {}), null, 2)}
       </div>
     </>
   )
