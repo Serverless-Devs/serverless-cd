@@ -47,6 +47,6 @@ defaultRoutes.forEach((route) => {
 router.all('*', (req, res) => {
   debug(`不支持此接口 /api${req.path}`);
   throw new Error(`不支持此接口 /api${req.path}`);
-})
+});
 
 module.exports = router;

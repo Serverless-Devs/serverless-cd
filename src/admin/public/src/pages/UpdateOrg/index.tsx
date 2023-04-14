@@ -21,7 +21,7 @@ const UpdateOrg: FC<Props> = ({ match }) => {
   const field = Field.useField({
     values: find(listOrgs, (item: any) => item.name === orgName),
   });
-  
+
   const { init, validate } = field;
 
   const onSubmit = async () => {
@@ -39,26 +39,29 @@ const UpdateOrg: FC<Props> = ({ match }) => {
         const userInfo = get(userState, 'userInfo', {});
         const newListOrgs = map(listOrgs, (item: any) => {
           if (item.name === orgName) {
-            return { ...item, ...params }
+            return { ...item, ...params };
           }
           return item;
-        })
-        userDispatchers.update({ userInfo: { ...userInfo, listOrgs: { ...userInfo['listOrgs'], result: newListOrgs } } })
+        });
+        userDispatchers.update({
+          userInfo: { ...userInfo, listOrgs: { ...userInfo['listOrgs'], result: newListOrgs } },
+        });
         history?.push(`/${orgName}/setting/org?orgRefresh=${Date.now()}`);
       }
     });
   };
   return (
     <Form field={field} {...FORM_ITEM_LAYOUT} className="page-content">
-       <FormItem label="团队地址" required>
-        <Input disabled
+      <FormItem label="团队地址" required>
+        <Input
+          disabled
           {...init('host', {
             initValue: window.location.origin,
-          })
-          }
+          })}
           style={{ width: '30%' }}
         />
-        <Input readOnly
+        <Input
+          readOnly
           {...init('name', {
             rules: [
               {
@@ -71,14 +74,16 @@ const UpdateOrg: FC<Props> = ({ match }) => {
         />
       </FormItem>
       <FormItem label="团队名称" required>
-        <Input {...init('alias', {
-          rules: [
-            {
-              required: true,
-              message: '请输入团队名称',
-            },
-          ],
-        })} />
+        <Input
+          {...init('alias', {
+            rules: [
+              {
+                required: true,
+                message: '请输入团队名称',
+              },
+            ],
+          })}
+        />
       </FormItem>
       <FormItem label="Logo">
         <Input {...init('logo')} />

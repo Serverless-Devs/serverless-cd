@@ -15,7 +15,14 @@ const ignoreRunFunctionError = async (fn, ...args) => {
   } catch (ex) {}
 };
 
-async function add({ repo_owner, repo, token: access_token, webHookSecret: secret, appId, provider }) {
+async function add({
+  repo_owner,
+  repo,
+  token: access_token,
+  webHookSecret: secret,
+  appId,
+  provider,
+}) {
   const providerClient = git(provider, { access_token });
   const webhooks = await providerClient.listWebhook({ owner: repo_owner, repo });
   const url = Webhook.getUrl(appId);
@@ -34,7 +41,13 @@ async function add({ repo_owner, repo, token: access_token, webHookSecret: secre
       return;
     }
   }
-  return await providerClient.createWebhook({ owner: repo_owner, repo, url, secret, events: WEBHOOK_EVENTS });
+  return await providerClient.createWebhook({
+    owner: repo_owner,
+    repo,
+    url,
+    secret,
+    events: WEBHOOK_EVENTS,
+  });
 }
 
 async function remove({ repo_owner, repo_name: repo, token: access_token, appId, provider }) {

@@ -27,22 +27,24 @@ const Settings: FC<Props> = (props) => {
       history?.push('/login');
     };
 
-    const LogOutIcon = (props) => (
-      <Icon component={CUSTOMICON['LOGOUT']} {...props} />
-    );
+    const LogOutIcon = (props) => <Icon component={CUSTOMICON['LOGOUT']} {...props} />;
     const MENUICON = {
       USERNAME: <UserOutlined style={{ marginRight: '6px' }} />,
       PERSONALSET: <FormOutlined style={{ marginRight: '6px' }} />,
       TEAMMANAGEMENT: <TeamOutlined style={{ marginRight: '6px' }} />,
       LOGOUT: <LogOutIcon style={{ marginRight: '6px' }} />,
-    }
+    };
 
     return (
       <Menu className="top-bar-menu__wrapper">
         <Menu.Item className="border-bottom">
-          {MENUICON.USERNAME}<span onClick={stopPropagation}>{username}</span>
+          {MENUICON.USERNAME}
+          <span onClick={stopPropagation}>{username}</span>
         </Menu.Item>
-        <Menu.Item className="border-bottom" onClick={() => history?.push(`/${orgName}/profile/organizations`)}>
+        <Menu.Item
+          className="border-bottom"
+          onClick={() => history?.push(`/${orgName}/profile/organizations`)}
+        >
           {MENUICON.PERSONALSET}个人设置
         </Menu.Item>
         {isAdmin(orgName) && (
@@ -50,9 +52,7 @@ const Settings: FC<Props> = (props) => {
             {MENUICON.TEAMMANAGEMENT}团队管理
           </Menu.Item>
         )}
-        <Menu.Item onClick={onLogout}>
-           {MENUICON.LOGOUT}退出登录
-        </Menu.Item>
+        <Menu.Item onClick={onLogout}>{MENUICON.LOGOUT}退出登录</Menu.Item>
       </Menu>
     );
   };

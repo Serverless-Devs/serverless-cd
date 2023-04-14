@@ -79,10 +79,11 @@ const BasicInfoDetail = (props: Props) => {
               text: '关联云账号',
               value: cloudAlias,
             },
-            repo_url && !commit && {
-              text: '仓库地址',
-              value: <CodeSource provider={provider} repo_url={repo_url} repo_name={repo_name} />,
-            },
+            repo_url &&
+              !commit && {
+                text: '仓库地址',
+                value: <CodeSource provider={provider} repo_url={repo_url} repo_name={repo_name} />,
+              },
             commit && {
               text: 'Commit',
               value: (

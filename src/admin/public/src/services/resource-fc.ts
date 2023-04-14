@@ -43,12 +43,18 @@ const invoke = async (signData, method, body, headers = {}, asyncMode = false) =
 
 export const eventInvoke = async ({ cloudAlias, resource, payload = '' }) => {
   const { data } = await request.post('/api/resource/fc/eventInvoke', { cloudAlias, resource });
-  return await invoke(data, 'POST', Buffer.from(payload, 'utf8'), { 'content-type': 'application/octet-stream', });
+  return await invoke(data, 'POST', Buffer.from(payload, 'utf8'), {
+    'content-type': 'application/octet-stream',
+  });
 };
 
 export const httpInvoke = async ({ cloudAlias, resource, payload }) => {
   const { asyncMode, headers = {}, method = 'GET', body } = payload || {};
   unset(payload, 'body');
-  const { data } = await request.post('/api/resource/fc/httpInvoke', { cloudAlias, resource, payload });
+  const { data } = await request.post('/api/resource/fc/httpInvoke', {
+    cloudAlias,
+    resource,
+    payload,
+  });
   return await invoke(data, method, body, headers, asyncMode);
 };

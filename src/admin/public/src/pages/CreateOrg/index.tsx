@@ -33,7 +33,7 @@ const CreateOrg: FC<Props> = (props) => {
         Toast.success('创建团队成功');
         setVisible(false);
         callback();
-        history?.push(`/${orgName}/profile/organizations?orgRefresh=${new Date().getTime()}`)
+        history?.push(`/${orgName}/profile/organizations?orgRefresh=${new Date().getTime()}`);
       }
     });
   };

@@ -17,7 +17,11 @@ const Home: FC<Props> = (props) => {
   return (
     <Tooltip
       trigger={
-        <Icon type="home" className="mr-16 cursor-pointer" onClick={() => history?.push(`/${orgName}/application`)} />
+        <Icon
+          type="home"
+          className="mr-16 cursor-pointer"
+          onClick={() => history?.push(`/${orgName}/application`)}
+        />
       }
       triggerType="hover"
     >

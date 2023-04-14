@@ -1,15 +1,19 @@
-import Icon, { TeamOutlined, ProfileOutlined, KeyOutlined, ClusterOutlined, ControlOutlined, AppstoreOutlined, CloudOutlined } from '@ant-design/icons';
+import Icon, {
+  TeamOutlined,
+  ProfileOutlined,
+  KeyOutlined,
+  ClusterOutlined,
+  ControlOutlined,
+  AppstoreOutlined,
+  CloudOutlined,
+} from '@ant-design/icons';
 import React from 'react';
 import { CUSTOMICON } from '@/constants';
 import { split, size } from 'lodash';
 
-const TEAMSETICON = (props) => (
-  <Icon component={CUSTOMICON.TEAMSET} {...props} />
-);
+const TEAMSETICON = (props) => <Icon component={CUSTOMICON.TEAMSET} {...props} />;
 
-const BINDICON = (props) => (
-  <Icon component={CUSTOMICON.BIND} {...props} />
-);
+const BINDICON = (props) => <Icon component={CUSTOMICON.BIND} {...props} />;
 
 export const getMenuPath = ({ orgName }) => {
   return {
@@ -91,13 +95,13 @@ export const getUserSettingMenuConfig = ({ orgName }) => {
 
 // 环境侧边栏
 export const getEnvironmentMenuPath = ({ orgName, pathname }) => {
-  if (!orgName) return
+  if (!orgName) return;
   const pathNames = split(pathname, '/');
-  if (size(pathNames) !== 6) return
+  if (size(pathNames) !== 6) return;
   return {
     overview: `/${orgName}/application/${pathNames[3]}/${pathNames[4]}/overview`,
     cicd: `/${orgName}/application/${pathNames[3]}/${pathNames[4]}/cicd`,
-    operation: `/${orgName}/application/${pathNames[3]}/${pathNames[4]}/operation`
+    operation: `/${orgName}/application/${pathNames[3]}/${pathNames[4]}/operation`,
   };
 };
 
@@ -120,12 +124,11 @@ export const getEnvironmentMenuConfig = ({ orgName, pathname }) => {
         name: '运维管理',
         path: menuPath.operation,
         icon: <ControlOutlined className="mr-6" />,
-      }
+      },
     ];
   }
   return data;
 };
-
 
 // 使用loginLayout 布局路径
 
@@ -134,4 +137,4 @@ export const loginLayoutPathName = [
   '/signUp',
   '/login',
   // '/noAuth'
-]
+];

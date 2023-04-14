@@ -10,7 +10,6 @@ import Trigger, { valuesFormat } from '@serverless-cd/trigger-ui';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import SlidePanel from '@alicloud/console-components-slide-panel';
 
-
 const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, envName }) => {
   const { request, loading } = useRequest(updateApp);
   const branchReq = useRequest(githubBranches);

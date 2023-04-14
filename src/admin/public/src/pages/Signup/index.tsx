@@ -26,7 +26,13 @@ const Login = ({ location: { search } }) => {
   );
   return (
     <div className="session-container">
-      <AccountSingUp title={title} request={signUp} github_unionid={github_unionid} gitee_unionid={gitee_unionid} search={search} />
+      <AccountSingUp
+        title={title}
+        request={signUp}
+        github_unionid={github_unionid}
+        gitee_unionid={gitee_unionid}
+        search={search}
+      />
     </div>
   );
 };

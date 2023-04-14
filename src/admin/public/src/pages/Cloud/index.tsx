@@ -23,17 +23,12 @@ const Cloud: FC<{}> = (props) => {
     unset(data, 'alias');
     await updateCloudSecret({ [alias]: data });
     await orgRequestDetail.refresh();
-  }
+  };
 
   return (
     <PageInfo
       extra={
-        <CredentialUi
-          title="添加账号"
-          showAccountID
-          existAlias={existAlias}
-          onConfirm={onConfirm}
-        >
+        <CredentialUi title="添加账号" showAccountID existAlias={existAlias} onConfirm={onConfirm}>
           <Button type="primary">添加账号</Button>
         </CredentialUi>
       }
@@ -46,6 +41,6 @@ const Cloud: FC<{}> = (props) => {
       />
     </PageInfo>
   );
-}
+};
 
 export default Cloud;

@@ -48,29 +48,20 @@ router.post('/updateAuth', auth(ADMIN_ROLE_KEYS), async (req, res) => {
 
 // 编辑信息
 router.post('/update', auth(ADMIN_ROLE_KEYS), async (req, res) => {
-  const {
-    orgName,
-    body,
-  } = req;
+  const { orgName, body } = req;
   delete body.orgName;
   await orgService.updateOwnerByName(orgName, body);
   res.json(Result.ofSuccess());
 });
 
 router.post('/updateCloudSecret', auth(ADMIN_ROLE_KEYS), async (req, res) => {
-  const {
-    orgName,
-    body,
-  } = req;
+  const { orgName, body } = req;
   await orgService.updateCloudSecret(orgName, { cloudSecret: body });
   res.json(Result.ofSuccess());
 });
 
 router.post('/removeCloudSecret', auth(ADMIN_ROLE_KEYS), async (req, res) => {
-  const {
-    orgName,
-    body,
-  } = req;
+  const { orgName, body } = req;
   await orgService.updateCloudSecret(orgName, { deleteKey: body.deleteKey });
   res.json(Result.ofSuccess());
 });

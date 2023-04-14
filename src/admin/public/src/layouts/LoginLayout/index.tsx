@@ -70,16 +70,14 @@ export function LoginLayout({ children, match: { path } }: IBasicLayoutProps) {
         fixedHeader={false}
         className="layout-content-bg"
       >
-        {
-          path !== '/noAuth' && (
-            <Shell.Branding>
-              <Logo
+        {path !== '/noAuth' && (
+          <Shell.Branding>
+            <Logo
               image={LOGO_URL}
               // text="Serverless CD"
-              />
-            </Shell.Branding>
-          )
-        }
+            />
+          </Shell.Branding>
+        )}
         <Shell.Content>
           {children}
           <ToastContainer />

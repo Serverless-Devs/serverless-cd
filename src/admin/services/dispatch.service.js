@@ -41,7 +41,11 @@ async function invokeFunction(trigger_payload) {
   );
 }
 
-async function redeploy(dispatchOrgId, orgName, { useDebug, taskId, appId, triggerType = REDEPLOY } = {}) {
+async function redeploy(
+  dispatchOrgId,
+  orgName,
+  { useDebug, taskId, appId, triggerType = REDEPLOY } = {},
+) {
   if (_.isEmpty(taskId)) {
     throw new ValidationError('taskId 必填');
   }
@@ -167,7 +171,8 @@ async function manualTask(dispatchOrgId, orgName, body = {}) {
     throw new ValidationError('没有查到应用信息');
   }
 
-  const { repo_owner, provider, repo_name, repo_url, environment, owner_org_id } = applicationResult;
+  const { repo_owner, provider, repo_name, repo_url, environment, owner_org_id } =
+    applicationResult;
 
   debug('find provider access token');
   const providerToken = await orgService.getProviderToken(orgName, provider);
