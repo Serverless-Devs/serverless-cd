@@ -14,6 +14,7 @@ interface IProps {
   createType?: `${CREATE_TYPE}`;
   orgName: string;
   setTemplateCreateStatus?: Function;
+  templateName?: string;
 }
 declare type status = 'wait' | 'finish';
 declare type Request = {
@@ -34,7 +35,7 @@ declare type Repo = {
 };
 
 const TemplateDialog = (props: IProps) => {
-  const { value, createType, orgName, setTemplateCreateStatus = noop } = props;
+  const { value, createType, orgName, setTemplateCreateStatus = noop, templateName } = props;
   const [retryType, setRetryType] = useState('current');
   const repoName = get(value, 'repoName');
   const provider = 'github';
@@ -188,7 +189,7 @@ const TemplateDialog = (props: IProps) => {
           errorMsg: '创建应用失败',
           run: async () => {
             // 创建应用
-            const res = await doCreateApp({ ...value, repo }, createType);
+            const res = await doCreateApp({ ...value, repo, template: templateName }, createType);
             if (!res.success) {
               throw new Error(res.message);
             } else {

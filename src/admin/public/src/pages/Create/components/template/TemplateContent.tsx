@@ -51,7 +51,7 @@ const TemplateContent = (props: IProps) => {
         />
         模版列表
       </h1>
-      <Github field={field} createType="template" orgName={orgName} />
+      <Github field={field} createType="template" templateName={template} orgName={orgName} />
     </>
   );
 };

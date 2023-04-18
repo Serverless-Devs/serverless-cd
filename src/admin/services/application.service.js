@@ -61,6 +61,7 @@ async function create(orgId, orgName, body) {
     provider,
     environment,
     name,
+    template,
   } = body;
   const appId = unionId();
   const webHookSecret = unionId();
@@ -86,6 +87,7 @@ async function create(orgId, orgName, body) {
     repo_owner,
     provider,
     environment,
+    template,
     repo_id: providerRepoId,
     repo_name: repo,
     repo_url,
@@ -213,7 +215,7 @@ async function update(appId, params) {
   await appModel.updateAppById(appId, { ...appDetail, ...params });
 }
 
-async function remove(orgName, appId) {
+async function remove(orgName, appId, isDeleteRepo) {
   const appDetail = await getAppById(appId);
 
   if (_.isEmpty(appDetail)) {
@@ -230,10 +232,16 @@ async function remove(orgName, appId) {
   debug('Start remove app');
   await appModel.deleteAppById(appId);
   debug('Removed app successfully');
-
-  debug(`Removed webhook:\repo_owner: ${repo_owner}, repo_name: ${repo_name}, appId: ${appId}`);
-  await webhookService.remove({ repo_owner, repo_name, token, appId, provider });
-  debug(`Removed webhook successfully`);
+  debug(`isDeleteRepo: ${isDeleteRepo}`);
+  if (isDeleteRepo) {
+    debug(`Start remove ${provider} repo_name: ${repo_name}`);
+    await gitService.removeRepo({ repo_owner, repo_name, orgName, provider });
+    debug(`Removed ${provider} repo_name: ${repo_name} successfully`);
+  } else {
+    debug(`Removed webhook:\repo_owner: ${repo_owner}, repo_name: ${repo_name}, appId: ${appId}`);
+    await webhookService.remove({ repo_owner, repo_name, token, appId, provider });
+    debug(`Removed webhook successfully`);
+  }
 }
 
 async function transfer(appId, transferOrgName) {

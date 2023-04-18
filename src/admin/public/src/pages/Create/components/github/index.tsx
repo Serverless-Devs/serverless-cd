@@ -28,10 +28,11 @@ interface IProps {
   field: Field;
   createType?: string;
   orgName: string;
+  templateName?: string;
 }
 
 const Github = (props: IProps) => {
-  const { field, createType, orgName } = props;
+  const { field, createType, orgName, templateName } = props;
   const { init, getValue, resetToDefault, validate } = field;
   const [dialogVisible, setVisible] = useState(false);
   const [templateCreateStatus, setTemplateCreateStatus] = useState('');
@@ -211,6 +212,7 @@ const Github = (props: IProps) => {
         <TemplateDialog
           value={field.getValues()}
           setTemplateCreateStatus={setTemplateCreateStatus}
+          templateName={templateName}
           createType={createType as any}
           orgName={orgName}
         ></TemplateDialog>
