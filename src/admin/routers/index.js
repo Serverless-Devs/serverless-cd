@@ -34,10 +34,19 @@ const defaultRoutes = [
     path: '/common',
     route: require('./common'),
   },
+  {
+    path: '/resource/fc',
+    route: require('./resource/fc'),
+  },
 ];
 
 defaultRoutes.forEach((route) => {
   router.use(route.path, route.route);
+});
+
+router.all('*', (req, res) => {
+  debug(`不支持此接口 /api${req.path}`);
+  throw new Error(`不支持此接口 /api${req.path}`);
 });
 
 module.exports = router;

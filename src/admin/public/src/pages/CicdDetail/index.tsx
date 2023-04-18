@@ -13,6 +13,7 @@ import CreateEnv from '../EnvDetail/components/CreateEnv';
 import { Toast } from '@/components/ToastContainer';
 import BasicInfo from '@/components/BasicInfo';
 import { strictValuesParse } from '@serverless-cd/trigger-ui';
+import { filterTriggerInfo } from '@/utils/trigger';
 
 const { Tooltip } = Balloon;
 
@@ -36,9 +37,9 @@ const Details = ({
   const taskId = get(detailInfo, `data.environment.${envName}.latest_task.taskId`, '');
   const secrets = get(detailInfo, `data.environment.${envName}.secrets`, {});
   const appName = get(detailInfo, 'data.name') || get(detailInfo, 'data.repo_name', '');
-  const triggetInfo = strictValuesParse(get(trigger_spec, provider, {}));
-  const triggerType = triggetInfo['triggerType'];
-  const triggerRef = triggerType === 'pull_request' ? get(triggetInfo, `${triggerType}Target`) : get(triggetInfo, `${triggerType}Value`);
+  const triggerInfo = strictValuesParse(filterTriggerInfo(get(trigger_spec, provider, {})));
+  const triggerType = triggerInfo['triggerType'];
+  const triggerRef = triggerType === 'pull_request' ? get(triggerInfo, `${triggerType}Target`) : get(triggerInfo, `${triggerType}Value`);
   const repoOwner = get(data, 'repo_owner', '');
   const repoName = get(data, 'repo_name', '');
 
@@ -107,6 +108,7 @@ const Details = ({
     forceUpdate(Date.now());
   };
 
+
   return (
     <PageLayout
       title="环境切换"
@@ -172,15 +174,27 @@ const Details = ({
           items={[
             {
               text: '触发类型',
-              value: triggerType
+              value: triggerType,
             },
             {
               text: '触发分支',
-              value: <ShowBranch threshold={50} url={`https://${provider}.com/${repoOwner}/${repoName}/tree/${triggerRef}`} label={triggerRef} />,
+              value: (
+                <>
+                  {triggerRef ? (
+                    <ShowBranch
+                      threshold={50}
+                      url={`https://${provider}.com/${repoOwner}/${repoName}/tree/${triggerRef}`}
+                      label={triggerRef}
+                    />
+                  ) : (
+                    '-'
+                  )}
+                </>
+              ),
             },
             {
               text: '目标分支',
-              value: get(triggetInfo, `pull_requestSource`, '-'),
+              value: get(triggerInfo, `pull_requestSource`, '-'),
               hidden: triggerType !== 'pull_request'
             },
             {

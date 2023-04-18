@@ -1,20 +1,18 @@
 require('dotenv').config({
-  path: require('path').join(__dirname, '.env')
+  path: require('path').join(__dirname, '.env'),
 });
-const request = require("supertest");
+const request = require('supertest');
 const _ = require('lodash');
 const setCookie = require('set-cookie-parser');
 
 const url = 'http://0.0.0.0:9000';
 const user = {
   loginname: 'wss',
-  password: 'q`1234'
+  password: 'q`1234',
 };
 
 const login = async () => {
-  const res = await request(url).post("/api/auth/login")
-  .send(user)
-  .expect(200);
+  const res = await request(url).post('/api/auth/login').send(user).expect(200);
 
   const cookies = setCookie.parse(res);
   const { value: jwt } = _.find(cookies, ['name', 'jwt']);
@@ -24,11 +22,11 @@ const login = async () => {
   return {
     jwt,
     ...data,
-  }
+  };
 };
 
 module.exports = {
   url,
   user,
   login,
-}
+};

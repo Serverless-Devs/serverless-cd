@@ -25,7 +25,7 @@ const DB_TYPE = {
     fs.ensureDirSync(path.dirname(filePath));
     try {
       await fs.remove(filePath);
-    } catch (ex) { }
+    } catch (ex) {}
     try {
       await fs.copy(path.join(__dirname, '..', 'prisma', 'dev.db'), filePath);
     } catch (ex) {
@@ -46,7 +46,7 @@ const DB_TYPE = {
   mongodb: async () => {
     // 思路：链接远程数据库，然后使用 db 语法创建命名空间
     console.debug('TODO handler mongodb start');
-  }
+  },
 };
 
 module.exports = async function () {

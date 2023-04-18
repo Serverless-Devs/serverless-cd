@@ -55,16 +55,15 @@ async function tracker(orgName, payload = {}) {
   // 修改 app 表
   const targetFcResource = _.get(environment, `${envName}.resource.fc`, {});
   // 将fc相关数据写进app表
-  _.set(
-    environment,
-    `${envName}.resource.fc`,
-    mergeFcResources(
-      resource.fc,
-      targetFcResource,
-    )
-  );
+  _.set(environment, `${envName}.resource.fc`, mergeFcResources(resource.fc, targetFcResource));
   // 将上报相关数据写进app表latest_task
-  _.set(environment, `${envName}.latest_task`, { updated_time, taskId, status, trigger_type: triggerType, completed: true });
+  _.set(environment, `${envName}.latest_task`, {
+    updated_time,
+    taskId,
+    status,
+    trigger_type: triggerType,
+    completed: true,
+  });
   await applicationMode.updateAppById(appInfo.id, { environment });
 
   return { taskId };

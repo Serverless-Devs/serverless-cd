@@ -25,7 +25,7 @@ services:
       pre-deploy:
         - run: npm install --registry=https://registry.npmmirror.com
           path: './worker'
-        - run: npx prisma generate --schema=./prisma/mysql.prisma # TODO: 此处的 prisma 需要手动修改，后期可以和 admin 联动之后就可以废弃了
+        - run: npx prisma generate --schema=./prisma/mongodb.prisma # TODO: 此处的 prisma 需要手动修改，后期可以和 admin 联动之后就可以废弃了
           path: './worker'
       post-deploy:
         - component: fc api UpdateFunction --region ${vars.region} --header '{"x-fc-disable-container-reuse":"True"}' --path '{"serviceName":"${vars.service.name}","functionName":"${vars.workerFunctionName}"}'

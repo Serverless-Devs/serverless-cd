@@ -44,6 +44,7 @@ router.get('/log', async function (req, res) {
   }
 
   const logPath = `${LOG_LOCAL_PATH_PREFIX}/${taskId}/step_${stepCount}.log`;
+  debug(`logPath: ${logPath}`);
   const ossClient = Client.oss();
   if (ossClient) {
     try {

@@ -11,9 +11,10 @@ interface IProps {
   disabled: boolean;
   taskId: string;
   refreshCallback?: Function;
+  btnText?: string;
 }
 
-const Rollback: FC<IProps> = ({ disabled, refreshCallback, appId, taskId }) => {
+const Rollback: FC<IProps> = ({ disabled, refreshCallback, appId, taskId, btnText }) => {
   const [useDebug, setDebug] = useState<boolean | undefined>(false);
   const [visible, setVisible] = useState<Boolean>(false);
   const [loading, setLoading] = useState<Boolean>(false);
@@ -37,16 +38,16 @@ const Rollback: FC<IProps> = ({ disabled, refreshCallback, appId, taskId }) => {
 
   return (
     <>
-      <Button
-        disabled={disabled}
-        onClick={() => setVisible(true)}
-        type="primary"
-        text
-      >
-        回滚
+      <Button disabled={disabled} onClick={() => setVisible(true)} type="primary" text>
+        {btnText || '回滚'}
       </Button>
       <Dialog
-        title={<><ExclamationCircleFilled style={{ color: '#ffc440', marginRight: 8 }} />回滚</>}
+        title={
+          <>
+            <ExclamationCircleFilled style={{ color: '#ffc440', marginRight: 8 }} />
+            回滚
+          </>
+        }
         autoFocus
         visible={visible as any}
         onOk={onClose}
@@ -54,12 +55,17 @@ const Rollback: FC<IProps> = ({ disabled, refreshCallback, appId, taskId }) => {
         style={{ width: 600 }}
         className="rollback-dialog"
         footer={
-          <div className='flex-r'>
+          <div className="flex-r">
             <div>
               <Checkbox checked={useDebug} onChange={setDebug} label="开启 Debug 日志" />
             </div>
             <div>
-              <Button type="primary" className='mr-16' onClick={submit} loading={loading as boolean}>
+              <Button
+                type="primary"
+                className="mr-16"
+                onClick={submit}
+                loading={loading as boolean}
+              >
                 确定
               </Button>
               <Button type="normal" onClick={onClose} disabled={loading as boolean}>

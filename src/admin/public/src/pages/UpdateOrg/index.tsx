@@ -1,8 +1,8 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC } from 'react';
 import { useRequest, history } from 'ice';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import { Toast } from '@/components/ToastContainer';
-import { updateOrg } from '@/services/org';
+import { orgUpdate } from '@/services/org';
 import { Form, Field, Input, Button } from '@alicloud/console-components';
 import store from '@/store';
 import { find, get, map } from 'lodash';
@@ -17,11 +17,11 @@ const UpdateOrg: FC<Props> = ({ match }) => {
   const orgName = get(match, 'params.orgName');
   const [userState, userDispatchers] = store.useModel('user');
   const listOrgs = get(userState, 'userInfo.listOrgs.result', []);
-  const { request, loading } = useRequest(updateOrg);
+  const { request, loading } = useRequest(orgUpdate);
   const field = Field.useField({
     values: find(listOrgs, (item: any) => item.name === orgName),
   });
-  
+
   const { init, validate } = field;
 
   const onSubmit = async () => {
@@ -39,26 +39,29 @@ const UpdateOrg: FC<Props> = ({ match }) => {
         const userInfo = get(userState, 'userInfo', {});
         const newListOrgs = map(listOrgs, (item: any) => {
           if (item.name === orgName) {
-            return { ...item, ...params }
+            return { ...item, ...params };
           }
           return item;
-        })
-        userDispatchers.update({ userInfo: { ...userInfo, listOrgs: { ...userInfo['listOrgs'], result: newListOrgs } } })
+        });
+        userDispatchers.update({
+          userInfo: { ...userInfo, listOrgs: { ...userInfo['listOrgs'], result: newListOrgs } },
+        });
         history?.push(`/${orgName}/setting/org?orgRefresh=${Date.now()}`);
       }
     });
   };
   return (
     <Form field={field} {...FORM_ITEM_LAYOUT} className="page-content">
-       <FormItem label="团队地址" required>
-        <Input disabled
+      <FormItem label="团队地址" required>
+        <Input
+          disabled
           {...init('host', {
             initValue: window.location.origin,
-          })
-          }
+          })}
           style={{ width: '30%' }}
         />
-        <Input readOnly
+        <Input
+          readOnly
           {...init('name', {
             rules: [
               {
@@ -71,14 +74,16 @@ const UpdateOrg: FC<Props> = ({ match }) => {
         />
       </FormItem>
       <FormItem label="团队名称" required>
-        <Input {...init('alias', {
-          rules: [
-            {
-              required: true,
-              message: '请输入团队名称',
-            },
-          ],
-        })} />
+        <Input
+          {...init('alias', {
+            rules: [
+              {
+                required: true,
+                message: '请输入团队名称',
+              },
+            ],
+          })}
+        />
       </FormItem>
       <FormItem label="Logo">
         <Input {...init('logo')} />

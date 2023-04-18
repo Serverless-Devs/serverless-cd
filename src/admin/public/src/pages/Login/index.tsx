@@ -24,7 +24,7 @@ const Login = ({ location: { search } }) => {
   );
   return (
     <div className="session-container">
-      <SingIn title={title}  />
+      <SingIn title={title} />
     </div>
   );
 };

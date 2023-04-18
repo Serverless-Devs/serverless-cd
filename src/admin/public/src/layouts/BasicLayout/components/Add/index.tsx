@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { Dropdown, Menu } from '@alicloud/console-components';
 import { history, useRequest } from 'ice';
 import { listUsers } from '@/services/org';
@@ -30,20 +30,14 @@ const Add: FC<Props> = (props) => {
       return history?.push(url);
     };
 
-    const ADDAPPIcon = (props) => (
-      <Icon component={CUSTOMICON['ADDAPP']} {...props} />
-    );
-    const ADDTEAMIcon = (props) => (
-      <Icon component={CUSTOMICON['ADDTEAM']} {...props} />
-    );
-    const ADDMEMBERICON = (props) => (
-      <Icon component={CUSTOMICON['ADDMEMBER']} {...props} />
-    );
+    const ADDAPPIcon = (props) => <Icon component={CUSTOMICON['ADDAPP']} {...props} />;
+    const ADDTEAMIcon = (props) => <Icon component={CUSTOMICON['ADDTEAM']} {...props} />;
+    const ADDMEMBERICON = (props) => <Icon component={CUSTOMICON['ADDMEMBER']} {...props} />;
     const MENUICON = {
       NEWAPP: <ADDAPPIcon style={{ marginRight: '6px' }} />,
       NEWTEAM: <ADDTEAMIcon style={{ marginRight: '6px' }} />,
       NEWMEMBER: <ADDMEMBERICON style={{ marginRight: '6px' }} />,
-    }
+    };
     return (
       <Menu onItemClick={onItemClick} className="top-bar-menu__wrapper">
         <Menu.Item key={`/${orgName}/create`} className="border-bottom">
@@ -58,24 +52,25 @@ const Add: FC<Props> = (props) => {
       </Menu>
     );
   };
-  const ADDICON = (props) => (
-    <Icon component={CUSTOMICON['ADD']} {...props} />
-  )
+  const ADDICON = (props) => <Icon component={CUSTOMICON['ADD']} {...props} />;
 
   const handleCreateOrgCallback = () => {
-     history?.push(`/${orgName}/profile/organizations=${Date.now}`);
+    history?.push(`/${orgName}/profile/organizations=${Date.now}`);
   };
 
   const changeVisible = {
     orgVisible: (bol: boolean) => setOrgVisible(bol),
     memberVisible: (bol: boolean) => setMemberVisible(bol),
-  } 
+  }
 
   return (
     <React.Fragment>
-       <Dropdown
+      <Dropdown
         trigger={
-          <div className="layout-center mr-16 cursor-pointer header-add-icon" style={{ fontSize: '32px' }}>
+          <div
+            className="layout-center mr-16 cursor-pointer header-add-icon"
+            style={{ fontSize: '32px' }}
+          >
             <Icons type="add" className="add-icon" />
             <ADDICON className="add-icon-hover" />
           </div>
@@ -85,8 +80,19 @@ const Add: FC<Props> = (props) => {
       >
         {menu()}
       </Dropdown>
-      <AddMember callback={refresh} existUsers={map(data, (item) => item.username)} active={memberVisible} orgName={orgName} changeVisible={changeVisible.memberVisible} />
-      <CreateOrg callback={handleCreateOrgCallback} active={orgVisible} changeVisible={changeVisible.orgVisible} orgName={orgName} />
+      <AddMember
+        callback={refresh}
+        existUsers={map(data, (item) => item.username)}
+        active={memberVisible}
+        orgName={orgName}
+        changeVisible={changeVisible.memberVisible}
+      />
+      <CreateOrg
+        callback={handleCreateOrgCallback}
+        active={orgVisible}
+        changeVisible={changeVisible.orgVisible}
+        orgName={orgName}
+      />
     </React.Fragment>
   );
 };

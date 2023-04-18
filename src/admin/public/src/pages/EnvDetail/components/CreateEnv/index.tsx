@@ -1,7 +1,7 @@
 import React, { FC, useRef, useEffect } from 'react';
 import { useRequest } from 'ice';
 import SlidePanel from '@alicloud/console-components-slide-panel';
-import { Form, Field, Input } from '@alicloud/console-components';
+import { Form, Field, Input, Select } from '@alicloud/console-components';
 import { FORM_ITEM_LAYOUT } from '@/constants';
 import Trigger, { valuesFormat } from '@serverless-cd/trigger-ui';
 import { updateApp } from '@/services/applist';
@@ -12,6 +12,7 @@ import { TYPE as ENV_TYPE } from '@/components/EnvType';
 import { Toast } from '@/components/ToastContainer';
 import { get, keys, isEmpty, map } from 'lodash';
 import { getConsoleConfig } from '@/utils';
+import { orgDetail } from '@/services/org';
 
 const FormItem = Form.Item;
 
@@ -31,6 +32,12 @@ const CreateEnv: FC<IProps> = (props) => {
   const triggerRef: any = useRef(null);
   const secretsRef: any = useRef(null);
   const CD_PIPELINE_YAML = getConsoleConfig('CD_PIPELINE_YAML', 'serverless-pipeline.yaml');
+  const orgDetailRequest = useRequest(orgDetail);
+  const cloudData = get(orgDetailRequest.data, 'data.cloud_secret', {});
+
+  useEffect(() => {
+    orgDetailRequest.request();
+  }, []);
 
   useEffect(() => {
     if (visible) {
@@ -61,6 +68,7 @@ const CreateEnv: FC<IProps> = (props) => {
           trigger_spec: {
             [provider]: valuesFormat(values['trigger']),
           },
+          cloud_alias: get(values, 'cloud_alias', ''),
           cd_pipeline_yaml: values['cd_pipeline_yaml'],
         },
       };
@@ -132,6 +140,15 @@ const CreateEnv: FC<IProps> = (props) => {
           </FormItem>
           <FormItem label="Secrets">
             <ConfigEdit {...init('secrets')} ref={secretsRef} />
+          </FormItem>
+          <FormItem label="关联云账号">
+            <Select
+              {...(init('cloud_alias') as any)}
+              className="full-width"
+              placeholder="请选择"
+              dataSource={map(keys(cloudData), (item) => ({ label: item, value: item }))}
+            />
+            {/* <ConfigEdit {...init('secrets')} ref={secretsRef} /> */}
           </FormItem>
         </Form>
       </SlidePanel>

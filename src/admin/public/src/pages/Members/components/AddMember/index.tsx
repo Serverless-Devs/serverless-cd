@@ -1,8 +1,7 @@
 import React, { FC, useEffect } from 'react';
 import { useRequest, useLocation, history } from 'ice';
-import SlidePanel from '@alicloud/console-components-slide-panel';
 import { Form, Field, Select, Dialog, Loading } from '@alicloud/console-components';
-import { FORM_ITEM_LAYOUT, ROLE } from '@/constants';
+import { FORM_ITEM_LAYOUT, ROLE, ROLE_LABEL } from '@/constants';
 import { Toast } from '@/components/ToastContainer';
 import { inviteUser, updateAuth } from '@/services/org';
 import { debounce, map, filter, includes } from 'lodash';
@@ -24,7 +23,16 @@ type IProps = {
 
 const AddMember: FC<IProps> = (props) => {
   const { pathname } = useLocation();
-  const { children, callback, type = 'create', dataSource, existUsers, active = false, orgName, changeVisible } = props;
+  const {
+    children,
+    callback,
+    type = 'create',
+    dataSource,
+    existUsers,
+    active = false,
+    orgName,
+    changeVisible,
+  } = props;
   if (getParam('showSlide') === 'true' && type !== 'create') return null;
   const { request, loading } = useRequest(type === 'create' ? inviteUser : updateAuth);
   const [visible, setVisible] = React.useState(false);
@@ -34,14 +42,13 @@ const AddMember: FC<IProps> = (props) => {
       setVisible(active);
     }
   }, [active]);
-  const field = Field.useField({
-    values: dataSource,
-  });
-  const { init, resetToDefault, validate, getValue, setValue } = field;
+
+  const field = Field.useField();
+  const { init, resetToDefault, validate, getValue, setValue, setValues } = field;
   const handleClose = () => {
     resetToDefault();
     setVisible(false);
-    changeVisible(false);
+    changeVisible && changeVisible(false);
     if (getParam('showSlide') === 'true') {
       history?.push(pathname);
     }
@@ -53,8 +60,8 @@ const AddMember: FC<IProps> = (props) => {
       if (success) {
         Toast.success(type === 'create' ? '添加成员成功' : '编辑成员成功');
         active && history?.push(`/${orgName}/setting/members?orgRefresh=${new Date().getTime()}`);
-        handleClose();
         await callback();
+        handleClose();
       }
     });
   };
@@ -68,9 +75,22 @@ const AddMember: FC<IProps> = (props) => {
     );
   };
 
+  const initValue = () => {
+    setValues(dataSource)
+  }
+
   return (
     <>
-      <span onClick={() => setVisible(true)}>{children}</span>
+      <span
+        onClick={
+          () => {
+            initValue();
+            setVisible(true);
+          }
+        }
+      >
+        {children}
+      </span>
       <Dialog
         title={type === 'create' ? '添加成员' : '编辑成员'}
         visible={visible}
@@ -105,16 +125,10 @@ const AddMember: FC<IProps> = (props) => {
             <FormItem label="角色" required>
               <Select
                 className="full-width"
-                dataSource={[
-                  {
-                    label: '管理员',
-                    value: ROLE.ADMIN,
-                  },
-                  {
-                    label: '开发者',
-                    value: ROLE.MEMBER,
-                  },
-                ]}
+                dataSource={Object.values(ROLE).map((value) => ({
+                  value,
+                  label: ROLE_LABEL[value],
+                }))}
                 {...init('role', {
                   rules: [
                     {

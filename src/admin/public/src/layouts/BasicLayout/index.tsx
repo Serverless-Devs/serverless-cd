@@ -10,7 +10,12 @@ import Add from './components/Add';
 import Home from './components/Home';
 import { get, values, includes } from 'lodash';
 import { getOrgName } from '@/utils';
-import { getMenuPath, getUserSettingMenuPath, getEnvironmentMenuPath, loginLayoutPathName } from '@/constants/navConfig';
+import {
+  getMenuPath,
+  getUserSettingMenuPath,
+  getEnvironmentMenuPath,
+  loginLayoutPathName,
+} from '@/constants/navConfig';
 import './index.less';
 
 (function () {
@@ -68,7 +73,6 @@ function BasicLayout({ children, match, location }: IBasicLayoutProps) {
   const userSettingShowMenu = includes(values(getUserSettingMenuPath({ orgName })), pathname);
   const envShowMenu = includes(values(getEnvironmentMenuPath({ orgName, pathname })), pathname);
   const loginLayoutShow = includes(loginLayoutPathName, pathname);
-  console.log(loginLayoutShow, 'loginLayoutShow');
 
   if (typeof window !== 'undefined') {
     window.addEventListener('optimizedResize', (e) => {
@@ -86,17 +90,14 @@ function BasicLayout({ children, match, location }: IBasicLayoutProps) {
         type="light"
         fixedHeader={false}
       >
-        {
-          !loginLayoutShow && <Shell.Branding>
-            <Home orgName={orgName} />
-            <Org orgName={orgName} />
-          </Shell.Branding>
-
-        }
-        {
-          !loginLayoutShow && <Shell.Action>
+        {!loginLayoutShow && (
+          <Shell.Action style={{ width: '100%', justifyContent: 'space-between' }}>
+            <div className="flex-r">
+              <Home orgName={orgName} />
+              <Org orgName={orgName} />
+            </div>
             {match?.path !== '/login' && (
-              <>
+              <div className="flex-r">
                 <Add orgName={orgName} />
                 <Button
                   type="primary"
@@ -109,10 +110,10 @@ function BasicLayout({ children, match, location }: IBasicLayoutProps) {
                   帮助文档
                 </Button>
                 <Settings orgName={orgName} />
-              </>
+              </div>
             )}
           </Shell.Action>
-        }
+        )}
         {showMenu && (
           <Shell.Navigation
             direction={'ver'}
@@ -122,28 +123,24 @@ function BasicLayout({ children, match, location }: IBasicLayoutProps) {
             <PageNav />
           </Shell.Navigation>
         )}
-        {
-          userSettingShowMenu && (
-            <Shell.Navigation
-              direction={'ver'}
-              onCollapseChange={(collapse) => setIsCollapse(collapse)}
-              collapse={isCollapse}
-            >
-              <UserSettingNav />
-            </Shell.Navigation>
-          )
-        }
-        {
-          envShowMenu && (
-            <Shell.Navigation
-              direction={'ver'}
-              onCollapseChange={(collapse) => setIsCollapse(collapse)}
-              collapse={isCollapse}
-            >
-              <EnvNav />
-            </Shell.Navigation>
-          )
-        }
+        {userSettingShowMenu && (
+          <Shell.Navigation
+            direction={'ver'}
+            onCollapseChange={(collapse) => setIsCollapse(collapse)}
+            collapse={isCollapse}
+          >
+            <UserSettingNav />
+          </Shell.Navigation>
+        )}
+        {envShowMenu && (
+          <Shell.Navigation
+            direction={'ver'}
+            onCollapseChange={(collapse) => setIsCollapse(collapse)}
+            collapse={isCollapse}
+          >
+            <EnvNav />
+          </Shell.Navigation>
+        )}
         <Shell.Content>
           {children}
           <ToastContainer />
@@ -153,4 +150,4 @@ function BasicLayout({ children, match, location }: IBasicLayoutProps) {
   );
 }
 
-export default memo(BasicLayout)
+export default memo(BasicLayout);

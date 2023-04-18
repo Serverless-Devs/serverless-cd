@@ -15,6 +15,9 @@ const getOrgInfo = (result) => {
   if (result.third_part) {
     result.third_part = JSON.parse(result.third_part);
   }
+  if (result.cloud_secret) {
+    result.cloud_secret = JSON.parse(result.cloud_secret);
+  }
   return result;
 };
 
@@ -24,6 +27,9 @@ const saveOrg = (data) => {
   }
   if (data.third_part) {
     data.third_part = JSON.stringify(data.third_part);
+  }
+  if (data.cloud_secret) {
+    data.cloud_secret = JSON.stringify(data.cloud_secret);
   }
   _.unset(data, 'id');
   return data;
@@ -53,7 +59,7 @@ module.exports = {
       alias,
       logo,
     };
-    const result = await orgPrisma.create({ data: { id: orgId, ...saveOrg(data), } });
+    const result = await orgPrisma.create({ data: { id: orgId, ...saveOrg(data) } });
     return result;
   },
   async updateOrg(id, data) {

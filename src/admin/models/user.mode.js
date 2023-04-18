@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const { ROLE, TABLE } = require('@serverless-cd/config');
+const { TABLE } = require('@serverless-cd/config');
 const { unionId, md5Encrypt, prisma } = require('../util');
 
 const userPrisma = prisma[TABLE.USER];
@@ -68,8 +68,10 @@ module.exports = {
     if (data.third_part) {
       data.third_part = JSON.stringify(data.third_part);
     }
-    const userIdentify = username ? { username } : { email }
-    const params = github_unionid ? { ...userIdentify, github_unionid } : { ...userIdentify, gitee_unionid }
+    const userIdentify = username ? { username } : { email };
+    const params = github_unionid
+      ? { ...userIdentify, github_unionid }
+      : { ...userIdentify, gitee_unionid };
     const password = new_password ? new_password : data.password;
     const result = await userPrisma.update({
       where: {

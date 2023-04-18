@@ -56,6 +56,7 @@ const AppList = ({
 
   const { data, request, refresh, cancel } = useRequest(listApp, {
     pollingInterval: 5000,
+    pollingWhenHidden: false,
   });
   const [applist, setApplist] = useState<Array<IItem>>([]);
   const [queryKey, setQueryKey] = useState<string>('');
@@ -69,6 +70,7 @@ const AppList = ({
 
   useEffect(() => {
     fetchData();
+    return () => cancel();
   }, []);
 
   useEffect(() => {
@@ -134,14 +136,18 @@ const AppList = ({
     return (
       <>
         <Tooltip
-          trigger={<Link to={`/${orgName}/application/${record.id}/default/overview`}>{value}</Link>}
+          trigger={
+            <Link to={`/${orgName}/application/${record.id}/default/overview`}>{value}</Link>
+          }
           align="t"
         >
           <div className="text-bold">环境名称</div>
           {map(record.environment, (ele, envName) => {
             return (
               <div className="align-center mt-8">
-                <Link to={`/${orgName}/application/${record.id}/${envName}/overview`}>{envName}</Link>
+                <Link to={`/${orgName}/application/${record.id}/${envName}/overview`}>
+                  {envName}
+                </Link>
                 <span className="ml-2 mr-8">:</span>
                 <Status status={get(ele, 'latest_task.status', 'init')} />
               </div>
@@ -149,7 +155,7 @@ const AppList = ({
           })}
         </Tooltip>
         <div className="cursor-pointer pt-8">
-          <Copy content={record.id} >{record.id}</Copy>
+          <Copy content={record.id}>{record.id}</Copy>
         </div>
       </>
     );
@@ -171,7 +177,13 @@ const AppList = ({
       key: 'provider',
       title: '代码源',
       dataIndex: 'provider',
-      cell: (value, _index, record) => <CodeSource provider={value} repo_url={record.repo_url} repo_name={record.repo_name || record.name} />,
+      cell: (value, _index, record) => (
+        <CodeSource
+          provider={value}
+          repo_url={record.repo_url}
+          repo_name={record.repo_name || record.name}
+        />
+      ),
     },
     {
       key: 'description',

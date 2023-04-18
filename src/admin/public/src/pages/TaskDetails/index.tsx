@@ -24,7 +24,7 @@ const PanelTitle = ({ step, isRequest }) => {
 
   const icon = useMemo(() => {
     if (status === DEPLOY.SKIP) {
-      return <MinusCircleOutlined className={`mr-4`} />
+      return <MinusCircleOutlined className={`mr-4`} />;
     }
     return <Icon type={type} className={`${iconColor}`} size="small" />;
   }, []);
@@ -91,13 +91,19 @@ const Details = ({
     if (panelItem && !panelItem.rawLog) {
       panelItem.loading = true;
       setTaskSteps([...taskSteps]);
-      getTaskLog({ taskId, stepCount: panelItem.stepCount }).then((item) => {
-        panelItem.rawLog = formatLogs(item);
-        panelItem.loading = false;
-        panelItem.initialize = false;
-        setTaskSteps([...taskSteps]);
-        changeExpandedKeys(panelItemIndex);
-      });
+      getTaskLog({ taskId, stepCount: panelItem.stepCount })
+        .then((item) => {
+          panelItem.rawLog = formatLogs(item);
+          panelItem.loading = false;
+          panelItem.initialize = false;
+          setTaskSteps([...taskSteps]);
+          changeExpandedKeys(panelItemIndex);
+        })
+        .catch(() => {
+          panelItem.loading = false;
+          panelItem.initialize = false;
+          setTaskSteps([...taskSteps]);
+        });
     } else {
       changeExpandedKeys(panelItemIndex);
     }
@@ -145,7 +151,7 @@ const Details = ({
         },
         {
           name: `${appId}(${envName})`,
-          path: `/${orgName}/application/${appId}/${envName}`,
+          path: `/${orgName}/application/${appId}/${envName}/overview`,
         },
         {
           name: taskId,
@@ -167,8 +173,8 @@ const Details = ({
               return (
                 <Panel
                   className={`task-details-panel ${isDisabled || isSkipped || isRunning || isRequest
-                    ? 'task-details-panel-loading'
-                    : ''
+                      ? 'task-details-panel-loading'
+                      : ''
                     }`}
                   key={i}
                   title={<PanelTitle step={step} isRequest={isRequest} />}

@@ -3,7 +3,7 @@ import CreateTemplateDialog from '@serverless-cd/creating-ui';
 import { createByTemplate, templatePreview } from '@/services/applist';
 import { doManualDeployApp, doCreateApp } from '@/services/common';
 import { getParams } from '@/utils';
-import { get } from 'lodash';
+import { get, noop } from 'lodash';
 import { Toast } from '@/components/ToastContainer';
 import { CREATE_TYPE, SERVERLESS_PIPELINE_CONTENT_TEMPLATE } from './constant';
 import { history } from 'ice';
@@ -13,6 +13,7 @@ interface IProps {
   value: any;
   createType?: `${CREATE_TYPE}`;
   orgName: string;
+  setTemplateCreateStatus?: Function;
 }
 declare type status = 'wait' | 'finish';
 declare type Request = {
@@ -33,7 +34,7 @@ declare type Repo = {
 };
 
 const TemplateDialog = (props: IProps) => {
-  const { value, createType, orgName } = props;
+  const { value, createType, orgName, setTemplateCreateStatus = noop } = props;
   const [retryType, setRetryType] = useState('current');
   const repoName = get(value, 'repoName');
   const provider = 'github';
@@ -220,7 +221,7 @@ const TemplateDialog = (props: IProps) => {
         return await new Promise((resolve, reject) => {
           const { id } = params.content.createApp.result;
           setTimeout(() => {
-            history?.push(`/${orgName}/application/${id}/default`);
+            history?.push(`/${orgName}/application/${id}/default/overview`);
             resolve();
           }, 3000);
         });
@@ -229,7 +230,12 @@ const TemplateDialog = (props: IProps) => {
   ];
 
   return (
-    <CreateTemplateDialog dataSource={dataSource} retryType={retryType}></CreateTemplateDialog>
+    <CreateTemplateDialog
+      dataSource={dataSource}
+      retryType={retryType}
+      onError={() => setTemplateCreateStatus('error')}
+      onRetry={() => setTemplateCreateStatus('')}
+    ></CreateTemplateDialog>
   );
 };
 

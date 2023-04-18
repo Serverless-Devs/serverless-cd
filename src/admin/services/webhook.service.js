@@ -15,7 +15,14 @@ const ignoreRunFunctionError = async (fn, ...args) => {
   } catch (ex) {}
 };
 
-async function add({ repo_owner, repo, token: access_token, webHookSecret: secret, appId, provider }) {
+async function add({
+  repo_owner,
+  repo,
+  token: access_token,
+  webHookSecret: secret,
+  appId,
+  provider,
+}) {
   const providerClient = git(provider, { access_token });
   const webhooks = await providerClient.listWebhook({ owner: repo_owner, repo });
   const url = Webhook.getUrl(appId);
@@ -34,7 +41,13 @@ async function add({ repo_owner, repo, token: access_token, webHookSecret: secre
       return;
     }
   }
-  return await providerClient.createWebhook({ owner: repo_owner, repo, url, secret, events: WEBHOOK_EVENTS });
+  return await providerClient.createWebhook({
+    owner: repo_owner,
+    repo,
+    url,
+    secret,
+    events: WEBHOOK_EVENTS,
+  });
 }
 
 async function remove({ repo_owner, repo_name: repo, token: access_token, appId, provider }) {
@@ -98,6 +111,10 @@ async function triggered(appId, headers, body) {
       continue;
     }
     debug(`env ${key} validate trigger success`);
+
+    const cloudAlias = _.get(ele, 'cloud_alias', '');
+    const cloud_secret = _.get(orgResult, `cloud_secret.${cloudAlias}`, {});
+
     debug(`triggerConfig:\n${JSON.stringify(triggerConfig)}`);
     const workerPayload = {
       taskId,
@@ -117,6 +134,7 @@ async function triggered(appId, headers, body) {
         secrets,
         repo_owner,
         repo_webhook_secret,
+        cloud_secret,
       },
       envName: key,
       environment,
@@ -130,6 +148,8 @@ async function triggered(appId, headers, body) {
       taskId: workerPayload.taskId,
     };
   }
+
+  throw new ValidationError('没有被触发');
 }
 
 module.exports = {
