@@ -10,6 +10,7 @@ import EnvType from '@/components/EnvType';
 import { C_REPOSITORY } from '@/constants/repository';
 import CodeSource from '@/components/CodeSource';
 import TaskList from '@/components/TaskList';
+import CloudUserPanel from './CloudUserPanel'
 
 interface Props {
   data: object;
@@ -26,6 +27,7 @@ const BasicInfoDetail = (props: Props) => {
   const repo_name = get(data, 'repo_name', '');
   const repo_owner = get(data, 'repo_owner');
   const repo_url = get(data, 'repo_url');
+  const name = get(data, 'name', '-');
   const type = get(envInfo, 'type', '_');
   const created_time = formatTime(get(envInfo, 'created_time'));
   const update_time = formatTime(get(envInfo, 'update_time', created_time));
@@ -44,12 +46,12 @@ const BasicInfoDetail = (props: Props) => {
         items={
           [
             {
-              text: '环境名称',
-              value: envName,
+              text: '应用名称',
+              value: name,
             },
             {
-              text: '环境类型',
-              value: <EnvType type={type} />,
+              text: '环境名称',
+              value: <span className='flex-r flex-start'><span className='mr-8'>{envName}</span><EnvType type={type} /></span>,
             },
             {
               text: '创建时间',
@@ -77,13 +79,17 @@ const BasicInfoDetail = (props: Props) => {
             },
             {
               text: '关联云账号',
-              value: cloudAlias,
+              value: (
+                <div>
+                  {cloudAlias || '--'}
+                  <CloudUserPanel refreshCallback={refreshCallback} detailData={data} envName={envName} link={`/${orgName}/setting/cloud`} currentCloud={cloudAlias} />
+                </div>
+              )
             },
-            repo_url &&
-              !commit && {
-                text: '仓库地址',
-                value: <CodeSource provider={provider} repo_url={repo_url} repo_name={repo_name} />,
-              },
+            repo_url && {
+              text: '仓库地址',
+              value: <CodeSource provider={provider} repo_url={repo_url} repo_name={repo_name} />,
+            },
             commit && {
               text: 'Commit',
               value: (

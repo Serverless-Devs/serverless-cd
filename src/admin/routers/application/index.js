@@ -88,8 +88,8 @@ router.post('/createByTemplate', auth(ADMIN_ROLE_KEYS), async function (req, res
  * 应用删除
  */
 router.delete('/delete', auth(ADMIN_ROLE_KEYS), async function (req, res) {
-  await appService.remove(req.orgName, req.query.appId);
-
+  const isDeleteRepo = _.get(req.query, 'isDeleteRepo', 'false') === 'true';
+  await appService.remove(req.orgName, req.query.appId, isDeleteRepo);
   res.json(Result.ofSuccess({ message: '删除应用成功' }));
 });
 

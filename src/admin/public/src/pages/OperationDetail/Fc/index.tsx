@@ -1,15 +1,16 @@
 import React, { FC, useEffect, useState } from 'react';
-import { useRequest } from 'ice';
+import { useRequest, Link } from 'ice';
 import { detail, eventInvoke, httpInvoke } from '@/services/resource-fc';
-import { Input, Button } from '@alicloud/console-components';
+import { Input, Button, Message } from '@alicloud/console-components';
 import { isEmpty, get } from 'lodash';
 
 interface IProps {
   resource: Record<string, string>[];
   cloudAlias: string;
+  orgName: string;
 }
 
-const Fc: FC<IProps> = ({ resource, cloudAlias }) => {
+const Fc: FC<IProps> = ({ resource, cloudAlias, orgName }) => {
   const detailRequest = useRequest(detail);
   const eventInvokeRequest = useRequest(eventInvoke);
   const httpInvokeRequest = useRequest(httpInvoke);
@@ -23,7 +24,13 @@ const Fc: FC<IProps> = ({ resource, cloudAlias }) => {
   }, [cloudAlias]);
 
   if (isEmpty(cloudAlias)) {
-    return <>未关联云账号</>;
+    return <Message type="notice">
+      暂未绑定云账号，请往前
+      <Link to={`/${orgName}/setting/cloud`}>
+        云账号管理
+      </Link>
+      页面进行配置
+    </Message>;
   }
   if (isEmpty(resource)) {
     return <>未关联到资源</>;
