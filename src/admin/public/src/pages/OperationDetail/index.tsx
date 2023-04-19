@@ -140,7 +140,7 @@ const Details = ({
       }
       children={
         <Loading visible={loading} inline={false} className="mt-16">
-          <Fc resource={get(resource, 'fc', [])} cloudAlias={cloudAlias} />
+          <Fc resource={get(resource, 'fc', [])} cloudAlias={cloudAlias} orgName={orgName} />
         </Loading>
       }
     />
