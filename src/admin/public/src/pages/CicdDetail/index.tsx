@@ -213,7 +213,7 @@ const Details = ({
           refreshCallback={handleRefresh}
           envName={envName}
         />
-        <hr className="mb-20 mt-20" />
+        <div className="mb-20 mt-20" />
         <PageInfo title="部署历史">
           <TaskList
             appId={appId}
