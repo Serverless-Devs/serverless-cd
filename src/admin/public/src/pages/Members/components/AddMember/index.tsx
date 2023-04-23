@@ -76,16 +76,18 @@ const AddMember: FC<IProps> = (props) => {
   };
 
   const initValue = () => {
-    setValues(dataSource);
-  };
+    setValues(dataSource)
+  }
 
   return (
     <>
       <span
-        onClick={() => {
-          initValue();
-          setVisible(true);
-        }}
+        onClick={
+          () => {
+            initValue();
+            setVisible(true);
+          }
+        }
       >
         {children}
       </span>

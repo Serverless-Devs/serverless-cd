@@ -66,11 +66,7 @@ const App = (props) => {
           <Route path={'/login'} exact component={Login} />
           <Route path={'/signUp'} exact component={Signup} />
           <Route path={'/auth'} exact component={Auth} />
-          <Route
-            path={'/:orgName/application/:appId/:envName/overview'}
-            exact
-            component={EnvDetail}
-          />
+          <Route path={'/:orgName/application/:appId/:envName/overview'} exact component={EnvDetail} />
           <Route path={'/:orgName/application/:appId/:envName/cicd'} exact component={CicdDetail} />
           <Route
             path={'/:orgName/application/:appId/:envName/operation'}

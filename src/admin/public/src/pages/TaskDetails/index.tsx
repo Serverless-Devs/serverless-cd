@@ -172,11 +172,10 @@ const Details = ({
               const isRequest = initialize && loading && !rawLog;
               return (
                 <Panel
-                  className={`task-details-panel ${
-                    isDisabled || isSkipped || isRunning || isRequest
+                  className={`task-details-panel ${isDisabled || isSkipped || isRunning || isRequest
                       ? 'task-details-panel-loading'
                       : ''
-                  }`}
+                    }`}
                   key={i}
                   title={<PanelTitle step={step} isRequest={isRequest} />}
                   disabled={isDisabled}
