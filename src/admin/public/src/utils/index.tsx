@@ -155,20 +155,20 @@ export function localStorageGet(key) {
       return JSON.parse(value);
     }
     return value;
-  } catch (error) {}
+  } catch (error) { }
 }
 
 export function localStorageSet(key, value) {
   try {
     const newValue = typeof value === 'object' ? JSON.stringify(value) : value;
     localStorage.setItem(key, newValue);
-  } catch (error) {}
+  } catch (error) { }
 }
 
 export function localStorageRemove(key) {
   try {
     localStorage.removeItem(key);
-  } catch (error) {}
+  } catch (error) { }
 }
 
 export const stopPropagation = async (e) => {

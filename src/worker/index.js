@@ -51,6 +51,7 @@ async function handler(event, _context, callback) {
 
   const cwdPath = path.join(execDir, taskId);
   const logPrefix = `${LOG_LOCAL_PATH_PREFIX}/${taskId}`;
+  console.log('save log prefix: ', logPrefix);
   core.fs.emptyDirSync(logPrefix);
   console.log('start task, uuid: ', taskId);
 

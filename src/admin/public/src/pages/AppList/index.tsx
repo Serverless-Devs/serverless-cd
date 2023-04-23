@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useRequest, history, Link } from 'ice';
 import { listApp, deleteApp } from '@/services/applist';
 import {
@@ -9,8 +9,9 @@ import {
   Dialog,
   Icon,
   Balloon,
+  Checkbox
 } from '@alicloud/console-components';
-import { filter, includes, debounce, isEmpty, get, isBoolean, isUndefined, map } from 'lodash';
+import { filter, includes, debounce, isEmpty, get, isBoolean, isUndefined, map, noop } from 'lodash';
 import PageLayout from '@/layouts/PageLayout';
 import NotAppliaction from './components/NotAppliaction';
 import { CreateAppLication } from '../Create';
@@ -61,6 +62,7 @@ const AppList = ({
   const [applist, setApplist] = useState<Array<IItem>>([]);
   const [queryKey, setQueryKey] = useState<string>('');
   const [loading, setLoading] = useState(false);
+  const dialogRef = useRef<any>(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -117,18 +119,11 @@ const AppList = ({
   }
 
   const deleteApplication = (record) => {
-    const dialog = Dialog.alert({
+    const template = get(record, 'template');
+    dialogRef.current = Dialog.alert({
       title: `删除应用：${record.name || record.repo_name}`,
       content: '您确定删除当前应用吗?',
-      onOk: async () => {
-        const { success } = await deleteApp({ appId: record.id });
-        if (success) {
-          Toast.success('应用删除成功');
-          await sleep(800);
-          history?.push(`/${orgName}`);
-        }
-        dialog.hide();
-      },
+      footer: (<DialogFooter template={template} record={record} />)
     });
   };
 
@@ -160,6 +155,55 @@ const AppList = ({
       </>
     );
   };
+
+  const deleteReconfirm = (record) => {
+    const dialog = Dialog.alert({
+      title: `温馨提示`,
+      content: `您当前操作将删除应用并线上仓库，是否继续删除`,
+      onOk: () => onDelete(dialog, record.id, true)
+    });
+  }
+
+  const onDelete = async (dialog, appId, isDeleteRepo = false) => {
+    const { success } = await deleteApp({ appId, isDeleteRepo });
+    if (success) {
+      dialog.hide();
+      Toast.success('应用删除成功');
+      await sleep(800);
+      history?.push(`/${orgName}`);
+    }
+    dialog.hide();
+  }
+
+  const DialogFooter = ({ template, record }) => {
+    const [deleteLoading, setDeleteLoading] = useState(false);
+    let isDeleteRepo = false;
+    return (
+      <div className={template ? 'flex-r' : 'flex-r flex-end'}>
+        {
+          template && (
+            <label>
+              <Checkbox onChange={(v) => isDeleteRepo = v} />
+              <span className="next-checkbox-label">删除git仓库</span>
+            </label>
+          )
+        }
+        <div>
+          <Button type='primary' onClick={async () => {
+            if (isDeleteRepo) {
+              deleteReconfirm(record);
+              dialogRef?.current?.hide();
+            } else {
+              setDeleteLoading(true);
+              await onDelete({ hide: dialogRef?.current?.hide || noop }, record.id, false)
+              setDeleteLoading(false);
+            }
+          }} loading={deleteLoading}>确定</Button>
+          <Button className='ml-4' onClick={() => dialogRef?.current?.hide()}>取消</Button>
+        </div>
+      </div>
+    )
+  }
 
   const columns = [
     {

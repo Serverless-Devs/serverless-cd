@@ -110,6 +110,14 @@ async function createRepoWithWebhook({ repo_owner, repo, token, secret, appId, p
 }
 
 /**
+ * 删除repo
+ */
+async function removeRepo({ repo_owner, repo_name, orgName, provider }) {
+  const providerClient = await getProviderClient(orgName, provider);
+  return await providerClient.deleteRepo({ owner: repo_owner, repo: repo_name });
+}
+
+/**
  * git init
  * git config
  * git remote add origin
@@ -173,6 +181,7 @@ module.exports = {
   getProviderOrgs,
   getProviderRepos,
   createRepoWithWebhook,
+  removeRepo,
   initAndCommit,
   pushFile,
 };

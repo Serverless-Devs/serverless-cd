@@ -45,7 +45,7 @@ function Orgs({
 
   const handleChangeOrg = async (record) => {
     localStorageSet(record.user_id, record.name);
-    history?.push(`/${record.name}`);
+    history?.push(`/${record.name}/setting/org`);
   };
 
   const columns = [
