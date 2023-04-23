@@ -13,7 +13,7 @@
     "@prisma/client": "^4.8.1",
     "@serverless-cd/config": "^0.0.19",
     "@serverless-cd/core": "^0.0.15",
-    "@serverless-cd/engine": "^0.0.36",
+    "@serverless-cd/engine": "^0.0.37",
     "@serverless-cd/git": "^0.0.2",
     "@serverless-cd/setup-runtime": "^0.0.1-alpha.1",
     "koa": "^2.14.1",

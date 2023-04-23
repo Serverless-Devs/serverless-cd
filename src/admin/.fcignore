@@ -6,7 +6,7 @@
 ./node_modules/.prisma/client/libquery_engine-darwin.dylib.node
 ./node_modules/@serverless-devs/core
 ./node_modules/babel*
-./node_modules/ali-oss
+./node_modules/ali-oss/dist
 ./node_modules/nodemon
 ./node_modules/yargs
 ./node_modules/supertest
