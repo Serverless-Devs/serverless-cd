@@ -2,13 +2,14 @@ const path = require('path');
 const core = require('@serverless-cd/core');
 const {
   DOMAIN,
-  REGION,
+  FC,
   DOWNLOAD_CODE_DIR: execDir,
   CD_PIPELINE_YAML,
   CREDENTIALS,
   DEFAULT_UNSET_ENVS,
   LOG_LOCAL_PATH_PREFIX,
 } = require('@serverless-cd/config');
+const REGION = FC.workerFunction.region;
 
 const checkout = require('@serverless-cd/git').default;
 const Setup = require('@serverless-cd/setup-runtime').default;
@@ -150,6 +151,12 @@ async function handler(event, _context, callback) {
         event_name, // 触发的事件名称
         pusher,
       },
+      workerRunConfig: {
+        cdPipelineYaml: CD_PIPELINE_YAML,
+        logLocalPathPrefix: LOG_LOCAL_PATH_PREFIX,
+        region: REGION,
+        execDir,
+      },
     },
     events: {
       onInit,
@@ -192,7 +199,9 @@ async function handler(event, _context, callback) {
   // 防止有其他的动作，将等待状态也要set 到表中
   await updateAppEnvById(appId, envName, getEnvData(engine.context));
   console.log('engine run start');
+  console.time(`run task ${taskId} step`);
   await engine.start();
+  console.timeEnd(`run task ${taskId} step`);
 }
 
 exports.handler = handler;
