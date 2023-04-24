@@ -32,6 +32,7 @@ const Bind = React.lazy(() => import(/* webpackChunkName: 'Secrets' */ '@/pages/
 const NoAuth = React.lazy(() => import(/* webpackChunkName: 'NotAuth' */ '@/pages/NoAuth'));
 const Team = React.lazy(() => import(/* webpackChunkName: 'Team' */ '@/pages/Team'));
 const UpdateOrg = React.lazy(() => import(/* webpackChunkName: 'CreateOrg' */ '@/pages/UpdateOrg'));
+const AccountInformation = React.lazy(() => import(/* webpackChunkName: 'Team' */ '@/pages/AccountInformation'));
 
 const OrgVerify = ({
   history,
@@ -87,7 +88,7 @@ const App = (props) => {
           <Route path={'/:orgName/setting/org'} exact component={UpdateOrg} />
           <Route path={'/:orgName/team'} exact component={Team} />
           <Route path={'/:orgName/profile/organizations'} exact component={OrgSettings} />
-          <Route path={'/:orgName/profile/account_information'} exact component={Team} />
+          <Route path={'/:orgName/profile/account_information'} exact component={AccountInformation} />
           <Route path={'/'} component={OrgVerify} />
         </Switch>
       </Suspense>
