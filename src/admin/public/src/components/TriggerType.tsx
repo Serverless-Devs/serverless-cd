@@ -1,5 +1,6 @@
 import React from 'react';
 import { upperFirst } from 'lodash';
+import { C_REPOSITORY } from '@/constants/repository';
 
 export type ITriggerType = 'local' | 'console' | 'webhook';
 
@@ -35,5 +36,5 @@ export default ({ trigger }: Props) => {
   if (trigger === 'rollback') {
     return <>{triggerIcons['redeploy']}回滚</>;
   }
-  return <>{`${upperFirst(trigger)} 触发`}</>;
+  return <div className='align-center'>{C_REPOSITORY[trigger as any]?.svg(16)}<span className='ml-4'>{`${upperFirst(trigger)} 触发`}</span></div>;
 };

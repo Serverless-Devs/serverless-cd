@@ -106,7 +106,7 @@ const TaskList: FC<IProps> = ({
         const showLatest = !pollingStatus.includes(record.status) && latestTaskId === value;
 
         return (
-          <div className="flex-r" style={{ minWidth: 210 }}>
+          <div className="align-center">
             {showLinkNode}
             {showLatest && (
               <Tag color="orange" size="small" style={{ fontStyle: 'italic', marginLeft: 8 }}>
@@ -116,12 +116,14 @@ const TaskList: FC<IProps> = ({
           </div>
         );
       },
-      width: 200,
+      lock: 'left',
+      width: 240,
     },
     {
       title: '触发方式',
       dataIndex: 'trigger_type',
       cell: (value) => <TriggerType trigger={value} />,
+      width: 150,
     },
     {
       title: '触发内容',
@@ -131,39 +133,41 @@ const TaskList: FC<IProps> = ({
         const branch = get(row, 'branch');
         const message = get(row, 'message');
         return (
-          <div>
-            {branch && (
-              <ShowBranch
-                threshold={50}
-                label={branch}
-                url={`https://${provider}.com/${repoOwner}/${repoName}/tree/${branch}`}
-              />
-            )}
-            <div>
+          <>
+            <div className='align-center' style={{ flexWrap: 'nowrap' }}>
+              {branch && (
+                <ShowBranch
+                  threshold={50}
+                  label={branch}
+                  url={`https://${provider}.com/${repoOwner}/${repoName}/tree/${branch}`}
+                />
+              )}
               {value && (
                 <CommitId
+                  className='ml-8'
                   url={`https://${provider}.com/${repoOwner}/${repoName}/commit/${value}`}
                   label={value}
                   icon={false}
                 />
               )}
-              <Truncate
-                style={{ fontSize: 12, color: '#888', marginLeft: 8 }}
-                threshold={40}
-                align="t"
-              >
-                {message}
-              </Truncate>
+
             </div>
-          </div>
+            <Truncate
+              style={{ fontSize: 12, color: '#888' }}
+              threshold={40}
+              align="t"
+            >
+              {message}
+            </Truncate>
+          </>
         );
       },
-      width: 250,
+      width: 300,
     },
     {
       title: '部署状态',
       dataIndex: 'status',
-      width: 100,
+      width: 150,
       cell: (value) => <Status status={value} />,
     },
     {
@@ -181,6 +185,8 @@ const TaskList: FC<IProps> = ({
     {
       title: '操作',
       dataIndex: 'id',
+      width: 180,
+      lock: 'right',
       cell: (value, i, item) => {
         const updatedTime = moment(get(item, 'updated_time')).format('YYYY-MM-DD HH:mm:ss');
         const disabled = item.status !== 'success' || value === latestTaskId || startsWith(item.trigger_type, 'tracker:');
@@ -241,7 +247,7 @@ const TaskList: FC<IProps> = ({
         <RefreshButton styleObj={{ marginLeft: 8 }} refreshCallback={refreshCallback} />
       </div>
 
-      <Table
+      <Table.StickyLock
         columns={columns}
         hasBorder={false}
         dataSource={data.result}
