@@ -4,7 +4,7 @@ require('express-async-errors');
 const express = require('express');
 const { lodash: _ } = require('@serverless-cd/core');
 const cookieParser = require('cookie-parser');
-const jwtAuth = require('./middleware/jwt-auth');
+const jwtAuth = require('./middleware/auth/jwt');
 const logger = require('./middleware/logger');
 const { errorHandler } = require('./middleware/error');
 

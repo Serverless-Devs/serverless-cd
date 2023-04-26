@@ -3,7 +3,7 @@ const debug = require('debug')('serverless-cd:provider-github');
 
 const { Result } = require('../../../util');
 const { PROVIDER, ADMIN_ROLE_KEYS } = require('@serverless-cd/config');
-const auth = require('../../../middleware/auth');
+const auth = require('../../../middleware/auth/role');
 const gitService = require('../../../services/git.service');
 
 /**

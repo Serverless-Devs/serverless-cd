@@ -3,7 +3,7 @@ const debug = require('debug')('serverless-cd:dispatch');
 const { MEMBER_ROLE_KEYS } = require('@serverless-cd/config');
 
 const { Result } = require('../../util');
-const auth = require('../../middleware/auth');
+const auth = require('../../middleware/auth/role');
 const dispatchService = require('../../services/dispatch.service');
 
 //  重新 / 回滚

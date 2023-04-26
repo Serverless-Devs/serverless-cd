@@ -26,7 +26,7 @@ const TriggerConfig = ({ triggerSpec, provider, appId, refreshCallback, data, en
         [provider]: valuesFormat(values['trigger']),
       };
       environment[envName].cd_pipeline_yaml = values['cd_pipeline_yaml'];
-      const { success } = await request({ environment, appId, provider });
+      const { success } = await request({ environment, id: appId, provider });
       if (success) {
         Toast.success('配置成功');
         refreshCallback && refreshCallback();

@@ -72,7 +72,7 @@ const CreateEnv: FC<IProps> = (props) => {
           cd_pipeline_yaml: values['cd_pipeline_yaml'],
         },
       };
-      const { success } = await request({ environment, appId, provider });
+      const { success } = await request({ environment, id: appId, provider });
       if (success) {
         Toast.success('创建环境成功');
         setVisible(false);
