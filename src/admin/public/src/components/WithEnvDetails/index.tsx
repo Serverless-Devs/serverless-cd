@@ -73,7 +73,7 @@ const withEnvDetails = (WrappedComponent, { pageType }) => {
         title: `删除环境：${envName}`,
         content: '您确定删除当前环境吗?',
         onOk: async () => {
-          const { success } = await removeEnv({ envName, appId });
+          const { success } = await removeEnv({ envName, id: appId });
           if (success) {
             Toast.success('环境删除成功');
             history?.push(`/${orgName}/application/${appId}/default`);

@@ -11,7 +11,7 @@ interface Props {
 }
 
 const DeleteCommit = (props: Props) => {
-  const { taskId, refreshCallback, updatedTime } = props;
+  const { appId, taskId, refreshCallback, updatedTime } = props;
   const { loading, request } = useRequest(removeTaskCommit);
 
   const onDelete = () => {
@@ -30,7 +30,7 @@ const DeleteCommit = (props: Props) => {
         </span>
       ),
       onOk: async () => {
-        await request({ taskId });
+        await request({ appId, id: taskId });
         refreshCallback && refreshCallback();
       },
     });

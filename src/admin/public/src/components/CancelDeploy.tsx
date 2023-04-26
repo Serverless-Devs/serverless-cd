@@ -14,7 +14,7 @@ interface Props {
 }
 
 const CancelDeploy = (props: Props) => {
-  const { taskId, repoName, refreshCallback, isText = false } = props;
+  const { appId, taskId, repoName, refreshCallback, isText = false } = props;
   const [visible, setVisible] = useState<Boolean>(false);
   const [loading, setLoading] = useState<Boolean>(false);
   const { request } = useRequest(cancelDeployTask);
@@ -25,7 +25,7 @@ const CancelDeploy = (props: Props) => {
 
   const submit = async () => {
     setLoading(true);
-    const { success, data } = await request({ taskId });
+    const { success, data } = await request({ appId, taskId });
     if (success) {
       Toast.success('取消部署成功');
       refreshCallback && refreshCallback(data.taskId);

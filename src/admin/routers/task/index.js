@@ -4,7 +4,7 @@ const fs = require('fs');
 const debug = require('debug')('serverless-cd:task');
 
 const { Result, Client, ValidationError, NotFoundError } = require('../../util');
-const auth = require('../../middleware/auth');
+const auth = require('../../middleware/auth/role');
 const { MEMBER_ROLE_KEYS, LOG_LOCAL_PATH_PREFIX } = require('@serverless-cd/config');
 const taskService = require('../../services/task.service');
 
@@ -26,7 +26,7 @@ router.get('/list', async function (req, res) {
  * task 详情
  */
 router.get('/detail', async function (req, res) {
-  const result = await taskService.detail(req.query.taskId);
+  const result = await taskService.detail(req.query.id);
   return res.json(Result.ofSuccess(taskService.getTaskConfig(result)));
 });
 
@@ -34,10 +34,10 @@ router.get('/detail', async function (req, res) {
  * task 日志
  */
 router.get('/log', async function (req, res) {
-  const taskId = _.get(req.query, 'taskId');
+  const taskId = _.get(req.query, 'id');
   const stepCount = _.get(req.query, 'stepCount');
   if (_.isEmpty(taskId)) {
-    throw new ValidationError('TaskId is empty');
+    throw new ValidationError('Taski id is empty');
   }
   if (_.isEmpty(stepCount)) {
     throw new ValidationError('StepCount is empty');
@@ -71,7 +71,7 @@ router.get('/log', async function (req, res) {
  * 删除 task
  */
 router.post('/remove', auth(MEMBER_ROLE_KEYS), async function (req, res) {
-  const taskId = _.get(req.body, 'taskId');
+  const taskId = _.get(req.body, 'id');
   await taskService.remove(taskId);
   res.json(Result.ofSuccess());
 });
