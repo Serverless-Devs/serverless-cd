@@ -1,7 +1,9 @@
+// 用于验证登陆
+
 const { JWT_SECRET, EXCLUDE_AUTH_URL } = require('@serverless-cd/config');
 const { lodash: _ } = require('@serverless-cd/core');
 const jwt = require('jsonwebtoken');
-const { NeedLogin, generateOrgIdByUserIdAndOrgName } = require('../util');
+const { NeedLogin, generateOrgIdByUserIdAndOrgName } = require('../../util');
 const debug = require('debug')('serverless-cd:middleware');
 
 async function checkJwt(req, _res, next) {

@@ -1,5 +1,7 @@
-const { NoPermissionError, NoAuthError } = require('../util');
-const authService = require('../services/auth.service');
+// 验证角色权限
+
+const { NoPermissionError, NoAuthError } = require('../../util');
+const authService = require('../../services/auth.service');
 const debug = require('debug')('serverless-cd:middleware-auth');
 
 const auth = (orgRoleKeys) => async (req, _res, next) => {

@@ -4,7 +4,7 @@ const debug = require('debug')('serverless-cd:org');
 
 const { Result, generateOrgIdByUserIdAndOrgName } = require('../../util');
 const { OWNER_ROLE_KEYS, ADMIN_ROLE_KEYS, ROLE_KEYS } = require('@serverless-cd/config');
-const auth = require('../../middleware/auth');
+const auth = require('../../middleware/auth/role');
 const orgService = require('../../services/org.service');
 
 // 查看团队信息

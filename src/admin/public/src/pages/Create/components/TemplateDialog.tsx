@@ -45,7 +45,7 @@ const TemplateDialog = (props: IProps) => {
   const name = get(value, 'name', '');
   const body = {
     provider: provider,
-    appId: appId,
+    id: appId,
     repo_owner: repo_owner,
     repo: repoName,
     name,
