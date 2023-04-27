@@ -8,6 +8,7 @@ const applicationModel = require('../models/application.mode');
 
 const taskService = require('./task.service');
 const orgService = require('./org.service');
+const authService = require('./auth.service');
 
 const { ValidationError, Client, unionToken } = require('../util');
 const {
@@ -28,6 +29,14 @@ async function retryOnce(fnName, ...args) {
 }
 
 async function invokeFunction(trigger_payload) {
+  const dispatchOrgId = _.get(trigger_payload, 'authorization.dispatchOrgId');
+  if (!dispatchOrgId) {
+    throw new Error('运行调用 worker 函数异常，没有获取到dispatchOrg信息');
+  }
+  const [userId] = _.split(dispatchOrgId, ':')
+  const { token } = await authService.setJwt({ userId, sessionExpiration: 6 * 60 * 60 * 1000 }); // 超时时间
+
+  _.set(trigger_payload, 'token', token);
   return await retryOnce(
     'invokeFunction',
     serviceName,
