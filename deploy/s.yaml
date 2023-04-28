@@ -24,8 +24,6 @@ services:
       pre-deploy:
         - run: npm install --registry=https://registry.npmmirror.com
           path: '../src/worker'
-        - run: npx prisma generate --schema=./prisma/${vars.prisma}.prisma
-          path: '../src/worker'
       post-deploy:
         - component: fc api UpdateFunction --region ${vars.region} --header
             '{"x-fc-disable-container-reuse":"True"}' --path
@@ -46,12 +44,10 @@ services:
         timeout: 3600
         layers:
           - acs:fc:${vars.region}:official:layers/Nodejs16/versions/1
-          - acs:fc:${vars.region}:official:layers/SQLite3/versions/1
         environmentVariables:
           PATH: /opt:/opt/nodejs16/bin:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
           DOMAIN: ${vars.domain} # 用于给用户显示日志链接地址
           LOG_LOCAL_PATH_PREFIX: ${vars.logLocalPathPrefix}
-          DATABASE_URL: ${vars.databaseUrl} # 用于链接数据库
         asyncConfiguration:
           maxAsyncRetryAttempts: 0
           statefulInvocation: true
@@ -71,11 +67,6 @@ services:
         handler: deliver.handler
         memorySize: 640
         timeout: 600
-        layers:
-          - acs:fc:${vars.region}:official:layers/SQLite3/versions/1
-        environmentVariables:
-          PATH: /opt:/usr/local/bin/apache-maven/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ruby/bin
-          DATABASE_URL: ${vars.databaseUrl} # 用于链接数据库
         asyncConfiguration:
           maxAsyncRetryAttempts: 0
 
