@@ -68,13 +68,14 @@ async function handler(event, context, callback) {
   const payload = JSON.parse(eventPayload.requestPayload);
   console.debug('payload: ', payload);
   const {
+    token: jwt_token,
     taskId,
     commit,
     message,
     envName,
     ref,
     userId,
-    authorization: { appId } = {},
+    authorization: { appId, dispatchOrgId } = {},
     environment = {},
     trigger_type,
   } = payload || {};
@@ -88,6 +89,7 @@ async function handler(event, context, callback) {
     2. 执行超时        Failed
     3. 手动取消 // Stopping / Stopped
   */
+  const [,orgName] = _.split(dispatchOrgId, ':');
   const statefulAsyncInvocationStatus = await getStatefulAsyncInvocationStatus(taskId);
   if (statefulAsyncInvocationStatus === 'Failed') {
     const appTaskConfig = { taskId, commit, message, ref, trigger_type };
@@ -97,10 +99,10 @@ async function handler(event, context, callback) {
       completed: true,
       status: FAILED_STATUS,
     };
-    await updateAppEnvById(appId, envName, latestTask);
+    await updateAppEnvById(jwt_token, orgName, appId, envName, latestTask);
 
     let makeTaskPayload = {};
-    const dbConfig = await getTask(taskId);
+    const dbConfig = await getTask(jwt_token, orgName, appId, taskId);
     if (dbConfig.id && !_.isEmpty(dbConfig.steps)) {
       makeTaskPayload = {
         status: FAILED_STATUS,
@@ -119,7 +121,7 @@ async function handler(event, context, callback) {
         trigger_payload: payload,
       };
     }
-    await makeTask(taskId, makeTaskPayload);
+    await makeTask(jwt_token, orgName, appId, taskId, makeTaskPayload);
   } else {
     console.debug('statefulAsyncInvocationStatus not is Failed, skip');
   }

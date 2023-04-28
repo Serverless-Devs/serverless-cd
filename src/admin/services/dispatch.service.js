@@ -8,6 +8,7 @@ const applicationModel = require('../models/application.mode');
 
 const taskService = require('./task.service');
 const orgService = require('./org.service');
+const authService = require('./auth.service');
 
 const { ValidationError, Client, unionToken } = require('../util');
 const {
@@ -19,19 +20,24 @@ const {
 const MANUAL = 'manual';
 const REDEPLOY = 'redeploy';
 
-async function retryOnce(fnName, ...args) {
+async function retryOnce(...args) {
   try {
-    return await Client.fc(region)[fnName](...args);
+    return await Client.fc(region).invokeFunction(serviceName, functionName, ...args);
   } catch (error) {
-    return await Client.fc(region)[fnName](...args);
+    return await Client.fc(region).invokeFunction(serviceName, functionName, ...args);
   }
 }
 
 async function invokeFunction(trigger_payload) {
+  const dispatchOrgId = _.get(trigger_payload, 'authorization.dispatchOrgId');
+  if (!dispatchOrgId) {
+    throw new Error('运行调用 worker 函数异常，没有获取到dispatchOrg信息');
+  }
+  const [userId] = _.split(dispatchOrgId, ':')
+  const { token } = await authService.setJwt({ userId, sessionExpiration: 6 * 60 * 60 * 1000 }); // 超时时间
+
+  _.set(trigger_payload, 'token', token);
   return await retryOnce(
-    'invokeFunction',
-    serviceName,
-    functionName,
     JSON.stringify(trigger_payload),
     {
       'X-FC-Invocation-Type': 'Async',
@@ -121,7 +127,11 @@ async function cancelTask({ taskId } = {}) {
   const { steps = [], app_id, trigger_payload, status, trigger_type } = taskResult;
   try {
     const path = `/services/${serviceName}/functions/${functionName}/stateful-async-invocations/${taskId}`;
-    await retryOnce('put', path);
+    try {
+      await Client.fc(region).put(path);
+    } catch (error) {
+      await Client.fc(region).put(path);
+    }
   } catch (e) {
     debug(`cancel invoke error: ${e.code}, ${e.message}`);
     if (![RUNNING, PENDING].includes(status)) {
@@ -244,4 +254,5 @@ module.exports = {
   redeploy,
   cancelTask,
   invokeFunction,
+  retryOnce,
 };

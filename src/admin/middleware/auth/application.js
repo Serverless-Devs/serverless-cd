@@ -24,8 +24,9 @@ const checkAppAssociateUser = async (req, _res, next) => {
   }
 
   const appResult = await applicationmMode.getAppById(appId);
-  const [, appUseOrgName] = _.get(appResult, 'owner_org_id', '').split(':');
-  debug(`App use org name: ${appUseOrgName}`);
+  const ownerOrgId = _.get(appResult, 'owner_org_id', '');
+  const [, appUseOrgName] = _.split(ownerOrgId, ':');
+  debug(`ownerOrgId: ${ownerOrgId}, App use org name: ${appUseOrgName}`);
   if (appUseOrgName !== orgName) {
     next(new NoPermissionError(`应用${appId}不属于${orgName}团队`));
   }

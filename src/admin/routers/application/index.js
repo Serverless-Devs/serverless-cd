@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const _ = require('lodash');
 const debug = require('debug')('serverless-cd:application');
-const { push } = require('@serverless-cd/git');
 const { Result, ValidationError } = require('../../util');
 const auth = require('../../middleware/auth/role');
 const appService = require('../../services/application.service');

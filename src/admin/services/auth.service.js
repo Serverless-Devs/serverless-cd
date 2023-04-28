@@ -182,9 +182,9 @@ async function loginGitee({ code }) {
 /**
  * 设置 jwt
  */
-async function setJwt({ userId }, res) {
+async function setJwt({ userId, sessionExpiration = SESSION_EXPIRATION }, res) {
   const SESSION_EXPIRATION_EXP =
-    Math.floor(Date.now() / 1000) + Math.floor(SESSION_EXPIRATION / 1000);
+    Math.floor(Date.now() / 1000) + Math.floor(sessionExpiration / 1000);
   debug(`session expiration expires ${SESSION_EXPIRATION_EXP}`);
   const jwtSign = {
     userId,
@@ -194,12 +194,14 @@ async function setJwt({ userId }, res) {
   const token = await jwt.sign(jwtSign, JWT_SECRET);
   debug(`jwt sign token ${token}`);
 
-  res.cookie('jwt', token, {
-    maxAge: SESSION_EXPIRATION,
-    httpOnly: true,
-  });
+  if (res) {
+    res.cookie('jwt', token, {
+      maxAge: sessionExpiration,
+      httpOnly: true,
+    });
+  }
 
-  return { expires: SESSION_EXPIRATION_EXP };
+  return { token, expires: SESSION_EXPIRATION_EXP };
 }
 
 /**

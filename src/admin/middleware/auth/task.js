@@ -6,7 +6,7 @@ const debug = require('debug')('serverless-cd:middleware-auth');
 
 const checkTaskAssociateApp = async (req, _res, next) => {
   const { pathname = '' } = req._parsedUrl;
-  const notCheckPath = ['/task/list', '/task/create'];
+  const notCheckPath = ['/task/list', '/task/exists'];
   if (notCheckPath.includes(pathname)) {
     return next();
   }
