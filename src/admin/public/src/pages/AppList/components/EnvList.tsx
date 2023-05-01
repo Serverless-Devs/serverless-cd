@@ -97,7 +97,6 @@ const EnvList: FC<Props> = (props) => {
             <TriggerType trigger={triggerType} />
             {value.commit && (
               <div className="align-center ml-8">
-                {C_REPOSITORY[value.provider]?.svg(16)}
                 <CommitId
                   className="ml-4"
                   url={`https://${value.provider}.com/${value.repo_owner}/${value.repo_name}/commit/${value.commit}`}
