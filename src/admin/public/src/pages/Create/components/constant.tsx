@@ -60,19 +60,33 @@ export const SERVERLESS_PIPELINE_CONTENT_TEMPLATE = {
   name: 'Deploy Express application to FC',
   steps: [
     {
+      name: '缓存 npm 依赖包',
+      plugin: '@serverless-cd/cache',
+      id: 'npmCache',
+      inputs: {
+        key: "${{hashFile('./code/package.json')}}",
+        path: './code/node_modules',
+      },
+    },
+    {
       run: 'npm i @serverless-devs/s -g --registry=https://registry.npmmirror.com',
     },
     {
       run: 's -v',
     },
     {
-      run: 'echo ${{secrets.ALIYUN_AK}}',
+      name: '安装代码包依赖',
+      run: 'npm install --production --registry=https://registry.npmmirror.com',
+      'working-directory': './code',
+      if: "${{steps.npmCache.outputs['cache-hit'] != true}} ",
     },
     {
-      run: 'echo ${{secrets.ALIYUN_SK}}',
-    },
-    {
-      run: 's config add  --AccessKeyID ${{secrets.ALIYUN_AK}}  --AccessKeySecret ${{secrets.ALIYUN_SK}} -a default -f',
+      name: '部署函数',
+      run: 's deploy --use-local -y -a default_serverless_devs_access',
+      env: {
+        default_serverless_devs_access:
+          '{"AccountID":"${{cloudSecrets.AccountID}}","AccessKeyID":"${{cloudSecrets.AccessKeyID}}","AccessKeySecret":"${{cloudSecrets.AccessKeySecret}}"}',
+      },
     },
     {
       run: 's deploy --use-local -y',
@@ -91,9 +105,4 @@ export const TEMPLATE_TABS = [
     name: '其他模版',
     templateList: [],
   },
-  // { // 暂时下掉收藏模版
-  //   key: 'collection',
-  //   name: '收藏模版',
-  //   templateList: [],
-  // },
 ];
