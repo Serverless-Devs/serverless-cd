@@ -51,7 +51,7 @@ const SecretConfig: FC<IProps> = ({
   const onCompileSecret = async (values) => {
     const environment = get(data, 'environment');
     environment[envName].secrets = values;
-    const { success } = await request({ environment, appId, provider });
+    const { success } = await request({ environment, id: appId, provider });
     if (success) {
       Toast.success('配置成功');
       secretsDrawerRef?.current?.setVisible(false);

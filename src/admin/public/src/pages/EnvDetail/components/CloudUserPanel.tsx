@@ -41,7 +41,7 @@ const CloudUserPanel = ({ detailData, link = '/', currentCloud, envName = '', re
     const environment = get(detailData, 'environment') as any;
     const appId = get(detailData, 'id');
     environment[envName].cloud_alias = cloudAlias;
-    const { success } = await updateRequestApp.request({ environment, appId });
+    const { success } = await updateRequestApp.request({ environment, id: appId });
     success && await refreshCallback();
   }
 

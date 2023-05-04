@@ -83,6 +83,17 @@ async function remove(id) {
   return await taskModel.deleteById(id);
 }
 
+async function exists(id, payload) {
+  const result = await taskModel.getTaskById(id);
+  if (_.isEmpty(result)) {
+    return await taskModel.create({
+      ...payload,
+      id,
+    });
+  }
+  return await taskModel.updateTask(id, payload);
+}
+
 const getTaskConfig = (taskConfig) => {
   const result = _.omit(taskConfig, 'trigger_payload');
 
@@ -97,6 +108,7 @@ const getTaskConfig = (taskConfig) => {
 
 module.exports = {
   getTaskConfig,
+  exists,
   detail,
   list,
   remove,

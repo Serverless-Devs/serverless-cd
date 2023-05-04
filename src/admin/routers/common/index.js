@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { Result, Webhook } = require('../../util');
-const auth = require('../../middleware/auth');
+const auth = require('../../middleware/auth/role');
 const { MEMBER_ROLE_KEYS } = require('@serverless-cd/config');
 const init = require('../../services/init.service');
 const webhook = require('../../services/webhook.service');

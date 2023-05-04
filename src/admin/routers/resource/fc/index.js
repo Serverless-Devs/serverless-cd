@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { Result } = require('../../../util');
-const auth = require('../../../middleware/auth');
+const auth = require('../../../middleware/auth/role');
 const { MEMBER_ROLE_KEYS } = require('@serverless-cd/config');
 const fcService = require('../../../services/fc.service');
 

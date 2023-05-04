@@ -165,7 +165,7 @@ const AppList = ({
   }
 
   const onDelete = async (dialog, appId, isDeleteRepo = false) => {
-    const { success } = await deleteApp({ appId, isDeleteRepo });
+    const { success } = await deleteApp({ id: appId, isDeleteRepo });
     if (success) {
       dialog.hide();
       Toast.success('应用删除成功');

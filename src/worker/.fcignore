@@ -1,4 +1,2 @@
 __tests__
 package-lock.json
-./node_modules/@prisma/engines
-./node_modules/.prisma/client/libquery_engine-darwin.dylib.node

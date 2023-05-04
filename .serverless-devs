@@ -1,0 +1,12 @@
+{
+  "marked-yamls": [
+    {
+      "path": "src/s.local.yaml",
+      "alias": "测试环境"
+    },
+    {
+      "path": "deploy/s.yaml",
+      "alias": "线上环境"
+    }
+  ]
+}

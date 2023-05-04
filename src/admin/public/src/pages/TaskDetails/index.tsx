@@ -63,7 +63,7 @@ const Details = ({
 
   useEffect(() => {
     setLoading(true);
-    task.request({ taskId });
+    task.request({ appId, id: taskId });
   }, [taskId]);
 
   useEffect(() => {
@@ -91,7 +91,7 @@ const Details = ({
     if (panelItem && !panelItem.rawLog) {
       panelItem.loading = true;
       setTaskSteps([...taskSteps]);
-      getTaskLog({ taskId, stepCount: panelItem.stepCount })
+      getTaskLog({ id: taskId, appId, stepCount: panelItem.stepCount })
         .then((item) => {
           panelItem.rawLog = formatLogs(item);
           panelItem.loading = false;

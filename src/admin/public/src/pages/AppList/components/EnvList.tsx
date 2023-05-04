@@ -51,7 +51,7 @@ const EnvList: FC<Props> = (props) => {
       title: `删除环境：${envName}`,
       content: '您确定删除当前环境吗?',
       onOk: async () => {
-        const { success } = await request({ envName, appId });
+        const { success } = await request({ envName, id: appId });
         if (success) {
           Toast.success('环境删除成功');
           refresh();
@@ -97,7 +97,6 @@ const EnvList: FC<Props> = (props) => {
             <TriggerType trigger={triggerType} />
             {value.commit && (
               <div className="align-center ml-8">
-                {C_REPOSITORY[value.provider]?.svg(16)}
                 <CommitId
                   className="ml-4"
                   url={`https://${value.provider}.com/${value.repo_owner}/${value.repo_name}/commit/${value.commit}`}

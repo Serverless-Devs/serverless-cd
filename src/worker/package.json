@@ -10,10 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "@alicloud/fc-open20210406": "^1.1.13",
-    "@prisma/client": "^4.8.1",
     "@serverless-cd/config": "^0.0.19",
     "@serverless-cd/core": "^0.0.15",
-    "@serverless-cd/engine": "^0.0.29",
+    "@serverless-cd/engine": "^0.0.41",
     "@serverless-cd/git": "^0.0.2",
     "@serverless-cd/setup-runtime": "^0.0.1-alpha.1",
     "koa": "^2.14.1",
@@ -21,7 +20,5 @@
     "koa-onerror": "^4.2.0",
     "koa-router": "^12.0.0"
   },
-  "devDependencies": {
-    "prisma": "^4.8.1"
-  }
+  "devDependencies": { }
 }

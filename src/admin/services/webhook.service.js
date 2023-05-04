@@ -82,6 +82,7 @@ async function triggered(appId, headers, body) {
   }
   const {
     owner_org_id: ownerOrgId,
+    org_id: dispatchOrgId,
     environment = {},
     repo_webhook_secret,
     repo_owner = '',
@@ -130,7 +131,7 @@ async function triggered(appId, headers, body) {
       authorization: {
         appId,
         accessToken,
-        dispatchOrgId: ownerOrgId, // 如果是 webhook 触发则传递ownerOrgId
+        dispatchOrgId,
         secrets,
         repo_owner,
         repo_webhook_secret,

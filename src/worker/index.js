@@ -2,13 +2,14 @@ const path = require('path');
 const core = require('@serverless-cd/core');
 const {
   DOMAIN,
-  REGION,
+  FC,
   DOWNLOAD_CODE_DIR: execDir,
   CD_PIPELINE_YAML,
   CREDENTIALS,
   DEFAULT_UNSET_ENVS,
   LOG_LOCAL_PATH_PREFIX,
 } = require('@serverless-cd/config');
+const REGION = FC.workerFunction.region;
 
 const checkout = require('@serverless-cd/git').default;
 const Setup = require('@serverless-cd/setup-runtime').default;
@@ -23,6 +24,7 @@ async function handler(event, _context, callback) {
   const inputs = getPayload(event);
   console.log(JSON.stringify(inputs, null, 2));
   const {
+    token: jwt_token,
     taskId,
     provider,
     cloneUrl,
@@ -32,7 +34,7 @@ async function handler(event, _context, callback) {
       dispatchOrgId,
       repo_owner,
       appId,
-      accessToken: token,
+      accessToken: codeToken,
       secrets,
     } = {},
     ref,
@@ -47,21 +49,17 @@ async function handler(event, _context, callback) {
     trigger_type = provider,
     logLevel = 'info',
   } = inputs;
+  
+  const [,orgName] = _.split(dispatchOrgId, ':');
   const envSecrets = _.get(environment, `${envName}.secrets`) || {};
-
   const cwdPath = path.join(execDir, taskId);
   const logPrefix = `${LOG_LOCAL_PATH_PREFIX}/${taskId}`;
+  console.log('save log prefix: ', logPrefix);
   core.fs.emptyDirSync(logPrefix);
   console.log('start task, uuid: ', taskId);
 
-  let url = '';
-  if (DOMAIN && dispatchOrgId) {
-    const [, orgName] = _.split(dispatchOrgId, ':');
-    if (orgName) {
-      url = `${DOMAIN}/${orgName}/application/${appId}/detail/${envName}/${taskId}`;
-    }
-    console.log(`get task url: ${url}, target org name: ${orgName}`);
-  }
+  const url = `${DOMAIN}/${orgName}/application/${appId}/detail/${envName}/${taskId}`;
+  console.log(`get task url: ${url}, target org name: ${orgName}`);
 
   const appTaskConfig = { taskId, commit, message, ref, trigger_type };
 
@@ -76,7 +74,7 @@ async function handler(event, _context, callback) {
     logger.info('onInit: checkout start');
     logger.debug(`start checkout code, taskId: ${taskId}`);
     await checkout({
-      token,
+      token: codeToken,
       provider,
       logger,
       owner: repo_owner,
@@ -99,7 +97,7 @@ async function handler(event, _context, callback) {
     logger.debug(`parse spec success, steps: ${JSON.stringify(steps)}`);
     logger.debug(`start update app`);
     logger.info(`update app in engine onInit: ${JSON.stringify(environment)}`);
-    await updateAppEnvById(appId, envName, getEnvData(context));
+    await updateAppEnvById(jwt_token, orgName, appId, envName, getEnvData(context));
     logger.debug(`start update app success`);
 
     const runtimes = _.get(pipelineContext, 'runtimes', []);
@@ -149,28 +147,34 @@ async function handler(event, _context, callback) {
         event_name, // 触发的事件名称
         pusher,
       },
+      workerRunConfig: {
+        cdPipelineYaml: CD_PIPELINE_YAML,
+        logLocalPathPrefix: LOG_LOCAL_PATH_PREFIX,
+        region: REGION,
+        execDir,
+      },
     },
     events: {
       onInit,
       onPreRun: async function (_data, context) {
-        await makeTask(taskId, {
+        await makeTask(jwt_token, orgName, appId, taskId, {
           status: context.status,
           steps: getTaskPayload(context.steps),
         });
       },
       onPostRun: async function (_data, context) {
-        await makeTask(taskId, {
+        await makeTask(jwt_token, orgName, appId, taskId, {
           status: context.status,
           steps: getTaskPayload(context.steps),
         });
       },
       onCompleted: async function (context, logger) {
-        await makeTask(taskId, {
+        await makeTask(jwt_token, orgName, appId, taskId, {
           status: context.status,
           steps: getTaskPayload(context.steps),
         });
         logger.info(`onCompleted environment: ${JSON.stringify(environment)}`);
-        await updateAppEnvById(appId, envName, getEnvData(context));
+        await updateAppEnvById(jwt_token, orgName, appId, envName, getEnvData(context));
         logger.info('completed end.');
         callback(null, '');
       },
@@ -179,7 +183,7 @@ async function handler(event, _context, callback) {
   });
 
   console.log('init task');
-  await makeTask(taskId, {
+  await makeTask(jwt_token, orgName, appId, taskId, {
     trigger_type,
     env_name: envName,
     dispatch_org_id: dispatchOrgId,
@@ -189,9 +193,11 @@ async function handler(event, _context, callback) {
   });
   console.log('App update environment', JSON.stringify(environment));
   // 防止有其他的动作，将等待状态也要set 到表中
-  await updateAppEnvById(appId, envName, getEnvData(engine.context));
+  await updateAppEnvById(jwt_token, orgName, appId, envName, getEnvData(engine.context));
   console.log('engine run start');
+  console.time(`run task ${taskId} step`);
   await engine.start();
+  console.timeEnd(`run task ${taskId} step`);
 }
 
 exports.handler = handler;

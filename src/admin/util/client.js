@@ -1,25 +1,14 @@
 const _ = require('lodash');
-const OssClient = require('ali-oss');
 const Fc = require('@serverless-cd/srm-aliyun-fc2');
-const { CREDENTIALS, OSS_CONFIG } = require('@serverless-cd/config');
+const { CREDENTIALS } = require('@serverless-cd/config');
 
+// // 获取密钥配置
+// const accountId = envs.ACCOUNT_ID || envs.FC_ACCOUNT_ID;
+// const accessKeyId = envs.ACCESS_KEY_ID || envs.ALIBABA_CLOUD_ACCESS_KEY_ID;
+// const accessKeySecret = envs.ACCESS_KEY_SECRET || envs.ALIBABA_CLOUD_ACCESS_KEY_SECRET;
 const { accessKeyId, accessKeySecret, accountId, securityToken } = CREDENTIALS;
 
 module.exports = class Client {
-  static oss() {
-    if (_.get(OSS_CONFIG, 'bucket')) {
-      return new OssClient({
-        accessKeyId,
-        accessKeySecret,
-        stsToken: securityToken,
-        bucket: OSS_CONFIG.bucket,
-        region: OSS_CONFIG.region,
-        timeout: `${1 * 60 * 1000}`, // min
-      });
-    }
-    console.warn('没有配置 OSS bucket');
-  }
-
   static fc(region) {
     return new Fc(accountId, {
       accessKeyID: accessKeyId,
@@ -27,7 +16,7 @@ module.exports = class Client {
       securityToken,
       region,
       timeout: 60 * 1000,
-      internal: !!process.env.FC_QUALIFIER, // TODO: 区分环境
+      // internal: !!process.env.FC_QUALIFIER, // TODO: 区分环境
     });
   }
 

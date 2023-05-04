@@ -1,5 +1,6 @@
 import React from 'react';
 import { upperFirst } from 'lodash';
+import { C_REPOSITORY } from '@/constants/repository';
 
 export type ITriggerType = 'local' | 'console' | 'webhook';
 
@@ -11,8 +12,8 @@ export enum TriggerTypeLable {
 
 export const triggerIcons = {
   manual: <img className='mr-4' src="https://img.alicdn.com/imgextra/i3/O1CN01QEtrEF1ErzdKCIU02_!!6000000000406-55-tps-16-16.svg" alt="logo" style={{ width: 16, height: 16 }} />,
-  tracker: <img className='mr-4' src="https://img.alicdn.com/imgextra/i2/O1CN016suUeV1ILiBAilAYZ_!!6000000000877-55-tps-16-16.svg" alt="logo" style={{ width: 16, height: 16 }} />,
-  redeploy: <img className='mr-4' src="https://img.alicdn.com/imgextra/i1/O1CN017SFO9D1fIikoMrPDb_!!6000000003984-55-tps-16-16.svg" alt="logo" style={{ width: 16, height: 16 }} />
+  tracker: <img className='mr-4' src="https://img.alicdn.com/imgextra/i1/O1CN01g5BECJ1JR2PGL5E5U_!!6000000001024-55-tps-200-200.svg" alt="logo" style={{ width: 16, height: 16 }} />,
+  redeploy: <img className='mr-4' src="https://img.alicdn.com/imgextra/i3/O1CN01OMFS921GYsKuneK5w_!!6000000000635-55-tps-200-200.svg" alt="logo" style={{ width: 16, height: 16 }} />
 }
 
 interface Props {
@@ -35,5 +36,5 @@ export default ({ trigger }: Props) => {
   if (trigger === 'rollback') {
     return <>{triggerIcons['redeploy']}回滚</>;
   }
-  return <>{`${upperFirst(trigger)} 触发`}</>;
+  return <div className='align-center'>{C_REPOSITORY[trigger as any]?.svg(16)}<span className='ml-4'>{`${upperFirst(trigger)} 触发`}</span></div>;
 };
