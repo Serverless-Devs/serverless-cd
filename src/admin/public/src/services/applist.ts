@@ -4,8 +4,8 @@ export const createApp = async (body) => {
   return await request.post('/api/application/create', body);
 };
 
-export const listApp = async () => {
-  const { data } = await request.get('/api/application/list');
+export const listApp = async (orgName = '') => {
+  const { data } = await request.get(`/api/application/list`, { params: { orgName } });
   return data;
 };
 
