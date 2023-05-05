@@ -22,6 +22,7 @@ const Org: FC<Props> = (props) => {
   const { orgName } = props;
   const orgRequest = useRequest(listOrgs);
   const [dataSource, setDataSource] = useState<any>([]);
+  const [orgValue, setOrgValue] = useState(orgName);
 
   useEffect(() => {
     fetchData();
@@ -46,10 +47,12 @@ const Org: FC<Props> = (props) => {
         value: item.name,
       };
     });
+    isEmpty(dataList) && setOrgValue('')
     setDataSource(dataList);
   };
   const handleChangeOrg = async (value) => {
     const obj = find(dataSource, (item) => item.value === value);
+    setOrgValue(value);
     localStorageSet(obj.user_id, value);
     history?.push('/');
   };
@@ -57,7 +60,7 @@ const Org: FC<Props> = (props) => {
   return (
     <StyledWrapper>
       <Select
-        value={isEmpty(dataSource) ? '' : orgName}
+        value={orgValue}
         style={{ width: 150 }}
         dataSource={dataSource}
         onChange={handleChangeOrg}

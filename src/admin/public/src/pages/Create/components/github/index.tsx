@@ -10,13 +10,13 @@ import {
   Select,
 } from '@alicloud/console-components';
 import { FORM_ITEM_LAYOUT } from '@/constants';
-import { useRequest } from 'ice';
+import { useRequest, Link } from 'ice';
 import AuthDialog from './AuthDialog';
 import Repo from './Repo';
 import Trigger from './Trigger';
 import ConfigEdit from '@/components/ConfigEdit';
 import { PUSH } from '../constant';
-import { get, keys, map } from 'lodash';
+import { get, isEmpty, keys, map } from 'lodash';
 import Submit from '../Submit';
 import TemplateDialog from '../TemplateDialog';
 import { orgDetail } from '@/services/org';
@@ -33,7 +33,7 @@ interface IProps {
 
 const Github = (props: IProps) => {
   const { field, createType, orgName, templateName } = props;
-  const { init, getValue, resetToDefault, validate } = field;
+  const { init, getValue, resetToDefault, validate, setValue } = field;
   const [dialogVisible, setVisible] = useState(false);
   const [templateCreateStatus, setTemplateCreateStatus] = useState('');
   const [repoKey, setRepoKey] = useState(0);
@@ -47,6 +47,11 @@ const Github = (props: IProps) => {
   const [createDisabled, setCreateDisabled] = useState(false);
   const orgDetailRequest = useRequest(orgDetail);
   const cloudData = get(orgDetailRequest.data, 'data.cloud_secret', {});
+  const cloudDataList = map(keys(cloudData), (item) => ({ label: item, value: item }));
+
+  useEffect(() => {
+    !isEmpty(cloudDataList) && setValue('cloud_alias', get(cloudDataList, '[0].value'))
+  }, [JSON.stringify(cloudDataList)])
 
   useEffect(() => {
     orgDetailRequest.request();
@@ -166,12 +171,12 @@ const Github = (props: IProps) => {
 
         <div className="text-bold mt-16 mb-16">环境配置</div>
         <Trigger repo={getValue('repo')} {...(init('trigger') as any)} createTemplate={template} />
-        <FormItem label="关联云账号">
+        <FormItem label="关联云账号" required extra={isEmpty(cloudDataList) ? <div className='mt-4'>请前往 <Link to={`/${orgName}/setting/cloud`}>云账号管理</Link>页面进行配置</div> : ''}>
           <Select
             {...(init('cloud_alias') as any)}
             className="full-width"
             placeholder="请选择"
-            dataSource={map(keys(cloudData), (item) => ({ label: item, value: item }))}
+            dataSource={cloudDataList}
           />
         </FormItem>
         {(specify || template) && (

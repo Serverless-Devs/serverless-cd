@@ -6,7 +6,7 @@ const debug = require('debug')('serverless-cd:middleware-auth');
 
 const checkAppAssociateUser = async (req, _res, next) => {
   const { pathname = '' } = req._parsedUrl;
-  const notCheckPath = ['/application/list', '/application/create', '/application/preview'];
+  const notCheckPath = ['/application/list', '/application/create', '/application/preview', '/application/createByTemplate'];
   if (notCheckPath.includes(pathname)) {
     return next();
   }

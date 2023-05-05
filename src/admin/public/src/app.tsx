@@ -28,7 +28,8 @@ const appConfig: IAppConfig = {
           if (url === '/api/user/info' || url?.startsWith('http')) return config;
           const orgName = get(window, ORG_NAME);
           if (orgName) {
-            config.params = { ...config.params, orgName };
+            const paramsOrgName = get(config.params, 'orgName') || orgName;
+            config.params = { ...config.params, orgName: paramsOrgName };
           }
           return config;
         },
@@ -44,6 +45,10 @@ const appConfig: IAppConfig = {
             return response;
           }
           if (response.data.code === CODE.Forbidden) {
+            history?.push('/noAuth');
+            return response;
+          }
+          if (response.data.code === CODE.NoPermission) {
             history?.push('/noAuth');
             return response;
           }
